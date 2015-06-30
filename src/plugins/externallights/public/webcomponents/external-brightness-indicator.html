@@ -1,0 +1,32 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<polymer-element name="external-brightness-indicator" attributes="">
+  <template>
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/themes/OpenROV/css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
+
+
+    <style>
+    </style>
+
+    <div id="internal_lights_indicator" class="{{internalclass}}" ></div>
+    <div id="external_lights_indicator" class="{{externalclass}}" ></div>
+    
+
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        internal_brightnessLevel: '0',
+        external_brightnessLevel: '0',
+        computed: {
+          internalclass: 'Math.ceil(internal_brightnessLevel*10)',
+          externalclass: 'Math.ceil(external_brightnessLevel*10)'
+        }
+        }
+      })
+    })();
+  </script>
+
+</polymer-element>

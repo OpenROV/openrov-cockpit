@@ -8,18 +8,18 @@
     <style>
     </style>
 
-    <div id="brightnessIndicator" class="{{brightnessLevel}}" ></div>
+    <div id="brightnessIndicator" class="level{{brightnessLevel}}" ></div>
 
   </template>
   <script>
     (function() {
       Polymer({
-        brightnessLevel: 'level0',
+        brightnessLevel: '0',
         domReady: function() {
           var self = this;
 
           window.cockpit.rov.on('plugin.lights.level', function(level) {
-            self.brightnessLevel = level;
+            self.brightnessLevel = Math.ceil(level*10);
           });
         }
       })

@@ -5,6 +5,10 @@ function telemetry(name, deps) {
 
   deps.rov.on('status', function(data){
     for (var i in data) {
+      if (i === 'cmd'){
+        //filter out ping command echos
+        if (data[i].indexOf('ping')>=0) continue;
+      }
       statusdata[i] = data[i];
     }
   });

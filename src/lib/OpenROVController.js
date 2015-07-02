@@ -26,7 +26,7 @@ var OpenROVController = function (eventLoop, client) {
   var controller = this;
   var serial;
   var globalEventLoop = eventLoop;
-  this.physics = new ArduinoHelper();
+  this.physics = new ArduinoHelper().physics;
   this.hardware = new Hardware();
   this.cockpit = client;
 

@@ -2,6 +2,7 @@
   function Laser(name, deps) {
     console.log('Lights plugin loaded');
     var lights = 0;
+    var ArduinoHelper = require('../../lib/ArduinoHelper')();
 
     // Cockpit
     deps.cockpit.on('plugin.lights.toggle', function () {
@@ -15,8 +16,7 @@
     // Arduino
     deps.rov.on('status', function (data) {
       if ('LIGP' in data) {
-        var level = 'level' + Math.ceil(data.LIGP * 10);
-        deps.cockpit.emit('plugin.lights.level', level);
+        deps.cockpit.emit('plugin.lights.level', data.LIGP);
       }
     });
 
@@ -47,7 +47,7 @@
       if (lights < 0)
         lights = 0;
 
-      var command = 'ligt(' + deps.physics.mapLight(value) + ')';
+      var command = 'ligt(' + ArduinoHelper.serial.packPercent(value) + ')';
       deps.rov.send(command);
 
     };

@@ -22,7 +22,7 @@ void ELights::device_setup(){
 void ELights::device_loop(Command command){
 
     if( command.cmp("eligt")){
-      int percentvalue = command.args[1]/100.0; //0 - 255
+      float percentvalue = command.args[1]/100.0; //0 - 255
       int value = 255*percentvalue;
       elight.write(value);
 

@@ -1,5 +1,6 @@
 var OFFSET = 1500;
 var ArduinoHelper = function () {
+  var result = {};
   var physics = {};
   var serial = {};
   var CONFIG = require('./config');
@@ -41,11 +42,13 @@ var ArduinoHelper = function () {
   physics.mapLight = function (value) {
     return mapA(value, 0, 1, 0, 255);
   };
-  return physics;
 
   serial.packPercent = function (value) {
     return Math.floor(value*100);
   }
+  result.serial = serial;
+  result.physics = physics;
+  return result;
 };
 function mapA(x, in_min, in_max, out_min, out_max) {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;

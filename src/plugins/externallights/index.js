@@ -1,7 +1,10 @@
+
 (function() {
   function ExternalLights(name, deps) {
+    var ArduinoHelper = require('../../lib/ArduinoHelper')();
     console.log('ExternalLights plugin loaded');
-    var lights = 0;
+    this.lights = 0;
+    var self=this;
 
     // Cockpit
     deps.cockpit.on('plugin.externalLights.toggle', function () {
@@ -14,46 +17,50 @@
 
     // Arduino
     deps.rov.on('status', function (data) {
-      if ('LIGTE' in data) {
+      if ('LIGPE' in data) {
         //value of 0-1.0 representing percent
-        var level = data.LIGP;
-        lights = level;
+        var level = data.LIGPE;
+        self.lights = level;
         deps.cockpit.emit('plugin.externalLights.level', level);
       }
     });
 
-    var adjustLights = function (value) {
-      if (lights === 0 && value < 0) {
+      var adjustLights = function adjustLights(value) {
+      console.log("adjustLights:" + value);
+      if (this.lights === 0 && value < 0) {
         //this code rounds the horn so to speak by jumping from zero to max and vise versa
-        lights = 0;  //disabled the round the horn feature
-      } else if (lights == 1 && value > 0) {
-        lights = 1;  //disabled the round the horn feature
+        this.lights = 0;  //disabled the round the horn feature
+      } else if (this.lights == 1 && value > 0) {
+        this.lights = 1;  //disabled the round the horn feature
       } else {
-        lights += value;
+        this.lights = parseFloat(value) + parseFloat(this.lights);
       }
-      setLights(lights);
+      setLights(this.lights);
     };
 
-    var toggleLights = function() {
-      if (lights > 0) {
+    var toggleLights = function toggleLights() {
+      if (this.lights > 0) {
         setLights(0);
       } else {
         setLights(1);
       }
     };
 
-    var setLights = function (value) {
-      lights = value;
-      if (lights > 1)
-        lights = 1;
-      if (lights < 0)
-        lights = 0;
+    var setLights = function setLights(value) {
+      console.log("setLights:" + value);
+      this.lights = value;
+      if (this.lights > 1)
+        this.lights = 1;
+      if (this.lights < 0)
+        this.lights = 0;
 
-      var command = 'eligt(' + deps.ArduinoHelper.serial.packPercent(value) + ')';
+      var command = 'eligt(' + ArduinoHelper.serial.packPercent(this.lights) + ')';
       deps.rov.send(command);
 
     };
 
+
   }
+  
   module.exports = ExternalLights;
 })();

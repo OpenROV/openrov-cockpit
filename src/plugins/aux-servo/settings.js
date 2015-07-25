@@ -22,13 +22,13 @@ function settings(deps) {
   self.register = function() {
     self.preferences = getPreferences(deps.config);
 
-    deps.app.get('plugin/aux-servo/config', function (req, res) {
+    deps.app.get('/plugin/aux-servo/config', function (req, res) {
       res.send(self.preferences);
     });
-    deps.app.get('plugin/aux-servo/config/:servo', function (req, res) {
+    deps.app.get('/plugin/aux-servo/config/:servo', function (req, res) {
       res.send(self.preferences[req.params.servo]);
     });
-    deps.app.post('plugin/aux-servo/config/:servo', function (req, res) {
+    deps.app.post('/plugin/aux-servo/config/:servo', function (req, res) {
       self.saveServoConfig(req.body);
       res.status(200);
       res.send(self.preferences[req.params.servo]);

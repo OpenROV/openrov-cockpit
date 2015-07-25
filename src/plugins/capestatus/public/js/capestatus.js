@@ -172,6 +172,12 @@
     });
   };
 
+  capestatus.Capestatus.prototype.UpdateStatusIndicators = function UpdateStatusIndicators(data) {		
+    var self = this;		
+    
+    this.lastPing = new Date();		
+  };
+
   capestatus.Capestatus.prototype.updateConnectionStatus = function () {
     var self = this;
     var now = new Date();

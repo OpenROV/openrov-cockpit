@@ -170,6 +170,7 @@
     this.cockpit.rov.on('status', function (data) {
       capes.UpdateStatusIndicators(data);
     });
+  };
 
   capestatus.Capestatus.prototype.updateConnectionStatus = function () {
     var self = this;

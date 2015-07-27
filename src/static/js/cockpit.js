@@ -22,7 +22,7 @@
       self.extensionPoints = {
         rovSettings: $('html /deep/ rov-settings'),
         rovDiagnostics: $('html /deep/ rov-diagnostics /deep/ #dropIn'),
-        videoContainer: $('html /deep/ rov-video'),
+        videoContainer: $('html /deep/ #video-container1'),
         keyboardInstructions: $('html /deep/ #keyboardInstructions'),
         buttonPanel: $('html /deep/ #buttonPanel'),
         menu: $('html /deep/ rov-menu'),
@@ -81,7 +81,7 @@
       try {
         loadedPlugin = new plugin(cockpit);
       } catch (err) {
-        console.log('error loading a plugin!!!' + err);
+        console.error('error loading a plugin!!!' + err);
       }
       if (loadedPlugin != null && loadedPlugin !== undefined) {
         if (loadedPlugin.canBeDisabled != undefined) {

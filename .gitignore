@@ -38,5 +38,6 @@ node_modules
 src/capture
 temp
 .idea
+.settings
 etc/rovconfig.json
 share

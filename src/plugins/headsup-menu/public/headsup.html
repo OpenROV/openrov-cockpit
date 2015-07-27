@@ -2,22 +2,23 @@
     <div class="heading">Heads-Up Menu</div>
     <div id="headsup-menu-items">
 
-    <script type="text/html" id="menuRow-button">
-        <li>
-            <div class="menuRow" data-bind="attr: { id: $data.uniqueId }">
-                <button class="btn btn-large btn-block" data-bind="text: label, click: callback"></button>
-            </div>
-        </li>
-    </script>
-    <script type="text/html" id="menuRow-custom">
-        <li>
-            <div class="menuRow"  data-bind="attr: { id: $data.uniqueId }">
-                <!-- reference the created template -->
-                <div class="custom-block" data-bind="template: { name: $data.headsUpTemplateId }"></div>
-            </div>
-        </li>
-    </script>
-
+        <div id="headsup-menu-templates">
+            <script type="text/html" id="menuRow-button">
+                <li>
+                    <div class="menuRow" data-bind="attr: { id: $data.uniqueId }">
+                        <button class="btn btn-large btn-block" data-bind="text: label, click: callback"></button>
+                    </div>
+                </li>
+            </script>
+            <script type="text/html" id="menuRow-custom">
+                <li>
+                    <div class="menuRow"  data-bind="attr: { id: $data.uniqueId }">
+                        <!-- reference the created template -->
+                        <div class="custom-block" data-bind="template: { name: $data.headsUpTemplateId }"></div>
+                    </div>
+                </li>
+            </script>
+        </div>
         <ul class="unstyled" data-bind="template: { name: getTemplateName, foreach: enabledItems, as: 'item' }" />
     </div>
 </div>

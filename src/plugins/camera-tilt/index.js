@@ -1,7 +1,9 @@
 (function() {
-  function Laser(name, deps) {
+  function CameraTilt(name, deps) {
+    var ArduinoHelper = require('../../lib/ArduinoHelper')();
     console.log('Camera tilt plugin loaded');
     var tilt = 0;
+    var physics = ArduinoHelper.physics;
 
     // Cockpit
     deps.cockpit.on('plugin.cameraTilt.set', function (angle) {
@@ -27,7 +29,7 @@
       if (tilt < -1)
         tilt = -1;
 
-      var servoTilt = deps.physics.mapTiltServo(tilt);
+      var servoTilt = physics.mapTiltServo(tilt);
       var command = 'tilt(' + servoTilt + ')';
 
       deps.rov.send(command);
@@ -38,5 +40,5 @@
       setCameraTilt(tilt);
     };
   }
-  module.exports = Laser;
+  module.exports = CameraTilt;
 })();

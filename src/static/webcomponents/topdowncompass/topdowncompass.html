@@ -10,6 +10,7 @@
 
     <div id="compass" class="topdowncompass pull-left">
       <div id="needle" class="compassNeedle"></div>
+      <div id="readout" class=""></div>
     </div>
 
   </template>
@@ -41,12 +42,11 @@
             "-ms-transform" : "rotate(" + (this.heading) + "deg)",
             "-webkit-transform" : "rotate(" + (this.heading) + "deg)"
           })
+
+          this.$.readout.innerText = degrees;
         }
       });
     })();
   </script>
 
 </polymer-element>
-  
-
-

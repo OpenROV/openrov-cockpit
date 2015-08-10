@@ -5,14 +5,14 @@
  *
  * Description:
  * This module starts the video-server.js file in the root to mock a video stream.
- *  
+ *
  * License
  * This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported License.
  * To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/ or send a
  * letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
  *
  */
-var fork = require('child_process').fork, EventEmitter = require('events').EventEmitter, fs = require('fs'), path = require('path'), CONFIG = require('./config'), logger = require('./logger').create(CONFIG);
+var spawn = require('child_process').spawn, EventEmitter = require('events').EventEmitter, fs = require('fs'), path = require('path'), CONFIG = require('./config'), logger = require('./logger').create(CONFIG);
 var OpenROVCamera = function (options) {
   var camera = new EventEmitter();
   var _capturing = false;
@@ -26,7 +26,7 @@ var OpenROVCamera = function (options) {
   };
   // Actual camera capture function
   camera.capture = function (callback) {
-    captureProcess = fork(path.join(__dirname, 'mock-video-server.js'));
+    captureProcess = spawn('node',[path.join(__dirname, 'mock-video-server.js')]);
     captureProcess.on('exit', function (code, signal) {
       logger.log('Got \'exit\' message from camera child. Code: ' + code);
     });

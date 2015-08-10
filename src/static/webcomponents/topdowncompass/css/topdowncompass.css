@@ -18,3 +18,12 @@
     -o-transition: 100ms ease-in-out;
     transition: 100ms ease-in-out;
 }
+
+#readout{
+    position: absolute;
+    width: 61px;
+    top: 0px;
+    line-height: 76px;
+    vertical-align: middle;
+    text-align: center;
+}

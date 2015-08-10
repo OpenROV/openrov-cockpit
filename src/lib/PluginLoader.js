@@ -1,6 +1,14 @@
 var fs = require('fs');
 var path = require('path');
 
+if (typeof path.existsSync === 'undefined'){
+  //forward compatibiltiy to node 12+ from 10. Remove
+  //once the beaglebone node is moved to v12
+  //by changing the path to fs where existsSync
+  //is used
+  path.existsSync = fs.existsSync;
+}
+
 var PluginLoader = function() {
   var self = this;
 

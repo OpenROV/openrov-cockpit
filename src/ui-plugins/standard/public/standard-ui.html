@@ -52,7 +52,7 @@
     <!--        <rov-video>
             </rov-video>
     -->
-            <mjpeg-video src='/cockpit/camera1'  border='1' style='width: 100%; height:100%' menuState='on'></mjpeg-video>
+            <mjpeg-video id="camera1" src='/cockpit/camera1'  border='1' style='width: 100%; height:100%' menuState='on'></mjpeg-video>
             <video-compass></video-compass>
             <rov-horizon id="horizon"></rov-horizon>
 
@@ -112,6 +112,9 @@
       },
       getNavBar: function() {
         return($(this.$.navtoolbar))
+      },
+      configure: function(config) {
+        this.$.camera1.src=config.video_url;
       }
     })
   </script>

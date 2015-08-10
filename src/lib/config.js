@@ -51,7 +51,8 @@ nconf.defaults({
   'serial': '/dev/ttyO1',
   'serial_baud': 115200,
   'dashboardURL': '',
-  'USE_MOCK' : false
+  'USE_MOCK' : false,
+  'video_url' : '/cockpit/camera1'
 });
 
 function savePreferences() {
@@ -83,6 +84,7 @@ module.exports = {
   video_resolution: nconf.get('video_resolution'),
   video_device: nconf.get('video_device'),
   video_port: nconf.get('video_port'),
+  video_url: nconf.get('video_url'),
   port: nconf.get('port'),
   serial: nconf.get('serial'),
   serial_baud: nconf.get('serial_baud'),

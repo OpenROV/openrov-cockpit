@@ -7,6 +7,10 @@
 
   };
 
+  plugins.Lights.prototype.getTelemetryDefintions = function getTelemetryDefintions() {
+    return([{name: 'LIGP', description: 'Internal lights percent of power'}]);
+  }
+
   //This pattern will hook events in the cockpit and pull them all back
   //so that the reference to this instance is available for further processing
   plugins.Lights.prototype.listen = function listen() {

@@ -1,5 +1,5 @@
 var http = require('http'), fs = require('fs'), path = require('path'), CONFIG = require('../lib/config');
-var options = { delay: 33 };
+var options = { delay: 1000 };
 var response;
 var mockImages = [];
 var lastImageIndex = 0;

@@ -108,7 +108,7 @@ function Hardware() {
   }, 1000);
   setInterval(sendEvent, 3000);
   function sendEvent() {
-    var data = 'vout:9.9;iout:0.2;BT1I:0.3;BT2I:0.5';
+    var data = 'vout:9.9;iout:0.2;BT.1.I:0.3;BT.2.I:0.5;BNO055.enabled:true;BNO055.test1.pid:passed;BNO055.test2.zzz:passed;';
     var status = reader.parseStatus(data);
     hardware.emit('status', status);
   }

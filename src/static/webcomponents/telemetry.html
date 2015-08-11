@@ -2,20 +2,99 @@
 
 <polymer-element name="telemetry-monitor" attributes="maxLines">
   <template>
-    <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../themes/OpenROV/css/style.css">
     <style>
+    ::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 7px;
+    }
+    ::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background-color: rgba(200,200,200,.5);
+        -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+    }
       .well {
         background-color: black;
         color: white;
       }
+      ol.tree
+      {
+      	padding: 0 0 0 30px;
+      	width: 100%;
+      }
+      	li
+      	{
+      		position: relative;
+      		margin-left: -15px;
+      		list-style: none;
+      	}
+        li.tpoint
+        {
+          background: url('data:image/jpeg;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAYdJREFUeNqMksFqwkAQhmc3W4q0OSq09170LdJzb32IvkQVpIeeS6Gehdz6AkUoePOYe71VEBGiVkUxyaYzY9bENIYuTDbZ3f/b+Wci7ptNoCGEuMPpCsrHp9Z6qKMI4jjmBWVecL7utlqdHW4GFFpDhHtm3/M86PZ6D3QXxpchSqIlITSJgoBjt93CZr2G1WoFy+WS5/d2u4PnblF3YwAqQnEyBKElPs8sK006DCFEsO/78Oq64NTrby+u+4g7TwzQKUCSWDIG/kAcx2E7tm3Dh+fNDhmE2QwygCIIZcKvaDe1gBt5C9mRh9AlqCkE7C1ICZDcVASx9gCZWsgADhmUQCycwxMArgHXYZ9PIcTC9fDIAvY8nwHJTkHYQhCcsEAZYKvKIIJrmbGwGI/holo96oIugdC6sbCeTkEO+33wRyP6bVVSCD5kYOabumPW6SxpSEsXVL4Hg9piNjvPVPMgoKJRKCygUoq7QGdJQ1q6tYJR+5lM5peNxjP8Y+jNZk4aKsevAAMAmFzedjV8x2YAAAAASUVORK5CYII=') 0 0 no-repeat;
+          color: #fff;
+          padding-left: 21px;
+          text-decoration: none;
+        /*  display: block;*/
+        }
+      	li.file
+      	{
+      		margin-left: -1px !important;
+      	}
+      		li.file a
+      		{
+      			background: url('data:image/jpeg;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAYdJREFUeNqMksFqwkAQhmc3W4q0OSq09170LdJzb32IvkQVpIeeS6Gehdz6AkUoePOYe71VEBGiVkUxyaYzY9bENIYuTDbZ3f/b+Wci7ptNoCGEuMPpCsrHp9Z6qKMI4jjmBWVecL7utlqdHW4GFFpDhHtm3/M86PZ6D3QXxpchSqIlITSJgoBjt93CZr2G1WoFy+WS5/d2u4PnblF3YwAqQnEyBKElPs8sK006DCFEsO/78Oq64NTrby+u+4g7TwzQKUCSWDIG/kAcx2E7tm3Dh+fNDhmE2QwygCIIZcKvaDe1gBt5C9mRh9AlqCkE7C1ICZDcVASx9gCZWsgADhmUQCycwxMArgHXYZ9PIcTC9fDIAvY8nwHJTkHYQhCcsEAZYKvKIIJrmbGwGI/holo96oIugdC6sbCeTkEO+33wRyP6bVVSCD5kYOabumPW6SxpSEsXVL4Hg9piNjvPVPMgoKJRKCygUoq7QGdJQ1q6tYJR+5lM5peNxjP8Y+jNZk4aKsevAAMAmFzedjV8x2YAAAAASUVORK5CYII=') 0 0 no-repeat;
+      			color: #fff;
+      			padding-left: 21px;
+      			text-decoration: none;
+      			display: block;
+      		}
+      		li.file a[href *= '.pdf']	{ background: url(document.png) 0 0 no-repeat; }
+      		li.file a[href *= '.html']	{ background: url(document.png) 0 0 no-repeat; }
+      		li.file a[href $= '.css']	{ background: url(document.png) 0 0 no-repeat; }
+      		li.file a[href $= '.js']		{ background: url(document.png) 0 0 no-repeat; }
+      	li input
+      	{
+      		position: absolute;
+      		left: 0;
+      		margin-left: 0;
+      		opacity: 0;
+      		z-index: 2;
+      		cursor: pointer;
+      		height: 1em;
+      		width: 1em;
+      		top: 0;
+      	}
+      		li input + ol
+      		{
+      			background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAURJREFUeNpi/P//PwMlgImBQkCxASwwRlLLKwYmJqZgRkbGbiBXEYva+0Dvlv7792/tvBoxTAO+fv0MororE6UU9VU5MHRfvP1DsX3+M5DhaxkYxDC98ObNGxBW1FVmY/j16xcYu6SdYvjw4QPDixcvGGSEvoLlQeqweuHdu7dg+vfv32D85ctXsNijR4/B4hwcnHA1WA348uUbmP779y+DUchOuIKQsltgetsUE7garAb8/w9h/vz5h+H0Sk8w2yRsN8OZVa5g9ocPn+BqsBrAzs4PdQEzw48ff+Fi375B2Gxs3HA1WNPB45NlDNzcIvfPXv8LVMwJxmdWOcDZF2//A8uD1GF1wefXZ8Q+Pt42oWN+VBED41d5DKv+/30IlJ8IVCcF5D2DCTPC8gIwAXEDKT4Qk0Di+wzU8xnDgKGbmQACDAAtTZadqmiADQAAAABJRU5ErkJggg==') 40px 0 no-repeat;
+      			margin: -0.938em 0 0 -44px; /* 15px */
+      			height: 1em;
+      		}
+      		li input + ol > li { display: none; margin-left: -14px !important; padding-left: 1px; }
+      	li label
+      	{
+      		background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAATNJREFUeNqkk71KA1EQhc/dOxsbEYukVYm9jQg+hz6CYGkrBNsEKwtrX0EfwU4UVFDLFWSDlYGAGszP3p91ZlNpdoVrBg572bnf2ZlhR+V5jnmCbo9VZTJS2ODHbkX63Od4Ij7ssdbKbvAFbB76o2GWYTAe42sywX7aQL8/xNnjYsRXttR1G+3tg4tW7twPWGmNXvJcnBvrzRlzyd+c7nTIeWjPXxD9jjqDb0mC9O6+tAdhpwbWQDTTwsCgvrpSCksFr1dsYAsDC1diUETFe11bgC0qcCBnMoiCQikIS9ZxBcawgQnkIwgrBiT9h1YQRYUBkfFTA2/DKvA8RGGJ5xf/OcSK0JogLH2MsCS/VKzjsBZYwtJDiu7nSevyP4v00kNXNqnGWpbFCuQt613Nu87fAgwAb3KTD1NdyNYAAAAASUVORK5CYII=') 15px 1px no-repeat;
+      		cursor: pointer;
+      		display: block;
+      		padding-left: 37px;
+      	}
+
+      	li input:checked + ol
+      	{
+      		background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAASxJREFUeNpi/P//PwMlgImBQkCxASwwRlLLKwYmJqZgRkbGbiBXEYva+0Dvlv7792/tvBoxTAO+fv0MororE6UU9VU5MHRfvP1DsX3+M5DhaxkYsBjw5s0bEKWoq6zA8OvXL7AYKIC/f//O8OPHDwYZIVaQGqjLlDENePfuLZj+/fs3GH/58pXh/fv3YDYIcHBwwtVgDYMvX76B6b9//zIYhezEULhtiglcDVYD/v+HMH/+/MNweqUnhsIPHz7B1WA1gJ2dH+oCZqCf/2IoZGPjhqvBmg4enyxj4OYWuX/2+l+gYk4MfPH2P7A8SB1WF3x+fUbs4+NtEzrmRxUxMH6Vx7Dq/9+HQPmJQHVSQN4zmDAjLC8AExA3kOIDMQkkvs9APZ8xDBi6mQkgwADDMYZH9Ls66AAAAABJRU5ErkJggg==') 40px 5px no-repeat;
+      		margin: -1.25em 0 0 -44px; /* 20px */
+      		padding: 1.563em 0 0 80px;
+      		height: auto;
+      	}
+      	li input:checked + ol > li { display: block; margin: 0 0 0.125em;  /* 2px */}
+      	li input:checked + ol > li:last-child { margin: 0 0 0.063em; /* 1px */ }
     </style>
 
-    <div class="controller well well-small">
-      <ul>
-        <li id="TelemetryList">
+    <div class="controller well well-small" style="overflow-y: scroll;height: 100%;">
+      <div id="ImportantList"></div>
+      <ol id="TelemetryList">
+        <li>default item
         </li>
-      </ul>
+      </ol>
     </div>
 
 
@@ -26,6 +105,7 @@
       Polymer({
         telemetry: {},
         importantTelemetry: {},
+        expandedTelemetry: {},
         textcolor: 0,
         ready: function () {
           var self = this;
@@ -39,6 +119,7 @@
         domReady: function () {
           var self = this;
           this.list = $(this.$.TelemetryList);
+          this.ilist = $(this.$.ImportantList);
           self.telemetryList = this.list.length > 0 ? this.list[0] : undefined;
 
           if (self.telemetryList) {
@@ -53,7 +134,15 @@
         },
         logStatusData: function (data) {
           for (var i in data) {
-            this.telemetry[i] = data[i];
+            var ns = i.split('.');
+            var t = this.telemetry;
+            for (var j=0;j<ns.length-1;j++){
+              if (t[ns[j]]===undefined){
+                t[ns[j]]={};
+              }
+              t=t[ns[j]]; //set t to the namespace splitted in by ., such as bno055.test.first
+            }
+            t[ns[ns.length-1]] = data[i];
           }
         },
       cycleTextColor: function() {
@@ -68,8 +157,11 @@
           }
         },
         handleDescendantEvent: function(e) {
-          if (e.type == 'click' && e.eventPhase == Event.CAPTURING_PHASE) {
-            var telemetry_name = e.target.innerText.split(' ')[0];
+          if (e.type == 'click' && e.eventPhase == Event.CAPTURING_PHASE && e.srcElement.nodeName=='INPUT'){
+            this.expandedTelemetry[e.srcElement.id]=e.srcElement.checked;
+          }
+          if (e.type == 'click' && e.eventPhase == Event.CAPTURING_PHASE && e.srcElement.nodeName=='LI')  {
+            var telemetry_name = e.srcElement.id;
             if (this.importantTelemetry[telemetry_name] === true) {
               this.importantTelemetry[telemetry_name] = false;
             } else {
@@ -79,28 +171,74 @@
         },
         displayTelemetry: function () {
           var fragment = document.createDocumentFragment();
-          for (var item in this.telemetry) {
-            if (this.telemetry.hasOwnProperty(item)) {
+          var impfragment = document.createDocumentFragment();
+          var expTelemetry = this.expandedTelemetry;
+          var impTelemetry = this.importantTelemetry;
+          var updateTelemetry=function(telemetry_point,fragment,impfragment,name,fqn){
+
+            if(typeof telemetry_point === 'object'){
               var li = document.createElement('LI');
-              li.appendChild(document.createElement('SPAN').appendChild(document.createTextNode(item + ' ')));
-              li.appendChild(document.createElement('SPAN').appendChild(document.createTextNode(this.telemetry[item])));
-              //if (this.importantTelemetry.hasOwnProperty(item)) {
-              if (this.importantTelemetry[item] === true) {
-                li.setAttribute('class', 'important');
+              var lbl = document.createElement('label');
+              lbl.appendChild(document.createTextNode(name));
+              lbl.setAttribute('for',fqn);
+              li.appendChild(lbl);
+              var cb =document.createElement('input');
+              cb.setAttribute('type','checkbox');
+              cb.setAttribute('id',fqn);
+              if(expTelemetry[fqn]!==undefined && expTelemetry[fqn]==true){
+                cb.setAttribute('checked','checked');
+              }
+              li.appendChild(cb);
+              var ol = document.createElement('OL');
+              li.appendChild(ol);
+
+              if(name!==null){
+                fragment.appendChild(li);
+              } else {
+                //this is the root Node
+                ol = fragment;
+              }
+              var tp = Object.keys(telemetry_point).sort();
+              for (var i=0;i<tp.length;i++) {
+                if (telemetry_point.hasOwnProperty(tp[i])) {
+                  updateTelemetry(telemetry_point[tp[i]],ol,impfragment,tp[i],fqn+'-'+tp[i]);
+                }
+              }
+            } else {
+
+              var li = document.createElement('LI');
+              li.setAttribute('class','tpoint');
+              li.setAttribute('id',fqn);
+              li.appendChild(document.createElement('SPAN').appendChild(document.createTextNode(name + ' = ')));
+              li.appendChild(document.createElement('SPAN').appendChild(document.createTextNode(telemetry_point)));
+              if (impTelemetry[fqn] === true) {
+                li.className+=' important';
+
+                var di2 = document.createElement('DIV');
+                di2.appendChild(document.createElement('SPAN').appendChild(document.createTextNode(fqn + ' = ')));
+                di2.appendChild(document.createElement('SPAN').appendChild(document.createTextNode(telemetry_point)));
+                impfragment.appendChild(di2);
               }
               fragment.appendChild(li);
+
             }
-          }
+          };
+
+
+          updateTelemetry(this.telemetry,fragment,impfragment,null,'t');
+
           this.list.empty();
           if (this.list.length > 0) {
             this.list[0].appendChild(fragment.cloneNode(true));
           }
+
+          this.ilist.empty();
+          if (this.ilist.length > 0) {
+            this.ilist[0].appendChild(impfragment.cloneNode(true));
+          }
         }
-      });
+      })
     })();
   </script>
 
 </polymer-element>
-  
-
-

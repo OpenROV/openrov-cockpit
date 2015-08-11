@@ -35,6 +35,12 @@
       ]);
   };
 
+  plugins.CameraTilt.prototype.getTelemetryDefintions = function getTelemetryDefintions() {
+    return([
+      {name: 'servo', description: 'Camera tilt reported in microseconds'},
+      {name: 'starg', description: 'Target camera tilt reported in microseconds'}
+    ]);
+  }
   //This pattern will hook events in the cockpit and pull them all back
   //so that the reference to this instance is available for further processing
   plugins.CameraTilt.prototype.listen = function listen() {

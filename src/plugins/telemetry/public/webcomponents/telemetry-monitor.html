@@ -1,6 +1,6 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
+<!--link rel="import" href="../bower_components/polymer/polymer.html"-->
 
-<polymer-element name="telemetry-monitor" attributes="maxLines">
+<polymer-element name="telemetry-monitor" attributes="maxLines,define">
   <template>
     <style>
     ::-webkit-scrollbar {
@@ -106,15 +106,9 @@
         telemetry: {},
         importantTelemetry: {},
         expandedTelemetry: {},
+        titles: {},
         textcolor: 0,
         ready: function () {
-          var self = this;
-          window.cockpit.rov.on('plugin.telemetry.cycleTextColor', function () {
-            self.cycleTextColor();
-          });
-          window.cockpit.rov.on('plugin.telemetry.logData', function (data) {
-            self.logStatusData(data);
-          });
         },
         domReady: function () {
           var self = this;
@@ -124,6 +118,9 @@
 
           if (self.telemetryList) {
             self.telemetryList.addEventListener('click', function (e) {
+              self.handleDescendantEvent(e);
+            }, true);
+            self.telemetryList.addEventListener('mouseover', function (e) {
               self.handleDescendantEvent(e);
             }, true);
           }
@@ -168,13 +165,27 @@
               this.importantTelemetry[telemetry_name] = true;
             }
           }
+          if (e.type == 'mouseover' && e.eventPhase == Event.CAPTURING_PHASE && e.srcElement.nodeName=='LI')  {
+            var telemetry_name = e.srcElement.id.substring(2);
+            if(typeof this.define !== undefined ){
+              var titles = this.titles;
+              if(this.titles[telemetry_name] === undefined) {
+                this.define(telemetry_name,function(data){
+                  titles[data.name]=data.description || '';
+                });
+              }
+            }
+          }
+
+
         },
         displayTelemetry: function () {
           var fragment = document.createDocumentFragment();
           var impfragment = document.createDocumentFragment();
           var expTelemetry = this.expandedTelemetry;
           var impTelemetry = this.importantTelemetry;
-          var updateTelemetry=function(telemetry_point,fragment,impfragment,name,fqn){
+          var titles = this.titles;
+          var updateTelemetry=function(telemetry_point,fragment,impfragment,name,fqn,titles){
 
             if(typeof telemetry_point === 'object'){
               var li = document.createElement('LI');
@@ -201,21 +212,27 @@
               var tp = Object.keys(telemetry_point).sort();
               for (var i=0;i<tp.length;i++) {
                 if (telemetry_point.hasOwnProperty(tp[i])) {
-                  updateTelemetry(telemetry_point[tp[i]],ol,impfragment,tp[i],fqn+'-'+tp[i]);
+                  updateTelemetry(telemetry_point[tp[i]],ol,impfragment,tp[i],fqn+'-'+tp[i],titles);
                 }
               }
             } else {
-
+              var titlename = fqn.substring(2);
               var li = document.createElement('LI');
               li.setAttribute('class','tpoint');
               li.setAttribute('id',fqn);
+              if(titles[titlename] !== undefined){
+                li.setAttribute('title',titles[titlename]);
+              }
               li.appendChild(document.createElement('SPAN').appendChild(document.createTextNode(name + ' = ')));
               li.appendChild(document.createElement('SPAN').appendChild(document.createTextNode(telemetry_point)));
               if (impTelemetry[fqn] === true) {
                 li.className+=' important';
 
                 var di2 = document.createElement('DIV');
-                di2.appendChild(document.createElement('SPAN').appendChild(document.createTextNode(fqn + ' = ')));
+                if(titles[titlename] !== undefined){
+                  di2.setAttribute('title',titles[titlename]);
+                }
+                di2.appendChild(document.createElement('SPAN').appendChild(document.createTextNode(fqn.substring(2) + ' = ')));
                 di2.appendChild(document.createElement('SPAN').appendChild(document.createTextNode(telemetry_point)));
                 impfragment.appendChild(di2);
               }
@@ -225,7 +242,7 @@
           };
 
 
-          updateTelemetry(this.telemetry,fragment,impfragment,null,'t');
+          updateTelemetry(this.telemetry,fragment,impfragment,null,'t',titles);
 
           this.list.empty();
           if (this.list.length > 0) {

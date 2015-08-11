@@ -9,7 +9,7 @@
 <link rel="import" href="../../webcomponents/video-compass.html">
 <link rel="import" href="../../webcomponents/ping.html">
 <link rel="import" href="../../webcomponents/serial-monitor.html">
-<link rel="import" href="../../webcomponents/telemetry.html">
+<link rel="import" href="../../plugin/telemetry/webcomponents/telemetry-monitor.html">
 <link rel="import" href="./webcomponents/capestatus-footer.html">
 <link rel="import" href="./webcomponents/connection-health.html">
 <link rel="import" href="./webcomponents/servo-tilt.html">
@@ -99,9 +99,27 @@
   <script>
     Polymer({
       domReady: function() {
+        var self = this;
         var bodyWidth = $(this.$.newuiBody).innerWidth();
         var controlpadWidth = $(this.$.newuiControlpad).innerWidth();
         $(this.$.newuiVideo).width(bodyWidth - controlpadWidth);
+
+        /*  This is a good place to link up the controls to the larger
+            page concerns.  If the UI composition stays a control, we
+            should really pass in the depenecies so that we don't have
+            to directly access the window global object space as children
+            objects should never know about their parent containers.
+        */
+
+        window.cockpit.rov.on('plugin.telemetry.cycleTextColor', function () {
+          self.$.telemetry.cycleTextColor();
+        });
+        window.cockpit.rov.on('plugin.telemetry.logData', function (data) {
+          self.$.telemetry.logStatusData(data);
+        });
+        self.$.telemetry.define = function(name,callback){
+          window.cockpit.rov.emit('telemetry.getDefinition',name,callback);
+        };
       },
       setMenu: function(menuItem) {
         menuItem.appendTo($(this.$.menu));

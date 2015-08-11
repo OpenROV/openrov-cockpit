@@ -7,6 +7,7 @@
     this.cockpit = cockpit;
     this.importantTelemetry = {};
     this.textcolor = 0;
+    this.definitions = {};
     // Add required UI elements
     cockpit.extensionPoints.keyboardInstructions.append('<p><i>h</i> to cycle text color of telemetry</p>');
   };
@@ -21,6 +22,33 @@
         defaults: { keyboard: 'h' },
         down: function() { cockpit.rov.emit('plugin.telemetry.cycleTextColor'); }
       });
+
+    self.cockpit.rov.on('telemetry.getDefinition',function(name,callback){
+      if (self.definitions[name]!==undefined){
+        callback(self.definitions[name]);
+      } else {
+        callback({name: name});
+      }
+    });
+
+    self.cockpit.rov.on('telemetry.registerDefinition',function(data){
+      if('name' in data){
+        self.definitions[data.name]=data;
+      }
+    });
+
+    /* Crawl the plugins looking for those with telemetry definitions */
+    self.cockpit.loadedPlugins.forEach(function(plugin){
+      var defobject = self.definitions;
+      if (plugin.getTelemetryDefintions !== undefined){
+        plugin.getTelemetryDefintions().forEach(function(data){
+          if('name' in data){
+            defobject[data.name]=data;
+          }
+        });
+      }
+    });
+
 
   };
   window.Cockpit.plugins.push(Telemetry);

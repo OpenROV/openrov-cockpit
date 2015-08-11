@@ -7,6 +7,12 @@
 
   };
 
+  plugins.ExternalLights.prototype.getTelemetryDefintions = function getTelemetryDefintions() {
+    return([
+      {name: 'claser', description: 'Scaling Laser power 0 to 255'}
+    ]);
+  }
+
   //This pattern will hook events in the cockpit and pull them all back
   //so that the reference to this instance is available for further processing
   plugins.Laser.prototype.listen = function listen() {

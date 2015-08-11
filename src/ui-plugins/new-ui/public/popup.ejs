@@ -28,13 +28,15 @@
 
 <body>
 
-<<%= uiElement %>></<%= uiElement %>>
+<<%= uiElement %> id="<%= uiId %>"></<%= uiElement %>>
 
   <script>
     var socket = window.io.connect();
     window.cockpit = {
       rov: new window.MessageManager(socket, this)
     }
+
+    <%- scriptBlock %>
   </script>
 
 </body>

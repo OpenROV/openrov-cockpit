@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <!-- The following viewport code is intended to fullscreen the cockpit and prevent scrolling -->
+    <meta id="Viewport" name="viewport" width="initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <script type='text/javascript' src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script type='text/javascript' src="bower_components/jquery-ui//jquery-ui.min.js"></script>
+
+    <title>TEST</title>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/bootstrap-responsive.css" rel="stylesheet">
+        <link href="css/ui-lightness/jquery-ui-1.8.23.custom.css" rel="stylesheet" />
+    <% for(var i=0; i<styles.length; i++) {%>
+    <link rel="stylesheet" href="<%= styles[i] %>"><% } %>
+    <script type="text/javascript" src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
+    <link rel="import" href="bower_components/polymer/polymer.html">
+
+  <% for(var i=0; i<sysscripts.length; i++) {%>
+  <script type="text/javascript" src="<%= sysscripts[i] %>"></script><% } %>
+
+  <!--
+  <% for(var i=0; i<scripts.length; i++) {%>
+  <script type="text/javascript" src="<%= scripts[i] %>"></script><% } %>
+-->
+  <script type="text/javascript" src="js/no-scroll-fullscreen-viewport.js"></script>
+  </head>
+  <body>
+  <template id="t" is="auto-binding">
+  <link rel="import" href="bower_components/mjpeg-video-webcomponents/mjpeg-video.html">
+  <link rel="import" href="plugin/camera-tilt/webcomponents/servo-tilt.html">
+
+<!-- define the overall page layout with named sections. -->
+      <div id="header">
+        <div class="navbar-inner">
+          <a class="brand" href="#">
+            <img src="../../themes/OpenROV/img/openrov.png" class="logo"/>
+            <span class="navbar-title">Cockpit</span>
+          </a>
+        </div>
+      </div>
+
+
+      <!-- Main ROW -->
+      <div id="main-row">
+        <div id="system-panel">      
+          <servo-tilt servoAngle="{{plugin_cameraTilt_angle}}" />
+        </div>
+        <div id="nav-display" class="important zoomed" ref-to="asdf" ></div>
+        <div id="primary-flight-display"></div>
+        <div id="standy-flight-display"></div>
+        <div id="warning-display"></div>
+        <div id="systems-display"></div>
+        <div id="flight-control-state"></div>
+        <div id="multipurpose-display"></div>
+        <div id="flight-control-unit"></div>
+        <div id="data-control-unit"></div>
+        <div id="camera-display">
+          <mjpeg-video id="camera1" src='<%= config.video_url %>'  border='1' style='width: 100%; height:100%' menuState='on'></mjpeg-video>
+          <rov-horizon id="horizon"></rov-horizon>
+        </div>
+      </div>
+ </template>
+ <script type="text/javascript" src="js/libs/eventemitter2.js"></script>
+ <script type='text/javascript' src="socket.io/socket.io.js"></script>
+
+  <script type='text/javascript' src='js/message-manager.js'></script>
+ <script type="text/javascript" src="js/cockpit.js"></script>
+ <script type="text/javascript" src="js/app.js"></script>
+ <script type="text/javascript" src="plugin/theme_r2/js/theme_r2_index.js"></script>
+
+</body>
+</html>

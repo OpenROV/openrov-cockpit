@@ -115,6 +115,7 @@ function Hardware() {
 
   var currentDepth = 0;
   var currentHeading = 0;
+  var currentServo = 1500;
   var interval = setInterval(function() {
     currentDepth += 0.5;
     hardware.emit('status', reader.parseStatus('deap:' + currentDepth));
@@ -128,6 +129,11 @@ function Hardware() {
       currentHeading = 0;
     }
 
+    currentServo +=50;
+    hardware.emit('status', reader.parseStatus('servo:' + currentServo));
+    if (currentServo >= 2000) {
+      currentServo = 1000;
+    }
   }, 2000);
 
 

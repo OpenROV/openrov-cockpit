@@ -51,10 +51,13 @@ app.get('/config.js', function (req, res) {
   res.send('var CONFIG = ' + JSON.stringify(CONFIG));
 });
 app.get('/', function (req, res) {
-  res.render('index', {
+  var view =  __dirname + '/plugins/theme_r2/index.ejs'
+  res.render(view, {
     title: 'OpenROV Cockpit',
     scripts: scripts,
-    styles: styles
+    styles: styles,
+    sysscripts: sysscripts,
+    config: CONFIG
   });
 });
 //socket.io cross domain access
@@ -168,6 +171,34 @@ function addPluginAssets(result) {
   });
 }
 var loader = new PluginLoader();
+
+/*Order does matter in the script loading below*/
+var sysscripts = [];
+
+/*
+var sysscripts = ["bogus",
+          "js/libs/eventemitter2.js",
+           "bower_components/jquery/dist/jquery.min.js",
+           "bower_components/jquery-ui//jquery-ui.min.js",
+           "js/libs/bootstrap.min.js",
+           "js/libs/mousetrap.min.js",
+           'bower_components/knockoutjs/dist/knockout.js',
+           "bower_components/knockout.validation/Dist/knockout.validation.js",
+           'js/knockout-extentions.js',
+           'js/libs/db.js',
+           "js/libs/IndexedDBShim.min.js",
+           "config.js",
+           "socket.io/socket.io.js",
+           'js/libs/gamepad.js',
+           'js/utilities.js',
+           'js/message-manager.js',
+    //       'js/ui-loader.js',
+           "js/cockpit.js",
+           'js/app.js'
+         ];
+*/
+//
+//            "bower_components/webcomponentsjs/webcomponents.min.js",
 loader.loadPlugins(path.join(__dirname, 'ui-plugins'), 'ui-plugin', deps, addPluginAssets);
 loader.loadPlugins(path.join(__dirname, 'system-plugins'), 'system-plugin', deps, addPluginAssets);
 loader.loadPlugins(path.join(__dirname, 'plugins'), 'plugin', deps, addPluginAssets);
@@ -180,5 +211,3 @@ controller.start();
 server.listen(app.get('port'), function () {
   console.log('Started listening on port: ' + app.get('port'));
 });
-
-

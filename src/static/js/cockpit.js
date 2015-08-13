@@ -12,12 +12,32 @@
   //Cockpit is inheriting from EventEmitter2.
   var Cockpit = function Cockpit(csocket) {
     var self = this;
-    this.uiLoader = new window.UiLoader();
+//    this.uiLoader = new window.UiLoader();
     this.rov = new window.MessageManager(csocket);
+    var onevent = csocket.onevent;
+    csocket.onevent = function (packet) {
+        var args = packet.data || [];
+        onevent.call (this, packet);    // original call
+        switch(args.length){
+          case 1: self.rov.emit(args.shift());      // additional call to catch-all
+          break;
+          case 2: self.rov.emit(args.shift(),args.shift());      // additional call to catch-all
+          break;
+          case 3: self.rov.emit(args.shift(),args.shift(),args.shift());
+          break;
+          case 4: self.rov.emit(args.shift(),args.shift(),args.shift(),args.shift());
+          break;
+          case 5: self.rov.emit(args.shift(),args.shift(),args.shift(),args.shift(),args.shift());
+          break;
+          case 6: self.rov.emit(args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift());
+          break;
+        }
+    };
+
     this.sendUpdateEnabled = true;
     this.capabilities = 0;
     this.loadedPlugins = [];
-
+/*
     this.loadUiTheme(function() {
       self.extensionPoints = {
         rovSettings: $('html /deep/ rov-settings'),
@@ -28,7 +48,7 @@
         menu: $('html /deep/ rov-menu'),
         inputController: undefined //will be set by the plugin
       };
-
+(
       self.extensionPoints.rovSettings.registerCloseHandler = function(handler) {
         if (self.extensionPoints.rovSettings[0]) {
           self.extensionPoints.rovSettings[0].registerCloseHandler(handler);
@@ -45,6 +65,7 @@
       // Register the various event handlers
       self.listen();
     });
+    */
   };
   Cockpit.prototype = new EventEmitter2();
   Cockpit.prototype.constructor = Cockpit;
@@ -58,7 +79,7 @@
       }
     });
   };
-
+/*
   Cockpit.prototype.loadUiTheme = function(done) {
     var defaultUiName = 'standard-ui'; //temp
     var self = this;
@@ -73,7 +94,7 @@
       self.uiLoader.load(defaultUiName, done);
     });
   };
-
+*/
   Cockpit.prototype.loadPlugins = function loadPlugins() {
     var cockpit = this;
     Cockpit.plugins.forEach(function (plugin) {

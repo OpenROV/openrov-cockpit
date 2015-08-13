@@ -9,12 +9,14 @@
     });
 
     this.on('newListener', function(aType, aListener) {
-      socket.on(aType, aListener);
+      if (aType!=='*'){
+        socket.on(aType, aListener);
+      }
     });
 
     return this;
   };
-  MessageManager.prototype = new EventEmitter2({ newListener: true });
+  MessageManager.prototype = new EventEmitter2({ newListener: true, wildcard: true });
   MessageManager.prototype.constructor = MessageManager;
 
   window.MessageManager = MessageManager;

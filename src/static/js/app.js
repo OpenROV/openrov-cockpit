@@ -25,7 +25,7 @@ $(function () {
     CONFIG.sample_freq = 20;
   } else {
     var socket = window.io.connect(window.location.protocol + '//' +
-                 window.location.hostname+ ':8080');
+                 window.location.hostname+ ':8080');        
   }
 
 
@@ -46,10 +46,3 @@ $(function () {
   });
   window.cockpit = cockpit;
 });
-//We have a contract for centralizing all keyboad instructions. This code
-//wires that content to where we display it in a popover.
-$('#keyboardpopover').hover(function () {
-  var kb =   this.cockpit.extensionPoints.rovSettings.find('#inputcontroller-settings');
-  $('#keyboardpopover').attr('data-content', kb.html());
-});
-$('[rel=\'popover\']').popover();

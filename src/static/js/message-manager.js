@@ -1,4 +1,9 @@
-(function(jQuery) {
+/*
+  This abstraction presents the Socket.io (and potentially other
+  transports) as an EventEmiiter.  It takes care of forwarding
+  the messages between the emitter and the message transport.
+*/
+(function() {
   var MessageManager = function(socket) {
     this.socket = socket;
 
@@ -20,4 +25,4 @@
   MessageManager.prototype.constructor = MessageManager;
 
   window.MessageManager = MessageManager;
-})(jQuery);
+})();

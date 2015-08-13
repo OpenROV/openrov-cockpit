@@ -14,7 +14,7 @@
         <link href="css/ui-lightness/jquery-ui-1.8.23.custom.css" rel="stylesheet" />
     <% for(var i=0; i<styles.length; i++) {%>
     <link rel="stylesheet" href="<%= styles[i] %>"><% } %>
-    <script type="text/javascript" src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
+    <script type="text/javascript" src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
     <link rel="import" href="bower_components/polymer/polymer.html">
 
   <% for(var i=0; i<sysscripts.length; i++) {%>
@@ -27,7 +27,7 @@
   <script type="text/javascript" src="js/no-scroll-fullscreen-viewport.js"></script>
   </head>
   <body>
-  <template id="t" is="auto-binding">
+  <template id="t" is="dom-bind">
   <link rel="import" href="bower_components/mjpeg-video-webcomponents/mjpeg-video.html">
   <link rel="import" href="plugin/camera-tilt/webcomponents/servo-tilt.html">
 
@@ -44,10 +44,10 @@
 
       <!-- Main ROW -->
       <div id="main-row">
-        <div id="system-panel">      
-          <servo-tilt servoAngle="{{plugin_cameraTilt_angle}}" />
+        <div id="system-panel">
+          <servo-tilt servo-angle={{plugin_cameraTilt_angle}} />
         </div>
-        <div id="nav-display" class="important zoomed" ref-to="asdf" ></div>
+        <div id="nav-display"></div>
         <div id="primary-flight-display"></div>
         <div id="standy-flight-display"></div>
         <div id="warning-display"></div>

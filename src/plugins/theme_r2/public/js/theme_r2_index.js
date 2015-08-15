@@ -25,4 +25,7 @@ console.log(this.event);
 //plugin.cameraTilt.angle
 $('#t')[0][this.event.replace(/\./g,"_")] = data;
 });
+
+$('#t')[0]['cockpit-event-emitter'] = window.cockpit;
+
 });

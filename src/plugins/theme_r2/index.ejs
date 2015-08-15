@@ -27,9 +27,16 @@
   <script type="text/javascript" src="js/no-scroll-fullscreen-viewport.js"></script>
   </head>
   <body>
+
+<!-- The template serves as the model for databinding, javascript is
+     interecpting all of the socket.io inbound messages and placing
+     them in the template model for one-way data binding.
+-->
   <template id="t" is="dom-bind">
-  <link rel="import" href="bower_components/mjpeg-video-webcomponents/mjpeg-video.html">
+  <!--link rel="import" href="bower_components/mjpeg-video-webcomponents/mjpeg-video.html"-->
   <link rel="import" href="plugin/camera-tilt/webcomponents/servo-tilt.html">
+  <link rel="import" href="plugin/lights/webcomponents/brightness-indicator.html">
+  <link rel="import" href="plugin/lasers/webcomponents/lasers.html">
 
 <!-- define the overall page layout with named sections. -->
       <div id="header">
@@ -45,7 +52,10 @@
       <!-- Main ROW -->
       <div id="main-row">
         <div id="system-panel">
-          <servo-tilt servo-angle={{plugin_cameraTilt_angle}} />
+          <servo-tilt servo-angle={{plugin_cameraTilt_angle}}></servo-tilt>
+          <brightness-indicator brightness-percent={{plugin_lights_level}}></brightness-indicator>
+          <rov-lasers event-emitter={{cockpit-event-emitter}}></rov-lasers>
+
         </div>
         <div id="nav-display"></div>
         <div id="primary-flight-display"></div>
@@ -57,18 +67,40 @@
         <div id="flight-control-unit"></div>
         <div id="data-control-unit"></div>
         <div id="camera-display">
-          <mjpeg-video id="camera1" src='<%= config.video_url %>'  border='1' style='width: 100%; height:100%' menuState='on'></mjpeg-video>
-          <rov-horizon id="horizon"></rov-horizon>
+          <!--mjpeg-video id="camera1" src='<%= config.video_url %>'  border='1' style='width: 100%; height:100%' menuState='on'></mjpeg-video>
+          <rov-horizon id="horizon"></rov-horizon-->
         </div>
       </div>
+      <script>
+
+      </script>
  </template>
+
+ <!--script>
+   document.addEventListener('WebComponentsReady', function() {
+      console.log('WebComponentsReady');
+      var container = document.querySelector('rov-lasers');
+        // var container = document.querySelector('say-hello');
+        container.addEventListener('toggle-lasers', function() {
+          cockpit.emit("plugin.laser.toggle");
+        });
+
+
+   });
+
+ </script-->
+
  <script type="text/javascript" src="js/libs/eventemitter2.js"></script>
  <script type='text/javascript' src="socket.io/socket.io.js"></script>
 
   <script type='text/javascript' src='js/message-manager.js'></script>
  <script type="text/javascript" src="js/cockpit.js"></script>
  <script type="text/javascript" src="js/app.js"></script>
+
+<script type="text/javascript" src="js/utilities.js"></script>
+
  <script type="text/javascript" src="plugin/theme_r2/js/theme_r2_index.js"></script>
+ <script type="text/javascript" src="plugin/lasers/js/laser.js"></script>
 
 </body>
 </html>

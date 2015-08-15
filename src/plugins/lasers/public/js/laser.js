@@ -7,7 +7,7 @@
 
   };
 
-  plugins.ExternalLights.prototype.getTelemetryDefintions = function getTelemetryDefintions() {
+  plugins.Laser.prototype.getTelemetryDefintions = function getTelemetryDefintions() {
     return([
       {name: 'claser', description: 'Scaling Laser power 0 to 255'}
     ]);
@@ -28,6 +28,12 @@
           }
         }
       ]);
+
+    /* Forward calls on the COCKPIT emitter to the ROV  */
+    self.cockpit.on('plugin.laser.toggle',function(){
+        alert("boom");
+        cockpit.rov.emit('plugin.laser.toggle');
+    });
 
     if (self.cockpit.extensionPoints.headsUpMenu) {
       self.cockpit.extensionPoints.headsUpMenu.register({

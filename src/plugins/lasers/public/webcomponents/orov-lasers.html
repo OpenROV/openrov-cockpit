@@ -1,4 +1,4 @@
-<dom-module name="rov-lasers">
+<dom-module name="orov-lasers">
 <style>
   .indicator {
     top: 5px;
@@ -40,12 +40,12 @@
   <template>
 
     <span id="laserIcon" on-click="toggle" class="indicator {{ lasersEnabled ? 'enabled' : '' }}" class="indicator"></span>
-
+    <comment>{{lasersEnabled.type}}</comment>
   </template>
   <script>
     (function() {
       Polymer({
-        is:'rov-lasers',
+        is:'orov-lasers',
         properties: {
           lasersEnabled: {type: Boolean, value:false},
           eventEmitter: {type: Object, readOnly: true, observer: 'eventEmitterChange'}

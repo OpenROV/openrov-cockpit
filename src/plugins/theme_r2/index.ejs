@@ -36,8 +36,9 @@
   <!--link rel="import" href="bower_components/mjpeg-video-webcomponents/mjpeg-video.html"-->
   <link rel="import" href="plugin/camera-tilt/webcomponents/servo-tilt.html">
   <link rel="import" href="plugin/lights/webcomponents/brightness-indicator.html">
-  <link rel="import" href="plugin/lasers/webcomponents/lasers.html">
-
+  <link rel="import" href="plugin/lasers/webcomponents/orov-lasers.html">
+  <!--link rel="import" href="plugin/motor_diags/webcomponents/orov-thruster2x1-settings.html"-->
+  <link rel="import" href="plugin/settings-manager/webcomponents/orov-settings-manager.html"-->
 <!-- define the overall page layout with named sections. -->
       <div id="header">
         <div class="navbar-inner">
@@ -54,7 +55,8 @@
         <div id="system-panel">
           <servo-tilt servo-angle={{plugin_cameraTilt_angle}}></servo-tilt>
           <brightness-indicator brightness-percent={{plugin_lights_level}}></brightness-indicator>
-          <rov-lasers event-emitter={{cockpit-event-emitter}}></rov-lasers>
+          <orov-lasers event-emitter={{cockpit-event-emitter}}></orov-lasers>
+          <orov-settings-manager event-emitter={{cockpit-event-emitter}}></orov-settings-manager>
 
         </div>
         <div id="nav-display"></div>
@@ -99,8 +101,13 @@
 
 <script type="text/javascript" src="js/utilities.js"></script>
 
+<!-- I am loading these manually.. but they should be populated through the
+     plugin manager -->
  <script type="text/javascript" src="plugin/theme_r2/js/theme_r2_index.js"></script>
  <script type="text/javascript" src="plugin/lasers/js/laser.js"></script>
+ <script type="text/javascript" src="plugin/settings-manager/js/settings-manager.js"></script>
+ <script type="text/javascript" src="plugin/motor_diags/js/motor_diags.js"></script>
+
 
 </body>
 </html>

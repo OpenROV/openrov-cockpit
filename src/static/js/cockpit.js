@@ -37,8 +37,13 @@
     this.sendUpdateEnabled = true;
     this.capabilities = 0;
     this.loadedPlugins = [];
-/*
+
     this.loadUiTheme(function() {
+      self.loadPlugins();
+      console.log('loaded plugins');
+      // Register the various event handlers
+      self.listen();
+       /*
       self.extensionPoints = {
         rovSettings: $('html /deep/ rov-settings'),
         rovDiagnostics: $('html /deep/ rov-diagnostics /deep/ #dropIn'),
@@ -59,13 +64,9 @@
           self.extensionPoints.rovDiagnostics[0].registerCloseHandler(handler);
         }
       };
-
-      self.loadPlugins();
-      console.log('loaded plugins');
-      // Register the various event handlers
-      self.listen();
-    });
     */
+    });
+
   };
   Cockpit.prototype = new EventEmitter2();
   Cockpit.prototype.constructor = Cockpit;
@@ -79,8 +80,11 @@
       }
     });
   };
-/*
+
   Cockpit.prototype.loadUiTheme = function(done) {
+    done();
+    return;
+    /*short circuit */
     var defaultUiName = 'standard-ui'; //temp
     var self = this;
     $.get('plugin/ui-selector', function (config) {
@@ -94,7 +98,7 @@
       self.uiLoader.load(defaultUiName, done);
     });
   };
-*/
+
   Cockpit.prototype.loadPlugins = function loadPlugins() {
     var cockpit = this;
     Cockpit.plugins.forEach(function (plugin) {

@@ -1,0 +1,48 @@
+<dom-module name="orov-thruster2x1-settings">
+<script src="/js/libs/jsoneditor.min.js"></script>
+
+<template>
+  <div id='form1'>
+  </div>
+</template>
+<script>
+(function() {
+  var editor;
+  Polymer({
+    is:'orov-thruster2x1-settings',
+    properties: {
+      eventEmitter: {type: Object, readOnly: true, observer: 'eventEmitterChange'}
+    },
+    eventEmitterChange: function(){
+      var self = this;
+      if (this.eventEmitter !== undefined){
+        this.eventEmitter.on('plugin.thrusters2x1.setting',function(data){
+          self.smoothingIncriment = data.smoothingIncriment;
+        });
+      }
+    },
+    ready: function(){
+      var options = {
+          "schema": {
+              "title": "What do you think of Alpaca?",
+              "type": "object",
+              "properties": {
+                  "name": {
+                      "type": "string",
+                      "title": "Name"
+                  },
+                  "ranking": {
+                      "type": "string",
+                      "title": "Ranking",
+                      "enum": ['excellent', 'not too shabby', 'alpaca built my hotrod']
+                  }
+              }
+          }
+      };
+      editor = new JSONEditor(this.$.form1, options);
+
+    }
+  })
+})();
+</script>
+</dom-module>

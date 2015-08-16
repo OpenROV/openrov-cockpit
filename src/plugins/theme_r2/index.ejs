@@ -37,6 +37,10 @@
   <link rel="import" href="plugin/camera-tilt/webcomponents/servo-tilt.html">
   <link rel="import" href="plugin/lights/webcomponents/brightness-indicator.html">
   <link rel="import" href="plugin/lasers/webcomponents/orov-lasers.html">
+  <link rel="import" href="plugin/thrusters2x1/webcomponents/orov-thrusters2x1-motortest.html">
+  <!-- Dependency for thrusters-testmotor -->
+      <link rel="import" href="bower_components/paper-slider/paper-slider.html">
+
   <!--link rel="import" href="plugin/motor_diags/webcomponents/orov-thruster2x1-settings.html"-->
   <link rel="import" href="plugin/settings-manager/webcomponents/orov-settings-manager.html"-->
 <!-- define the overall page layout with named sections. -->
@@ -56,8 +60,6 @@
           <servo-tilt servo-angle={{plugin_cameraTilt_angle}}></servo-tilt>
           <brightness-indicator brightness-percent={{plugin_lights_level}}></brightness-indicator>
           <orov-lasers event-emitter={{cockpit-event-emitter}}></orov-lasers>
-          <orov-settings-manager event-emitter={{cockpit-event-emitter}}></orov-settings-manager>
-
         </div>
         <div id="nav-display"></div>
         <div id="primary-flight-display"></div>
@@ -65,7 +67,11 @@
         <div id="warning-display"></div>
         <div id="systems-display"></div>
         <div id="flight-control-state"></div>
-        <div id="multipurpose-display"></div>
+        <div id="multipurpose-display">
+          <orov-thrusters2x1-motortest  event-emitter={{cockpit-event-emitter}}></orov-thrusters2x1-motortest>
+          <orov-settings-manager event-emitter={{cockpit-event-emitter}}></orov-settings-manager>
+        </div>
+
         <div id="flight-control-unit"></div>
         <div id="data-control-unit"></div>
         <div id="camera-display">
@@ -106,7 +112,7 @@
  <script type="text/javascript" src="plugin/theme_r2/js/theme_r2_index.js"></script>
  <script type="text/javascript" src="plugin/lasers/js/laser.js"></script>
  <script type="text/javascript" src="plugin/settings-manager/js/settings-manager.js"></script>
- <script type="text/javascript" src="plugin/motor_diags/js/motor_diags.js"></script>
+ <script type="text/javascript" src="plugin/thrusters2x1/js/thrusters2x1.js"></script>
 
 
 </body>

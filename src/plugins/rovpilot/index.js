@@ -151,7 +151,7 @@
 
     return this;
   };
-  
+
   ROVPilot.prototype.allStop = function allStop() {
     this.vtrim = 0;
     this.ttrim = 0;

@@ -34,7 +34,7 @@
 -->
   <template id="t" is="dom-bind">
   <!--link rel="import" href="bower_components/mjpeg-video-webcomponents/mjpeg-video.html"-->
-  <link rel="import" href="plugin/camera-tilt/webcomponents/servo-tilt.html">
+  <!--link rel="import" href="plugin/camera-tilt/webcomponents/servo-tilt.html"-->
   <link rel="import" href="plugin/lights/webcomponents/brightness-indicator.html">
   <link rel="import" href="plugin/lasers/webcomponents/orov-lasers.html">
   <link rel="import" href="plugin/thrusters2x1/webcomponents/orov-thrusters2x1-motortest.html">
@@ -57,7 +57,8 @@
       <!-- Main ROW -->
       <div id="main-row">
         <div id="system-panel">
-          <servo-tilt servo-angle={{plugin_cameraTilt_angle}}></servo-tilt>
+
+          <!--servo-tilt1 servo-angle={{plugin_cameraTilt_angle}}></servo-tilt1-->
           <brightness-indicator brightness-percent={{plugin_lights_level}}></brightness-indicator>
           <orov-lasers event-emitter={{cockpit-event-emitter}}></orov-lasers>
         </div>
@@ -113,6 +114,8 @@
  <script type="text/javascript" src="plugin/lasers/js/laser.js"></script>
  <script type="text/javascript" src="plugin/settings-manager/js/settings-manager.js"></script>
  <script type="text/javascript" src="plugin/thrusters2x1/js/thrusters2x1.js"></script>
+ <script type="text/javascript" src="plugin/camera-tilt/js/camera-tilt-widgets-autodiscovery.js"></script>
+
 
 
 </body>

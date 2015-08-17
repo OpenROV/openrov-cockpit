@@ -29,6 +29,11 @@ function namespace(namespaceString) {
     parent = window,
     currentPart = '';
 
+    if (window.OROV === undefined){
+      window.OROV = {};
+    }
+    parent = window.OROV;
+
   for(var i = 0, length = parts.length; i < length; i++) {
     currentPart = parts[i];
     parent[currentPart] = parent[currentPart] || {};

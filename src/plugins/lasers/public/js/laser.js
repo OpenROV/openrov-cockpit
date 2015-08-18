@@ -37,6 +37,10 @@
         cockpit.rov.emit('plugin.laser.toggle');
     });
 
+    self.cockpit.rov.on('plugin.laser.state', function(data){
+      cockpit.emit('plugin.laser.state',data);
+    });
+
 /*
     if (self.cockpit.extensionPoints.headsUpMenu) {
       self.cockpit.extensionPoints.headsUpMenu.register({
@@ -46,7 +50,7 @@
         }
       });
     }
-*/    
+*/
   };
 
   window.Cockpit.plugins.push(plugins.Laser);

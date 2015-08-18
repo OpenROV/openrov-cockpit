@@ -6,10 +6,10 @@
   'use strict';
   var widgets = namespace('widgets');
 
-  widgets['orov-servo-tilt'] =  {
-      name:'orov-servo-tilt',
+  widgets['orov-laser'] =  {
+      name:'orov-laser',
       defaultUISymantic: 'system-panel',
-      url: urlOfJsFile('camera-tilt-widgets-autodiscovery.js')+'../webcomponents/orov-servo-tilt.html'
+      url: urlOfJsFile('laser-widgets-autodiscovery.js')+'../webcomponents/orov-laser.html'
     };
 
 }

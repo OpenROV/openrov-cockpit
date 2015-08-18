@@ -59,7 +59,7 @@
         eventEmitterChange: function(){
           var self = this;
           if (this.eventEmitter !== undefined){
-            this.eventEmitter.on('plugin_laser_on',function(data){
+            this.eventEmitter.on('plugin.laser.state',function(data){
               self.lasersEnabled = data;
             });
           }

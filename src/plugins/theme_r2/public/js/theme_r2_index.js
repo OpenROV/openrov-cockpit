@@ -4,21 +4,8 @@
     to directly access the window global object space as children
     objects should never know about their parent containers.
 */
-
-/*
-  Dynamically add link files for widgets, hopefully blocking
-  while loading per the script example: http://www.html5rocks.com/en/tutorials/speed/script-loading/
-*/
 $( document ).ready(function() {
-  var wid =  window.OROV.widgets;
 
-  Object.keys(wid).forEach(function(src) {
-    var link = document.createElement('link');
-    link.href = wid[src].url;
-    link.rel = "import";
-    link.async = false;
-    document.head.appendChild(link);
-  });
 
 
 /* Telemetry Hooks
@@ -53,15 +40,4 @@ $('#t')[0]['cockpit-event-emitter'] = window.cockpit;
           <<%ui.systempanel[i].name %> event-emitter={{cockpit-event-emitter}}></<%ui.systempanel[i].name %>>
           <% } %>
 */
-
-
-window.addEventListener('WebComponentsReady', function(e) {
-  var wid =  window.OROV.widgets;
-//  $('#t')[0]['system-panel-widgets'] = wid;
-  console.dir(wid);
-  for( var i in wid){
-    var el1 = document.createElement(wid[i].name);
-    $('#'+wid[i].defaultUISymantic).append(el1);
-  }
-});
 });

@@ -21,14 +21,14 @@ app.configure(function () {
   app.use(express.favicon(__dirname + '/static/favicon.icon'));
   app.use(express.logger('dev'));
   app.use(app.router);
-  app.use('/components', express.static(path.join(__dirname, 'bower_components')));
-  app.use('/plugin_components', express.static('/usr/share/cockpit/bower_components'));
-  app.use('/plugin_components', express.static(path.join(__dirname,'plugins/telemetry/public/webcomponents/bower_components')));
-  app.use('/plugin_components/telemetry', express.static(path.join(__dirname,'plugins/telemetry/public/webcomponents')));
-  app.use('/plugin_components/telemetry', express.directory(path.join(__dirname,'plugins/telemetry/public/webcomponents')));
-  console.log('plugin_components/telemetry -> ' + path.join(__dirname,'plugins/telemetry/public/webcomponents'));
-  console.log('/plugin_components -> ' + path.join(__dirname,'plugins/telemetry/public/webcomponents/bower_components'));
+  app.use('/components', express.static(path.join(__dirname, 'static/bower_components')));
+  app.use('/components', express.static('/usr/share/cockpit/bower_components'));
+  app.use('/components', express.static(path.join(__dirname, 'static/webcomponents')));
 
+  app.use('/components', express.static(path.join(__dirname,'plugins/telemetry/public/bower_components')));
+  app.use('/components/telemetry', express.static(path.join(__dirname,'plugins/telemetry/public/webcomponents')));
+  app.use('/components/telemetry', express.directory(path.join(__dirname,'plugins/telemetry/public/webcomponents')));
+  console.log("!!!"+ path.join(__dirname, 'src/static/bower_components'));
 });
 // Keep track of plugins js and css to load them in the view
 var scripts = [], styles = [];
@@ -173,6 +173,7 @@ function addPluginAssets(result) {
   styles = styles.concat(result.styles);
   result.assets.forEach(function (asset) {
     console.log("TEST: " + asset.path);
+    console.dir(asset);
     app.use('/' + asset.path, express.static(asset.assets));
   });
 }

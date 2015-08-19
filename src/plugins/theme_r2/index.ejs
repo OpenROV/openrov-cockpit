@@ -5,8 +5,8 @@
 
     <!-- The following viewport code is intended to fullscreen the cockpit and prevent scrolling -->
     <meta id="Viewport" name="viewport" width="initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
-    <script type='text/javascript' src="bower_components/jquery/dist/jquery.min.js"></script>
-    <script type='text/javascript' src="bower_components/jquery-ui//jquery-ui.min.js"></script>
+    <script type='text/javascript' src="components/jquery/dist/jquery.min.js"></script>
+    <script type='text/javascript' src="components/jquery-ui/jquery-ui.min.js"></script>
 
     <title>TEST</title>
         <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -17,8 +17,8 @@
 
     <!-- hard coding while developing -->
     <link rel="stylesheet" href="plugin/theme_r2/css/theme_r2.css">
-    <script type="text/javascript" src="plugin_components/webcomponentsjs/webcomponents-lite.js"></script>
-    <link rel="import" href="plugin_components/polymer/polymer.html">
+    <script type="text/javascript" src="components/webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import" href="components/polymer/polymer.html">
 
   <% for(var i=0; i<sysscripts.length; i++) {%>
   <script type="text/javascript" src="<%= sysscripts[i] %>"></script><% } %>
@@ -37,10 +37,10 @@
 -->
   <template id="t" is="dom-bind">
   <!--link rel="import" href="bower_components/mjpeg-video-webcomponents/mjpeg-video.html"-->
-  <link rel="import" href="plugin_components/telemetry/telemetry-graph.html">
+  <link rel="import" href="components/telemetry/telemetry-graph.html">
   <!-- plugin/telemetry/webcomponents/ -->
   <!-- Dependency for thrusters-testmotor -->
-      <link rel="import" href="plugin_components/paper-slider/paper-slider.html">
+      <link rel="import" href="components/paper-slider/paper-slider.html">
 
 <!-- define the overall page layout with named sections. -->
       <div id="header">

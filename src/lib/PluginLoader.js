@@ -45,6 +45,15 @@ var PluginLoader = function() {
           if (fs.existsSync(assets = path.join(dir, plugin, 'public'))) {
             result.assets.push({ path: shareDir + '/' + plugin, assets: assets});
           }
+
+          // Add the webcomponents and bower dirs assets to a static route
+          if (fs.existsSync(assets = path.join(dir, plugin, 'public/webcomponents'))) {
+            result.assets.push({ path: 'components' + '/' + plugin, assets: assets});
+          }
+          if (fs.existsSync(assets = path.join(dir, plugin, 'public/bower_components'))) {
+            result.assets.push({ path: 'components' + '/' + plugin, assets: assets});
+          }
+
           // Add the js to the view
           if (fs.existsSync(js = path.join(assets, 'js'))) {
             fs.readdirSync(js).filter(getFilter('js')).forEach(function (script) {

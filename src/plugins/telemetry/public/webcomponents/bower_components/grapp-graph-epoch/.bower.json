@@ -1,0 +1,53 @@
+{
+  "name": "grapp-graph-epoch",
+  "description": "A web component that displays Epoch graphs",
+  "version": "0.1.0",
+  "main": "grapp-graph-epoch.html",
+  "license": "MIT",
+  "ignore": [
+    "bin",
+    "build",
+    "lib",
+    "node_modules",
+    "src",
+    "test",
+    "tmpl",
+    "package.json",
+    "**/.*",
+    "**/*.log",
+    "**/*.sublime-*"
+  ],
+  "keywords": [
+    "web-components",
+    "polymer",
+    "grappendorf"
+  ],
+  "authors": [
+    "Dirk Grappendorf <dirk@grappendorf.net> (http://www.grappendorf.net)"
+  ],
+  "homepage": "https://github.com/grappendorf/grapp-graph-epoch",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/grappendorf/grapp-graph-epoch.git"
+  },
+  "dependencies": {
+    "polymer": "Polymer/polymer#~1.0.0",
+    "epoch": "0.6.0",
+    "d3": "3.5.5"
+  },
+  "devDependencies": {
+    "web-component-tester": "Polymer/web-component-tester#3.1.7",
+    "jquery": "2.1.4",
+    "coffee-script": "1.9.3"
+  },
+  "_release": "0.1.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "0.1.0",
+    "commit": "07490ee8428ebd5a44007149a140957068c92b58"
+  },
+  "_source": "git://github.com/grappendorf/grapp-graph-epoch.git",
+  "_target": "~0.1.0",
+  "_originalSource": "grapp-graph-epoch",
+  "_direct": true
+}

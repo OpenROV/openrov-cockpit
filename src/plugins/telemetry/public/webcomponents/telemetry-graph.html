@@ -1,0 +1,56 @@
+<dom-module name="telemetry-graph">
+<style>
+</style>
+  <template>
+  <link href="../grapp-graph-epoch/grapp-graph-epoch.html" rel="import">
+    <grapp-graph-epoch id="timegraph" type="time.line" axis="left,bottom" width="800" height="300">
+      <grapp-graph-epoch-series label="Time Series 1"
+        data='[{"time":1370044800,"y":1},{"time":1370044801,"y":10}]'>
+      </grapp-graph-epoch-series>
+    </grapp-graph-epoch>
+
+  </template>
+  <script>
+    (function() {
+
+      Polymer({
+        is:'telemetry-graph',
+        properties:{
+          telemetry: {type:Object},
+          seriesToGraph: {type:String},
+          eventEmitter: {type: Object, readOnly: true, observer: 'eventEmitterChange'}
+        },
+        ready: function () {
+          if(this.eventEmitter !== undefined){
+            //var result = this.notifyPath('eventEmitter',this.eventEmitter);
+            this.eventEmitterHasChanged(null,this.eventEmitter);
+          }
+        },
+        eventEmitterHasChanged: function(oldvalue,newvalue){
+          var self=this;
+
+          if (this.dataupdate===undefined){
+            this.dataupdate = function(data){
+              self.logStatusData(data);
+            }
+          }
+
+          if(oldvalue !== null){
+            oldvalue.off('plugin.telemetry.logData',this.dataupdate)
+          }
+          this.eventEmitter.on('plugin.telemetry.logData',this.dataupdate);
+          //Todo: Dereference the old listener on the old emitter
+        },
+        logStatusData: function (data) {
+          var t = Object.keys(data)
+          for (var i in t) {
+            if (this.seriesToGraph.indexOf(t[i])>=0){
+              this.$.timegraph.push((new Date()).getTime()/1000, data[t[i]]);
+            }
+          }
+        },
+      })
+    })();
+  </script>
+
+</dom-module>

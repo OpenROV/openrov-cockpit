@@ -14,8 +14,11 @@
         <link href="css/ui-lightness/jquery-ui-1.8.23.custom.css" rel="stylesheet" />
     <% for(var i=0; i<styles.length; i++) {%>
     <link rel="stylesheet" href="<%= styles[i] %>"><% } %>
-    <script type="text/javascript" src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
-    <link rel="import" href="bower_components/polymer/polymer.html">
+
+    <!-- hard coding while developing -->
+    <link rel="stylesheet" href="plugin/theme_r2/css/theme_r2.css">
+    <script type="text/javascript" src="plugin_components/webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import" href="plugin_components/polymer/polymer.html">
 
   <% for(var i=0; i<sysscripts.length; i++) {%>
   <script type="text/javascript" src="<%= sysscripts[i] %>"></script><% } %>
@@ -26,7 +29,7 @@
 -->
   <script type="text/javascript" src="js/no-scroll-fullscreen-viewport.js"></script>
   </head>
-  <body>
+  <body class='theme_r2'>
 
 <!-- The template serves as the model for databinding, javascript is
      interecpting all of the socket.io inbound messages and placing
@@ -34,15 +37,11 @@
 -->
   <template id="t" is="dom-bind">
   <!--link rel="import" href="bower_components/mjpeg-video-webcomponents/mjpeg-video.html"-->
-  <!--link rel="import" href="plugin/camera-tilt/webcomponents/servo-tilt.html"-->
-  <link rel="import" href="plugin/lights/webcomponents/brightness-indicator.html">
-  <link rel="import" href="plugin/lasers/webcomponents/orov-lasers.html">
-  <link rel="import" href="plugin/thrusters2x1/webcomponents/orov-thrusters2x1-motortest.html">
+  <link rel="import" href="plugin_components/telemetry/telemetry-graph.html">
+  <!-- plugin/telemetry/webcomponents/ -->
   <!-- Dependency for thrusters-testmotor -->
-      <link rel="import" href="bower_components/paper-slider/paper-slider.html">
+      <link rel="import" href="plugin_components/paper-slider/paper-slider.html">
 
-  <!--link rel="import" href="plugin/motor_diags/webcomponents/orov-thruster2x1-settings.html"-->
-  <link rel="import" href="plugin/settings-manager/webcomponents/orov-settings-manager.html"-->
 <!-- define the overall page layout with named sections. -->
       <div id="header">
         <div class="navbar-inner">
@@ -57,10 +56,6 @@
       <!-- Main ROW -->
       <div id="main-row">
         <div id="system-panel">
-
-          <!--servo-tilt servo-angle={{plugin_cameraTilt_angle}}></servo-tilt-->
-          <!--brightness-indicator brightness-percent={{plugin_lights_level}}></brightness-indicator-->
-          <!--orov-lasers event-emitter={{cockpit-event-emitter}}></orov-lasers-->
         </div>
         <div id="nav-display"></div>
         <div id="primary-flight-display"></div>
@@ -69,8 +64,7 @@
         <div id="systems-display"></div>
         <div id="flight-control-state"></div>
         <div id="multipurpose-display">
-          <orov-thrusters2x1-motortest  event-emitter={{cockpit-event-emitter}}></orov-thrusters2x1-motortest>
-          <orov-settings-manager event-emitter={{cockpit-event-emitter}}></orov-settings-manager>
+          <telemetry-graph series-to-graph="['deap']" event-emitter={{cockpit-event-emitter}}></telemetry-graph>
         </div>
 
         <div id="flight-control-unit"></div>
@@ -85,20 +79,6 @@
       </script>
  </template>
 
- <!--script>
-   document.addEventListener('WebComponentsReady', function() {
-      console.log('WebComponentsReady');
-      var container = document.querySelector('rov-lasers');
-        // var container = document.querySelector('say-hello');
-        container.addEventListener('toggle-lasers', function() {
-          cockpit.emit("plugin.laser.toggle");
-        });
-
-
-   });
-
- </script-->
-
  <script type="text/javascript" src="js/libs/eventemitter2.js"></script>
  <script type='text/javascript' src="socket.io/socket.io.js"></script>
 
@@ -111,11 +91,18 @@
 <!-- I am loading these manually.. but they should be populated through the
      plugin manager -->
  <script type="text/javascript" src="plugin/theme_r2/js/theme_r2_index.js"></script>
+ <script type="text/javascript" src="plugin/lasers/js/laser-widgets-autodiscovery.js"></script>
  <script type="text/javascript" src="plugin/lasers/js/laser.js"></script>
  <script type="text/javascript" src="plugin/settings-manager/js/settings-manager.js"></script>
+ <script type="text/javascript" src="plugin/settings-manager/js/settings-manager-widgets-autodiscovery.js"></script>
+
  <script type="text/javascript" src="plugin/thrusters2x1/js/thrusters2x1.js"></script>
+ <script type="text/javascript" src="plugin/thrusters2x1/js/thrusters2x1-widgets-autodiscovery.js"></script>
+
  <script type="text/javascript" src="plugin/camera-tilt/js/camera-tilt-widgets-autodiscovery.js"></script>
  <script type="text/javascript" src="plugin/camera-tilt/js/camera-tilt.js"></script>
+
+ <script type="text/javascript" src="plugin/telemetry/js/telemetry.js"></script>
 
  <script type="text/javascript" src="js/widget-layout-manager.js"></script>
 

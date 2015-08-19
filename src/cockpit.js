@@ -23,6 +23,12 @@ app.configure(function () {
   app.use(app.router);
   app.use('/components', express.static(path.join(__dirname, 'bower_components')));
   app.use('/plugin_components', express.static('/usr/share/cockpit/bower_components'));
+  app.use('/plugin_components', express.static(path.join(__dirname,'plugins/telemetry/public/webcomponents/bower_components')));
+  app.use('/plugin_components/telemetry', express.static(path.join(__dirname,'plugins/telemetry/public/webcomponents')));
+  app.use('/plugin_components/telemetry', express.directory(path.join(__dirname,'plugins/telemetry/public/webcomponents')));
+  console.log('plugin_components/telemetry -> ' + path.join(__dirname,'plugins/telemetry/public/webcomponents'));
+  console.log('/plugin_components -> ' + path.join(__dirname,'plugins/telemetry/public/webcomponents/bower_components'));
+
 });
 // Keep track of plugins js and css to load them in the view
 var scripts = [], styles = [];

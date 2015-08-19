@@ -6,10 +6,10 @@
   'use strict';
   var widgets = namespace('widgets');
 
-  widgets['orov-thrusters2x1-motortest'] =  {
-      name:'orov-thrusters2x1-motortest',
+  widgets['orov-settings-manager'] =  {
+      name:'orov-settings-manager',
       defaultUISymantic: 'multipurpose-display',
-      url: urlOfJsFile('thrusters2x1-widgets-autodiscovery.js')+'../webcomponents/orov-thrusters2x1-motortest.html'
+      url: urlOfJsFile('settings-manager-widgets-autodiscovery.js')+'../webcomponents/orov-settings-manager.html'
     };
 
 }

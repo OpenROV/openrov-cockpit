@@ -1,0 +1,212 @@
+<!--
+Copyright (c) 2014-2015 Dirk Grappendorf, www.grappendorf.net. All rights reserved.
+This code may only be used under the MIT style license found in the file LICENSE.txt.
+
+Element: grapp-graph-epoch
+Version: 0.1.0
+Description: A web component that displays Epoch graphs
+-->
+
+
+<link href="../polymer/polymer.html" rel="import">
+<link href="grapp-graph-epoch-series.html" rel="import">
+
+<dom-module id="grapp-graph-epoch">
+
+  <link rel="stylesheet" href="../epoch/epoch.min.css">
+
+  <template>
+
+    <div class$=[[_epochThemeClass(theme)]]">
+      <div id="graph" class$="[[_epochGraphClass(category)]]"></div>
+    </div>
+
+  </template>
+
+  <script src="../d3/d3.min.js"></script>
+  <script src="../epoch/epoch.min.js"></script>
+
+<script type="text/javascript">(function() {
+  var slice = [].slice;
+
+  Polymer({
+    is: 'grapp-graph-epoch',
+    properties: {
+      type: {
+        type: String
+      },
+      axis: {
+        type: String,
+        observer: '_axisChanged'
+      },
+      theme: {
+        type: String,
+        value: 'default'
+      },
+      category: {
+        type: String,
+        value: 'category10'
+      },
+      width: {
+        type: Number
+      },
+      height: {
+        type: Number
+      },
+      ticks: {
+        type: String
+      },
+      tickSize: {
+        type: Number
+      },
+      tickOffset: {
+        type: Number
+      },
+      windowSize: {
+        type: Number
+      },
+      historySize: {
+        type: Number
+      },
+      queueSize: {
+        type: Number
+      },
+      margins: {
+        type: String
+      },
+      domain: {
+        type: String
+      },
+      range: {
+        type: String
+      }
+    },
+    attached: function() {
+      if (this.type) {
+        return this._createGraph();
+      }
+    },
+    draw: function() {
+      var options;
+      this.$.graph.innerHTML = '';
+      options = {
+        el: this.$.graph,
+        data: this.data,
+        axes: this.axis,
+        width: this.width,
+        height: this.height,
+        ticks: this.ticks ? convertStringToObject(this.ticks) : void 0,
+        tickSize: this.tickSize,
+        tickOffset: this.tickOffset,
+        windowSize: this.windowSize,
+        historySize: this.historySize,
+        queueSize: this.queueSize,
+        margins: this.margins ? convertStringToObject(this.margins) : void 0,
+        domain: this.domain != null ? convertStringToArray(this.domain) : void 0,
+        range: this.range != null ? convertStringToArray(this.range) : void 0
+      };
+      this.graph = new Epoch._typeMap[this.type](options);
+      return;// this.graph.draw();
+    },
+    push: function() {
+      var args, d;
+      args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+      if (typeof args[0] === 'number') {
+        return this.graph.push([
+          {
+            time: args[0],
+            y: args[1]
+          }
+        ]);
+      } else {
+        return this.graph.push((function() {
+          var i, len, results;
+          results = [];
+          for (i = 0, len = args.length; i < len; i++) {
+            d = args[i];
+            results.push({
+              time: d[0],
+              y: d[1]
+            });
+          }
+          return results;
+        })());
+      }
+    },
+    clear: function() {
+      var i, len, ref, series;
+      ref = this.data;
+      for (i = 0, len = ref.length; i < len; i++) {
+        series = ref[i];
+        series.values = [
+          {
+            time: 0,
+            y: 0
+          }
+        ];
+      }
+      return this.draw();
+    },
+    _createGraph: function() {
+      var s;
+      this.data = (function() {
+        var i, len, ref, results;
+        ref = Polymer.dom(this).querySelectorAll('grapp-graph-epoch-series');
+        results = [];
+        for (i = 0, len = ref.length; i < len; i++) {
+          s = ref[i];
+          results.push({
+            label: s.label,
+            values: s.data
+          });
+        }
+        return results;
+      }).call(this);
+      return this.draw();
+    },
+    _axisChanged: function() {
+      if (this.graph) {
+        return this.graph.option('axis', this.axis);
+      }
+    },
+    _convertStringToArray: function(s) {
+      var i, len, n, ref, results;
+      ref = s.split(',');
+      results = [];
+      for (i = 0, len = ref.length; i < len; i++) {
+        n = ref[i];
+        results.push(parseInt(n));
+      }
+      return results;
+    },
+    _convertStringToObject: function(s) {
+      var i, kv, len, o, part, ref;
+      o = {};
+      ref = (function() {
+        var j, len, ref, results;
+        ref = s.split(',');
+        results = [];
+        for (j = 0, len = ref.length; j < len; j++) {
+          part = ref[j];
+          results.push(part.split(':'));
+        }
+        return results;
+      })();
+      for (i = 0, len = ref.length; i < len; i++) {
+        kv = ref[i];
+        o[kv[0]] = parseInt(kv[1]);
+      }
+      return o;
+    },
+    _epochThemeClass: function(theme) {
+      return "epoch-theme-" + theme;
+    },
+    _epochGraphClass: function(category) {
+      return "epoch " + category;
+    }
+  });
+
+}).call(this);
+</script>
+
+</dom-module>

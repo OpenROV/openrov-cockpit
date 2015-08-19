@@ -1,7 +1,25 @@
-.testoverlay {
-    opacity: 0.5;
-    z-index: 3;
-    top: 0px;
-    left: 0px;
-    position: absolute;
+body.theme_r2 #system-panel {
+  height: 20px;
+  position: absolute;
+  top:0;
+  left:0;
+}
+
+body.theme_r2 #system-panel * {
+  height: 20px;
+  width: 20px;
+  margin: auto;
+  line-height: 20px;
+  display: inline-flex;
+  float: none;
+
+}
+
+body.theme_r2 #multipurpose-display {
+  height: 200px;
+  width: 200px;
+  position:absolute;
+  bottom:0;
+  right:0;
+
 }

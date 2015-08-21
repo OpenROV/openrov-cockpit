@@ -1,0 +1,49 @@
+<link rel="import" href="../polymer/polymer.html">
+<dom-module name="javascript-latency">
+<style>
+</style>
+  <template>
+    <span id='fpsmeter'></span>
+
+  </template>
+
+  <script src='../fpsmeter/dist/fpsmeter.js' ></script>
+  <script>
+    (function() {
+      Polymer({
+        is: 'javascript-latency',
+        ready: function () {
+            this.meter = new FPSMeter(this.$.fpsmeter, {
+              interval: 100,
+              smoothing: 10,
+              show: 'fps',
+              toggleOn: '',
+              decimals: 1,
+              maxFps: 30,
+              threshold: 100,
+              position: 'absolute',
+              zIndex: 10,
+          //    left: '5px',
+          //    top: '5px',
+        //      right: 'auto',
+        //      bottom: 'auto',
+              margin: '0 0 0 0',
+              theme: 'colorful',
+              heat: 1,
+              graph: 1,
+              history: 20
+            });
+      //      this.meter.hide();
+
+            var self = this;
+
+            setInterval(function () {
+              self.meter.tick();
+            }, 32);
+
+        }
+      })
+    })();
+  </script>
+
+</dom-module>

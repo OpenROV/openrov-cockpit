@@ -6,8 +6,8 @@
     self.cockpit = cockpit;
     console.log("CameraTilt Plugin running");
 
-/*
-    self.cockpit.extensionPoints.inputController.register(
+
+    this.inputDefaults =
       [
         // camera up/centre/down
         {
@@ -34,8 +34,7 @@
             cockpit.rov.emit('plugin.cameraTilt.adjust', 0.1);
           }
         }
-      ]);
-*/
+      ];
   };
 
   plugins.CameraTilt.prototype.getTelemetryDefintions = function getTelemetryDefintions() {

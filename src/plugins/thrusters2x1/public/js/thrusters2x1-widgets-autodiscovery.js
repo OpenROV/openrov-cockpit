@@ -9,7 +9,7 @@
   widgets['orov-thrusters2x1-motortest'] =  {
       name:'orov-thrusters2x1-motortest',
       defaultUISymantic: 'multipurpose-display',
-      url: urlOfJsFile('thrusters2x1-widgets-autodiscovery.js')+'../webcomponents/orov-thrusters2x1-motortest.html'
+      url: 'thrusters2x1/orov-thrusters2x1-motortest.html'
     };
 
 }

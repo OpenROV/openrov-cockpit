@@ -9,7 +9,7 @@
   widgets['orov-settings-manager'] =  {
       name:'orov-settings-manager',
       defaultUISymantic: 'multipurpose-display',
-      url: urlOfJsFile('settings-manager-widgets-autodiscovery.js')+'../webcomponents/orov-settings-manager.html'
+      url: 'settings-manager/orov-settings-manager.html'
     };
 
 }

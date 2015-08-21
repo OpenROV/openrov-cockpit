@@ -1,0 +1,55 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module name="orov-ping-graph">
+  <style>
+  .std {
+    background-color: black;
+    color: white;
+    width: 100px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 2vw;
+  }
+  </style>
+    <template>
+    <div on-click="toggle">
+    <link href="../grapp-graph-epoch/grapp-graph-epoch.html" rel="import">
+      <grapp-graph-epoch id="timegraph" hidden="{{!enabled}}" type="time.bar" window-size="10" history-size="10" axis="" width="100" height="40">
+        <grapp-graph-epoch-series label="Time Series 1"
+          data='[{"time":1370044800,"y":1},{"time":1370044801,"y":10}]'>
+        </grapp-graph-epoch-series>
+      </grapp-graph-epoch>
+    <span id="instantvalue" hidden="{{enabled}}" class="std">{{toFixed(pingTime,2)}}</span>
+  </div>
+    </template>
+
+  </template>
+  <script>
+    (function() {
+      var orovbehaviors = namespace('behaviors');
+      Polymer({
+        is: 'orov-ping-graph',
+        properties: {
+          pingTime: {type:Number,value:0}
+        },
+        behaviors: [orovbehaviors.oROVStandard],
+        toFixed: function(n,places){
+          return n.toFixed(places);
+        },
+        ready: function () {
+        },
+        registerEmitterHanlders: function(emitter){
+          var self = this;
+          emitter.on('plugin.connection-health.ping-latency',function(ms){
+            self.pingTime = ms;
+            if (self.$.timegraph.push !== undefined){
+              self.$.timegraph.push((new Date()).getTime()/1000,ms);
+            }
+          });
+
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

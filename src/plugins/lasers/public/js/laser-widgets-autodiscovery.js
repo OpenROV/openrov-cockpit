@@ -9,7 +9,7 @@
   widgets['orov-lasers'] =  {
       name:'orov-lasers',
       defaultUISymantic: 'system-panel',
-      url: urlOfJsFile('laser-widgets-autodiscovery.js')+'../webcomponents/orov-lasers.html'
+      url: 'lasers/orov-lasers.html'
     };
 
 }

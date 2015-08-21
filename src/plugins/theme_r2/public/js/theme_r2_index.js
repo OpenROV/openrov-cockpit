@@ -29,7 +29,7 @@ $('#telemetry').define = function(name,callback){
 
 window.cockpit.rov.onAny(function(data) {
 //  $('servo-tilt')[0].servoAngle = angle;
-console.log(this.event);
+//console.log(this.event);
 //plugin.cameraTilt.angle
 $('#t')[0][this.event.replace(/\./g,"_")] = data;
 });

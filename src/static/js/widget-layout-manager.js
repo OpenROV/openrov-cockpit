@@ -8,7 +8,7 @@ $( document ).ready(function() {
 
   Object.keys(wid).forEach(function(src) {
     var link = document.createElement('link');
-    link.href = wid[src].url;
+    link.href = 'components/'+ wid[src].url;
     link.rel = "import";
     link.async = false;
     document.head.appendChild(link);

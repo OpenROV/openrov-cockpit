@@ -93,14 +93,7 @@ deps.cockpit.on('videoStatus', function(clk) {
 });
 
 deps.cockpit.emit('settings', CONFIG.preferences.get());
-var lastping = 0;
-deps.cockpit.on('ping', function (id) {
-  deps.cockpit.emit('pong', id);
-  if (new Date().getTime() - lastping > 1000) {
-    controller.send('ping(0)');
-    lastping = new Date().getTime();
-  }
-});
+
 deps.cockpit.on('update_settings', function (value) {
   for (var property in value)
     if (value.hasOwnProperty(property))

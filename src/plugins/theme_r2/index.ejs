@@ -30,6 +30,9 @@
   <script type="text/javascript" src="js/no-scroll-fullscreen-viewport.js"></script>
   </head>
   <body class='theme_r2'>
+  <script type="text/javascript" src="js/utilities.js"></script>
+  <script type="text/javascript" src="js/orov-behavior.js"></script> <!--for orov webcontrols -->
+
 
 <!-- The template serves as the model for databinding, javascript is
      interecpting all of the socket.io inbound messages and placing
@@ -38,6 +41,10 @@
   <template id="t" is="dom-bind">
   <!--link rel="import" href="bower_components/mjpeg-video-webcomponents/mjpeg-video.html"-->
   <link rel="import" href="components/telemetry/telemetry-graph.html">
+  <link rel="import" href="components/telemetry/telemetry-item.html">
+  <link rel="import" href="components/host-diagnostics/javascript-loopspeed.html">
+
+
   <!-- plugin/telemetry/webcomponents/ -->
   <!-- Dependency for thrusters-testmotor -->
       <link rel="import" href="components/paper-slider/paper-slider.html">
@@ -61,14 +68,19 @@
         <div id="primary-flight-display"></div>
         <div id="standy-flight-display"></div>
         <div id="warning-display"></div>
-        <div id="systems-display"></div>
+        <div id="systems-display">
+          <telemetry-item telemetry-item="deap" event-emitter={{cockpit-event-emitter}}></telemetry-item>
+          <javascript-latency></javascript-latency>
+        </div>
+
         <div id="flight-control-state"></div>
         <div id="multipurpose-display">
           <telemetry-graph series-to-graph="['deap']" event-emitter={{cockpit-event-emitter}}></telemetry-graph>
         </div>
 
         <div id="flight-control-unit"></div>
-        <div id="data-control-unit"></div>
+        <div id="data-control-unit">
+        </div>
         <div id="camera-display">
           <!--mjpeg-video id="camera1" src='<%= config.video_url %>'  border='1' style='width: 100%; height:100%' menuState='on'></mjpeg-video>
           <rov-horizon id="horizon"></rov-horizon-->
@@ -86,13 +98,15 @@
  <script type="text/javascript" src="js/cockpit.js"></script>
  <script type="text/javascript" src="js/app.js"></script>
 
-<script type="text/javascript" src="js/utilities.js"></script>
+
 
 <!-- I am loading these manually.. but they should be populated through the
      plugin manager -->
  <script type="text/javascript" src="plugin/theme_r2/js/theme_r2_index.js"></script>
+
  <script type="text/javascript" src="plugin/lasers/js/laser-widgets-autodiscovery.js"></script>
  <script type="text/javascript" src="plugin/lasers/js/laser.js"></script>
+
  <script type="text/javascript" src="plugin/settings-manager/js/settings-manager.js"></script>
  <script type="text/javascript" src="plugin/settings-manager/js/settings-manager-widgets-autodiscovery.js"></script>
 
@@ -103,6 +117,15 @@
  <script type="text/javascript" src="plugin/camera-tilt/js/camera-tilt.js"></script>
 
  <script type="text/javascript" src="plugin/telemetry/js/telemetry.js"></script>
+  <script type="text/javascript" src="plugin/connection-health/js/connection-health.js"></script>
+  <script type="text/javascript" src="plugin/connection-health/js/connection-health-widgets-autodiscovery.js"></script>
+
+  <script type="text/javascript" src="plugin/externallights/js/externallights.js"></script>
+  <script type="text/javascript" src="plugin/externallights/js/externallights-widgets-autodiscovery.js"></script>
+
+  <script type="text/javascript" src="plugin/rovpilot/js/rovpilot.js"></script>
+  <script type="text/javascript" src="plugin/rovpilot/js/rovpilot-widgets-autodiscovery.js"></script>
+
 
  <script type="text/javascript" src="js/widget-layout-manager.js"></script>
 

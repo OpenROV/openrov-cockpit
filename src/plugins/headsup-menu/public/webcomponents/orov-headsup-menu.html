@@ -1,0 +1,53 @@
+<link rel="import" href="../polymer/polymer.html">
+<dom-module name="orov-headsup-menu">
+  <style>
+  </style>
+  <template>
+    <div id="headsup-menu-container">
+        <div class="heading">Heads-Up Menu</div>
+        <div id="headsup-menu-items">
+
+            <div id="headsup-menu-templates">
+                <script type="text/html" id="menuRow-button">
+                    <li>
+                        <div class="menuRow" data-bind="attr: { id: $data.uniqueId }">
+                            <button class="btn btn-large btn-block" data-bind="text: label, click: callback"></button>
+                        </div>
+                    </li>
+                </script>
+                <script type="text/html" id="menuRow-custom">
+                    <li>
+                        <div class="menuRow"  data-bind="attr: { id: $data.uniqueId }">
+                            <!-- create a template based on the custom content -->
+                            <script type="text/html" data-bind="attr: { id: $data.headsUpTemplateId }, html: content" />
+                            <!-- reference the created template -->
+                            <div class="custom-block" data-bind="template: { name: $data.headsUpTemplateId }" />
+                        </div>
+                    </li>
+                </script>
+            </div>
+
+            <ul class="unstyled" data-bind="template: { name: getTemplateName, foreach: items, as: 'item' }" />
+        </div>
+    </div>    
+  </template>
+
+  <script>
+    (function() {
+      var orovbehaviors = namespace('behaviors');
+      Polymer({
+        is: "orov-headsup-menu",
+        properties: {
+        },
+        behaviors: [orovbehaviors.oROVStandard],
+        registerEmitterHanlders: function(emitter){
+          var self = this;
+          emitter.on('plugin.cameraTilt.angle',function(angle){
+            self.servoAngle = angle;
+          });
+        }
+      })
+    })();
+  </script>
+
+</dom-module>

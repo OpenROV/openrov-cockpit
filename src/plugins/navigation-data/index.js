@@ -1,5 +1,5 @@
 (function() {
-  function Laser(name, deps) {
+  function NavigationData(name, deps) {
     console.log('Navigation Data plugin loaded');
 
     var navdata = {
@@ -45,5 +45,5 @@
     }, 100);
 
   }
-  module.exports = Laser;
+  module.exports = NavigationData;
 })();

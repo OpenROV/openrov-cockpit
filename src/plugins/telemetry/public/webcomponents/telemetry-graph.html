@@ -45,7 +45,9 @@
           var t = Object.keys(data)
           for (var i in t) {
             if (this.seriesToGraph.indexOf(t[i])>=0){
-              this.$.timegraph.push((new Date()).getTime()/1000, data[t[i]]);
+              if (this.$.timegraph.push !== undefined){
+                this.$.timegraph.push((new Date()).getTime()/1000, data[t[i]]);
+              }
             }
           }
         },

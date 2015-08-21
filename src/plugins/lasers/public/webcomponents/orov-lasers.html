@@ -1,3 +1,4 @@
+<link rel="import" href="../polymer/polymer.html">
 <dom-module name="orov-lasers">
 <style>
   .indicator {
@@ -48,21 +49,19 @@
         is:'orov-lasers',
         properties: {
           lasersEnabled: {type: Boolean, value:false},
-          eventEmitter: {type: Object, readOnly: true, observer: 'eventEmitterChange'}
         },
+        behaviors: [namespace('behaviors').oROVStandard],
         toggle: function() {
           this.fire('toggle-lasers');
           if (this.eventEmitter !== undefined){
             this.eventEmitter.emit("plugin.laser.toggle");
           }
         },
-        eventEmitterChange: function(){
+        registerEmitterHanlders: function(emitter){
           var self = this;
-          if (this.eventEmitter !== undefined){
-            this.eventEmitter.on('plugin.laser.state',function(data){
-              self.lasersEnabled = data;
-            });
-          }
+          emitter.on('plugin.laser.state',function(data){
+            self.lasersEnabled = data;
+          });
         }
       })
     })();

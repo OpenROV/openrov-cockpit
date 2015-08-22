@@ -6,10 +6,10 @@
   'use strict';
   var widgets = namespace('widgets');
 
-  widgets['orov-telemetry-monitor'] =  {
-      name:'orov-telemetry-monitor',
+  widgets['orov-plugin-finder'] =  {
+      name:'orov-plugin-finder',
       defaultUISymantic: 'multipurpose-display',
-      url: 'telemetry/orov-telemetry-monitor.html'
+      url: 'plugin-finder/orov-plugin-finder.html'
     };
 
 }

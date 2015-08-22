@@ -41,17 +41,10 @@ var PluginLoader = function() {
           var pluginInstance = require(path.join(dir, plugin))(plugin, deps);
           result.plugins.push(pluginInstance);
 
+          //Note the asset is set in the if check and used by the css and js search
           // Add the public assets to a static route
           if (fs.existsSync(assets = path.join(dir, plugin, 'public'))) {
             result.assets.push({ path: shareDir + '/' + plugin, assets: assets});
-          }
-
-          // Add the webcomponents and bower dirs assets to a static route
-          if (fs.existsSync(assets = path.join(dir, plugin, 'public/webcomponents'))) {
-            result.assets.push({ path: 'components' + '/' + plugin, assets: assets});
-          }
-          if (fs.existsSync(assets = path.join(dir, plugin, 'public/bower_components'))) {
-            result.assets.push({ path: 'components' + '/' + plugin, assets: assets});
           }
 
           // Add the js to the view
@@ -66,6 +59,15 @@ var PluginLoader = function() {
               result.styles.push(shareDir + '/' + plugin + '/css/' + style);
             });
           }
+
+          // Add the webcomponents and bower dirs assets to a static route
+          if (fs.existsSync(assets = path.join(dir, plugin, 'public/webcomponents'))) {
+            result.assets.push({ path: 'components' + '/' + plugin, assets: assets});
+          }
+          if (fs.existsSync(assets = path.join(dir, plugin, 'public/bower_components'))) {
+            result.assets.push({ path: 'components' + '/' + plugin, assets: assets});
+          }
+
        } else {
         console.log('Skipping as file not found in expected location');
        }

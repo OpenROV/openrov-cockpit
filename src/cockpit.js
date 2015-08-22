@@ -163,6 +163,11 @@ if (process.platform === 'linux') {
 // Load the plugins
 function addPluginAssets(result) {
   scripts = scripts.concat(result.scripts);
+  console.log("====== Scripts ======")
+  console.dir(result.scripts);
+  result.scripts.forEach(function (asset) {
+    console.log("SCRIPT: " + asset);
+  });
   styles = styles.concat(result.styles);
   result.assets.forEach(function (asset) {
     console.log("TEST: " + asset.path);

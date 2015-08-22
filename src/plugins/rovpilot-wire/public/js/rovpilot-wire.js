@@ -18,7 +18,7 @@
 
   };
 
-  ROVpilot.prototype.defaultInputs = function defaultInputs() {
+  ROVpilotWire.prototype.defaultInputs = function defaultInputs() {
     self = this;
     return [
       // Toggle heading hold
@@ -45,7 +45,7 @@
   }
 
 
-  ROVpilot.prototype.defaultMenu = function defaultMenu() {
+  ROVpilotWire.prototype.defaultMenu = function defaultMenu() {
     return [
       {
         label: 'Toggle Depth hold',
@@ -65,25 +65,25 @@
 
   //This pattern will hook events in the cockpit and pull them all back
   //so that the reference to this instance is available for further processing
-  ROVpilot.prototype.listen = function listen() {
+  ROVpilotWire.prototype.listen = function listen() {
     var self = this;
 
-    this.cockpit.on('plugin.rovpilot.allStop') = function allStop() {
+    this.cockpit.on('plugin.rovpilot.allStop',function allStop() {
       this.positions.throttle = 0;
       this.positions.yaw = 0;
       this.positions.lift = 0;
       this.positions.pitch = 0;
       this.positions.roll = 0;
       this.postitions.strafe = 0;
-    };
+    });
 
-    this.rovsendPilotingDataTimer = setInterval(function(){
-      self.rovsendPilotingData();
-    },100); //Todo: Make configurable
+//    this.rovsendPilotingDataTimer = setInterval(function(){
+//      self.rovsendPilotingData();
+//    },100); //Todo: Make configurable
 
   };
 
-  ROVPilot.prototype.sendPilotingData = function sendPilotingData() {
+  ROVpilotWire.prototype.sendPilotingData = function sendPilotingData() {
     var positions = this.positions;
     var self = this;
     //force an update if the ack has not been cleared
@@ -114,5 +114,5 @@
   };
 
 
-  window.Cockpit.plugins.push(ROVpilot);
+  window.Cockpit.plugins.push(ROVpilotWire);
 }(window, jQuery));

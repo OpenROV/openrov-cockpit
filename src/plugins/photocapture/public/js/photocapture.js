@@ -20,7 +20,7 @@
         description: 'Take a snapshot of the current video image.',
         defaults: { keyboard: 'c', gamepad: 'LB' },
         down: function() { photoc.cockpit.rov.emit('plugin.photoCapture.snapshot'); }
-      });
+      }
     ]
   };
 

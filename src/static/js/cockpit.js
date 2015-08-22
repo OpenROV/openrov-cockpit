@@ -31,6 +31,16 @@
           break;
           case 6: self.rov.emit(args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift());
           break;
+          case 7: self.rov.emit(args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift());
+          break;
+          case 8: self.rov.emit(args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift());
+          break;
+          case 9: self.rov.emit(args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift());
+          break;
+          case 10: self.rov.emit(args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift());
+          break;
+
+
         }
     };
 

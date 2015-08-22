@@ -1,6 +1,6 @@
-<!--link rel="import" href="../bower_components/polymer/polymer.html"-->
+<link rel="import" href="../polymer/polymer.html">
 
-<polymer-element name="telemetry-monitor" attributes="maxLines,define">
+<dom-module name="orov-telemetry-monitor">
   <template>
     <style>
     ::-webkit-scrollbar {
@@ -103,17 +103,25 @@
     (function() {
 
       Polymer({
-        telemetry: {},
-        importantTelemetry: {},
-        expandedTelemetry: {},
-        titles: {},
-        textcolor: 0,
-        ready: function () {
+        is:'orov-telemetry-monitor',
+        properties:{
+          telemetry: {type:Object, value: {}},
+          importantTelemetry: {type:Object, value: {}},
+          expandedTelemetry: {type: Object, value: {}},
+          titles: {type:Object, value: {}},
+          textcolor: {type: Number, value: 0}
         },
-        domReady: function () {
+        behaviors: [namespace('behaviors').oROVStandard],
+        registerEmitterHanlders: function(emitter){
           var self = this;
-          this.list = $(this.$.TelemetryList);
-          this.ilist = $(this.$.ImportantList);
+          emitter.on('status',function(status){
+            self.logStatusData(status);
+          });
+        },
+        ready: function () {
+          var self = this;
+          this.list = this.$.TelemetryList;
+          this.ilist = this.$.ImportantList;
           self.telemetryList = this.list.length > 0 ? this.list[0] : undefined;
 
           if (self.telemetryList) {
@@ -244,18 +252,25 @@
 
           updateTelemetry(this.telemetry,fragment,impfragment,null,'t',titles);
 
-          this.list.empty();
-          if (this.list.length > 0) {
-            this.list[0].appendChild(fragment.cloneNode(true));
+
+          while (this.list.firstChild) {
+            this.list.removeChild(this.list.firstChild);
           }
 
-          this.ilist.empty();
-          if (this.ilist.length > 0) {
-            this.ilist[0].appendChild(impfragment.cloneNode(true));
+          if (this.list !== undefined) {
+            this.list.appendChild(fragment.cloneNode(true));
+          }
+
+          while (this.ilist.firstChild) {
+            this.ilist.removeChild(this.ilist.firstChild);
+          }
+
+          if (this.ilist !== undefined) {
+            this.ilist.appendChild(impfragment.cloneNode(true));
           }
         }
       })
     })();
   </script>
 
-</polymer-element>
+</dom-module>

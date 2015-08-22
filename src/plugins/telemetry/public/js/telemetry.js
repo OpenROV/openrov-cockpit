@@ -42,6 +42,11 @@
       }
     });
 
+    self.cockpit.rov.on('status',function(data){
+      self.cockpit.emit('status',data);
+    });
+
+
     /* Crawl the plugins looking for those with telemetry definitions */
     self.cockpit.loadedPlugins.forEach(function(plugin){
       var defobject = self.definitions;

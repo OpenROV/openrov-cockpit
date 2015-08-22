@@ -9,7 +9,7 @@
   widgets['brightness-indicator'] =  {
       name:'brightness-indicator',
       defaultUISymantic: 'system-panel',
-      url: urlOfJsFile('lights-widgets-autodiscovery.js')+'../webcomponents/brightness-indicator.html'
+      url: 'lights/brightness-indicator.html'
     };
 
 }

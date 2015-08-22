@@ -24,8 +24,6 @@
   <script type="text/javascript" src="<%= sysscripts[i] %>"></script><% } %>
 
   <!--
-  <% for(var i=0; i<scripts.length; i++) {%>
-  <script type="text/javascript" src="<%= scripts[i] %>"></script><% } %>
 -->
   <script type="text/javascript" src="js/no-scroll-fullscreen-viewport.js"></script>
   </head>
@@ -39,10 +37,11 @@
      them in the template model for one-way data binding.
 -->
   <template id="t" is="dom-bind">
-  <!--link rel="import" href="bower_components/mjpeg-video-webcomponents/mjpeg-video.html"-->
+  <!--link rel="import" href="bower_components/mjpeg-video-webcomponents/mjpeg-video.html">
   <link rel="import" href="components/telemetry/telemetry-graph.html">
   <link rel="import" href="components/telemetry/telemetry-item.html">
   <link rel="import" href="components/host-diagnostics/javascript-loopspeed.html">
+-->
 
 
   <!-- plugin/telemetry/webcomponents/ -->
@@ -69,7 +68,7 @@
         <div id="standy-flight-display"></div>
         <div id="warning-display"></div>
         <div id="systems-display">
-          <telemetry-item telemetry-item="deap" event-emitter={{cockpit-event-emitter}}></telemetry-item>
+          <telemetry-item telemetry-item="cpuUsage" event-emitter={{cockpit-event-emitter}}></telemetry-item>
           <javascript-latency></javascript-latency>
         </div>
 
@@ -103,7 +102,7 @@
 <!-- I am loading these manually.. but they should be populated through the
      plugin manager -->
  <script type="text/javascript" src="plugin/theme_r2/js/theme_r2_index.js"></script>
-
+<!--
  <script type="text/javascript" src="plugin/lasers/js/laser-widgets-autodiscovery.js"></script>
  <script type="text/javascript" src="plugin/lasers/js/laser.js"></script>
 
@@ -125,6 +124,11 @@
 
   <script type="text/javascript" src="plugin/rovpilot/js/rovpilot.js"></script>
   <script type="text/javascript" src="plugin/rovpilot/js/rovpilot-widgets-autodiscovery.js"></script>
+-->
+ <!--Auto Added -->
+ <% for(var i=0; i<scripts.length; i++) {%>
+ <script type="text/javascript" src="<%= scripts[i] %>"></script><% } %>
+
 
 
  <script type="text/javascript" src="js/widget-layout-manager.js"></script>

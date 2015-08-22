@@ -55,7 +55,7 @@
   //so that the reference to this instance is available for further processing
   plugins.SystemPower.prototype.listen = function listen() {
     var self = this;
-    this.cockpit.rov.on('status',function(data){
+    this.cockpit.rov.on('status',function(status){
       //Work around not having the explicit status in the MCU code
       if ('log' in status){
         if (status[log].indexOf('log:escpower=') > 0){

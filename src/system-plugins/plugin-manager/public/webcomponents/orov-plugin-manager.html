@@ -1,0 +1,57 @@
+<link rel="import" href="../polymer/polymer.html">
+<dom-module name="orov-plugin-manager">
+  <style>
+  </style>
+  <template>
+            <label>Plugins to enable/disable</label>
+                    <ul>
+                      <template is="dom-repeat" items="{{controlablePlugins}}">
+
+                        <li>
+                            <div>
+                                <span>{{item.viewName}}</span>
+                                <button type="button" class="btn btn-xs btn-default" hidden?="isEnabled()" on-click="enable" >Enable</button>
+                                <button type="button" class="btn btn-xs btn-default" hidden?="!isEnabled()" on-click="disable">Disable</button>
+                            </div>
+                        </li>
+                      </template>
+                    </ul>
+
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        is: "orov-plugin-manager",
+        properties: {
+          controlablePlugins: {type: Array, value: []}
+        },
+        behaviors: [namespace('behaviors').oROVStandard],
+        attached: function () {
+          var self = this;
+          if (this.eventEmitter!==undefined){
+            self.eventEmitter.emit('plugin-manager.getControllablePlugins',function(results){
+              self.controlablePlugins = results;
+            });
+          }
+        },
+        registerEmitterHanlders: function(emitter){
+          var self = this;
+//          emitter.on('plugin.cameraTilt.angle',function(angle){
+//            self.servoAngle = angle;
+//          });
+        },
+        enable: function(e){
+          if (this.eventEmitter!==undefined){
+            this.eventEmitter.emit('plugin-manager.enablePlugin',e.model.item.name);
+          }
+        },
+        disable: function(e){
+          if (this.eventEmitter!==undefined){
+            this.eventEmitter.emit('plugin-manager.disablePlugin',e.model.item.name);
+          }
+        }
+      })
+    })();
+  </script>
+
+</dom-module>

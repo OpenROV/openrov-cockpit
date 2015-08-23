@@ -21,6 +21,23 @@
       starboardThrottle: 'tankControl.starboardThrottle'
     };
 
+    // for plugin management:
+    this.name = 'TankControl';   // for the settings
+    this.viewName = 'Tank GamePad Controls'; // for the UI
+    this.canBeDisabled = true; //allow enable/disable
+    var self = this;
+    this.enable = function () {
+      if (!self.tankControlActive){
+        self.toggleControl();
+      }
+    };
+    this.disable = function () {
+      if (self.tankControlActive){
+        self.toggleControl();
+      }
+    };
+
+
   };
 
 
@@ -33,7 +50,7 @@
         down: function() { rov.toggleControl(); }
       },
         {
-          name: rov.controlNames.leftLift,
+          name: 'rov.controlNames.leftLift',
           description: 'Tankcontrol: Lift control control for the left hand gamepad.',
           defaults: { gamepad: 'LEFT_STICK_X' },
           active: false,
@@ -50,7 +67,7 @@
           }
         },
         {
-          name: rov.controlNames.portThrottle,
+          name: 'rov.controlNames.portThrottle',
           description: 'Tankcontrol: Throttle control for the port prop.',
           defaults: { gamepad: 'LEFT_STICK_Y' },
           active: false,
@@ -60,7 +77,7 @@
           }
         },
         {
-          name: rov.controlNames.rightLift,
+          name: 'rov.controlNames.rightLift',
           description: 'Tankcontrol: Lift control control for the right hand gamepad.',
           defaults: { gamepad: 'RIGHT_STICK_X' },
           active: false,
@@ -78,7 +95,7 @@
           }
         },
         {
-          name: rov.controlNames.starboardThrottle,
+          name: 'rov.controlNames.starboardThrottle',
           description: 'Tankcontrol: Throttle control for the starboard prop.',
           defaults: { gamepad: 'RIGHT_STICK_Y' },
           active: false,

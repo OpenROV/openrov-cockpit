@@ -38,7 +38,6 @@
       }
     };
 
-    this.cockpit.extensionPoints.inputController = self;
     return self;
   };
 
@@ -70,7 +69,11 @@
     /* Crawl the plugins looking for those with settings definitions */
     this.cockpit.loadedPlugins.forEach(function(plugin){
       if (plugin.inputDefaults !== undefined){
-        self.register(plugin.inputDefaults());
+        if (typeof(plugin.inputDefaults) == 'function'){
+          self.register(plugin.inputDefaults());
+        }else {
+          self.register(plugin.inputDefaults);
+        }
       }
     });
 

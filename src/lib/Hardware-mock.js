@@ -14,8 +14,11 @@ function Hardware() {
   hardware.connect = function () {
     console.log('!Serial port opened');
   };
-  hardware.toggleRawSerialData = function toggleRawSerialData() {
-    emitRawSerial = !emitRawSerial;
+  hardware.startRawSerialData = function startRawSerialData() {
+    emitRawSerial = true;
+  };
+  hardware.stopRawSerialData = function stopRawSerialData() {
+    emitRawSerial = false;;
   };
 
   hardware.write = function (command) {

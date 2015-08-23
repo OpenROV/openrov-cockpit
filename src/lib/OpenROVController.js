@@ -87,8 +87,12 @@ var OpenROVController = function (eventLoop, client) {
     controller.Capabilities = val;
   });
 
-  globalEventLoop.on('SerialMonitor_toggle_rawSerial', function () {
-    controller.hardware.toggleRawSerialData();
+  globalEventLoop.on('SerialMonitor_start_rawSerial', function () {
+    controller.hardware.startRawSerialData();
+  });
+
+  globalEventLoop.on('SerialMonitor_stop_rawSerial', function () {
+    controller.hardware.stopRawSerialData();
   });
 
   globalEventLoop.on('serial-stop', function () {

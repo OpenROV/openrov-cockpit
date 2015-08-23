@@ -9,6 +9,7 @@
     "jquery": "1.11",
     "jquery-ui": "1.11",
     "knockoutjs": "3.2",
-    "iron-ajax": "PolymerElements/iron-ajax#~1.0.4"
+    "iron-ajax": "PolymerElements/iron-ajax#~1.0.4",
+    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#~1.0.2"
   }
 }

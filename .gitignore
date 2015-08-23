@@ -40,3 +40,4 @@ temp
 .idea
 etc/rovconfig.json
 share
+bower_components

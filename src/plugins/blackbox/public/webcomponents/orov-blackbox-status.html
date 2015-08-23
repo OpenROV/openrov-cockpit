@@ -1,0 +1,37 @@
+<link rel="import" href="../polymer/polymer.html">
+<dom-module name="orov-blackbox-status">
+  <link rel="import" type="css" href="components-font-awesome/css/font-awesome.min.css">
+  <style>
+    .recording{
+      color: green;
+    }
+  </style>
+  <template>
+    <i id='icon' class="fa fa-database fa-2x"></i>
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        is: "orov-blackbox-status",
+        properties: {
+          status: {type: Boolean, value: false, observer: '_statusChanged'}
+        },
+        behaviors: [namespace('behaviors').oROVStandard],
+        registerEmitterHanlders: function(emitter){
+          var self = this;
+          emitter.on('plugin-blackbox-recording-status',function(status){
+            self.status = status;
+          });
+        },
+        _statusChanged: function(newv, oldv){
+          if (newv){
+            this.$.icon.className = this.$.icon.className + ' recording';
+          } else {
+            this.$.icon.className = this.$.icon.className.replace(/\brecording\b/,'');
+          }
+        }
+      })
+    })();
+  </script>
+
+</dom-module>

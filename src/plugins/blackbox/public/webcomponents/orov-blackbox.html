@@ -1,0 +1,50 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
+<dom-module name="orov-blackbox">
+  <style>
+  </style>
+  <template>
+    <lable>Black Box Controls</label>
+    <button on-click='start'>Start</button>
+    <button on-click='stop'>Stop</button>
+<paper-dropdown-menu label="Choose format:">
+      <paper-menu class="dropdown-content" selected="{{format}}">
+          <paper-item>csv</paper-item>
+          <paper-item>json</paper-item>
+          <paper-item>xml</paper-item>
+      </paper-menu>
+</paper-dropdown-menu>
+    <button on-click='export'>Export</button>
+
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        is: "orov-blackbox",
+        properties: {
+          format: {type: String, value: 'csv'}
+        },
+        behaviors: [namespace('behaviors').oROVStandard],
+        registerEmitterHanlders: function(emitter){
+        },
+        start: function(){
+          if(this.eventEmitter !== undefined){
+            this.eventEmitter.emit('plugin-blackbox-recording-start');
+          }
+        },
+        stop: function(){
+          if(this.eventEmitter !== undefined){
+            this.eventEmitter.emit('plugin-blackbox-recording-stop');
+          }
+        },
+        export: function(){
+          var options = {collection: '*', format: this.format};
+          if(this.eventEmitter !== undefined){
+            this.eventEmitter.emit('plugin-blackbox-export',options);
+          }
+        }
+      })
+    })();
+  </script>
+
+</dom-module>

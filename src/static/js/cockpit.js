@@ -14,7 +14,7 @@
     var self = this;
 //    this.uiLoader = new window.UiLoader();
     this.rov = new window.MessageManager(csocket);
-    var onevent = csocket.onevent;
+/*    var onevent = csocket.onevent;
     csocket.onevent = function (packet) {
         var args = packet.data || [];
         onevent.call (this, packet);    // original call
@@ -43,7 +43,7 @@
 
         }
     };
-
+*/
     this.sendUpdateEnabled = true;
     this.capabilities = 0;
     this.loadedPlugins = [];

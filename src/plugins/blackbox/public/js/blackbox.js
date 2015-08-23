@@ -1,212 +1,194 @@
-(function (window, document) {
+(function (window, document, jQuery) {
   'use strict';
-  /*
-         * Constructuor
-         */
-  var telemetry = [];
-  var server;
-  var idb;
+  var plugins = namespace('plugins');
+
 
   var Blackbox = function Blackbox(cockpit) {
     console.log('Loading Blackbox plugin.');
     this.cockpit = cockpit;
     this.recording = false;
-    var blackbox = this;
-    // add required UI elements
-    cockpit.extensionPoints.buttonPanel.append('<span id="blackboxstatus" class="false pull-right"></span>');
-    cockpit.extensionPoints.buttonPanel.append('<button id="exportButton" class="btn pull-right disabled">Download Data</button><a id="exportLink" download="data.json"></a>');
-    $('#keyboardInstructions').append('<p><i>r</i> to toggle recording of telemetry</p>');
-    cockpit.extensionPoints.buttonPanel.find('#exportButton').click(exportData);
-    this.cockpit.rov.on('plugin.navigationData.data', function (data) {
-      if (!jQuery.isEmptyObject(data)) {
-        blackbox.logNavData(data);
-      }
-    });
-    this.cockpit.rov.on('status', function (data) {
-      if (!jQuery.isEmptyObject(data)) {
-        blackbox.logStatusData(data);
-      }
+    this.idb;
+
+    this.idb = this.defineDB(); //Readies the DB, ensures schema is consistent
+    this.idb.on('error', function (err) {
+        // Catch all uncatched DB-related errors and exceptions
+        console.error(err);
     });
   };
-  /*
-         * Register keyboard event listener
-         */
-  Blackbox.prototype.listen = function listen() {
-    var self = this;
 
-    self.cockpit.extensionPoints.inputController.register(
+  plugins.Blackbox = Blackbox;
+
+  Blackbox.prototype.inputDefaults = function inputDefaults() {
+    var self = this;
+    return [
       {
         name: 'blackbox.record',
         description: 'Start recording telemetry data.',
         defaults: { keyboard: 'r' },
-        down: function() { self.keyDown();  }
-      });
-    };
+        down: function() { self.toggleRecording();  }
+      }
+    ]
+  }
 
-  var refreshintervalID;
-  //	var server;
-  //	var telemetry = [];
+  Blackbox.prototype.listen = function listen() {
+    var self = this;
+
+    this.cockpit.rov.on('plugin.navigationData.data', function (data) {
+      if (!jQuery.isEmptyObject(data)) {
+        self.logNavData(data);
+      }
+    });
+    this.cockpit.rov.on('status', function (data) {
+      if (!jQuery.isEmptyObject(data)) {
+        self.logStatusData(data);
+      }
+    });
+
+    this.cockpit.on('plugin-blackbox-export', function(options){
+      self.exportData(options);
+    });
+
+    this.cockpit.on('plugin-blackbox-recording-start', function(){
+      self.startRecording();
+    });
+
+    this.cockpit.on('plugin-blackbox-recording-stop', function(){
+      self.stopRecording();
+    });
+
+    this.cockpit.on('plugin-blackbox-recording?', function(fn){
+      if(typeof(fn) === 'function'){
+        fn(self.recording);
+      }
+    });
+
+
+  };
+
   Blackbox.prototype.toggleRecording = function toggleRecording() {
-    console.log('Recording = ' + this.recording);
+    if (this.recording){
+      this.stopRecording();
+    } else {
+      this.startRecording();
+    }
+  };
+
+  Blackbox.prototype.startRecording = function startRecording() {
     if (!this.recording) {
       console.log('Recording Telemetry');
-      cockpit.extensionPoints.buttonPanel.find('#blackboxstatus').toggleClass('false true');
-      cockpit.extensionPoints.buttonPanel.find('#exportButton').toggleClass('disabled enabled');
       var blackbox = this;
-      refreshintervalID = self.setInterval(blackbox.logTelemetryData, 1000);
-    } else {
+      this.idb.open();
+      this.recording = true;
+      this.cockpit.emit('plugin-blackbox-recording-status',true);
+    }
+  };
+
+  Blackbox.prototype.stopRecording = function stopRecording() {
+    if (this.recording) {
       console.log('Stopping Telemetry');
-      cockpit.extensionPoints.buttonPanel.find('#blackboxstatus').toggleClass('true false');
-      cockpit.extensionPoints.buttonPanel.find('#exportButton').toggleClass('enabled disabled');
-      clearInterval(refreshintervalID);
-    }
-    this.recording = !this.recording;
-  };
-  Blackbox.prototype.test = function () {
-    console.log('tteesstt');
-    blackbox.logTelemetryData();
-  };
-  /*
-         * Process onkeydown.
-         */
-  Blackbox.prototype.keyDown = function keyDown(ev) {
-    var self = this;
-    if (!this.recording) {
-      this.openDB(function() {self.toggleRecording();});
-    } else {
-      this.closeDB(function() {self.toggleRecording();});
+      this.recording = false;
+      this.idb.close();
+      this.cockpit.emit('plugin-blackbox-recording-status',false);
     }
   };
+
   Blackbox.prototype.logNavData = function logNavData(navdata) {
     if (!this.recording) {
       return;
     }
-    navdata.timestamp = new Date().getTime();
-    server.navdata.add(navdata).done(function (item) {
-      console.log('saved');
-    });
+    navdata.timestamp = Date.now();
+    this.idb.navdata.add(navdata)
+      .catch(function (error) {
+        console.error(error);
+      });
   };
-  Blackbox.prototype.logTelemetryData = function logTelemetryData() {
-    var clone = {};
-    for (var i in telemetry) {
-      clone[i] = telemetry[i];
-    }
-    clone.timestamp = new Date().getTime();
-    server.telemetry.add(clone).done(function (item) {
-      console.log('saved telemetry');
-    }).fail(function (a, x) {
-      console.log(x);
-    });
-  };
-  Blackbox.prototype.logStatusData = function logStatusData(data) {
+
+  Blackbox.prototype.logStatusData = function logStatusData(statusdata) {
     if (!this.recording) {
       return;
     }
-    for (var i in data) {
-      telemetry[i] = data[i];
-    }
+    statusdata.timestamp = Date.now();
+    this.idb.telemetry.add(statusdata)
+      .catch(function (error) {
+        console.error(error);
+      });
   };
-  Blackbox.prototype.openDB = function openDB(callback) {
-    db.open({
-      server: 'openrov-blackbox',
-      version: 1,
-      schema: {
-        navdata: {
-          key: {
-            keyPath: 'timestamp',
-            autoIncrement: false
-          },
-          indexes: {}
-        },
-        telemetry: {
-          key: {
-            keyPath: 'timestamp',
-            autoIncrement: false
-          }
-        }
-      }
-    }).done(function (s) {
-      server = s;
-      idb = server.db();
-      callback();
+
+  Blackbox.prototype.defineDB = function defineDB(callback){
+    //Instructions to upgrade: https://github.com/dfahlander/Dexie.js/wiki/Design
+    var idb = new Dexie("openrov-blackbox2");
+    idb.version(1).stores({
+        navdata: 'timestamp',
+        telemetry: 'timestamp',
     });
+    return idb;
+  }
+
+  Blackbox.prototype.exportData = function exportData(options){
+    var cols;
+
+    if(options.collection === "*"){
+      cols = ['navdata','telemetry'];
+    } else {
+      cols = [options.collection];
+    }
+
+    for(var i in cols){
+      options.collection = cols[i];
+      if (!this.recording) {
+        this.idb.open()
+          .catch(function (error) {
+            console.error(error);
+          });
+        this._exportData(options);
+        this.idb.close();
+      } else {
+        this._exportData(options);
+      }
+    }
+
   };
-  Blackbox.prototype.closeDB = function closeDB(callback) {
-    server.close();
-    callback();
-  };
-  window.Cockpit.plugins.push(Blackbox);
 
+  Blackbox.prototype._exportData = function _exportData(options,callback){
 
-  var exportData = function (e) {
-    //block click before ready
-    if (!idb)
-      return;
-    e.preventDefault();
-    var link = cockpit.extensionPoints.buttonPanel.find('#exportLink');
-    //Ok, so we begin by creating the root object:
-    var data = {};
-    var promises = [];
-    var content = [];
-
-    var handleResult = function (event) {
-      var cursor = event.target.result;
-      if (cursor) {
-        content.push(cursor.value);
-        cursor.continue();
+    var fakeClick = function fakeClick(anchorObj) {
+      if (anchorObj.click) {
+        anchorObj.click();
+      } else if (document.createEvent) {
+        if (event.target !== anchorObj) {
+          var evt = document.createEvent('MouseEvents');
+          evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+          var allowDefault = anchorObj.dispatchEvent(evt);
+        }
       }
     };
 
-    for (var i = 0; i < idb.objectStoreNames.length; i++) {
-      //thanks to http://msdn.microsoft.com/en-us/magazine/gg723713.aspx
-      promises.push($.Deferred(function (defer) {
-        var objectstore = idb.objectStoreNames[i];
-        console.log(objectstore);
-        var transaction = idb.transaction([objectstore], 'readonly');
-        content = [];
-        transaction.oncomplete = function (event) {
-          console.log('trans oncomplete for ' + objectstore + ' with ' + content.length + ' items');
-          defer.resolve({
-            name: objectstore,
-            data: content
-          });
-        };
-        transaction.onerror = function (event) {
-          // Don't forget to handle errors!
-          console.dir(event);
-        };
-        var objectStore = transaction.objectStore(objectstore);
-        objectStore.openCursor().onsuccess = handleResult;
-      }).promise()); /* jshint ignore:line */
-    }
-    $.when.apply(null, promises).then(function (result) {
-      //arguments is an array of structs where name=objectstorename and data=array of crap
-      //make a copy cuz I just don't like calling it argument
-      var dataToStore = arguments;
-      //serialize it
-      var serializedData = JSON.stringify(dataToStore);
-      //The Christian Cantrell solution
-      //document.location = 'data:Application/octet-stream,' + encodeURIComponent(serializedData);
-      var blob = new Blob([serializedData], { 'type': 'application/octet-stream' });
-      link.attr('href', window.URL.createObjectURL(blob));
-      //link.attr("href",'data:Application/octet-stream,'+encodeURIComponent(serializedData));
-      //link.trigger("click");
-      fakeClick(link[0]);
-    });
-  };
-  function fakeClick(anchorObj) {
-    if (anchorObj.click) {
-      anchorObj.click();
-    } else if (document.createEvent) {
-      if (event.target !== anchorObj) {
-        var evt = document.createEvent('MouseEvents');
-        evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-        var allowDefault = anchorObj.dispatchEvent(evt);  // you can check allowDefault for false to see if
-                                                          // any handler called evt.preventDefault().
-                                                          // Firefox will *not* redirect to anchorObj.href
-                                                          // for you. However every other browser will.
-      }
-    }
-  }
+    var downloadInBrowser = function downloadInBrowser(data,name){
+      var blob = new Blob([data], { 'type': 'application/octet-stream' });
+      var link = document.createElement("A");
+      link.setAttribute('href', window.URL.createObjectURL(blob));
+      link.setAttribute('download',name);
+      //download="data.json"
+      //link.attr('href', window.URL.createObjectURL(blob));
+      document.body.appendChild(link);
+      fakeClick(link);
+    };
 
-}(window, document));
+    this.idb[options.collection].toArray(function(name,dump){
+      var serializedData;
+      switch(options.format){
+        case 'json': serializedData = JSON.stringify(dump);
+        break;
+        case 'xml': JSON.stringify(dump); //TODO:
+        break;
+        case 'csv':
+        default: serializedData = new CSV(dump, {header: true}).encode(); //TODO:
+      }
+      downloadInBrowser(serializedData,name+'.'+options.format);
+    }.bind(null,options.collection));
+
+  };
+
+  window.Cockpit.plugins.push(Blackbox);
+
+}(window, document, $));

@@ -59,10 +59,10 @@
         fn();
       }
     });
-    this.cockpit.on('InputController.getCommands',function(controls,fn){
+    this.cockpit.on('InputController.getCommands',function(fn){
       var commands = [];
       if (fn!==undefined){
-        fn(commands);
+        fn(self.model.commands);
       }
     });
 

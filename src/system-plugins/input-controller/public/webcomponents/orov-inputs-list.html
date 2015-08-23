@@ -22,13 +22,17 @@
           commands: {type: Array},
         },
         behaviors: [namespace('behaviors').oROVStandard],
-        ready: function () {
+        attached: function () {
+          var self = this;
+          if (this.eventEmitter !== undefined){
+            this.eventEmitter.emit('InputController.getCommands',function(results){
+              self.commands = results;
+            });
+          }
         },
         registerEmitterHanlders: function(emitter){
           var self = this;
-          emitter.on('plugin.input-controller.getCommands',function(results){
-            self.commands = results;
-          });
+
         },
       })
     })();

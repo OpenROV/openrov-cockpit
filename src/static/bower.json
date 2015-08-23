@@ -8,6 +8,7 @@
     "paper-slider": "PolymerElements/paper-slider#^1.0.4",
     "jquery": "1.11",
     "jquery-ui": "1.11",
-    "knockoutjs": "3.2"
+    "knockoutjs": "3.2",
+    "iron-ajax": "PolymerElements/iron-ajax#~1.0.4"
   }
 }

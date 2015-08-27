@@ -1,10 +1,12 @@
 <link rel="import" href="../polymer/polymer.html">
 <dom-module name="javascript-latency">
+    <link href="../fpsmeter/dist/fpsmeter.css" rel="import">
 <style>
 </style>
   <template>
-    <span id='fpsmeter'></span>
-
+    <div style='width:100px;'>
+    <span id='fpsmeter' style='width: 100px; display: block;'></span>
+   </div>
   </template>
 
   <script src='../fpsmeter/dist/fpsmeter.js' ></script>
@@ -23,11 +25,11 @@
               threshold: 100,
               position: 'absolute',
               zIndex: 10,
-          //    left: '5px',
-          //    top: '5px',
-        //      right: 'auto',
-        //      bottom: 'auto',
-              margin: '0 0 0 0',
+              left: '10',
+              top: '10',
+              right: 'auto',
+              bottom: 'auto',
+              margin: 'auto',
               theme: 'colorful',
               heat: 1,
               graph: 1,

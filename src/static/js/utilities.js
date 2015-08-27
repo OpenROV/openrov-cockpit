@@ -25,6 +25,9 @@ function urlOfJsFile ( jsfile ) {
 }
 
 function namespace(namespaceString) {
+  if(namespaceString === undefined){
+    namespaceString = '';
+  }
   var parts = namespaceString.split('.'),
     parent = window,
     currentPart = '';

@@ -14,13 +14,14 @@
     properties: {
       schema: {type: Object},
       value: {type: Object},
-      editor: {type: Object},
+//      editor: {type: Object},
       editorOptions: {type: Object, value: {
         theme: null,
         disable_edit_json: true,
         disable_properties: true
       }}
     },
+    editor: {},
     behaviors: [namespace('behaviors').oROVStandard],
     registerEmitterHanlders: function(emitter){
       var self = this;
@@ -58,7 +59,7 @@
       var self = this;
 
       if(this.eventEmitter === undefined){
-          this.editor = new JSONEditor(this.$.form1, this.schema);
+//          this.editor = new JSONEditor(this.$.form1, this.schema);
       }
 
     }

@@ -1,4 +1,4 @@
-<dom-module name="telemetry-item">
+<dom-module name="orov-telemetry-item">
 <style>
 .std {
   background-color: black;
@@ -10,6 +10,7 @@
 }
 </style>
   <template>
+    <label>{{telemetryItem}}</label>
   <div on-click="toggle">
   <link href="../grapp-graph-epoch/grapp-graph-epoch.html" rel="import">
     <grapp-graph-epoch id="timegraph" hidden="{{!enabled}}" type="time.line" axis="" width="100" height="40">
@@ -25,37 +26,21 @@
     (function() {
 
       Polymer({
-        is:'telemetry-item',
+        is:'orov-telemetry-item',
         properties:{
-          telemetry: {type:Object},
-          telemetryItem: {type:String},
+          telemetryItem: {type:String, persisted: true},
           telemetryItemValue: {type:String, observer: 'telemetryItemValueChanged'},
-          eventEmitter: {type: Object, readOnly: true, observer: 'eventEmitterChange'},
           enabled: {type: Boolean, value: true}
         },
-        ready: function () {
-          if(this.eventEmitter !== undefined){
-            //var result = this.notifyPath('eventEmitter',this.eventEmitter);
-            this.eventEmitterHasChanged(null,this.eventEmitter);
-          }
+        behaviors: [namespace('behaviors').oROVStandard],
+        registerEmitterHanlders: function(emitter){
+          var self = this;
+          emitter.on('status',function(status){
+            self.logStatusData(status);
+          });
         },
-        telemetryItemValueChanged: function(oldvalue,newvalue){
+        telemetryItemValueChanged: function(newvalue,oldvalue){
           //should update graph
-        },
-        eventEmitterHasChanged: function(oldvalue,newvalue){
-          var self=this;
-
-          if (this.dataupdate===undefined){
-            this.dataupdate = function(data){
-              self.logStatusData(data);
-            }
-          }
-
-          if(oldvalue !== null){
-            oldvalue.off('plugin.telemetry.logData',this.dataupdate)
-          }
-          this.eventEmitter.on('plugin.telemetry.logData',this.dataupdate);
-          //Todo: Dereference the old listener on the old emitter
         },
         logStatusData: function (data) {
           var t = Object.keys(data)

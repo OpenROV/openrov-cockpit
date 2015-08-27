@@ -1,19 +1,19 @@
-body.theme_r2 #system-panel {
-  height: 20px;
-  position: absolute;
-  top:0;
-  left:0;
-}
-
-body.theme_r2 #system-panel * {
+body.theme_r2 #system-panel > * {
   height: 20px;
   width: 20px;
   margin: auto;
   line-height: 20px;
-  display: inline-flex;
+  display: block;
   float: none;
-
 }
+
+body.theme_r2 #main-row > * {
+  border: 1px;
+  border-style: dashed;
+  overflow:auto;
+  width: 400px;
+}
+
 
 body.theme_r2 #multipurpose-display {
   height: 200px;

@@ -5,8 +5,34 @@
     console.log('Loading HostDiagnostics plugin in the browser.');
     // Instance variables
     this.cockpit = cockpit;
+    this.cockpit_events = 0;
+    this.rov_events = 0;
+    this.rov_socketevents = 0;
   };
   HostDiagnostics.prototype.listen = function listen() {
+    var self = this;
+
+    //For counting events
+    this.cockpit.onAny(function(){
+      self.cockpit_events++;
+    });
+
+    this.cockpit.rov.onAny(function(){
+      self.rov_events++;
+    })
+
+    setInterval(function(){
+      self.cockpit.emit('plugin.host-diagnostics.event-counts',{
+        cockpit: self.cockpit_events,
+        rov: self.rov_events,
+        socketIO: self.rov_socketevents
+      });
+      self.cockpit_events = 0;
+      self.rov_events = 0;
+      self.rov_socketevents = 0;
+    },1000);
+
+    //end For counting events
 /*
     // Toggle FPS counter
     this.cockpit.extensionPoints.inputController.register(
@@ -22,5 +48,5 @@
     //This has been working so not going to refactor to make jshint happy just yet
 //    this.meter.isPaused ? this.meter.show() : this.meter.hide(); /* jshint ignore:line */
   };
-  window.Cockpit.plugins.push(HostDiagnostics);
+window.Cockpit.plugins.push(HostDiagnostics);
 }(window, jQuery));

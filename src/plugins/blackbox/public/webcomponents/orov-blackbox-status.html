@@ -1,13 +1,15 @@
 <link rel="import" href="../polymer/polymer.html">
 <dom-module name="orov-blackbox-status">
-  <link rel="import" type="css" href="components-font-awesome/css/font-awesome.min.css">
+  <!--link rel="import" type="css" href="components-font-awesome/css/font-awesome.min.css"-->
+  <link rel="import" href="../fontawesome-iconset/fa-all.html">
   <style>
     .recording{
       color: green;
     }
   </style>
   <template>
-    <i id='icon' class="fa fa-database fa-2x"></i>
+    <iron-icon id='icon2' icon="fa:database"></iron-icon>
+    <!--i id='icon' class="fa fa-database fa-2x"></i-->
   </template>
   <script>
     (function() {
@@ -23,11 +25,16 @@
             self.status = status;
           });
         },
+        attached: function (){
+  //        this.importHref(this.resolveUrl('components-font-awesome/css/font-awesome.min.css'), function(e) {
+  //          console.log("Imported font-awesome");
+  //        });
+        },
         _statusChanged: function(newv, oldv){
           if (newv){
-            this.$.icon.className = this.$.icon.className + ' recording';
+            this.$.icon2.className = this.$.icon2.className + ' recording';
           } else {
-            this.$.icon.className = this.$.icon.className.replace(/\brecording\b/,'');
+            this.$.icon2.className = this.$.icon2.className.replace(/\brecording\b/,'');
           }
         }
       })

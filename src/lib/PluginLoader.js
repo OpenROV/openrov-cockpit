@@ -65,7 +65,7 @@ var PluginLoader = function() {
             result.assets.push({ path: 'components' + '/' + plugin, assets: assets});
           }
           if (fs.existsSync(assets = path.join(dir, plugin, 'public/bower_components'))) {
-            result.assets.push({ path: 'components' + '/' + plugin, assets: assets});
+            result.assets.push({ path: 'components' , assets: assets});
           }
 
        } else {

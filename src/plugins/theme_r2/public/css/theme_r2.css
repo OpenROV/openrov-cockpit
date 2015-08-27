@@ -1,6 +1,6 @@
 body.theme_r2 #system-panel > * {
-  height: 20px;
-  width: 20px;
+  height: 30px;
+  width: 30px;
   margin: auto;
   line-height: 20px;
   display: block;
@@ -11,15 +11,6 @@ body.theme_r2 #main-row > * {
   border: 1px;
   border-style: dashed;
   overflow:auto;
-  width: 400px;
-}
-
-
-body.theme_r2 #multipurpose-display {
-  height: 200px;
-  width: 200px;
-  position:absolute;
-  bottom:0;
-  right:0;
-
+  width:80%;
+  margin-left: 10%;
 }

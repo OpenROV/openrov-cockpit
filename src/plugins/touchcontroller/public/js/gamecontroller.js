@@ -27,11 +27,11 @@
       i = 2;
     }
     // Handle case when target is a string or something( possible in deep copy )
-    if (typeof target !== 'object' && !typeof target === 'function') { // jshint ignore:line
+    if (typeof target !== 'object' && !typeof target === 'function') {
       target = {};
     }
     // Only deal with non-null/undefined values
-    if (options == src) {
+    if (options = src) {
       // Extend the base object
       for (name in options) {
         src = target[name];
@@ -254,21 +254,18 @@
     paused: false,
     init: function (options) {
       // Don't do anything if there's no touch support
-      if (!'ontouchstart' in document.documentElement) // jshint ignore:line
+      if (!'ontouchstart' in document.documentElement)
         console.log('Overriding touch detection');
       //return;
       // Merge default options and specified options
       options = options || {};
-
-      this.options.canvas = options.canvas;
-      delete options.canvas;
-      extend(this.options, options); //breaks when passing an html element as canvas
+      extend(this.options, options);
       var userAgent = navigator.userAgent.toLowerCase();
       // See if we should run the performanceFriendly version (for slower CPUs)
       this.performanceFriendly = userAgent.indexOf('iphone') !== -1 || userAgent.indexOf('android') !== -1 || this.options.forcePerformanceFriendly;
       // Grab the canvas if one wasn't passed
       var ele;
-      if (!this.options.canvas || !(ele = this.options.canvas)) {
+      if (!this.options.canvas || !(ele = document.getElementById(this.options.canvas))) {
         this.options.canvas = document.getElementsByTagName('canvas')[0];
       } else if (ele) {
         this.options.canvas = ele;
@@ -283,25 +280,20 @@
           'right'
         ];
       // Square - pivot is top left
-      var width;
-      var height;
-      var left;
-      var top;
-      var radius;
       if (options.width) {
-        width = this.getPixels(options.width);
-        height = this.getPixels(options.height);
-        left = this.getPixels(options.x);
-        top = this.getPixels(options.y);
+        var width = this.getPixels(options.width);
+        var height = this.getPixels(options.height);
+        var left = this.getPixels(options.x);
+        var top = this.getPixels(options.y);
       }  // Circle - pivot is center
       else {
         if (this.options.touchRadius)
-          radius = this.getPixels(options.radius) * 2 + this.getPixels(this.options.touchRadius) / 2;  // size of the box the joystick can go to
+          var radius = this.getPixels(options.radius) * 2 + this.getPixels(this.options.touchRadius) / 2;  // size of the box the joystick can go to
         else
-          radius = options.radius;
-        width = height = (radius + this.getPixels(options.stroke)) * 2;
-        left = this.getPixels(options.x) - width / 2;
-        top = this.getPixels(options.y) - height / 2;
+          var radius = options.radius;
+        var width = height = (radius + this.getPixels(options.stroke)) * 2;
+        var left = this.getPixels(options.x) - width / 2;
+        var top = this.getPixels(options.y) - height / 2;
       }
       var right = left + width;
       var bottom = top + height;
@@ -317,7 +309,7 @@
     createOverlayCanvas: function () {
       this.canvas = document.createElement('canvas');
       // Scale to same size as original canvas
-      this.canvas.id = 'touchcontroller';
+      this.canvas.id = "touchcontroller";
       this.canvas.setAttribute('class', 'real');
       this.resize(true);
       document.getElementsByTagName('body')[0].appendChild(this.canvas);
@@ -336,7 +328,7 @@
       this.loadSide('right');
       // Starts up the rendering / drawing
       this.render();
-      if (!this.touches || this.touches.length === 0)
+      if (!this.touches || this.touches.length == 0)
         this.paused = true;  // pause until a touch event
     },
     pixelRatio: 1,
@@ -441,7 +433,7 @@
         } else {
           _this.touches = e.touches || [];
         }
-        if (!e.touches || e.touches.length === 0) {
+        if (!e.touches || e.touches.length == 0) {
           // Draw once more to remove the touch area
           _this.render();
           _this.paused = true;
@@ -740,7 +732,7 @@
     }();
   var TouchableDirection = function (__super) {
       __extends(TouchableDirection, __super);
-      function TouchableDirection(options) { /* jshint ignore:line */
+      function TouchableDirection(options) {
         for (var i in options) {
           if (i == 'x')
             this[i] = GameController.getPixels(options[i], 'x');
@@ -773,27 +765,25 @@
           if (!this.active)
             // Direction currently being touched
             opacity *= 0.5;
-
-          var gradient;
           switch (this.direction) {
           case 'up':
-            gradient = ctx.createLinearGradient(0, 0, 0, this.height);
+            var gradient = ctx.createLinearGradient(0, 0, 0, this.height);
             gradient.addColorStop(0, 'rgba( 0, 0, 0, ' + opacity * 0.5 + ' )');
             gradient.addColorStop(1, 'rgba( 0, 0, 0, ' + opacity + ' )');
             break;
           case 'left':
-            gradient = ctx.createLinearGradient(0, 0, this.width, 0);
+            var gradient = ctx.createLinearGradient(0, 0, this.width, 0);
             gradient.addColorStop(0, 'rgba( 0, 0, 0, ' + opacity * 0.5 + ' )');
             gradient.addColorStop(1, 'rgba( 0, 0, 0, ' + opacity + ' )');
             break;
           case 'right':
-            gradient = ctx.createLinearGradient(0, 0, this.width, 0);
+            var gradient = ctx.createLinearGradient(0, 0, this.width, 0);
             gradient.addColorStop(0, 'rgba( 0, 0, 0, ' + opacity + ' )');
             gradient.addColorStop(1, 'rgba( 0, 0, 0, ' + opacity * 0.5 + ' )');
             break;
-          case 'down': /* jshint ignore:line */
+          case 'down':
           default:
-            gradient = ctx.createLinearGradient(0, 0, 0, this.height);
+            var gradient = ctx.createLinearGradient(0, 0, 0, this.height);
             gradient.addColorStop(0, 'rgba( 0, 0, 0, ' + opacity + ' )');
             gradient.addColorStop(1, 'rgba( 0, 0, 0, ' + opacity * 0.5 + ' )');
           }
@@ -810,7 +800,7 @@
     }(TouchableArea);
   var TouchableButton = function (__super) {
       __extends(TouchableButton, __super);
-      function TouchableButton(options) /* jshint ignore:line */
+      function TouchableButton(options)
         //x, y, radius, backgroundColor )
         {
           for (var i in options) {
@@ -863,7 +853,7 @@
             gradient.addColorStop(1, '#E8E10E');
             textShadowColor = '#BDB600';
             break;
-          case 'white': /* jshint ignore:line */
+          case 'white':
           default:
             gradient.addColorStop(0, 'rgba( 255,255,255,.3 )');
             gradient.addColorStop(1, '#eee');
@@ -900,7 +890,7 @@
     }(TouchableArea);
   var TouchableJoystick = function (__super) {
       __extends(TouchableJoystick, __super);
-      function TouchableJoystick(options) /* jshint ignore:line */
+      function TouchableJoystick(options)
         //x, y, radius, backgroundColor )
         {
           for (var i in options)
@@ -959,18 +949,17 @@
           subCanvas.width = subCanvas.height = 2 * (this.radius + GameController.options.touchRadius + this.stroke);
           var ctx = subCanvas.getContext('2d');
           ctx.lineWidth = this.stroke;
-          var gradient;
           if (this.active)
             // Direction currently being touched
             {
-              gradient = ctx.createRadialGradient(0, 0, 1, 0, 0, this.radius);
+              var gradient = ctx.createRadialGradient(0, 0, 1, 0, 0, this.radius);
               gradient.addColorStop(0, 'rgba( 100,156,107,.5 )');
               gradient.addColorStop(1, 'rgba( 143,156,118,.9 )');
               ctx.strokeStyle = '#000';
             }
           else {
             // STYLING FOR BUTTONS
-            gradient = ctx.createRadialGradient(0, 0, 1, 0, 0, this.radius);
+            var gradient = ctx.createRadialGradient(0, 0, 1, 0, 0, this.radius);
             gradient.addColorStop(0, 'rgba( 100,156,107,.2 )');
             gradient.addColorStop(1, 'rgba( 143,156,118,.4 )');
             ctx.strokeStyle = 'rgba( 0,0,0,.4 )';
@@ -995,7 +984,7 @@
     }(TouchableArea);
   var TouchableCircle = function (__super) {
       __extends(TouchableCircle, __super);
-      function TouchableCircle(options) { /* jshint ignore:line */
+      function TouchableCircle(options) {
         for (var i in options) {
           if (i == 'x')
             this[i] = GameController.getPixels(options[i], 'x');

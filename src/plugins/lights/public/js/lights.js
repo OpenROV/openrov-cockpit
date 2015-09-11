@@ -1,52 +1,109 @@
-(function(window) {
+$( document ).ready(function() {
   'use strict';
-  var plugins = namespace('plugins');
-  plugins.Lights = function(cockpit) {
+
+  window.lightsPlugin = this;
+
+  var Lights;
+
+  Lights = function lights(cockpit) {
+
+    console.log('Loading lights plugin in the browser.');
+
+    //private variables
+    this.intensity = 0;
     var self = this;
-    self.cockpit = cockpit;
+    // Instance variables
+    this.cockpit = cockpit;
+    // Add required UI elements
 
-  };
+    //$('#navtoolbar').append('<ul id="lightindicators"><li id="internal_lights_indicator" class="level10" ></li><li id="external_lights_indicator" class="level10" ></li></ul>');
 
-  //This pattern will hook events in the cockpit and pull them all back
-  //so that the reference to this instance is available for further processing
-  plugins.Lights.prototype.listen = function listen() {
-    var self = this;
-
-    self.cockpit.extensionPoints.inputController.register(
+    this.cockpit.emit('inputController.register',
       [
-        // lights increment
-        {
-          name: 'plugin.lights.adjust_increment',
-          description: 'Makes the ROV lights brighter.',
-          defaults: { keyboard: 'p', gamepad: 'DPAD_UP' },
-          down: function () {
-            cockpit.rov.emit('plugin.lights.adjust', 0.1);
-          }
+      {
+        name: "lights.keyBoardMapping",
+        description: "lights for keymapping.",
+        defaults: { keyboard: 'alt+i' },
+        down: function() {
+          var target = 0;
+          if (self.intensity === 0) target = 1;
+          self.setLights(target);
+         }
         },
-
-        // lights decrement
-        {
-          name: 'plugin.lights.adjust_increment',
-          description: 'Makes the ROV lights dimmer.',
-          defaults: { keyboard: 'o', gamepad: 'DPAD_DOWN' },
-
-          down: function () {
-            cockpit.rov.emit('plugin.lights.adjust', -0.1);
-          }
-        },
-
-        // lights toggle
-        {
-          name: 'plugin.lights.toggle',
-          description: 'Toggles the ROV lights on/off.',
-          defaults: { keyboard: 'i' },
-          down: function () {
-            cockpit.rov.emit('plugin.lights.toggle');
-          }
+      {
+        name: "lights.keyBoardMapping",
+        description: "lights for keymapping.",
+        defaults: { keyboard: 'alt+p' },
+        down: function() {
+          self.setLights(intensity+.1);
         }
-      ]);
+      },
+      {
+        name: "lights.keyBoardMapping",
+        description: "lights for keymapping.",
+        defaults: { keyboard: 'alt+o' },
+        down: function() { self.setLights(intensity-.1); }
+      }
+      ]
+    );
+
+    // for plugin management:
+    this.name = 'lights';   // for the settings
+    this.viewName = 'lights plugin'; // for the UI
+    this.canBeDisabled = true; //allow enable/disable
+    this.enable = function () {
+      alert('lights enabled');
+    };
+    this.disable = function () {
+      alert('lights disabled');
+    };
   };
 
-  window.Cockpit.plugins.push(plugins.Lights);
+  Lights.prototype.listen = function listen() {
+    var rov = this;
 
-})(window);
+    setTimeout(function(){
+      $('#brightnessIndicator')
+      .replaceWith('<li id="lightindicators"><div id="internal_lights_indicator" class="level10" /><div id="external_lights_indicator" class="level10"/ ></li>');
+      },1000
+    );
+
+    this.cockpit.socket.on('status', function (data) {
+      if ('LIGP' in data)
+        $('#internal_lights_indicator').attr( "class", "level" + Math.ceil(data.LIGP * 10));
+      if ('LIGPE' in data)
+        $('#external_lights_indicator').attr( "class", "level" + Math.ceil(data.LIGPE * 10));  
+    });
+
+    var item = [{
+      label: ko.observable("ext lights off"),
+      callback: function () {
+        rov.setLights(0);
+      }
+    },
+    {
+      label: ko.observable("ext lights 50%"),
+      callback: function () {
+        rov.setLights(.50);
+      }
+    },
+    {
+      label: ko.observable("ext lights full"),
+      callback: function () {
+        rov.setLights(1);
+      }
+    }
+    ];
+    rov.cockpit.emit('headsUpMenu.register', item);
+
+  };
+  Lights.prototype.setLights = function setLights(value) {
+    this.intensity = value;
+    if (this.intensity > 1)
+      this.intensity = 1;
+    if (this.intensity < 0)
+      this.intensity = 0;
+    this.cockpit.socket.emit('lights.set_external_lights_power', this.intensity);
+  };
+  window.Cockpit.plugins.push(Lights);
+});

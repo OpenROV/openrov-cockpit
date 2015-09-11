@@ -1,13 +1,13 @@
 (function (window, $, undefined) {
+  'use strict';
   var Touchcontroller;
   var is_touch_device = 'ontouchstart' in document.documentElement;
   if (!is_touch_device)
     return;
   function setupGameController(cockpit) {
-    cockpit.extensionPoints.videoContainer.append('<canvas id="touchcontroller" class="row-fluid full-height testoverlay"></canvas>');
-    var canvas = cockpit.extensionPoints.videoContainer.find('#touchcontroller')[0];
+    $('#outter-videocontainer').append('<canvas id="touchcontroller" class="row-fluid full-height testoverlay"></canvas>');
     GameController.init({
-      canvas: canvas,
+      canvas: 'touchcontroller',
       left: {
         type: 'dpad',
         position: {
@@ -16,8 +16,8 @@
         },
         dpad: {
           touchMove: function (details) {
-            cockpit.rov.emit('plugin.rovpilot.setThrottle', details.normalizedY);
-            cockpit.rov.emit('plugin.rovpilot.setYaw', details.normalizedX);
+            cockpit.emit('rovpilot.setThrottle', details.normalizedY);
+            cockpit.emit('rovpilot.setYaw', details.normalizedX);
             console.log(details.dx);
             console.log(details.dy);
             console.log(details.max);
@@ -34,7 +34,7 @@
         },
         dpad: {
           touchMove: function (details) {
-            cockpit.rov.emit('plugin.rovpilot.setLift', details.normalizedY);
+            cockpit.emit('setLift', details.normalizedY);
           }
         }
       },
@@ -57,7 +57,7 @@
               y: 0
             },
             touchStart: function () {
-              cockpit.rov.emit('plugin.rovpilot.toggleLights');
+              cockpit.emit('rovpilot.toggleLights');
             }
           },
           {
@@ -72,10 +72,10 @@
               y: '-15%'
             },
             touchStart: function () {
-              cockpit.rov.emit('plugin.rovpilot.setLift', 1);
+              cockpit.emit('rovpilot.setLift', 1);
             },
             touchEnd: function () {
-              cockpit.rov.emit('plugin.rovpilot.setLift', 0);
+              cockpit.emit('rovpilot.setLift', 0);
             }
           },
           {
@@ -90,10 +90,10 @@
               y: '0%'
             },
             touchStart: function () {
-              cockpit.rov.emit('plugin.rovpilot.setLift', -1);
+              cockpit.emit('rovpilot.setLift', -1);
             },
             touchEnd: function () {
-              cockpit.rov.emit('plugin.rovpilot.setLift', 0);
+              cockpit.emit('rovpilot.setLift', 0);
             }
           },
           {
@@ -108,7 +108,7 @@
               y: '-15%'
             },
             touchStart: function () {
-              cockpit.rov.emit('plugin.rovpilot.adjustCameraTilt', 0.1);
+              cockpit.emit('rovpilot.adjustCameraTilt', 0.1);
             }
           },
           {
@@ -123,7 +123,7 @@
               y: '-5%'
             },
             touchStart: function () {
-              cockpit.rov.emit('plugin.rovpilot.setCameraTilt', 0);
+              cockpit.emit('rovpilot.setCameraTilt', 0);
             }
           },
           {
@@ -138,7 +138,7 @@
               y: '4%'
             },
             touchStart: function () {
-              cockpit.rov.emit('plugin.rovpilot.adjustCameraTilt', -0.1);
+              cockpit.emit('rovpilot.adjustCameraTilt', -0.1);
             }
           },
           {
@@ -153,7 +153,7 @@
               y: '-15%'
             },
             touchStart: function () {
-              cockpit.rov.emit('plugin.rovpilot.toggleLasers');
+              cockpit.emit('rovpilot.toggleLasers');
             }
           }
         ]
@@ -163,6 +163,8 @@
 
   Touchcontroller = function Touchcontroller(cockpit) {
     console.log('Loading Touchcontroller plugin in the browser.');
+    if (!is_touch_device)
+      return;
     setupGameController(cockpit);
 
     // Instance variables

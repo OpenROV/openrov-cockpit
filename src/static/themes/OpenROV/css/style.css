@@ -21,17 +21,6 @@ body {
     opacity: 0.75;
 }
 
-.navbar .nav>li>a {
-    padding-left: 5px;
-    padding-right: 5px;
-}
-
-ul.nav>li>* {
-    margin-left: 5px;
-    margin-right: 5px;
-}
-
-
 a .navbar-titel {
     color: #ffffff;
     margin-left: 20px;
@@ -43,8 +32,6 @@ a .navbar-titel {
 .navbar-inverse #menuitems.nav>li>a {
     color: #ffffff;
     line-height: 30px;
-    padding-left: 15px;
-    padding-right: 15px;
 }
 .navbar-inverse .nav>li>a:hover {
     opacity: 0.75;
@@ -66,7 +53,7 @@ a .navbar-titel {
 }
 #telemetry {
   height: 100%;
-  overflow: auto;
+  overflow: scroll;
 }
 .container-fluid {
       padding-right: 0px;
@@ -218,6 +205,13 @@ img.center {
     height: 32px;
 }
 
+#video {
+  border: 2px solid black;
+  background-color: black;
+  max-width: 100%;
+  vertical-align: middle;
+  height: 100%;
+}
 
 #video-container{
   height: 100%;
@@ -230,14 +224,8 @@ img.center {
   height: 80%;
 }
 
-#diagnostic,
-#plugin-settings {
-    z-index: 1039;
-}
-
 #footer{
   height: 150px;
-    bottom: -10px;
 }
 
 .full-height{
@@ -330,7 +318,7 @@ img.center {
 }
 
 #blackboxstatus{
-    margin:0 10px;
+    margin:5px 10px;
     width:30px;
     height: 30px;
     background-image: url('../img/bbconnection.png');
@@ -360,6 +348,14 @@ img.center {
     left: 0px;
 }
 
+#compass {
+	position: absolute;
+	width: 100%;
+	height: 30px;
+	bottom: 0px;
+	z-index: 5;
+}
+
 #rov_status_panel .well {
   background-color: black;
   color: white;
@@ -374,10 +370,4 @@ img.center {
 .accordion-toggle {
     font-size: large;
     font-weight: bold;
-}
-
-#buttonPanel {
-    padding: 5px;
-    display: block;
-    min-height: inherit;
 }

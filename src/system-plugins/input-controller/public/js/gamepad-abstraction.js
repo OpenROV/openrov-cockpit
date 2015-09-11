@@ -51,11 +51,11 @@ inputController.GamepadAbstraction = function (cockpit) {
   gamepad.bind(Gamepad.Event.CONNECTED, function (device) {
     ignoreInputUntil = new Date().getTime() + 1000;
     console.log('Controller connected', device);
-    gp.cockpit.rov.emit('plugin.input.gamepad.connected');
+    gp.cockpit.emit('gamepad.connected');
   });
   gamepad.bind(Gamepad.Event.DISCONNECTED, function (device) {
     console.log('Controller disconnected', device);
-    gp.cockpit.rov.emit('plugin.input.gamepad.disconnected');
+    gp.cockpit.emit('gamepad.disconnected');
   });
   gamepad.bind(Gamepad.Event.UNSUPPORTED, function (device) {
     console.log('Unsupported controller connected', device);
@@ -71,7 +71,7 @@ inputController.GamepadAbstraction = function (cockpit) {
   if (gp.isAvailable()) {
     //send an initial is connected if already plugged in.
     setTimeout(function () {
-      gp.cockpit.rov.emit('gamepad.connected');
+      gp.cockpit.emit('gamepad.connected');
     }, 1000);
   }
   return gp;

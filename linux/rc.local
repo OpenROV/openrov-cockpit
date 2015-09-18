@@ -40,15 +40,15 @@ if [ ! -f /var/swapfile ]; then
   bash /opt/openrov/cockpit/linux/addswapfile.sh
 fi
 
-nice -n 19 /opt/openrov/cockpit/linux/knight-rider.js & 
- 
+nice -n 19 /opt/openrov/cockpit/linux/knight-rider.js &
+
 # load the device tree overlay for pin 25 (RESET) and SPI
 CAPEMGR=$( find /sys/devices/ -name bone_capemgr* | head -n 1 )
 echo OPENROV-RESET > $CAPEMGR/slots
 echo BB-SPI0DEV > $CAPEMGR/slots
+echo BB-UART1 > $CAPEMGR/slots
 
 #auto detect configuration and update environment settings
 . /opt/openrov/cockpit/linux/system-detect.sh || /bin/true
 
 exit 0
-

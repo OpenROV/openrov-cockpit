@@ -40,7 +40,7 @@ fi
 
 #package
 fpm -f -m info@openrov.com -s dir -t deb -a $ARCH \
-	-n openrov-proxy \
+	-n openrov-cockpit \
 	-v ${PACKAGE_VERSION} \
   --after-install=./install_lib/openrov-cockpit-afterinstall.sh \
   --before-remove=./install_lib/openrov-cockpit-beforeremove.sh \

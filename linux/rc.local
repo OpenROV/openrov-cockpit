@@ -21,7 +21,7 @@ if [ -f /var/.RESIZE_ROOT_PARTITION ]; then
 
   echo 255 > /sys/class/leds/beaglebone\:green\:heartbeat/brightness || true
   echo 255 > /sys/class/leds/beaglebone\:green\:mmc0/brightness || true
-  /opt/openrov/cockpit/linux/expand_root_partition.sh
+  /opt/scripts/tools/grow_partition.sh
   # the expand script initiates a reboot
   exit 0
 fi

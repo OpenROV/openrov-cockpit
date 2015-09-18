@@ -7,6 +7,6 @@
     "should": "^4.0.4"
   },
   "scripts": {
-    "bower": "../../node_modules/bower/bin/bower --config.interactive=false --allow-root install"
+    "bower": "bower-script.sh"
   }
 }

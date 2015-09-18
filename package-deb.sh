@@ -10,7 +10,7 @@ npm install --loglevel error
 npm run bower
 popd
 
-VERSION_NUMBER="`cat package.json | grep version | grep -o '[0-9]\.[0-9]\.[0-9]\+'`"
+VERSION_NUMBER="`cat package.json | grep version | grep -o '[0-9]*\.[0-9]*\.[0-9]\+'`"
 GIT_COMMIT="`git rev-parse --short HEAD`"
 
 if [ "x$GIT_BRANCH" = "x" ]

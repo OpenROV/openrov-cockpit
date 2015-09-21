@@ -39,6 +39,8 @@ else
   PACKAGE_VERSION="${PACKAGE_VERSION}${BUILD_NUMBER}.$GIT_COMMIT"
 fi
 
+rm -rf .git
+
 #package
 fpm -f -m info@openrov.com -s dir -t deb -a $ARCH \
 	-n openrov-cockpit \

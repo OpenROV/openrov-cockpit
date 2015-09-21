@@ -4,9 +4,9 @@ set -ex
 gem install fpm
 
 #Install dependencies
-npm install
+npm install --production
 pushd src/static
-npm install --loglevel error
+npm install --loglevel error --production
 npm run bower
 popd
 

@@ -3,13 +3,15 @@ set -ex
 #Install Pre-req
 gem install fpm
 
+
+git clean -d -x -f -e node_modules
 #Install dependencies
 npm install --production
 pushd src/static
 npm install --loglevel error --production
 npm run bower
 popd
-git clean -d -x -f -e node_modules
+
 
 VERSION_NUMBER="`cat package.json | grep version | grep -o '[0-9]*\.[0-9]*\.[0-9]\+'`"
 GIT_COMMIT="`git rev-parse --short HEAD`"

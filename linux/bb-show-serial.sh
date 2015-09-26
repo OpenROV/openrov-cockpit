@@ -11,6 +11,8 @@
 # as well.
 #
 
+
+
 notif () {
    echo "${1}${2}"
 }
@@ -24,7 +26,7 @@ checks () {
    if ! [ $(id -u) = 0 ]; then
       fail "you need to be root to run this (or use sudo)."
    fi
-   
+
    has_hexdump=$(which hexdump 2>/dev/null)
    if [ ! "${has_hexdump}" ]; then
       fail "you need to install the BSD utils (apt-get install bsdmainutils)."
@@ -32,23 +34,37 @@ checks () {
 }
 
 print_serial () {
-   EEPROM="/sys/bus/i2c/devices/1-0050/eeprom"
-   
-   if [ ! -f "${EEPROM}" ]; then
-      EEPROM="/sys/bus/i2c/devices/0-0050/eeprom"
-   fi
-   
-   if [ ! -f "${EEPROM}" ]; then
-      fail "i2c eeprom file not found in sysfs."
-   fi
-   
-   SERIAL=$(hexdump -e '8/1 "%c"' "${EEPROM}" -s 16 -n 12 2>&1)
-   
+
+  unset got_eeprom
+
+  #v8 of nvmem...
+  if [ -f /sys/bus/nvmem/devices/at24-0/nvmem ] && [ "x${got_eeprom}" = "x" ] ; then
+  	eeprom="/sys/bus/nvmem/devices/at24-0/nvmem"
+  	got_eeprom="true"
+  fi
+
+  #pre-v8 of nvmem...
+  if [ -f /sys/class/nvmem/at24-0/nvmem ] && [ "x${got_eeprom}" = "x" ] ; then
+  	eeprom="/sys/class/nvmem/at24-0/nvmem"
+  	got_eeprom="true"
+  fi
+
+  #eeprom...
+  if [ -f /sys/bus/i2c/devices/0-0050/eeprom ] && [ "x${got_eeprom}" = "x" ] ; then
+  	eeprom="/sys/bus/i2c/devices/0-0050/eeprom"
+  	got_eeprom="true"
+  fi
+
+  if [ "x${got_eeprom}" = "xtrue" ] ; then
+
+   SERIAL=$(hexdump -e '8/1 "%c"' "${eeprom}" -s 16 -n 12 2>&1)
+
    if [ "${SERIAL}" = "${SERIAL#*BB}" ]; then
       fail "failed to extract serial number from i2c eeprom: " "${SERIAL}"
    fi
-   
-   notif "beaglebone serial number: " "${SERIAL}"
-}
 
+   notif "beaglebone serial number: " "${SERIAL}"
+  fi
+}
+checks
 print_serial

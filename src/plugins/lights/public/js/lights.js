@@ -62,10 +62,16 @@ $( document ).ready(function() {
   Lights.prototype.listen = function listen() {
     var rov = this;
 
-    setTimeout(function(){
-      $('#brightnessIndicator')
-      .replaceWith('<li id="lightindicators"><div id="internal_lights_indicator" class="level10" /><div id="external_lights_indicator" class="level10"/ ></li>');
-      },1000
+    var injectorInterval =
+    setInterval(function(){
+      if ($('#brightnessIndicator').length > 0){
+      
+        $('#brightnessIndicator')
+        .replaceWith('<li id="lightindicators"><div id="internal_lights_indicator" class="level10" /><div id="external_lights_indicator" class="level10"/ ></li>');
+        
+        clearInterval(injectorInterval);
+      }
+      },500
     );
 
     this.cockpit.socket.on('status', function (data) {

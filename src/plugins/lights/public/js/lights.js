@@ -65,10 +65,10 @@ $( document ).ready(function() {
     var injectorInterval =
     setInterval(function(){
       if ($('#brightnessIndicator').length > 0){
-      
+
         $('#brightnessIndicator')
-        .replaceWith('<li id="lightindicators"><div id="internal_lights_indicator" class="level10" /><div id="external_lights_indicator" class="level10"/ ></li>');
-        
+        .replaceWith('<li id="lightindicators"><div id="internal_lights_indicator" class="level0" /><div id="external_lights_indicator" class="level0"/ ></li>');
+
         clearInterval(injectorInterval);
       }
       },500
@@ -78,7 +78,7 @@ $( document ).ready(function() {
       if ('LIGP' in data)
         $('#internal_lights_indicator').attr( "class", "level" + Math.ceil(data.LIGP * 10));
       if ('LIGPE' in data)
-        $('#external_lights_indicator').attr( "class", "level" + Math.ceil(data.LIGPE * 10));  
+        $('#external_lights_indicator').attr( "class", "level" + Math.ceil(data.LIGPE * 10));
     });
 
     var item = [{

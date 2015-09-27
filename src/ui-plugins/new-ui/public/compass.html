@@ -75,9 +75,8 @@
           self.setBearing(undefined);
         });
         window.cockpit.rov.on('plugin.navigationData.data', function(data) {
-          self.setHeading(parseFloat(data.heading).toFixed(0));
+          self.setHeading(self.pad(parseFloat(data.heading).toFixed(0), 3));
         });
-
       },
       domReady: function() {
         this.setHeading(this.heading);
@@ -103,6 +102,11 @@
         else {
           bearing.animate({svgOpacity: '0'}, 10)
         }
+      },
+      pad: function(num, size) {
+        var s = num+"";
+        while (s.length < size) s = "0" + s;
+        return s;
       }
     });
   </script>

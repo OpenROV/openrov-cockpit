@@ -11,7 +11,7 @@
 
     this.model.on('apply', function(selectedUI) {
       $.post(
-        '/plugin/ui-selector/selectedUi/' + selectedUI.name,
+        'plugin/ui-selector/selectedUi/' + selectedUI.name,
         function() {
           location.reload();
         });

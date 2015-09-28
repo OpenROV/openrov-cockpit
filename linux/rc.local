@@ -34,11 +34,18 @@ if [ -f /var/.RESIZE_ROOT_PARTITION ]; then
 
   echo 255 > ${led0}/brightness || true
   echo 255 > ${led1}//brightness || true
+  echo none > ${led2}/trigger || true
+  echo none > ${led3}/trigger || true
+
   /opt/scripts/tools/grow_partition.sh
-  systemctl reboot
 fi
 
 if [ ! -f /var/swapfile ]; then
+  echo none > ${led0}/trigger || true
+  echo 255 > ${led1}/brightness || true
+  echo 255 > ${led2}//brightness || true
+  echo none > ${led3}/trigger || true
+
   bash /opt/openrov/cockpit/linux/addswapfile.sh
 fi
 

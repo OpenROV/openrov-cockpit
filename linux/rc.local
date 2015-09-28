@@ -35,7 +35,7 @@ if [ -f /var/.RESIZE_ROOT_PARTITION ]; then
   echo 255 > ${led0}/brightness || true
   echo 255 > ${led1}//brightness || true
   /opt/scripts/tools/grow_partition.sh
-  reboot
+  systemctl reboot
 fi
 
 if [ ! -f /var/swapfile ]; then

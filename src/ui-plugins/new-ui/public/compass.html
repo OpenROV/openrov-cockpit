@@ -46,33 +46,62 @@
       <text id="text4975" fill="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(0.70710678,0.70710678,-0.70710678,0.70710678,0,0)" line-height="125%" font-size="72px" y="-391.12482" x="667.26764">NE</text>
       </g>
       </g>
-      <text id="heading" fill="{{ options.bezel }}" style="letter-spacing:0;text-anchor:middle;word-spacing:0;text-align:center;" font-family="Sans" font-size="250px" letter-spacing="0" line-height="125%" word-spacing="0" y="578.01447" x="460.67117" font-weight="bold">{{heading}}</text>
-      <g id="indicator" stroke="{{ options.indicator }}" fill="{{ options.indicator }}" transform="translate(17.197253,32.920483)">
-        <rect id="rect4935-9" height="76.511" width="15" y="85.057" x="450.31" stroke-width="3"/>
+      <text id="heading" fill="{{ options.headingFill }}" stroke="{{ options.bezel }}" stroke-width="{{ options.headingStrokeWidth }}" style="letter-spacing:0;text-anchor:middle;word-spacing:0;text-align:center;" font-family="Sans" font-size="250px" letter-spacing="0" line-height="125%" word-spacing="0" y="578.01447" x="460.67117" font-weight="bold">{{heading}}</text>
+
+      <text id="target" fill="{{ options.bezel }}" style="letter-spacing:0;text-anchor:middle;word-spacing:0;text-align:center;" font-family="Sans" font-size="150px" letter-spacing="0" line-height="100%" word-spacing="0" y="720" x="460.67117" font-weight="bold">{{target}}</text>
+
+      <g
+       id="indicator">
+      <path
+         fill="{{ options.bezel }}"
+         d="M 471.26387,-8.3145628 C 516.34739,113.74783 516.29456,113.61458 516.29456,113.61458 l -88.6758,0 z"
+         style="fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <g
+       id="bearing">
+      <path
+         fill="{{ options.bezel }}"
+         style="fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="M 472.95107,236.16615 C 427.87169,114.36552 427.92452,114.49849 427.92452,114.49849 l 88.66766,0 z" />
+    </g>
+
+      <!--<g id="bearing" stroke="{{ options.indicator }}" fill="{{ options.indicator }}" transform="translate(17.197253,32.920483)">
+        <rect id="rect4935-9" height="60" width="50" y="110" x="450" stroke-width="0"></rect>
       </g>
-      <circle id="bearing" fill="{{ options.bearing }}" cy="80" cx="472.5" r="20"/>
+      <g id="indicator" stroke="{{ options.indicator }}" fill="{{ options.indicator }}" transform="translate(17.197253,32.920483)">
+        <rect id="rect4935-9" height="120" width="50" y="0" x="450" stroke-width="0"></rect>
+      </g>-->
       </g>
       </svg>
     </div>
   </template>
   <script>
     Polymer({
-      heading: 0,
+      heading: '000',
       bearing: undefined,
+      target: 0,
       options: {
         indicator: "white",
         bezel: 'white',
-        bearing: 'red',
-        background: 'black'
+        bearing: 'white',
+        background: 'black',
+        headingFill: undefined, // will be set to options.bezel
+        headingStrokeWidth: 0,
+        headingStrokeWidthTargetHold: 15
       },
       ready: function() {
         var self = this;
+        self.options.headingFill = self.options.bezel;
 
         window.cockpit.rov.on('plugin.rovpilot.headingHold.target', function(target) {
           self.setBearing(target);
+          self.options.headingFill = 'none';
+          self.options.headingStrokeWidth = self.options.headingStrokeWidthTargetHold;
         });
         window.cockpit.rov.on('plugin.rovpilot.headingHold.disabled', function() {
           self.setBearing(undefined);
+          self.options.headingFill = self.options.bezel;
+          self.options.headingStrokeWidth = 0;
         });
         window.cockpit.rov.on('plugin.navigationData.data', function(data) {
           self.setHeading(self.pad(parseFloat(data.heading).toFixed(0), 3));
@@ -92,15 +121,22 @@
       setHeading: function (value) {
         this.heading = value;
         $(this.$.indicator).animate({svgTransform: 'rotate(' + value + ', 472.5, 472.5)'}, 20);
+        if (!this.target) {
+          $(this.$.bearing).animate({svgTransform: 'rotate(' + value + ', 472.5, 472.5)'}, 20);
+        } 
       },
       setBearing: function (value) {
         var bearing = $(this.$.bearing);
+        var target = $(this.$.target);
         if (value) {
+          this.target = this.pad(value, 3);
           bearing.animate({svgTransform: 'rotate(' + value + ', 472.5, 472.5)'}, 20);
-          bearing.animate({svgOpacity: '100'}, 10)
+          target.animate({svgOpacity: '100'}, 10);
         }
         else {
-          bearing.animate({svgOpacity: '0'}, 10)
+          target.animate({svgOpacity: '0'}, 10);
+          bearing.animate({svgTransform: 'rotate(' + this.heading + ', 472.5, 472.5)'}, 20);
+          this.target = undefined;
         }
       },
       pad: function(num, size) {

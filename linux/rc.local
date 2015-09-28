@@ -37,7 +37,7 @@ if [ -f /var/.RESIZE_ROOT_PARTITION ]; then
   echo none > ${led2}/trigger || true
   echo none > ${led3}/trigger || true
 
-  /opt/scripts/tools/grow_partition.sh
+  /opt/scripts/tools/grow_partition.sh || true
 fi
 
 if [ ! -f /var/swapfile ]; then

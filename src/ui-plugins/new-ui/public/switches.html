@@ -44,6 +44,7 @@
       .switch-on > .switches-switch-off { color: transparent }
       .switch-off > .switches-switch-on { color: transparent }
       .switch-off > .switches-switch-off { color: #ffffff }
+      .switchable { cursor: pointer }
 
     </style>
     <div id="switchesContainer" class="center">
@@ -59,14 +60,17 @@
       Polymer({
         lastPing: new Date(),
         switches: {
-          COM: {switchable: false, state: false, message: { enabled: 'plugin.capestatus.connection.connected', disabled: 'capestatus.connection.disconnected'} },
-          GPD: {switchable: false, state: false, message: { enabled: 'plugin.input.gamepad.connected', disabled: 'plugin.input.gamepad.disconnected'} },
-          TNK: {switchable: false, state: false, message: 'plugin.tankControl'},
-          DLK: {switchable: false, state: false, message: 'plugin.rovpilot.depthHold'},
-          HLK: {switchable: false, state: false, message: 'plugin.rovpilot.headingHold'},
-          LSR: {switchable: false, state: false, message: 'plugin.laser' },
-          LED: {switchable: false, state: false},
-          ESC: {switchable: false, state: true, message: 'plugin.rovpilot.esc' }
+          COM: {switchable: false, state: false, message: { enabled: 'plugin.capestatus.connection.connected', disabled: 'capestatus.connection.disconnected'}, description: "Communication status"},
+          GPD: {switchable: false, state: false, message: { enabled: 'plugin.input.gamepad.connected', disabled: 'plugin.input.gamepad.disconnected'}, description: "Gamepad active/inactive" },
+          TNK: {switchable: true, state: false, message: 'plugin.tankControl', description: "Tank control active/inactive", onClick: function() { window.cockpit.rov.emit('plugin.tankControl.toggle'); } },
+          DLK: {switchable: true, state: false, message: 'plugin.rovpilot.depthHold', description: "Depthhold active/inactive", onClick: function() { window.cockpit.rov.emit('plugin.rovpilot.depthHold.toggle'); } },
+          HLK: {switchable: true, state: false, message: 'plugin.rovpilot.headingHold', description: "Heading lock active/inactive", onClick: function() { window.cockpit.rov.emit('plugin.rovpilot.headingHold.toggle'); } },
+          LSR: {switchable: true, state: false, message: 'plugin.laser', description: "Lasers on/off", onClick: function() { window.cockpit.rov.emit('plugin.laser.toggle'); } },
+          LED: {switchable: true, state: false, description: "LED lights on/off", onClick: function() { window.cockpit.rov.emit('plugin.lights.toggle'); }},
+          ESC: {switchable: true, state: true, message: 'plugin.rovpilot.esc', description: "ROV ESCs active/inactive", onClick: function(state) {
+            if (state) { window.cockpit.rov.emit('plugin.rovpilot.powerOffESCs'); }
+            else {  window.cockpit.rov.emit('plugin.rovpilot.powerOnESCs'); }
+          }}
         },
         update: function() {
           for (var aSwitch in this.switches) {
@@ -112,11 +116,16 @@
           var self = this;
           var container = $(this.$.switchesContainer);
 
-          self.onSwitch = function(aSwitch) { };
+          self.onSwitch = function(aSwitch) {
+            if (self.switches[aSwitch].onClick) {
+              self.switches[aSwitch].state = ! self.switches[aSwitch].state;
+              self.switches[aSwitch].onClick(self.switches[aSwitch].state)
+            }
+           };
 
           for (var aSwitch in self.switches) {
             container.append(
-              '<div class="switches-row" id="' + aSwitch + '">'+
+              '<div class="switches-row ' + (self.switches[aSwitch].switchable ? 'switchable' : '') + '" id="' + aSwitch + '" title="' + self.switches[aSwitch].description + '">'+
               '<div class="switches-switch-on">' + aSwitch + '</div>'+
               '<div class="switches-switch-off">'+ aSwitch + '</div>'+
               '</div>');
@@ -132,7 +141,7 @@
 
           window.cockpit.rov.on('plugin.lights.level', function(level) {
             var state = false;
-            if (level !== 'level0') { state = true; }
+            if (Number(level) !== 0) { state = true; }
             self.switches.LED.state = state;
             self.update();
           });

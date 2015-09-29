@@ -2,6 +2,7 @@
   'use strict';
   var TankControl;
   TankControl = function Example(cockpit) {
+    var self = this;
     console.log('Loading TankControl plugin in the browser.');
     // Instance variables
     this.cockpit = cockpit;
@@ -23,6 +24,10 @@
 
     // Add required UI elements
     cockpit.extensionPoints.keyboardInstructions.append('<p><i>t</i> to toggle tank control</p>');
+    
+    cockpit.rov.on('plugin.tankControl.toggle', function() {
+      self.toggleControl();
+    });
   };
   TankControl.prototype.listen = function listen() {
     var rov = this;
@@ -33,7 +38,7 @@
         name: 'tankcontrol.toggleTankControl',
         description: 'Toggles the tank control mode on/off',
         defaults: { keyboard: 't' },
-        down: function() { rov.toggleControl(); }
+        down: function() { rov.cockpit.rov.emit('plugin.tankControl.toggle'); }
       });
 
     // register controls

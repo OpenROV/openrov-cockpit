@@ -129,6 +129,9 @@
       if ('targetDepth' in status) {
         enabled = status.targetDepth != DISABLED;
         deps.cockpit.emit('plugin.rovpilot.depthHold.' + (enabled ? 'enabled' : 'disabled'));
+        if (enabled) {
+          deps.cockpit.emit('plugin.rovpilot.depthHold.target', Number(status.targetDepth)/100);
+        }
       }
       if ('targetHeading' in status) {
         enabled = status.targetHeading != DISABLED;

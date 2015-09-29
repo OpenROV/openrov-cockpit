@@ -62,12 +62,12 @@
         switches: {
           COM: {switchable: false, state: false, message: { enabled: 'plugin.capestatus.connection.connected', disabled: 'capestatus.connection.disconnected'}, description: "Communication status"},
           GPD: {switchable: false, state: false, message: { enabled: 'plugin.input.gamepad.connected', disabled: 'plugin.input.gamepad.disconnected'}, description: "Gamepad active/inactive" },
-          TNK: {switchable: true, state: false, message: 'plugin.tankControl', description: "Tank control active/inactive", onClick: function() { window.cockpit.rov.emit('plugin.tankControl.toggle'); } },
-          DLK: {switchable: true, state: false, message: 'plugin.rovpilot.depthHold', description: "Depthhold active/inactive", onClick: function() { window.cockpit.rov.emit('plugin.rovpilot.depthHold.toggle'); } },
-          HLK: {switchable: true, state: false, message: 'plugin.rovpilot.headingHold', description: "Heading lock active/inactive", onClick: function() { window.cockpit.rov.emit('plugin.rovpilot.headingHold.toggle'); } },
-          LSR: {switchable: true, state: false, message: 'plugin.laser', description: "Lasers on/off", onClick: function() { window.cockpit.rov.emit('plugin.laser.toggle'); } },
-          LED: {switchable: true, state: false, description: "LED lights on/off", onClick: function() { window.cockpit.rov.emit('plugin.lights.toggle'); }},
-          ESC: {switchable: true, state: true, message: 'plugin.rovpilot.esc', description: "ROV ESCs active/inactive", onClick: function(state) {
+          TNK: {switchable: true, state: false, message: 'plugin.tankControl', description: "Tank control active/inactive", switch: function() { window.cockpit.rov.emit('plugin.tankControl.toggle'); } },
+          DLK: {switchable: true, state: false, message: 'plugin.rovpilot.depthHold', description: "Depthhold active/inactive", switch: function() { window.cockpit.rov.emit('plugin.rovpilot.depthHold.toggle'); } },
+          HLK: {switchable: true, state: false, message: 'plugin.rovpilot.headingHold', description: "Heading lock active/inactive", switch: function() { window.cockpit.rov.emit('plugin.rovpilot.headingHold.toggle'); } },
+          LSR: {switchable: true, state: false, message: 'plugin.laser', description: "Lasers on/off", switch: function() { window.cockpit.rov.emit('plugin.laser.toggle'); } },
+          LED: {switchable: true, state: false, description: "LED lights on/off", switch: function() { window.cockpit.rov.emit('plugin.lights.toggle'); }},
+          ESC: {switchable: true, state: true, message: 'plugin.rovpilot.esc', description: "ROV ESCs active/inactive", switch: function(state) {
             if (state) { window.cockpit.rov.emit('plugin.rovpilot.powerOffESCs'); }
             else {  window.cockpit.rov.emit('plugin.rovpilot.powerOnESCs'); }
           }}
@@ -117,9 +117,9 @@
           var container = $(this.$.switchesContainer);
 
           self.onSwitch = function(aSwitch) {
-            if (self.switches[aSwitch].onClick) {
+            if (self.switches[aSwitch].switch) {
               self.switches[aSwitch].state = ! self.switches[aSwitch].state;
-              self.switches[aSwitch].onClick(self.switches[aSwitch].state)
+              self.switches[aSwitch].switch(self.switches[aSwitch].state)
             }
            };
 

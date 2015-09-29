@@ -3,7 +3,10 @@
   <template>
     <style type="text/css">
 
-      .unit { font-size: 0.95em; }
+      .unit { 
+        font-size: 0.95em; 
+        margin-bottom: -0.5vw;
+      }
       .text-center { text-align: center;}
       #depthContainer {
         width: 100%;
@@ -31,13 +34,20 @@
       #depthTarget.hidden {
         opacity: 0;
       }
-      #depth-unit {
-        text-align: right;
-        position: relative;
+      #depth-footer  {
         margin-top: -1vw;
         padding-top: 5px;
         margin-bottom: -0.5vw;
         padding-right: 3px;
+        padding-left: 3px;
+      }
+      #depth-unit {
+        float: right;
+        text-align: right;
+      }
+      #water-type {
+        float: left;
+        text-align: left;
       }
       .depth-line-container,
       #depth-change-container {
@@ -78,7 +88,10 @@
         {{depth}}
       </div>
       <div id="depthTarget" title="Depthhold target depth" class="center text-center hidden">{{target}}</div>
-      <div id="depth-unit" class="unit">m</div>
+      <div id="depth-footer">
+        <div id="water-type" class="unit" title="Water type">{{waterType}}</div>
+        <div id="depth-unit" class="unit">m</div>
+      </div>
       <div class="depth-line-container">
         <span class="depth-line"><hr /></span>
         <span class="depth-line-text">VSI</span>
@@ -106,6 +119,7 @@
         depth: 0.0,
         target: 0.0,
         change: "0.0",
+        waterType: 'salt',
         options: {
           indicatorActive: "#ffffff",
           indicatorInactive: "#000000",
@@ -169,6 +183,10 @@
           $(self.$.depth).removeClass('inverted');
           $(self.$.depthTarget).addClass('hidden');
         });
+        
+        window.cockpit.rov.on('plugin.diveprofile.watertype', function(data) { 
+          self.waterType = data.watertype;
+          });
         }
       });
     })();

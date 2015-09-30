@@ -72,7 +72,7 @@ io.sockets.on('connection', function (socket) {
   socket.emit('settings', CONFIG.preferences.get());
   var lastping = 0;
   socket.on('ping', function (id) {
-   if (Math.abs(new Date().getTime() - lastping) > 1000) {
+   if (Math.abs(new Date().getTime() - lastping) > 500) {
       controller.send('ping(0)');
       lastping = new Date().getTime();
       socket.emit('pong', id);

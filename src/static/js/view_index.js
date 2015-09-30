@@ -32,17 +32,6 @@ $(function () {
   //plugin hooks
   var cockpit = new Cockpit(socket);
   cockpit.rov.on('cockpit.pluginsLoaded', function() {
-    cockpit.extensionPoints.keyboardInstructions.append('<p><i>\\</i> to toggle heads up display</p>');
-    cockpit.extensionPoints.inputController.register(
-      {
-        name: 'main.toggleHeadsUpDisplay',
-        description: 'Toggle the heads-up-display on/off',
-        defaults: { keyboard: '\\' },
-        down: function () {
-          $('.hud').toggleClass('hidden');
-        }
-      });
-
   });
   window.cockpit = cockpit;
 });

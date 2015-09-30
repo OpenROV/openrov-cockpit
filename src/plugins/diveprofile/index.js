@@ -6,15 +6,18 @@ function example(name, deps) {
   });
     
   deps.rov.on('status', function(data) {
+    var watertype = undefined;
     if ('dtwa' in data) {
-      var watertype = data.dtwa.toString() == '1' ? 'salt' : 'fresh';
-      deps.cockpit.emit('plugin.diveprofile.watertype', { raw: data.dtwa, watertype: watertype});
+      watertype = {raw: data.dtwa, watertype: data.dtwa.toString() == '1' ? 'salt' : 'fresh' };
     }
     if ('settings' in data) {
       if (data.settings.water_type) {       
-        var watertype = data.settings.water_type.toString() == '1' ? 'salt' : 'fresh';
-        deps.cockpit.emit('plugin.diveprofile.watertype', { raw: data.dtwa, watertype: watertype});
+        watertype = {raw: data.settings.water_type, watertype: data.settings.water_type.toString() == '1' ? 'salt' : 'fresh' };
       }
+    }
+    if (watertype !== undefined) {
+      deps.cockpit.emit('plugin.diveprofile.watertype', watertype);
+      deps.config.preferences.set('water_type', watertype.raw );
     }
   });
 }

@@ -46,7 +46,6 @@ var OpenROVController = function (eventLoop, client) {
       controller.ArduinoFirmwareVersion = status.ver;
     }
     if ('TSET' in status) {
-      console.log(status.settings);
       var setparts = status.settings.split(',');
       settingsCollection.smoothingIncriment = setparts[0];
       settingsCollection.deadZone_min = setparts[1];
@@ -152,7 +151,7 @@ OpenROVController.prototype.requestCapabilities = function () {
 };
 
 OpenROVController.prototype.requestSettings = function () {
-  //todo: Move to motor-diag plugin
+  //todo: Move to a settings manager
   var command = 'reportSetting();';
   this.hardware.write(command);
   command = 'rmtrmod();';
@@ -160,7 +159,11 @@ OpenROVController.prototype.requestSettings = function () {
 };
 
 OpenROVController.prototype.updateSetting = function () {
-  var command = 'updateSetting(' + CONFIG.preferences.get('smoothingIncriment') + ',' + CONFIG.preferences.get('deadzone_neg') + ',' + CONFIG.preferences.get('deadzone_pos') + ',' + CONFIG.preferences.get('water_type') + ');';
+  var command = 'updateSetting(' 
+    + CONFIG.preferences.get('smoothingIncriment') + ',' 
+    + CONFIG.preferences.get('deadzone_neg') + ',' 
+    + CONFIG.preferences.get('deadzone_pos') + ',' 
+    + CONFIG.preferences.get('water_type') + ');';
   this.hardware.write(command);
   //This is the multiplier used to make the motor act linear fashion.
   //for example: the props generate twice the thrust in the positive direction

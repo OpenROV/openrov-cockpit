@@ -72,7 +72,11 @@ io.sockets.on('connection', function (socket) {
   socket.emit('settings', CONFIG.preferences.get());
   var lastping = 0;
   socket.on('ping', function (id) {
-    socket.emit('pong', id);
+   if (Math.abs(new Date().getTime() - lastping) > 1000) {
+      controller.send('ping(0)');
+      lastping = new Date().getTime();
+      socket.emit('pong', id);
+   }
     controller.send('ping(0)');
   });
   socket.on('tilt_update', function (value) {

@@ -17,7 +17,8 @@ var statusdata = {};
 var settingsCollection = {
     smoothingIncriment: 0,
     deadZone_min: 0,
-    deadZone_max: 0
+    deadZone_max: 0,
+    water_type: 0 // FreshWater
   };
 
 var rovsys = { capabilities: 0 };
@@ -50,6 +51,7 @@ var OpenROVController = function (eventLoop, client) {
       settingsCollection.smoothingIncriment = setparts[0];
       settingsCollection.deadZone_min = setparts[1];
       settingsCollection.deadZone_max = setparts[2];
+      settingsCollection.water_type = setparts[3];
       controller.emit('Arduino-settings-reported', settingsCollection);
     }
     if ('CAPA' in status) {

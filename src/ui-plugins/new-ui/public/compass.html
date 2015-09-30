@@ -46,6 +46,9 @@
       <text id="text4975" fill="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(0.70710678,0.70710678,-0.70710678,0.70710678,0,0)" line-height="125%" font-size="72px" y="-391.12482" x="667.26764">NE</text>
       </g>
       </g>
+     
+     <text id="lock" fill="{{ options.bezel }}" style="letter-spacing:0;text-anchor:middle;word-spacing:0;text-align:center;" font-family="Sans" font-size="120px" letter-spacing="0" line-height="100%" word-spacing="0" y="280" x="460.67117" title="Heading hold target">LK</text>
+     
       <text id="heading" fill="{{ options.headingFill }}" stroke="{{ options.bezel }}" stroke-width="{{ options.headingStrokeWidth }}" style="letter-spacing:0;text-anchor:middle;word-spacing:0;text-align:center;" font-family="Sans" font-size="250px" letter-spacing="0" line-height="125%" word-spacing="0" y="530" x="460.67117" font-weight="bold">{{heading}}</text>
 
       <text id="target" fill="{{ options.bezel }}" style="letter-spacing:0;text-anchor:middle;word-spacing:0;text-align:center;" font-family="Sans" font-size="150px" letter-spacing="0" line-height="100%" word-spacing="0" y="680" x="460.67117" font-weight="bold" title="Heading hold target">{{target}}</text>
@@ -128,13 +131,16 @@
       setBearing: function (value) {
         var bearing = $(this.$.bearing);
         var target = $(this.$.target);
+        var lock = $(this.$.lock);
         if (value) {
           this.target = this.pad(value, 3);
           bearing.animate({svgTransform: 'rotate(' + value + ', 472.5, 472.5)'}, 20);
           target.animate({svgOpacity: '100'}, 10);
+          lock.animate({svgOpacity: '100'}, 10);
         }
         else {
           target.animate({svgOpacity: '0'}, 10);
+          lock.animate({svgOpacity: '0'}, 10);          
           bearing.animate({svgTransform: 'rotate(' + this.heading + ', 472.5, 472.5)'}, 20);
           this.target = undefined;
         }

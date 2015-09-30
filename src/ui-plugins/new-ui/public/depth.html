@@ -6,6 +6,8 @@
       .unit { 
         font-size: 0.95em; 
         margin-bottom: -0.5vw;
+        margin-left: 4px;
+        margin-right: 4px;
       }
       .text-center { text-align: center;}
       #depthContainer {
@@ -16,6 +18,7 @@
       #depth {
         font-size: 1.8vw;
         font-weight: bold;
+        text-align: center;
       }
       #depth.inverted {
         color: black;
@@ -29,25 +32,23 @@
       #depthTarget {
         font-size: 1vw;
         font-weight: bold;
-        padding-top: 2px;
+        /*padding-top: 2px;*/
       }
       #depthTarget.hidden {
         opacity: 0;
       }
       #depth-footer  {
-        margin-top: -1vw;
-        padding-top: 5px;
-        margin-bottom: -0.5vw;
-        padding-right: 3px;
-        padding-left: 3px;
-      }
-      #depth-unit {
-        float: right;
-        text-align: right;
+        width: 100%;
+        margin-top: -20px;
       }
       #water-type {
+        width: 35%;
         float: left;
-        text-align: left;
+      }
+      #depth-unit {
+        width: 35%;
+        text-align: right;
+        float: right;
       }
       .depth-line-container,
       #depth-change-container {
@@ -73,6 +74,17 @@
         margin: 0 0 .2em;
         padding: 0;
       }
+      #depthLock { 
+        text-align: right;
+        right: 10px;
+        margin-top: -29px;
+      }
+      #numberContainer {
+        margin-top: 10px;
+        padding-bottom: 14px;
+      }
+      #depthLock.hidden { opacity: 0; }
+      
     
       #depthChangeUp { padding-left: 1em }
       #depthChangeDown { padding-right: 1em }
@@ -84,10 +96,13 @@
       svg { width: 100%; }
     </style>
     <div id="depthContainer" style="font-family: Sans">
-      <div id="depth" class="center text-center">
-        {{depth}}
+      <div id="depthLock" class="unit hidden" style="">LK</div>
+      <div id="numberContainer">
+        <div id="depth" class="center text-center">
+          {{depth}}
+        </div>
+        <div id="depthTarget" title="Depthhold target depth" class="center text-center hidden">{{target}}</div>
       </div>
-      <div id="depthTarget" title="Depthhold target depth" class="center text-center hidden">{{target}}</div>
       <div id="depth-footer">
         <div id="water-type" class="unit" title="Water type">{{waterType}}</div>
         <div id="depth-unit" class="unit">m</div>
@@ -177,11 +192,13 @@
           self.target = Number(target).toFixed(1);
           $(self.$.depth).addClass('inverted');
           $(self.$.depthTarget).removeClass('hidden');
+          $(self.$.depthLock).removeClass('hidden');
         });
         window.cockpit.rov.on('plugin.rovpilot.depthHold.disabled', function() {
           self.target = 0;
           $(self.$.depth).removeClass('inverted');
           $(self.$.depthTarget).addClass('hidden');
+          $(self.$.depthLock).addClass('hidden');
         });
         
         window.cockpit.rov.on('plugin.diveprofile.watertype', function(data) { 

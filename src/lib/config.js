@@ -43,7 +43,7 @@ nconf.defaults({
   'production' : true,
   'sample_freq': 20,
   'dead_zone':  10,
-  'video_frame_rate': 10,
+  'video_frame_rate': 30,
   'video_resolution': 'SXGA',
   'video_device': '/dev/video0',
   'video_port': 8090,

@@ -64,18 +64,18 @@
                id="path3767"
                style="fill:none;stroke:#ffffff;stroke-width:12.30000019;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:12.3, 36.9;stroke-dashoffset:0" />
             <g
-               id="throttle">
+               id="maxThrottle">
               <rect
-                 width="21.809999"
+                 width="10"
                  height="131.31982"
-                 x="1"
+                 x="7.8473511"
                  y="341.21478"
                  id="rect3779"
                  style="fill:#ffffff;fill-opacity:1;stroke:none" />
               <rect
-                 width="21.809999"
+                 width="10"
                  height="131.31982"
-                 x="85.757599"
+                 x="91.368195"
                  y="341.21478"
                  id="rect3781"
                  style="fill:#fff9f9;fill-opacity:1;stroke:none" />
@@ -85,16 +85,13 @@
                height="173.74623"
                x="38.606461"
                y="221.30832"
-               id="maxThrottle"
+               id="throttle"
                style="fill:#cccccc;fill-opacity:1;stroke:none" />
           </g>
           <path
-             style="fill:none;stroke:#ffffff;stroke-width:14.10000038;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-             d="m 7.0500002,400.60717 104.9296498,0"
+             d="m 1.0500002,407.07541 104.9296498,0"
              id="mid"
-             inkscape:connector-curvature="0"
-             sodipodi:nodetypes="cc"
-             inkscape:label="#path3164" />
+             style="fill:none;stroke:#ffffff;stroke-width:10;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
         </svg>
 
 
@@ -148,9 +145,9 @@
         self.setStarboard(0);
       },
       setPowerLevel: function(level) {
-        var portMaxElement = $(this.$.port).find("#maxThrottle");
-        var verticalMaxElement = $(this.$.vertical).find("#maxThrottle");
-        var starboardMaxElement = $(this.$.starboard).find("#maxThrottle");
+        var portMaxElement = $(this.$.port).find("#maxThrottle rect");
+        var verticalMaxElement = $(this.$.vertical).find("#maxThrottle rect");
+        var starboardMaxElement = $(this.$.starboard).find("#maxThrottle rect");
 
         //815 is the design height of the throttle SVG element, 200 the min height of the throttle display at power level 1      
         var height = level.map(1, 5, 200, 815);
@@ -161,15 +158,15 @@
         this.height = height;
       },
       setVertical: function(lift) {
-        var element = $(this.$.vertical).find("#throttle rect");
+        var element = $(this.$.vertical).find("#throttle");
         this.setElement(element, lift);
       },
       setPort: function(left) {
-        var element = $(this.$.port).find("#throttle rect");
+        var element = $(this.$.port).find("#throttle");
         this.setElement(element, left);
       },
       setStarboard: function(right) {
-        var element = $(this.$.starboard).find("#throttle rect");
+        var element = $(this.$.starboard).find("#throttle");
         this.setElement(element, right);
       },
       setElement : function(element, value) {

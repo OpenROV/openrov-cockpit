@@ -17,6 +17,11 @@
     $('#photos').load(jsFileLocation + '../photospanel.html', function () {
       // Register the various event handlers
       ko.applyBindings(self, $('#photos')[0]);
+            
+      $('#photos .back-button').click(function () {
+        self.hidePhotos();
+      });
+     
     });
   };
   //This pattern will hook events in the cockpit and pull them all back
@@ -52,9 +57,6 @@
       Mousetrap.bind('esc', function () {
         self.hidePhotos();
       });
-    });
-    $('#photos .back-button').click(function () {
-      photoc.hidePhotos();
     });
   };
   Photocapture.prototype.hidePhotos = function hidePhoto() {

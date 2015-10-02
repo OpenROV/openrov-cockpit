@@ -5,6 +5,9 @@
       #container {
         width: 90%;
         height: 110px;
+        margin-top: 6px;
+        margin-left: 0.9vw;
+        margin-bottom: -2.8vw;
       }
       .center {
         left: 0;
@@ -85,6 +88,13 @@
                id="maxThrottle"
                style="fill:#cccccc;fill-opacity:1;stroke:none" />
           </g>
+          <path
+             style="fill:none;stroke:#ffffff;stroke-width:14.10000038;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+             d="m 7.0500002,400.60717 104.9296498,0"
+             id="mid"
+             inkscape:connector-curvature="0"
+             sodipodi:nodetypes="cc"
+             inkscape:label="#path3164" />
         </svg>
 
 
@@ -132,6 +142,10 @@
         });
       },
       domReady: function() {
+        var self = this;
+        self.setVertical(0);
+        self.setPort(0);
+        self.setStarboard(0);
       },
       setPowerLevel: function(level) {
         var portMaxElement = $(this.$.port).find("#maxThrottle");
@@ -147,39 +161,27 @@
         this.height = height;
       },
       setVertical: function(lift) {
-        var y;
-        var verticalElement = $(this.$.vertical).find("#throttle rect");
-        var height = (lift.map(-1, 1, 0 - this.height, this.height) / 2);
-        y = (815/2) - height;
-        if (height < 0) {
-          height = -1 * height;
-          y = 815/2;
-        }
-        verticalElement.animate({svgHeight: height, svgY: y}, 10);
+        var element = $(this.$.vertical).find("#throttle rect");
+        this.setElement(element, lift);
       },
       setPort: function(left) {
-        var y;
         var element = $(this.$.port).find("#throttle rect");
-        var height = (left.map(-1, 1, 0 - this.height, this.height) / 2);
-        y = (815/2) - height;
-        if (height < 0) {
-          height = -1 * height;
-          y = 815/2;
-        }
-        element.animate({svgHeight: height, svgY: y}, 10);
+        this.setElement(element, left);
       },
       setStarboard: function(right) {
-        var y;
         var element = $(this.$.starboard).find("#throttle rect");
-        var height = (right.map(-1, 1, 0 - this.height, this.height) / 2);
+        this.setElement(element, right);
+      },
+      setElement : function(element, value) {
+        var y;
+        var height = (value.map(-1, 1, 0 - this.height, this.height) / 2);
         y = (815/2) - height;
         if (height < 0) {
           height = -1 * height;
           y = 815/2;
         }
         element.animate({svgHeight: height, svgY: y}, 10);
-      }
-      
+      }      
     });
   </script>
 </polymer-element>

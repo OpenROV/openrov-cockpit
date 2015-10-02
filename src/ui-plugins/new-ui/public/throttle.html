@@ -1,0 +1,203 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<polymer-element name="newui-throttle" attributes="">
+  <template>
+    <style>
+      #container {
+        width: 90%;
+        height: 110px;
+      }
+      .center {
+        left: 0;
+        right: 0;
+        margin-left: auto;
+        margin-right: auto;
+        float: none;
+      }
+      
+      .element svg {
+        height: 100px;
+        width: 30%;
+        float: left;
+      }
+
+    </style>
+    <div id="container" class="center" style="">
+
+      <div id="template" style="display:none">
+        
+        <svg
+           xmlns:dc="http://purl.org/dc/elements/1.1/"
+           xmlns:cc="http://creativecommons.org/ns#"
+           xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+           xmlns:svg="http://www.w3.org/2000/svg"
+           xmlns="http://www.w3.org/2000/svg"
+           version="1.1"
+           width="106.5676"
+           height="815.15717"
+           viewbox="0 0 106.5676 815.15717"
+           id="svg2">
+          <defs
+             id="defs4" />
+          <metadata
+             id="metadata7">
+            <rdf:RDF>
+              <cc:Work
+                 rdf:about="">
+                <dc:format>image/svg+xml</dc:format>
+                <dc:type
+                   rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+                <dc:title></dc:title>
+              </cc:Work>
+            </rdf:RDF>
+          </metadata>
+          <g
+             id="layer1">
+            <path
+               d="m 12.807624,5.934328 0,802.857152"
+               id="path3765"
+               style="fill:none;stroke:#ffffff;stroke-width:12.30000019;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:12.3, 36.9;stroke-dashoffset:0" />
+            <path
+               d="m 96.5219,5.934328 0,802.857152"
+               id="path3767"
+               style="fill:none;stroke:#ffffff;stroke-width:12.30000019;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:12.3, 36.9;stroke-dashoffset:0" />
+            <g
+               id="throttle">
+              <rect
+                 width="21.809999"
+                 height="131.31982"
+                 x="1"
+                 y="341.21478"
+                 id="rect3779"
+                 style="fill:#ffffff;fill-opacity:1;stroke:none" />
+              <rect
+                 width="21.809999"
+                 height="131.31982"
+                 x="85.757599"
+                 y="341.21478"
+                 id="rect3781"
+                 style="fill:#fff9f9;fill-opacity:1;stroke:none" />
+            </g>
+            <rect
+               width="30.840309"
+               height="173.74623"
+               x="38.606461"
+               y="221.30832"
+               id="maxThrottle"
+               style="fill:#cccccc;fill-opacity:1;stroke:none" />
+          </g>
+        </svg>
+
+
+      </div>
+
+      <div id="port" class="element">
+      </div>
+      <div id="vertical" class="element">
+      </div>
+      <div id="starboard" class="element">
+      </div>
+
+
+    </div>
+  </template>
+  <script>
+    Number.prototype.map = function ( in_min , in_max , out_min , out_max ) {
+      return ( this - in_min ) * ( out_max - out_min ) / ( in_max - in_min ) + out_min;
+    };
+
+    Polymer({
+      maxThrottle: 100,
+      height: 0,
+      ready: function() {
+        var self = this;
+        var template = $(this.$.template).find('svg'); 
+        template.clone().appendTo($(this.$.port));
+        template.clone().appendTo($(this.$.vertical));
+        template.clone().appendTo($(this.$.starboard));
+        window.cockpit.rov.on('plugin.rovpilot.powerLevel', function(level) {
+          self.setPowerLevel(level);
+        })
+        // window.cockpit.rov.on('status', function(status){
+        //   if ('mtarg' in status) {
+        //     self.setThrottle(status.mtarg);
+        //   }
+        // });
+        window.cockpit.rov.on('plugin.rovpilot.setLift', function(lift) {
+          self.setVertical(Number(lift));
+        });
+        window.cockpit.rov.on('plugin.rovpilot.setThrottle', function(throttle) {
+          self.setPort(Number(throttle));
+          self.setStarboard(Number(throttle));
+        });
+        window.cockpit.rov.on('plugin.rovpilot.setYaw', function(yaw) {
+          var port = yaw;
+          var starboard = -1 * yaw;
+          self.setPort(Number(port));
+          self.setStarboard(Number(starboard));
+        });
+      },
+      domReady: function() {
+      },
+      setPowerLevel: function(level) {
+        var portMaxElement = $(this.$.port).find("#maxThrottle");
+        var verticalMaxElement = $(this.$.vertical).find("#maxThrottle");
+        var starboardMaxElement = $(this.$.starboard).find("#maxThrottle");
+
+        //815 is the design height of the throttle SVG element, 200 the min height of the throttle display at power level 1      
+        var height = level.map(1, 5, 200, 815);
+        var y = ((815/2) - (height/2));
+        portMaxElement.animate({svgHeight: height, svgY: y}, 10);
+        verticalMaxElement.animate({svgHeight: height, svgY: y}, 10);
+        starboardMaxElement.animate({svgHeight: height, svgY: y}, 10);
+        this.height = height;
+      },
+      setThrottle: function(data) {
+        var split = data.split(',');
+        var port = Number(split[0]);
+        var vertical = Number(split[1]);
+        var starboard = Number(split[2]);
+
+        var portElement = $(this.$.port).find("#throttle rect");
+        var verticalElement = $(this.$.vertical).find("#throttle rect");
+        var starboardElement = $(this.$.starboard).find("#throttle rect");
+
+        var height = port.map(1200, 1800, 0, 815) - 815/2;
+        var y = ((815/2) - (height/2));
+      },
+      setVertical: function(lift) {
+        var y;
+        var verticalElement = $(this.$.vertical).find("#throttle rect");
+        var height = (lift.map(-1, 1, 0 - this.height, this.height) / 2);
+        y = (815/2) - height;
+        if (height < 0) {
+          height = -1 * height;
+          y = 815/2;
+        }
+        verticalElement.animate({svgHeight: height, svgY: y}, 10);
+      },
+      setPort: function(left) {
+        var y;
+        var element = $(this.$.port).find("#throttle rect");
+        var height = (left.map(-1, 1, 0 - this.height, this.height) / 2);
+        y = (815/2) - height;
+        if (height < 0) {
+          height = -1 * height;
+          y = 815/2;
+        }
+        element.animate({svgHeight: height, svgY: y}, 10);
+      },
+      setStarboard: function(right) {
+        var y;
+        var element = $(this.$.starboard).find("#throttle rect");
+        var height = (right.map(-1, 1, 0 - this.height, this.height) / 2);
+        y = (815/2) - height;
+        if (height < 0) {
+          height = -1 * height;
+          y = 815/2;
+        }
+        element.animate({svgHeight: height, svgY: y}, 10);
+      }
+      
+    });
+  </script>
+</polymer-element>

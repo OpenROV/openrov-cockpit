@@ -117,11 +117,6 @@
         window.cockpit.rov.on('plugin.rovpilot.powerLevel', function(level) {
           self.setPowerLevel(level);
         })
-        // window.cockpit.rov.on('status', function(status){
-        //   if ('mtarg' in status) {
-        //     self.setThrottle(status.mtarg);
-        //   }
-        // });
         window.cockpit.rov.on('plugin.rovpilot.setLift', function(lift) {
           self.setVertical(Number(lift));
         });
@@ -150,19 +145,6 @@
         verticalMaxElement.animate({svgHeight: height, svgY: y}, 10);
         starboardMaxElement.animate({svgHeight: height, svgY: y}, 10);
         this.height = height;
-      },
-      setThrottle: function(data) {
-        var split = data.split(',');
-        var port = Number(split[0]);
-        var vertical = Number(split[1]);
-        var starboard = Number(split[2]);
-
-        var portElement = $(this.$.port).find("#throttle rect");
-        var verticalElement = $(this.$.vertical).find("#throttle rect");
-        var starboardElement = $(this.$.starboard).find("#throttle rect");
-
-        var height = port.map(1200, 1800, 0, 815) - 815/2;
-        var y = ((815/2) - (height/2));
       },
       setVertical: function(lift) {
         var y;

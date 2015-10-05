@@ -35,14 +35,14 @@ $( document ).ready(function() {
         description: "lights for keymapping.",
         defaults: { keyboard: 'alt+p' },
         down: function() {
-          self.setLights(intensity+.1);
+          self.setLights(self.intensity+.1);
         }
       },
       {
         name: "lights.keyBoardMapping",
         description: "lights for keymapping.",
         defaults: { keyboard: 'alt+o' },
-        down: function() { self.setLights(intensity-.1); }
+        down: function() { self.setLights(self.intensity-.1); }
       }
       ]
     );

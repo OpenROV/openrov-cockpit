@@ -9,13 +9,14 @@
 var CONFIG = require('./lib/config'), fs = require('fs'), express = require('express'), app = express(), server = require('http').createServer(app), io = require('socket.io').listen(server, { log: false, origins: '*:*' }), EventEmitter = require('events').EventEmitter, OpenROVCamera = require(CONFIG.OpenROVCamera), OpenROVController = require(CONFIG.OpenROVController), logger = require('./lib/logger').create(CONFIG), mkdirp = require('mkdirp'), path = require('path');
 var PluginLoader = require('./lib/PluginLoader');
 var CockpitMessaging = require('./lib/CockpitMessaging');
+var SD_LISTEN_FDS_START = 3;
 app.configure(function () {
   app.use(express.static(__dirname + '/static/'));
   app.use(express.json());
   app.use(express.urlencoded());
   app.use('/photos', express.directory(CONFIG.preferences.get('photoDirectory')));
   app.use('/photos', express.static(CONFIG.preferences.get('photoDirectory')));
-  app.set('port', CONFIG.port);
+  app.set('port', process.env.LISTEN_FDS > 0 ? SD_LISTEN_FDS_START : CONFIG.port);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'ejs', { pretty: true });
   app.use(express.favicon(__dirname + '/static/favicon.icon'));
@@ -180,5 +181,3 @@ controller.start();
 server.listen(app.get('port'), function () {
   console.log('Started listening on port: ' + app.get('port'));
 });
-
-

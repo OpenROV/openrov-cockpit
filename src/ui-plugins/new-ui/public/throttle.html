@@ -234,6 +234,11 @@
       return ( this - in_min ) * ( out_max - out_min ) / ( in_max - in_min ) + out_min;
     };
     
+    function limit(value, l, h) {
+      // truncate anything that goes outside of max and min value
+      return Math.max(l, Math.min(h, value));
+    }
+
     Polymer({
       maxThrottle: 100,
       height: 0,
@@ -269,7 +274,7 @@
         var starboardMaxElement = $(this.$.starboard).find("#maxThrottle rect");
 
         //815 is the design height of the throttle SVG element, 200 the min height of the throttle display at power level 1      
-        var height = level.map(1, 5, 200, 815);
+        var height = level.map(1, 5, 0, 815) + 200; 
         var y = ((815/2) - (height/2));
         portMaxElement.animate({svgHeight: height, svgY: y}, 10);
         verticalMaxElement.animate({svgHeight: height, svgY: y}, 10);
@@ -291,7 +296,7 @@
       setElement : function(element, value) {
         var y;
         // the min throttle height is 200, therefore we substract 100 px
-        var maxheight = 815 - 100; 
+        var maxheight = 815 ; 
         var height = value.map(1000, 2000, 0 - maxheight, maxheight);
         console.log('level height: ' + this.height/2 + ' height: ' + height);
         y = (815/2) - height;

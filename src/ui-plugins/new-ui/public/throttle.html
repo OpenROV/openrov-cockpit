@@ -233,10 +233,23 @@
     Number.prototype.map = function ( in_min , in_max , out_min , out_max ) {
       return ( this - in_min ) * ( out_max - out_min ) / ( in_max - in_min ) + out_min;
     };
+    
+    function mapRawMotor(val) {
+      val = limit(val, -1, 1);
+      val = val.map(-1, 1, 1000, 2000);
+      val = Math.round(val);
+      return val;
+    };
+    
+    function limit(value, l, h) {
+      // truncate anything that goes outside of max and min value
+      return Math.max(l, Math.min(h, value));
+    }
 
     Polymer({
       maxThrottle: 100,
       height: 0,
+      power: 0,
       ready: function() {
         var self = this;
         var template = $(this.$.template).find('svg'); 
@@ -246,19 +259,35 @@
         window.cockpit.rov.on('plugin.rovpilot.powerLevel', function(level) {
           self.setPowerLevel(level);
         })
-        window.cockpit.rov.on('plugin.rovpilot.setLift', function(lift) {
-          self.setVertical(Number(lift));
+        window.cockpit.rov.on('plugin.rovpilot.controls', function(data) {
+          console.log(data);
+          
+          // var port = data.throttle + data.yaw;
+          // var starbord  = data.throttle - data.yaw;
+          // var vertical = data.lift;
+          
+          // self.setVertical(Number(mapRawMotor(vertical)));          
+          // self.setPort(Number(mapRawMotor(port)));          
+          // self.setStarboard(Number(mapRawMotor(starbord)));          
+          
+          self.setVertical(Number(data.vertical));          
+          self.setPort(Number(data.port));          
+          self.setStarboard(Number(data.starbord));          
+
         });
-        window.cockpit.rov.on('plugin.rovpilot.setThrottle', function(throttle) {
-          self.setPort(Number(throttle));
-          self.setStarboard(Number(throttle));
-        });
-        window.cockpit.rov.on('plugin.rovpilot.setYaw', function(yaw) {
-          var port = yaw;
-          var starboard = -1 * yaw;
-          self.setPort(Number(port));
-          self.setStarboard(Number(starboard));
-        });
+        // window.cockpit.rov.on('plugin.rovpilot.setLift', function(lift) {
+        //   self.setVertical(Number(lift));
+        // });
+        // window.cockpit.rov.on('plugin.rovpilot.setThrottle', function(throttle) {
+        //   self.setPort(Number(throttle));
+        //   self.setStarboard(Number(throttle));
+        // });
+        // window.cockpit.rov.on('plugin.rovpilot.setYaw', function(yaw) {
+        //   var port = yaw;
+        //   var starboard = -1 * yaw;
+        //   self.setPort(Number(port));
+        //   self.setStarboard(Number(starboard));
+        // });
       },
       domReady: function() {
         var self = this;
@@ -267,13 +296,13 @@
         self.setStarboard(0);
       },
       setPowerLevel: function(level) {
+        this.power = level;
         var portMaxElement = $(this.$.port).find("#maxThrottle rect");
         var verticalMaxElement = $(this.$.vertical).find("#maxThrottle rect");
         var starboardMaxElement = $(this.$.starboard).find("#maxThrottle rect");
 
         //815 is the design height of the throttle SVG element, 200 the min height of the throttle display at power level 1      
         var height = level.map(1, 5, 200, 815);
-        console.log(height);
         var y = ((815/2) - (height/2));
         portMaxElement.animate({svgHeight: height, svgY: y}, 10);
         verticalMaxElement.animate({svgHeight: height, svgY: y}, 10);
@@ -294,7 +323,12 @@
       },
       setElement : function(element, value) {
         var y;
-        var height = (value.map(-1, 1, 0 - this.height, this.height) / 2);
+        var maxheight = 815 - 100; 
+        var height = value.map(1000, 2000, 0 - maxheight, maxheight);
+        console.log('level height: ' + this.height/2 + ' height: ' + height);
+        //var mapped = value.map(1000, 2000, 0 - this.height, this.height);
+        //var height = ( mapped);
+        //console.log("value: " + value + " mapped: " + mapped + " height: " + height);
         y = (815/2) - height;
         if (height < 0) {
           height = -1 * height;

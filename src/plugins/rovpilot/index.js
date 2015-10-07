@@ -1,11 +1,14 @@
 (function() {
   var DISABLED = 'DISABLED';
+  var ArduinoHelper = require('../../lib/ArduinoHelper');
 
   var ROVPilot = function ROVPilot(deps) {
     console.log('The rovpilot plugin.');
     var self = this;
     self.SAMPLE_PERIOD = 1000 / deps.config.sample_freq;
+    this.physics = new ArduinoHelper().physics;
 
+    self.cockpit = deps.cockpit;
     self.rov = deps.rov;
     self.powerLevel = 2;
     self.sendToROVEnabled = true;
@@ -217,6 +220,8 @@
         }
       }
       this.rov.sendCommand(controls.throttle, controls.yaw, controls.lift);
+      var motorCommands = this.physics.mapMotors(controls.throttle, controls.yaw, controls.lift);
+      this.cockpit.emit('plugin.rovpilot.controls', motorCommands);
       this.priorControls = controls;
     }
   };

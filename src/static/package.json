@@ -7,6 +7,6 @@
     "should": "^4.0.4"
   },
   "scripts": {
-    "bower": "bower-script.sh"
+    "bower": "bash bower-script.sh"
   }
 }

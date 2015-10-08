@@ -296,7 +296,7 @@
       setElement : function(element, value) {
         var y;
         // the min throttle height is 200, therefore we substract 100 px
-        var maxheight = 815 ; 
+        var maxheight = 815; 
         var height = value.map(1000, 2000, 0 - maxheight, maxheight);
         console.log('level height: ' + this.height/2 + ' height: ' + height);
         y = (815/2) - height;

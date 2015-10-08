@@ -104,47 +104,52 @@
     	return jQuery.isWindow( elem ) ? elem : elem.nodeType === 9 && elem.defaultView;
     }
     
-    // The JQuery function we use does not implement offset correctly for shadow root 
+    // The JQuery function we use does not implement offset correctly for shadow root
+    // The following offset function comes from https://github.com/jquery/jquery/blob/c9cf250daafe806818da1dd207a88a8e94a4ad16/src/offset.js 
     jQuery.fn.extend({
-    	offset: function( options ) {
-    		if ( arguments.length ) {
-    			return options === undefined ?
-    				this :
-    				this.each(function( i ) {
-    					jQuery.offset.setOffset( this, options, i );
-    				});
-    		}
-    
-    		var docElem, win, rect,
-    			elem = this[ 0 ],
-    			box = { top: 0, left: 0 },
-    			doc = elem && elem.ownerDocument;
-    
-    		if ( !doc ) {
-    			return;
-    		}
-    
-    		// Make sure it's not a disconnected DOM node,
-    		// which is enough only if user-agent does not support ShadowDOM
-    		if ( !elem.createShadowRoot && !jQuery.contains( docElem, elem ) ) {
-    			return box;
-    		}
-    
-    		rect = elem.getBoundingClientRect();
-    
-    		// Make sure element is not hidden or disconnected
-    		if ( !rect.width && !rect.height ) {
-    			return box;
-    		}
-    
-    		docElem = doc.documentElement;
-    		win = getWindow( doc );
-    
-    		return {
-    			top: rect.top + win.pageYOffset - docElem.clientTop,
-    			left: rect.left + win.pageXOffset - docElem.clientLeft
-    		};
-      }});
+      offset: function( options ) {
+      
+      		// Preserve chaining for setter
+      		if ( arguments.length ) {
+      			return options === undefined ?
+      				this :
+      				this.each( function( i ) {
+      					jQuery.offset.setOffset( this, options, i );
+      				} );
+      		}
+      
+      		var docElem, win, rect, doc,
+      			elem = this[ 0 ];
+      
+      		if ( !elem ) {
+      			return;
+      		}
+      
+      		// Support: IE<=11+
+      		// Running getBoundingClientRect on a
+      		// disconnected node in IE throws an error
+      		if ( !elem.getClientRects().length ) {
+      			return { top: 0, left: 0 };
+      		}
+      
+      		rect = elem.getBoundingClientRect();
+      
+      		// Make sure element is not hidden (display: none)
+      		if ( rect.width || rect.height ) {
+      			doc = elem.ownerDocument;
+      			win = getWindow( doc );
+      			docElem = doc.documentElement;
+      
+      			return {
+      				top: rect.top + win.pageYOffset - docElem.clientTop,
+      				left: rect.left + win.pageXOffset - docElem.clientLeft
+      			};
+      		}
+      
+      		// Return zeros for disconnected and hidden elements (gh-2310)
+      		return rect;
+      	},
+      });
     
     Polymer({
       domReady: function() {

@@ -28,7 +28,7 @@
       <div class="navbar-inner">
         <a class="brand" href="#"><img src="../../themes/OpenROV/img/openrov.png" class="logo"/><span class="navbar-titel">Cockpit</span></a>
         <ul class="nav" id="navtoolbar">
-          <li><a href="#"><img id="keyboardpopover" src="../../themes/OpenROV/img/keyboard.png" data-trigger="hover" data-placement="bottom" rel='popover' title="keyboard commands" html="true" /></a></li>
+          <li><a href="#"><img id="keyboardpopover" src="../../themes/OpenROV/img/keyboard.png" data-trigger="hover" data-container="html /deep/ #keyboardInstructions" data-placement="bottom" rel='popover' title="keyboard commands" html="true" /></a></li>
           <li><a href="#" id="servoTilt"><servo-tilt class="pull-left"></servo-tilt></a></li>
           <li><brightness-indicator  class="pull-left"></brightness-indicator></li>
           <li><rov-gamepad class="pull-left"></rov-gamepad></li>
@@ -126,8 +126,9 @@
         $(self.$.keyboardpopover).hover(function () {
           var kb =   window.cockpit.extensionPoints.keyboardInstructions;
           $(self.$.keyboardpopover).attr('data-content', kb.html());
+          //$(self.$.keyboardpopover).attr('data-container', 'html /deep/ #keyboardInstructions');
         });
-        $(self.$.keyboardpopover).popover();
+        $('html /deep/ [rel=\'popover\']').popover();
 
       },
       setMenu: function(menuItem) {

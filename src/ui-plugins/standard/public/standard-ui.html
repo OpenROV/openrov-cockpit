@@ -120,6 +120,15 @@
         self.$.telemetry.define = function(name,callback){
           window.cockpit.rov.emit('telemetry.getDefinition',name,callback);
         };
+        
+        //We have a contract for centralizing all keyboad instructions. This code
+        //wires that content to where we display it in a popover.
+        $(self.$.keyboardpopover).hover(function () {
+          var kb =   window.cockpit.extensionPoints.keyboardInstructions;
+          $(self.$.keyboardpopover).attr('data-content', kb.html());
+        });
+        $(self.$.keyboardpopover).popover();
+
       },
       setMenu: function(menuItem) {
         menuItem.appendTo($(this.$.menu));

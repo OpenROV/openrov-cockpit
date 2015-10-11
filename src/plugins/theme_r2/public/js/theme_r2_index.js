@@ -61,7 +61,7 @@ ThemeR2.prototype.getDefaultConfiguration = function getDefaultConfiguration(){
     to directly access the window global object space as children
     objects should never know about their parent containers.
 */
-$( document ).ready(function() {
+//$( document ).ready(function() {
 
 
 

@@ -36,11 +36,13 @@
            way we don't create a broken form that is missing
            fields.
         */
-        _emitter.emit('plugin.settings-manager.getSettings',function(settings){
+        _emitter.emit('plugin.settings-manager.getSettings',null,function(settings){
           _self.value = settings;
           _self.editorOptions['schema'] = schema;
           _self.editor = new JSONEditor(_self.$.form1, _self.editorOptions);
           var defaults = _self.editor.getValue();
+          console.log("Defaults")
+          console.log(JSON.stringify(defaults));
           //zips the object properies in to _self.value
           Object.assign(_self.value,defaults);
           _self.editor.setValue(_self.value);

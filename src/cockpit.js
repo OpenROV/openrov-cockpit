@@ -9,6 +9,7 @@
 var CONFIG = require('./lib/config'), fs = require('fs'), express = require('express'), app = express(), server = require('http').createServer(app), io = require('socket.io').listen(server, { log: false, origins: '*:*' }), EventEmitter = require('events').EventEmitter, OpenROVCamera = require(CONFIG.OpenROVCamera), OpenROVController = require(CONFIG.OpenROVController), logger = require('./lib/logger').create(CONFIG), mkdirp = require('mkdirp'), path = require('path');
 var PluginLoader = require('./lib/PluginLoader');
 var CockpitMessaging = require('./lib/CockpitMessaging');
+var Q=require('Q');
 require('systemd');
 app.configure(function () {
   app.use(express.static(__dirname + '/static/'));
@@ -50,7 +51,8 @@ var deps = {
   camera: camera,
   cockpit: client,
   config: CONFIG,
-  globalEventLoop: globalEventLoop
+  globalEventLoop: globalEventLoop,
+  loadedPlugins: []
 };
 
 app.get('/config.js', function (req, res) {
@@ -175,6 +177,9 @@ function addPluginAssets(result) {
     console.dir(asset);
     app.use('/' + asset.path, express.static(asset.assets));
   });
+  if (result.plugins !== undefined){
+    deps.loadedPlugins=deps.loadedPlugins.concat(result.plugins);
+  }
 }
 var loader = new PluginLoader();
 
@@ -205,13 +210,42 @@ var sysscripts = ["bogus",
 */
 //
 //            "bower_components/webcomponentsjs/webcomponents.min.js",
-loader.loadPlugins(path.join(__dirname, 'ui-plugins'), 'ui-plugin', deps, addPluginAssets);
-loader.loadPlugins(path.join(__dirname, 'system-plugins'), 'system-plugin', deps, addPluginAssets);
-loader.loadPlugins(path.join(__dirname, 'plugins'), 'plugin', deps, addPluginAssets);
 mkdirp.sync('/usr/share/cockpit/bower_components');
-loader.loadPlugins('/usr/share/cockpit/bower_components', 'community-plugin', deps, addPluginAssets, function (file) {
-  return file.substring(0, 15) === 'openrov-plugin-';
-});
+
+var funcs = [
+  loader.loadPlugins(path.join(__dirname, 'ui-plugins'), 'ui-plugin', deps),
+  loader.loadPlugins(path.join(__dirname, 'system-plugins'), 'system-plugin', deps),
+  loader.loadPlugins(path.join(__dirname, 'plugins'), 'plugin', deps),
+  loader.loadPlugins('/usr/share/cockpit/bower_components', 'community-plugin', deps, function (file) {
+    return file.substring(0, 15) === 'openrov-plugin-';
+  })
+]
+
+Q.allSettled(funcs).then(function(results){
+  results.forEach(function (result) {
+    if (result.state === "fulfilled") {
+        var value = result.value;
+        addPluginAssets(value);
+    } else {
+        var reason = result.reason;
+        throw reason;
+    }
+  });
+  console.warn("Executing Now");
+  console.dir(deps.loadedPlugins);
+
+  deps.loadedPlugins.forEach(function(plugin){
+    if (plugin.start !== undefined){
+      plugin.start();
+    }
+  });
+})
+.catch(function (error) {
+    console.error("Executing Error");
+    console.log(error);
+    throw error;
+})
+
 controller.start();
 // Start the web server
 server.listen(app.get('port'), function () {

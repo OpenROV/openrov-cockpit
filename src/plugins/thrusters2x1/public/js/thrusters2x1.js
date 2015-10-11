@@ -10,51 +10,6 @@
     // Add required UI elements
   };
 
-  Thrusters2x1.prototype.getSettingSchema = function getSettingSchema(){
-    return [
-      {
-          "title": "Thruster Settings",
-          "id" : "thrusters2x1",
-          "type": "object",
-          "properties": {
-              "motor-response-delay-ms": {
-                  "type": "number",
-                  "title": "Motor response delay (ms)",
-                  "minimum": 0,
-                  "maximum": 100,
-              },
-              "port": {
-                "title:": "Port Motor",
-                "type": "object",
-                "properties": {
-                  "reversed" : {"type": "boolean", "format": "checkbox"},
-                  "forward-modifier" : {"type":"number"},
-                  "reverse-modifier" : {"type":"number"}
-                }
-              },
-              "vertical": {
-                "title:": "Port Motor",
-                "type": "object",
-                "properties": {
-                  "reversed" : {"type": "boolean", "format": "checkbox"},
-                  "forward-modifier" : {"type":"number"},
-                  "reverse-modifier" : {"type":"number"}
-                }
-              },
-              "starboard": {
-                "title:": "Port Motor",
-                "type": "object",
-                "properties": {
-                  "reversed" : {"type": "boolean", "format": "checkbox"},
-                  "forward-modifier" : {"type":"number"},
-                  "reverse-modifier" : {"type":"number"}
-                }
-              }
-          }
-      }
-    ]
-  }
-
   Thrusters2x1.prototype.loaded = function() {
   };
 

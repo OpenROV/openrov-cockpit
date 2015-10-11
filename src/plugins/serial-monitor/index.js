@@ -24,4 +24,6 @@ SerialMonitor.prototype.listen = function listen(deps) {
   });
 
 };
-module.exports = SerialMonitor;
+module.exports = function (name, deps) {
+  return new SerialMonitor(name,deps);
+};

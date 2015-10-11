@@ -17,4 +17,6 @@ function example(name, deps) {
     ]
   });
 }
-module.exports = example;
+module.exports = function (name, deps) {
+  return new example(name,deps);
+};

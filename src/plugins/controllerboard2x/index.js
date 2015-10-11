@@ -45,5 +45,8 @@
     });
 
   }
-  module.exports = Controllerboard2x;
+  module.exports = function (name, deps) {
+    return new Controllerboard2x(name,deps);
+  };
+
 })();

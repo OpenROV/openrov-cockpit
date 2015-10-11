@@ -1,4 +1,4 @@
-function example(name, deps) {
+function ConnectionHealth(name, deps) {
   console.log('This is where connection-health plugin code would execute in the node process.');
 
   var lastping = 0;
@@ -10,4 +10,6 @@ function example(name, deps) {
     }
   });
 }
-module.exports = example;
+module.exports = function (name, deps) {
+  return new ConnectionHealth(name,deps);
+};

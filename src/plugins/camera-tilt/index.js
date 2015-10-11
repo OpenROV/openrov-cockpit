@@ -22,6 +22,11 @@
       }
     });
 
+    var mapTiltServo = function (value) {
+      value = limit(value, -0.7, 0.7);
+      return ArduinoHelper.mapA(value, -1, 1, 1000, 2000);
+    };
+
     var setCameraTilt = function(value) {
       tilt = value;
       if (tilt > 1)
@@ -29,7 +34,7 @@
       if (tilt < -1)
         tilt = -1;
 
-      var servoTilt = physics.mapTiltServo(tilt);
+      var servoTilt = mapTiltServo(tilt);
       var command = 'tilt(' + servoTilt + ')';
 
       deps.rov.send(command);
@@ -40,5 +45,8 @@
       setCameraTilt(tilt);
     };
   }
-  module.exports = CameraTilt;
+
+  module.exports = function (name, deps) {
+    return new CameraTilt(name,deps);
+  };
 })();

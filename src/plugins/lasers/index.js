@@ -26,5 +26,7 @@
     };
 
   }
-  module.exports = Laser;
+  module.exports = function (name, deps) {
+    return new Laser(name,deps);
+  };  
 })();

@@ -45,6 +45,8 @@
 
 
 
-  module.exports = UiSelectorLoader;
 
+  module.exports = function (name, deps) {
+    return new UiSelectorLoader(name,deps);
+  };
 })();

@@ -21,6 +21,7 @@ function readyAyeReady(name, deps) {
        }
        else {
          clearInterval(chk);
+         //TODO: Add motor chirp by cycling ESCs
          setTimeout(function() { deps.rov.send('ligt(24.5)');}, 500);
          setTimeout(function() { deps.rov.send('ligt(40.5)');}, 1000);
          setTimeout(function() { deps.rov.send('ligt(24.5)');}, 1500);
@@ -39,4 +40,7 @@ function readyAyeReady(name, deps) {
   });
 
 }
-module.exports = readyAyeReady ;
+
+module.exports = function (name, deps) {
+  return new readyAyeReady(name,deps);
+};

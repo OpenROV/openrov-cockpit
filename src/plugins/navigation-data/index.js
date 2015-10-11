@@ -45,5 +45,7 @@
     }, 100);
 
   }
-  module.exports = NavigationData;
+  module.exports = function (name, deps) {
+    return new NavigationData(name,deps);
+  };
 })();

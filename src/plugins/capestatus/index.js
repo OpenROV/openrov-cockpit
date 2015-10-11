@@ -165,4 +165,6 @@ function capestatus(name, deps) {
     return preferences;
   }
 }
-module.exports = capestatus;
+module.exports = function (name, deps) {
+  return new capestatus(name,deps);
+};

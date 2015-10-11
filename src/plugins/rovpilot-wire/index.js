@@ -1,7 +1,7 @@
 (function() {
   var DISABLED = 'DISABLED';
 
-  var ROVPilot = function ROVPilot(deps) {
+  var ROVPilotWire = function ROVPilotWire(deps) {
     console.log('The rovpilot plugin.');
     var self = this;
     self.SAMPLE_PERIOD = 1000 / deps.config.sample_freq;
@@ -100,7 +100,7 @@
     return this;
   };
 
-  ROVPilot.prototype.allStop = function allStop() {
+  ROVPilotWire.prototype.allStop = function allStop() {
     this.positions.throttle = 0;
     this.positions.yaw = 0;
     this.positions.lift = 0;
@@ -111,7 +111,7 @@
 
 
 
-  ROVPilot.prototype.sendPilotingData = function() {
+  ROVPilotWire.prototype.sendPilotingData = function() {
     var positions = this.positions;
     var updateRequired = false;
     //Only send if there is a change
@@ -144,7 +144,7 @@
   };
 
   module.exports = function (name, deps) {
-    return new ROVPilot(deps);
+    return new ROVPilotWire(deps);
   };
 
 })();

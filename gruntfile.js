@@ -15,7 +15,8 @@ module.exports = function(grunt) {
         timeout: 3000,
         ignoreLeaks: false,
         ui: 'bdd',
-        reporter: 'spec'
+        reporter: 'spec',
+        grep: 'unit'
       },
       all: { src: [
         'src/*plugins/**/tests/*.js',
@@ -26,6 +27,15 @@ module.exports = function(grunt) {
       test: {
         src: ['src/*plugins/**/public/tests/*.html']
       }
+    },
+    watch:{
+      all:{
+        files:[
+          'src/*plugins/**/tests/*.js',
+          'src/tests/**/*.js'
+        ],
+        tasks:['test']
+      }
     }
   });
 
@@ -35,4 +45,5 @@ module.exports = function(grunt) {
 
   grunt.registerTask('test', ['simplemocha', 'mocha']);
   grunt.registerTask('default', ['jshint', 'test' ]);
+  grunt.registerTask('watch', ['test', 'watch:all']);
 };

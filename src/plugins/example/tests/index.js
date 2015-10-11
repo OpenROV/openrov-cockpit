@@ -33,12 +33,12 @@ describe('Example plugin constructor', function() {
   });
 
   it('registers on events from cockpit', function() {
-    new testee('', deps);
-    deps.cockpit.on.calledOnce.should.be.true; /* jshint ignore:line */
+    new testee('', deps).start();
+    deps.cockpit.on.calledTwice.should.be.true; /* jshint ignore:line */
   });
 
   it('registers passthrough commands', function() {
-    new testee('', deps);
+    new testee('', deps).start();
     deps.rov.registerPassthrough.calledOnce.should.be.true; /* jshint ignore:line */
   });
 });

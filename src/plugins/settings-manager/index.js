@@ -65,9 +65,15 @@ settingsManager.prototype.start = function start(){
     if ((modulename !== undefined) && (modulename !== null)){
       var result = {};
       result[modulename]=self.settings[modulename];
-      fn(result);
+      if (fn!==undefined){
+        fn(result);
+      };
+      self.deps.cockpit.emit('settings-change.'+modulename,result);
     } else {
-      fn(self.settings)
+      if (fn!==undefined){
+        fn(self.settings)
+      }
+      self.deps.cockpit.emit('settings-change',self.settings);
     }
   })
 

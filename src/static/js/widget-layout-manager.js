@@ -113,6 +113,13 @@ $(document).ready(function() {
 
       },
       "_linkhref": "connection-health/orov-ping-graph.html"
+    },
+    {
+     "tag": "orov-example",
+     "settings": {
+
+     },
+     "_linkhref": "example/example.html"
     }],
     "flight-control-state": [{
       "tag": "orov-events-graph",

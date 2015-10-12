@@ -66,13 +66,24 @@
         if (plugin.canBeDisabled) {
           return true;
       }}).map(function(plugin){
-        var p = {
-            rawPlugin: plugin,
-            config: {},
-            isEnabled: plugin.defaultEnabled !== 'undefined' ? plugin.defaultEnabled : true,
-            name: plugin.name,
-            viewName: plugin.viewName
-        };
+        var p = {};
+        if (plugin.pluginDefaults!==undefined){
+          p = {
+              rawPlugin: plugin,
+              config: {},
+              isEnabled: plugin.pluginDefaults.defaultEnabled !== 'undefined' ? plugin.pluginDefaults.defaultEnabled : true,
+              name: plugin.pluginDefaults.name,
+              viewName: plugin.pluginDefaults.viewName
+          };
+        }else{ //support backwards compatibility pre plugin object
+          p = {
+              rawPlugin: plugin,
+              config: {},
+              isEnabled: plugin.defaultEnabled !== 'undefined' ? plugin.defaultEnabled : true,
+              name: plugin.name,
+              viewName: plugin.viewName
+          };
+        }
         //option to async get additional properies from config here.
         return p;
       });

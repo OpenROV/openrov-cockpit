@@ -80,6 +80,11 @@ settingsManager.prototype.start = function start(){
   this.deps.cockpit.on('plugin.settings-manager.saveSettings',function(settings,fn){
     self.deps.config.preferences.set(PREFERENCES_NS, settings);
     self.deps.config.savePreferences();
+    for(var item in settings){
+      var result = {}
+      result[item]=settings[item];
+      self.deps.cockpit.emit('settings-change.'+item,result);
+    };
 
     if (fn!==undefined){
       fn();

@@ -58,16 +58,6 @@ $(document).ready(function() {
       "_linkhref": "blackbox/orov-blackbox-status.html"
     },
     {
-      "tag": "orov-generic-gauge",
-      "settings": {
-
-        "title": "MCU Runtime",
-        "eventName": "plugin.controllerboard2x.mcu-run-time",
-        "displayGraph" :false
-      },
-      "_linkhref": "theme_r2/orov-generic-gauge.html",
-    },
-    {
       "tag": "orov-telemetry-item",
       "settings": {
         "telemetryItem" : "vout",

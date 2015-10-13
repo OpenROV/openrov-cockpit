@@ -13,7 +13,7 @@
   <template>
     <label>{{telemetryItem}}</label>
   <div on-click="toggle">
-  <!--link href="../grapp-graph-epoch/grapp-graph-epoch.html" rel="import"-->
+  <link href="../grapp-graph-epoch/grapp-graph-epoch.html" rel="import">
     <grapp-graph-epoch id="timegraph" hidden="{{!enabled}}" type="time.line" axis="" width="100" height="40">
       <grapp-graph-epoch-series label="Time Series 1"
         data='[{"time":1370044800,"y":1},{"time":1370044801,"y":10}]'>
@@ -43,11 +43,6 @@
         telemetryItemValueChanged: function(newvalue,oldvalue){
           //should update graph
         },
-        attached: function (){
-          this.importHref(this.resolveUrl('../grapp-graph-epoch/grapp-graph-epoch.html'), function(e) {
-              console.log("Imported grapp");
-          });
-        },        
         logStatusData: function (data) {
           var t = Object.keys(data)
           for (var i in t) {

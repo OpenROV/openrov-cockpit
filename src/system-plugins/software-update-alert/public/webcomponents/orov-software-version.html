@@ -58,6 +58,7 @@
         },
         behaviors: [namespace('behaviors').oROVStandard],
         calculateUpdateAvailable: function(data){
+          if ((data===undefined) || (data===null)) return false;
           return data.length>0;
         },
         attached: function () {

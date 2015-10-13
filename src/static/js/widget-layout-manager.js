@@ -3,12 +3,21 @@
 $(document).ready(function() {
 
   window.OROV.layoutConfig = {
-    "multipurpose-display": [{
-      "tag": "orov-inputs-list",
-      "settings": {
-      },
-      "_linkhref": "input-controller/orov-inputs-list.html"
-    }, {
+    "multipurpose-display": [
+      {      //          <telemetry-graph series-to-graph="['deap']" event-emitter={{cockpit-event-emitter}}></telemetry-graph>
+        "tag": "orov-telemetry-graph",
+        "settings": {
+          "seriesToGraph" : "['deap']"
+        },
+        "_linkhref": "telemetry/telemetry-graph.html"
+     },
+      {
+        "tag": "orov-inputs-list",
+        "settings": {
+        },
+        "_linkhref": "input-controller/orov-inputs-list.html"
+     },
+     {
       "tag": "orov-plugin-finder",
       "settings": {
       },
@@ -139,6 +148,7 @@ $(document).ready(function() {
   };
 
 
+//Place the html links to the webcomponents in the header
   var wid =  window.OROV.layoutConfig;
   Object.keys(wid).forEach(function(section) {
     for (var i in wid[section]){
@@ -181,15 +191,20 @@ $(document).ready(function() {
         if (savedConfig[k[i]][j].tag.startsWith('orov')){
            el.eventEmitter = window.cockpit;
         }
+        area.append(el);
 
-        for (var l in el.properties){
-          if ((el.properties[l].persisted) && (l in savedConfig[k[i]][j].settings )){
-            el[l] = savedConfig[k[i]][j].settings[l];
-          }
+        for (var s in savedConfig[k[i]][j].settings){
+          el[s] = savedConfig[k[i]][j].settings[s];
         }
 
+//        for (var l in el.properties){
+//          if ((el.properties[l].persisted) && (l in savedConfig[k[i]][j].settings )){
+//            el[l] = savedConfig[k[i]][j].settings[l];
+//          }
+//        }
 
-        area.append(el);
+
+
       }
     }
   });

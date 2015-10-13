@@ -1,11 +1,11 @@
 <link rel="import" href="../polymer/polymer.html">
 <dom-module name="orov-events-graph">
 <link rel="import" type="css" href="../epoch/epoch.min.css">
-  <link href="../grapp-graph-epoch/grapp-graph-epoch.html" rel="import">
+
 <style>
 </style>
   <template>
-
+  <!--link href="../grapp-graph-epoch/grapp-graph-epoch.html" rel="import"-->
     <grapp-graph-epoch id="timegraph" type="time.line" axis="left,bottom" width="400" height="150">
       <grapp-graph-epoch-series id='cockpit' label="cockpit"
         data='[{"time":1370044800,"y":1},{"time":137004900,"y":2}]'>
@@ -34,9 +34,9 @@
           });
         },
         attached: function (){
-//          this.importHref(this.resolveUrl('../grapp-graph-epoch/grapp-graph-epoch.html'), function(e) {
-//            console.log("Imported grapp");
-//          });
+          this.importHref(this.resolveUrl('../grapp-graph-epoch/grapp-graph-epoch.html'), function(e) {
+              console.log("Imported grapp");
+          });
         },
         logStatusData: function (data) {
           var d = Date.now()/1000;
@@ -46,9 +46,12 @@
           this.$.socketio.data.push({time:d, y:data.socketIO});
           this.$.timegraph.graph.draw();
 */
-
-          this.$.timegraph.graph.push([{time: d, y: data.cockpit},{time: d,y:data.rov},{time:d,y:data.socketIO}]);
-
+          if (this.$.timegraph.graph !== undefined){
+            this.$.timegraph.graph.push([{time: d, y: data.cockpit},{time: d,y:data.rov},{time:d,y:data.socketIO}]);
+          }
+          else {
+            console.warn("events-graph graph objects not ready");
+          }
 
 //         this.$.timegraph.data.[0].push({time: d, y: data.cockpit},{time: d,y:data.rov},{time:d,y:data.socketIO});
 /*

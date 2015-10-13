@@ -1,5 +1,5 @@
 (function() {
-
+  var PREFERENCES_NS="plugins"
   var SystemEnvionment = function SystemEnvironment(name, deps) {
     console.log('Controllerboard2x:SystemEnvironment plugin loaded');
 
@@ -14,6 +14,8 @@
 
   var SystemPower = function SystemPower(name,deps){
     console.log('Controllerboard2x:SystemPower plugin loaded');
+
+    this.config = deps.config;
 
     deps.rov.on('status', function(data) {
 //      if ('')
@@ -35,6 +37,20 @@
   };
 
   SystemPower.prototype.getSettingSchema = function getSettingSchema(){
+
+    //Technically the json-editor supports "watch" that can be used
+    //to dynamically add items from an array as an ENUM to a select
+    //in the same document.  Have an issue filed as I cannot get it
+    //to work.  WORKAROUND: Manually parse the config for the Battery
+    //types and inject them in to the schema.  TODO: signal an update
+    //to the schema that is caches in several spots when a Battery
+    //is changed.
+    BatteryOptions = [];
+    var b = this.config.preferences.get(PREFERENCES_NS);
+    b.batteryDefintions.batteries.forEach(function(bat){
+      BatteryOptions.push(bat.name);
+    });
+
     return      [{
       "id": "batteryDefintions",
       "type": "object",
@@ -72,13 +88,7 @@
         "selectedBattery" : {
           "id" : "selectedBattery",
           "type" : "string",
-          "watch" : {
-            "batteryEnum" : "batteries"
-          },
-          "enumSource" : [{
-            "source" : "batteryEnum",
-            "value" : "{{item.name}}"
-          }]
+          "enum" : BatteryOptions
         }
       },
       "required": [

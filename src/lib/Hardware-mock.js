@@ -22,7 +22,7 @@ function Hardware() {
   };
 
   hardware.write = function (command) {
-    console.log('HARDWARE-MOCK:' + command);
+    //console.log('HARDWARE-MOCK:' + command);
     var commandParts = command.split(/\(|\)/);
     var commandText = commandParts[0];
     if (commandText === 'rcap') {
@@ -30,11 +30,11 @@ function Hardware() {
     }
     if (commandText === 'ligt') {
       hardware.emitStatus('LIGP:' + commandParts[1] / 255);
-      console.log('HARDWARE-MOCK return light status');
+  //    console.log('HARDWARE-MOCK return light status');
     }
     if (commandText === 'tilt') {
       hardware.emitStatus('servo:' + commandParts[1]);
-      console.log('HARDWARE-MOCK return servo status');
+  //    console.log('HARDWARE-MOCK return servo status');
     }
     if (commandText === 'claser') {
         if (hardware.laserEnabled) {

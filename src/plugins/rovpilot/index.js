@@ -57,8 +57,8 @@
 
     deps.cockpit.on('plugin.rovpilot.desiredControlRates', function (rates,ack,fn) {
       self.positions = rates;
-      console.log("this should be a callback!");
-      console.dir(fn);
+//      console.log("this should be a callback!");
+//      console.dir(fn);
 //      fn(ack); //ack
     });
 
@@ -110,7 +110,7 @@
           if(controls[control] != this.priorControls[control]){
             var command = control + '(' + controls[control] * 100+ ')';
             this.rov.send(command);
-            console.log(command);
+          //  console.log(command);
           }
         }
       }

@@ -34,9 +34,78 @@
 
   };
 
+  SystemPower.prototype.getSettingSchema = function getSettingSchema(){
+    return      [{
+      "id": "batteryDefintions",
+      "type": "object",
+      "properties": {
+        "batteries": {
+          "id": "batteries",
+          "type": "array",
+          "items": {
+            "id": "0",
+            "type": "object",
+            "properties": {
+              "name": {
+                "id": "name",
+                "type": "string"
+              },
+              "minVoltage": {
+                "id": "minVoltage",
+                "type": "integer"
+              },
+              "maxVoltage": {
+                "id": "maxVoltage",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "name",
+              "minVoltage",
+              "maxVoltage"
+            ]
+          },
+          "required": [
+            "0"
+          ]
+        },
+        "selectedBattery" : {
+          "id" : "selectedBattery",
+          "type" : "string",
+          "watch" : {
+            "batteryEnum" : "batteries"
+          },
+          "enumSource" : [{
+            "source" : "batteryEnum",
+            "value" : "{{item.name}}"
+          }]
+        }
+      },
+      "required": [
+        "batteries",
+        "selectedBattery"
+      ]
+
+    }];
+
+  }
+/*
+,
+"selectedBattery" : {
+  "id" : "selectedBattery",
+  "type" : "string",
+  "watch" : {
+    "batteryEnum" : "batteries"
+  },
+  "enumSource" : [{
+    "source" : "batteryEnum",
+    "value" : "{{item.name}}"
+  }]
+}
+*/
 
 
-  function Controllerboard2x(name, deps) {
+  var Controllerboard2x=function Controllerboard2x(name, deps) {
     console.log('Controllerboard2x plugin loaded');
 
     deps.rov.on('status', function(data) {
@@ -45,8 +114,17 @@
     });
 
   }
+
+  Controllerboard2x.prototype.getSettingSchema = function getSettingSchema(){
+    var item= this.systempower.getSettingSchema();
+    return item;
+  }
+
   module.exports = function (name, deps) {
-    return new Controllerboard2x(name,deps);
+    var result = new Controllerboard2x(name,deps);
+    result.systempower = new SystemPower(name,deps);
+    result.systemenvionment = new SystemEnvionment(name,deps);
+    return result;
   };
 
 })();

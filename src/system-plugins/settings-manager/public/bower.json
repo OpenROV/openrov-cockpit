@@ -15,6 +15,6 @@
     "tests"
   ],
   "dependencies": {
-    "json-editor": "~0.7.22"
+    "json-editor": "~0.7.23"
   }
 }

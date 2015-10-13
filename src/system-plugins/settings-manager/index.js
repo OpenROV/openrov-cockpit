@@ -80,6 +80,7 @@ settingsManager.prototype.start = function start(){
   this.deps.cockpit.on('plugin.settings-manager.saveSettings',function(settings,fn){
     self.deps.config.preferences.set(PREFERENCES_NS, settings);
     self.deps.config.savePreferences();
+    self.preferences = getNameSpacedPreferences(self.deps.config);
     for(var item in settings){
       var result = {}
       result[item]=settings[item];
@@ -96,12 +97,17 @@ settingsManager.prototype.start = function start(){
   this.deps.loadedPlugins.forEach(function(plugin){
     var _schema = self.schema;
     var _settings = self.settings;
-    if (plugin.getSettingSchema !== undefined){
-      plugin.getSettingSchema().forEach(function(data){
-        if('id' in data){
-          _schema[data.id]=data;
-        }
-      });
+    if (plugin !== undefined){
+      if (plugin.getSettingSchema !== undefined){
+        var result = plugin.getSettingSchema();
+        if ((result !== undefined) && (Array.isArray(result))){
+          result.forEach(function(data){
+            if('id' in data){
+              _schema[data.id]=data;
+            }
+          });
+        };
+      }
     }
 
   });

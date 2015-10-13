@@ -42,6 +42,7 @@
 
 
   TankControl.prototype.inputDefaults = function inputDefaults() {
+    var rov = this;
     return [
       {
         name: 'tankcontrol.toggleTankControl',

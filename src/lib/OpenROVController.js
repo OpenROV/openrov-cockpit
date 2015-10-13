@@ -61,7 +61,7 @@ var OpenROVController = function (eventLoop, client) {
     }
     if ('cmd' in status) {
       if (status.com != 'ping(0)'){
-        console.log('cmd: ' + status.cmd);
+        //console.log('cmd: ' + status.cmd);
         controller.emit('command', status.cmd);
       }
     }
@@ -142,7 +142,7 @@ OpenROVController.prototype.send = function (cmd) {
     return;
 
   var command = cmd + ';';
-  console.log('Sending command to arduino: ' + command);
+//  console.log('Sending command to arduino: ' + command);
 
   controller.hardware.write(command);
 };

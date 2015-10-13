@@ -121,11 +121,11 @@ controller.on('rovsys', function (data) {
 });
 controller.on('Arduino-settings-reported', function (settings) {
   deps.cockpit.emit('settings', settings);
-  console.log('sending arduino settings to web client');
+//  console.log('sending arduino settings to web client');
 });
 controller.on('settings-updated', function (settings) {
   deps.cockpit.emit('settings', settings);
-  console.log('sending settings to web client');
+//  console.log('sending settings to web client');
 });
 globalEventLoop.on('videoStarted', function () {
   deps.cockpit.emit('videoStarted');
@@ -228,7 +228,8 @@ Q.allSettled(funcs).then(function(results){
         addPluginAssets(value);
     } else {
         var reason = result.reason;
-        throw reason;
+        console.error(reason);
+        debugger;
     }
   });
   console.warn("Executing Now");
@@ -240,10 +241,16 @@ Q.allSettled(funcs).then(function(results){
     }
   });
 })
-.catch(function (error) {
-    console.error("Executing Error");
-    console.log(error);
-    throw error;
+.fail(function (error) {
+    console.log("Executing Error");
+    if (error !== undefined){
+      console.dir(error);
+    }
+    process.exit -1;
+    throw new Error("Error in loading plugins");
+
+//    console.log(error);
+//    throw error;
 })
 
 controller.start();

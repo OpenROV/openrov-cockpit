@@ -134,7 +134,7 @@
           if(controls[control] != this.priorControls[control]){
             var command = control + '(' + controls[control] * 100+ ')';
             this.rov.send(command);
-            console.log(command);
+      //      console.log(command);
           }
         }
       }

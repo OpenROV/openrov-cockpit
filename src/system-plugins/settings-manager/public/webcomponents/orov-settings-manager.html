@@ -1,6 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
 <dom-module name="orov-settings-manager">
-<script src="../json-editor/dist/jsoneditor.min.js"></script>
+<script src="../json-editor/dist/jsoneditor.js"></script>
 <template>
   <div id='form1'>
   </div>
@@ -44,7 +44,7 @@
           console.log("Defaults")
           console.log(JSON.stringify(defaults));
           //zips the object properies in to _self.value
-          Object.assign(_self.value,defaults);
+          Object.assign(_self.value,settings);
           _self.editor.setValue(_self.value);
         });
 

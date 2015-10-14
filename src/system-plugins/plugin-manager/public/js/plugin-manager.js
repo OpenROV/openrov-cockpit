@@ -6,7 +6,10 @@
     var self = this;
     this.configManager = new window.Plugins.PluginManager.Config();
 
+
   };
+  //private variables
+  var _plugins = null;
 
   PluginManager.prototype.listen = function listen(){
     var self = this;
@@ -32,6 +35,7 @@
       if(p.name === plugin){
         if(p.isEnabled === false){
           p.rawPlugin.enable();
+          p.isEnabled = true;
           if (typeof(fn) === 'function'){
             fn();
           }
@@ -47,6 +51,7 @@
       if(p.name === plugin){
         if(p.isEnabled === true){
           p.rawPlugin.disable();
+          p.isEnabled=false;
           if (typeof(fn) === 'function'){
             fn();
           }
@@ -60,10 +65,11 @@
 
   PluginManager.prototype.EnumerateControllablePlugins = function EnumerateControllablePlugins(){
     self = this;
-    return this.cockpit.loadedPlugins
+    if (_plugins !== null) return _plugins;
+    _plugins= this.cockpit.loadedPlugins
       .filter(function (plugin) {
         console.log('evaluating plugin for pluginmanager');
-        if (plugin.canBeDisabled) {
+        if ((plugin.pluginDefaults !== undefined && plugin.pluginDefaults.canBeDisabled)||(plugin.canBeDisabled)) {
           return true;
       }}).map(function(plugin){
         var p = {};
@@ -87,6 +93,7 @@
         //option to async get additional properies from config here.
         return p;
       });
+      return _plugins;
   };
 
   window.Cockpit.plugins.push(PluginManager);

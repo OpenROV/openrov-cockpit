@@ -7,6 +7,7 @@
     var self = this;
     this.cachedAvailablePlugins = [];
     var configManager = new window.Plugins.PluginFinder.Config();
+    //TODO: Figure out why this blocks
     this.primeCache();
   };
 

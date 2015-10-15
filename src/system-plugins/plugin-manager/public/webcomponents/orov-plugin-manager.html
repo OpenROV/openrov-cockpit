@@ -9,9 +9,9 @@
 
                         <li>
                             <div>
-                                <span>{{item.viewName}}</span>
-                                <button type="button" class="btn btn-xs btn-default" hidden?="isEnabled()" on-click="enable" >Enable</button>
-                                <button type="button" class="btn btn-xs btn-default" hidden?="!isEnabled()" on-click="disable">Disable</button>
+                                <span>{{item.viewName}}</span><span>Enabled:</span><span>{{item.isEnabled}}</span>
+                                <button type="button" class="btn btn-xs btn-default" hidden="{{item.isEnabled}}" on-click="enable" >Enable</button>
+                                <button type="button" class="btn btn-xs btn-default" hidden="{{!item.isEnabled}}" on-click="disable">Disable</button>
                             </div>
                         </li>
                       </template>
@@ -36,10 +36,13 @@
         },
         registerEmitterHanlders: function(emitter){
           var self = this;
-//          emitter.on('plugin.cameraTilt.angle',function(angle){
-//            self.servoAngle = angle;
-//          });
+          emitter.on('plugin-manager.ControllablePluginsChanged',function(p){
+            self.controlablePlugins = p;
+          });
         },
+//        isEnabled(e){
+//          var plugin = e.model.isEnabled;
+//        }
         enable: function(e){
           if (this.eventEmitter!==undefined){
             this.eventEmitter.emit('plugin-manager.enablePlugin',e.model.item.name);

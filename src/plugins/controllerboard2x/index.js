@@ -47,10 +47,11 @@
     //is changed.
     BatteryOptions = [];
     var b = this.config.preferences.get(PREFERENCES_NS);
-    b.batteryDefintions.batteries.forEach(function(bat){
-      BatteryOptions.push(bat.name);
-    });
-
+    if ('batteryDefintions' in b){
+      b.batteryDefintions.batteries.forEach(function(bat){
+        BatteryOptions.push(bat.name);
+      });
+    }
     return      [{
       "id": "batteryDefintions",
       "type": "object",

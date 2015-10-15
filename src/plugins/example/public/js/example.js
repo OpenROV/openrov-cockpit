@@ -19,9 +19,10 @@
 
     // for plugin management:
     this.pluginDefaults = {
-    name : 'example',   // for the settings
-    viewName : 'Example plugin', // for the UI
-    canBeDisabled : true //allow enable/disable
+      name : 'example',   // for the settings
+      viewName : 'Example plugin', // for the UI
+      canBeDisabled : true, //allow enable/disable
+      defaultEnabled: true
    };
 
   };

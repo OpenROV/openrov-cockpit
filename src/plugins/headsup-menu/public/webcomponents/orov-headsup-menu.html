@@ -3,6 +3,7 @@
   <style>
   </style>
   <template>
+    <div id="headsup-menu-base">
     <div id="headsup-menu-container">
         <div class="heading">Heads-Up Menu</div>
         <div id="headsup-menu-items">
@@ -29,7 +30,8 @@
 
             <ul class="unstyled" data-bind="template: { name: getTemplateName, foreach: items, as: 'item' }" />
         </div>
-    </div>    
+    </div>
+    </div> 
   </template>
 
   <script>

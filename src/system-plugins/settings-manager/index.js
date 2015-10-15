@@ -10,9 +10,13 @@ var settingsManager = function settingsManager(name, deps) {
   this.schema = {};
   this.settings = {};
   this.preferences = getNameSpacedPreferences(deps.config);
+
+  var self=this;
 }
 
 //Private functions
+
+
 
 var _makeSchema = function(schemaArray){
   var s = {
@@ -38,60 +42,26 @@ var getNameSpacedPreferences = function getNameSpacedPreferences(config) {
 
 //Public Functions
 
+settingsManager.prototype.loadSettings = function loadSettings(callback){
+  //Initialize with the defaults from the schema for settings values
+  var _s = _makeSchema(this.schema);
+  this.settings = Defaults(_s);
+
+  //Get the settings from nconf for this module
+  //and zip them together with the defaults for the final
+  //settings.
+  this.preferences = getNameSpacedPreferences(this.deps.config);
+  objectAssign(this.settings,this.preferences);
+//  console.log(JSON.stringify(this.settings));
+
+  if(typeof(callback)==="function"){
+    callback();
+  }
+}
+
+
 settingsManager.prototype.start = function start(){
   var self = this;
-
-  //Wireup event listeners
-  this.deps.rov.on('status', function (status) {
-  });
-
-  this.deps.cockpit.on('callibrate_escs', function () {
-  });
-
-  this.deps.cockpit.on('plugin.settings-manager.getSchemas',function(fn){
-
-    var s = {
-      "title": "OpenROV Settings",
-      "type": "object",
-      "properties" : {}
-    };
-    for(var i in self.schema){
-      s.properties[i] = self.schema[i];
-    }
-    fn(s);
-  })
-
-  this.deps.cockpit.on('plugin.settings-manager.getSettings',function(modulename,fn){
-    if ((modulename !== undefined) && (modulename !== null)){
-      var result = {};
-      result[modulename]=self.settings[modulename];
-      if (fn!==undefined){
-        fn(result);
-      };
-      self.deps.cockpit.emit('settings-change.'+modulename,result);
-    } else {
-      if (fn!==undefined){
-        fn(self.settings)
-      }
-      self.deps.cockpit.emit('settings-change',self.settings);
-    }
-  })
-
-  this.deps.cockpit.on('plugin.settings-manager.saveSettings',function(settings,fn){
-    self.deps.config.preferences.set(PREFERENCES_NS, settings);
-    self.deps.config.savePreferences();
-    self.preferences = getNameSpacedPreferences(self.deps.config);
-    for(var item in settings){
-      var result = {}
-      result[item]=settings[item];
-      self.deps.cockpit.emit('settings-change.'+item,result);
-    };
-
-    if (fn!==undefined){
-      fn();
-    }
-  })
-
 
   /* Crawl the plugins looking for those with settings definitions */
   this.deps.loadedPlugins.forEach(function(plugin){
@@ -112,20 +82,65 @@ settingsManager.prototype.start = function start(){
 
   });
 
-  //Initialize with the defaults from the schema for settings values
-  var _s = _makeSchema(self.schema);
-  this.settings = Defaults(_s);
-
-  //Get the settings from nconf for this module
-  //and zip them together with the defaults for the final
-  //settings.
-
-  objectAssign(this.settings,this.preferences);
-//  console.log(JSON.stringify(this.settings));
-
+  this.loadSettings(function(){self.listen();});
 
 }
 
+settingsManager.prototype.listen = function listen(){
+
+  var self=this;
+  //Wireup event listeners
+  this.deps.rov.on('status', function (status) {
+  });
+
+  this.deps.cockpit.on('callibrate_escs', function () {
+  });
+
+  this.deps.cockpit.on('plugin.settings-manager.getSchemas',function(fn){
+
+    var s = {
+      "title": "OpenROV Settings",
+      "type": "object",
+      "properties" : {}
+    };
+    for(var i in self.schema){
+      s.properties[i] = self.schema[i];
+    }
+    fn(s);
+  });
+
+  this.deps.cockpit.on('plugin.settings-manager.getSettings',function(modulename,fn){
+    if ((modulename !== undefined) && (modulename !== null)){
+      var result = {};
+      result[modulename]=self.settings[modulename];
+      if (fn!==undefined){
+        fn(result);
+      };
+    } else {
+      if (fn!==undefined){
+        fn(self.settings)
+      }
+
+    }
+  })
+
+  this.deps.cockpit.on('plugin.settings-manager.saveSettings',function(settings,fn){
+    self.deps.config.preferences.set(PREFERENCES_NS, settings);
+    self.deps.config.savePreferences();
+    self.loadSettings(function(){
+      for(var item in settings){
+        var result = {}
+        result[item]=settings[item];
+        self.deps.cockpit.emit('settings-change.'+item,result);
+      };
+      self.deps.cockpit.emit('settings-change',self.settings);
+
+      if (fn!==undefined){
+        fn();
+      }
+    });
+  })
+}
 
 
 //Export provides the public interface

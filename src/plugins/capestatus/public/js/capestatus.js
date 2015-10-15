@@ -9,21 +9,6 @@
 
 
     var jsFileLocation = urlOfJsFile('capestatus.js');
-    cockpit.extensionPoints.rovSettings.append('<div id="capestatus-settings"></div>');
-
-    var statusSettings = cockpit.extensionPoints.rovSettings.find('#capestatus-settings');
-    statusSettings.load(jsFileLocation + '../settings.html', function () {
-      ko.applyBindingsWithValidation(
-        statusSettings[0],
-        {
-          insertMessages: true,
-          decorateElement: true,
-          errorElementClass: 'error',
-          errorMessageClass: 'help-inline',
-          errorClass: 'error'
-        }
-      );
-    });
 
     setInterval(function () {
       self.updateConnectionStatus();

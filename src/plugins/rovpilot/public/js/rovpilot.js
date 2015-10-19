@@ -227,12 +227,13 @@
   }
 
 
-  ROVpilot.prototype.defaultMenu = function defaultMenu() {
+  ROVpilot.prototype.altMenuDefaults = function altMenuDefaults() {
+    self=this;
     return [
       {
         label: 'Increment power level',
         callback: function () {
-          rov.cockpit.emit('plugin.rovpilot.incrementPowerLevel');
+          self.rov.cockpit.emit('plugin.rovpilot.incrementPowerLevel');
         }
       }
     ]

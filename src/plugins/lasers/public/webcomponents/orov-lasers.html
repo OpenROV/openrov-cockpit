@@ -57,6 +57,20 @@
             this.eventEmitter.emit("plugin.laser.toggle");
           }
         },
+        attached: function(){
+          //register alt-menu
+          var self = this;
+          if (this.eventEmitter !== undefined){
+            this.eventEmitter.emit('plugin.headsupmenu.register',
+            {
+              label: 'Toggle lasers',
+              callback: function () {
+                cockpit.rov.emit('plugin.laser.toggle');
+              }
+            });
+          }
+
+        },
         registerEmitterHanlders: function(emitter){
           var self = this;
           emitter.on('plugin.laser.state',function(data){

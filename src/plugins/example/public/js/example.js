@@ -138,10 +138,10 @@
   };
 
   //headsUpMenuItems is called by the headsup-menu plugin if present.
-  Example.prototype.headsUpMenuItems = function headsUpMenuItems(){
+  Example.prototype.altMenuDefaults = function altMenuDefaults(){
     //TODO: Need to cleanup the interface to the alt-menu
     var item = {
-      label: ko.observable('Example menu'),
+      label: 'Example menu',
       callback: function () {
         alert('example menu item from heads up menu');
         item.label(this.label() + ' Foo Bar');

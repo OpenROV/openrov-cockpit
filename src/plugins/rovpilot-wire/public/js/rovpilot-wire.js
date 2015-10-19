@@ -45,18 +45,19 @@
   }
 
 
-  ROVpilotWire.prototype.defaultMenu = function defaultMenu() {
+  ROVpilotWire.prototype.altMenuDefaults = function altMenuDefaults() {
+    var self=this;
     return [
       {
         label: 'Toggle Depth hold',
         callback: function () {
-          rov.cockpit.rov.emit('plugin.rovpilot.depthHold.toggle');
+          self.rov.cockpit.rov.emit('plugin.rovpilot.depthHold.toggle');
         }
       },
       {
         label: 'Toggle Heading hold',
         callback: function () {
-          rov.cockpit.rov.emit('plugin.rovpilot.headingHold.toggle');
+          self.rov.cockpit.rov.emit('plugin.rovpilot.headingHold.toggle');
         }
       }
     ]

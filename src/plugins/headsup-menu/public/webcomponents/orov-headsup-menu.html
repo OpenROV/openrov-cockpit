@@ -1,37 +1,81 @@
 <link rel="import" href="../polymer/polymer.html">
 <dom-module name="orov-headsup-menu">
-  <style>
+  <style id="headsup-menu-style">
+  #headsup-menu-base {
+      z-index: 4;
+      top: 0px;
+      left: 0px;
+      position: absolute;
+  }
+
+  #headsup-menu-container {
+      opacity: 0.8;
+      z-index: 3;
+      top: 50px;
+      left: 50px;
+      position: absolute;
+      clear: both;
+      white-space: nowrap;
+      border: 2px solid black;
+      padding: 10px;
+      font-size: large;
+      background-color: beige;
+      border-radius: 4px;
+  }
+  #headsup-menu-container .heading {
+      font-weight: bold;
+      padding-bottom: 3px;
+      margin: 3px;
+  }
+  #headsup-menu-container .menuRow {
+      text-align: left;
+  }
+
+  #headsup-menu-container .menuRow.active {
+      background-color: #6fbef5;
+  }
+
+  #headsup-menu-container button.btn-block {
+      padding-left: 10px;
+      padding-right: 10px;
+      text-align: left;
+  }
+
+  #headsup-menu-container button.btn {
+      -webkit-border-radius: 0;
+      -moz-border-radius: 0;
+      border-radius: 0;
+  }
+
+  #headsup-menu-container .menuRow .custom-block {
+      display: block;
+      width: 100%;
+      padding-left: 0;
+      padding-right: 0;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+  }
   </style>
   <template>
-    <div id="headsup-menu-base">
-    <div id="headsup-menu-container">
-        <div class="heading">Heads-Up Menu</div>
-        <div id="headsup-menu-items">
+<div id="headsup-menu-base" hidden={{!visible}}>
+  <div id="headsup-menu-container">
+      <div class="heading">Heads-Up Menu</div>
+      <div id="headsup-menu-items">
 
-            <div id="headsup-menu-templates">
-                <script type="text/html" id="menuRow-button">
-                    <li>
-                        <div class="menuRow" data-bind="attr: { id: $data.uniqueId }">
-                            <button class="btn btn-large btn-block" data-bind="text: label, click: callback"></button>
-                        </div>
-                    </li>
-                </script>
-                <script type="text/html" id="menuRow-custom">
-                    <li>
-                        <div class="menuRow"  data-bind="attr: { id: $data.uniqueId }">
-                            <!-- create a template based on the custom content -->
-                            <script type="text/html" data-bind="attr: { id: $data.headsUpTemplateId }, html: content" />
-                            <!-- reference the created template -->
-                            <div class="custom-block" data-bind="template: { name: $data.headsUpTemplateId }" />
-                        </div>
-                    </li>
-                </script>
-            </div>
+          <div id="headsup-menu-templates">
+              <template is="dom-repeat" items="{{menuItems}}">
+                  <li>
+                      <div class="menuRow">
+                          <button class="btn btn-large btn-block" on-click="menu_click">{{item.label}}</button>
+                      </div>
+                  </li>
+              </template>
+          </div>
+      </div>
+  </div>
+</div>
 
-            <ul class="unstyled" data-bind="template: { name: getTemplateName, foreach: items, as: 'item' }" />
-        </div>
-    </div>
-    </div> 
   </template>
 
   <script>
@@ -40,6 +84,9 @@
       Polymer({
         is: "orov-headsup-menu",
         properties: {
+          menuItems:{type:Array},
+          currentSelected:{type:Number},
+          visible:{type:Boolean, value:false}
         },
         behaviors: [orovbehaviors.oROVStandard],
         registerEmitterHanlders: function(emitter){
@@ -47,6 +94,51 @@
           emitter.on('plugin.cameraTilt.angle',function(angle){
             self.servoAngle = angle;
           });
+        },
+        attached: function (){
+//          this.importHref(this.resolveUrl('../paper-fab-menu/paper-fab-menu.html'), function(e) {
+//              console.log("Imported paper-fab-menu");
+  //        });
+          var self = this;
+          if (this.eventEmitter !== undefined){
+            this.eventEmitter.emit('plugin.heasup-menu.getMenuItems',function(results){
+              self.menuItems = results;
+            });
+
+            this.eventEmitter.emit('InputController.register',
+              [
+                {
+                  name: 'headsupMenu.show',
+                  description: 'Show the heads up menu.',
+                  defaults: { keyboard: 'e', gamepad: 'START' },
+                  down: function () {
+                    self.visible=true;
+                  },
+                  up: function(){
+                    self.visible=false;
+                  //  self.executeMenuItem();
+                  },
+                  secondary: [
+                    {
+                      name: 'headsupMenu.next',
+                      description: 'select the next element of the heads up menu',
+                      defaults: { keyboard: 'c', gamepad: 'DPAD_DOWN' },
+              //            down: moveSelectionNext
+                    },
+                    {
+                      name: 'headsupMenu.prev',
+                      description: 'select the previous element of the heads up menu',
+                      defaults: { keyboard: 'd', gamepad: 'DPAD_UP' },
+              //            down: moveSelectionPrev
+                    }
+                  ]
+                }
+              ]
+            )
+          }
+        },
+        menu_click: function(e){
+          e.model.item.callback();
         }
       })
     })();

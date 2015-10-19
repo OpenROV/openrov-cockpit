@@ -65,6 +65,12 @@
         fn(self.model.commands);
       }
     });
+    this.cockpit.on('InputController.register',function(controls,fn){
+      self.register(controls);
+      if (typeof(fn)=="function"){
+        fn();
+      }
+    });
 
     /* Crawl the plugins looking for those with settings definitions */
     this.cockpit.loadedPlugins.forEach(function(plugin){

@@ -17,7 +17,7 @@ $(document).ready(function() {
         },
         "_linkhref": "input-controller/orov-inputs-list.html"
      },
-     {
+      {
       "tag": "orov-plugin-finder",
       "settings": {
       },
@@ -144,7 +144,15 @@ $(document).ready(function() {
 
       },
         "_linkhref": "serial-monitor/orov-serial-monitor.html"
-    }]
+    }],
+    "camera-display" : [
+      {
+        "tag": "orov-headsup-menu",
+        "settings": {
+        },
+        "_linkhref": "headsup-menu/orov-headsup-menu.html"
+     }
+    ]
   };
 
 

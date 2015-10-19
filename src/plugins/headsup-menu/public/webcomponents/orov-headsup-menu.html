@@ -654,7 +654,7 @@
       <div id="headsup-menu-items">
 
           <div id="headsup-menu-templates" class="btn-group-vertical" role="group">
-              <template is="dom-repeat" items="{{menuItems}}">
+              <template id="menuItemList" is="dom-repeat" items="{{menuItems}}">
                       <div class="menuRow">
                           <button class="btn btn-lg btn-block" on-mouseover="menu_hover" on-mouseout="menu_nohover" on-click="menu_click">{{item.label}}</button>
                       </div>
@@ -663,7 +663,6 @@
       </div>
   </div>
 </div>
-
   </template>
 
   <script>
@@ -673,7 +672,7 @@
         is: "orov-headsup-menu",
         properties: {
           menuItems:{type:Array},
-          currentSelected:{type:Number},
+          currentSelected:{type:Number, value:-1},
           visible:{type:Boolean, value:false}
         },
         behaviors: [orovbehaviors.oROVStandard],
@@ -683,10 +682,10 @@
             self.servoAngle = angle;
           });
         },
+        elementArray: [],
+        selectedElement: null,
         attached: function (){
-//          this.importHref(this.resolveUrl('../paper-fab-menu/paper-fab-menu.html'), function(e) {
-//              console.log("Imported paper-fab-menu");
-  //        });
+
           var self = this;
           if (this.eventEmitter !== undefined){
             this.eventEmitter.emit('plugin.heasup-menu.getMenuItems',function(results){
@@ -704,26 +703,30 @@
                   },
                   up: function(){
                     self.visible=false;
-                  //  self.executeMenuItem();
+                    self.executeMenuItem();
                   },
                   secondary: [
                     {
                       name: 'headsupMenu.next',
                       description: 'select the next element of the heads up menu',
-                      defaults: { keyboard: 'c', gamepad: 'DPAD_DOWN' },
-              //            down: moveSelectionNext
+                      defaults: { keyboard: '.', gamepad: 'DPAD_DOWN' },
+                          down: function(){self.moveSelectionNext();}
                     },
                     {
                       name: 'headsupMenu.prev',
                       description: 'select the previous element of the heads up menu',
                       defaults: { keyboard: 'd', gamepad: 'DPAD_UP' },
-              //            down: moveSelectionPrev
+                          down: function(){self.moveSelectionPrevious();}
                     }
                   ]
                 }
               ]
             )
           }
+          this.async(function() {
+            self.elementArray = Polymer.dom(this.root).querySelectorAll(".menuRow button");
+          });
+
         },
         menu_click: function(e){
           e.model.item.callback();
@@ -733,6 +736,28 @@
         },
         menu_nohover: function(e){
           e.srcElement.classList.remove('btn-primary');
+        },
+        moveSelectionNext: function(){
+          if (this.currentSelected < this.elementArray.length-1){
+            if(this.currentSelected>-1){
+              this.elementArray[this.currentSelected].classList.remove('btn-primary');
+            }
+            this.currentSelected++;
+            this.elementArray[this.currentSelected].classList.add('btn-primary');
+          }
+        },
+        moveSelectionPrevious: function(){
+          if (this.currentSelected > 0){
+            if(this.currentSelected<this.elementArray.length){
+              this.elementArray[this.currentSelected].classList.remove('btn-primary');
+            }
+            this.currentSelected--;
+            this.elementArray[this.currentSelected].classList.add('btn-primary');
+          }
+        },
+        executeMenuItem: function(){
+          var listItem = this.$.menuItemList.itemForElement(this.elementArray[this.currentSelected]);
+          listItem.callback();
         }
       })
     })();

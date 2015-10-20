@@ -32,7 +32,9 @@
         },
         registerEmitterHanlders: function(emitter){
           var self = this;
-
+          emitter.on('InputController.registeredCommand',function(command){
+            self.push('commands',command);
+          });
         },
       })
     })();

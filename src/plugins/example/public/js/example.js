@@ -140,11 +140,12 @@
   //headsUpMenuItems is called by the headsup-menu plugin if present.
   Example.prototype.altMenuDefaults = function altMenuDefaults(){
     //TODO: Need to cleanup the interface to the alt-menu
+    var self = this;
     var item = {
       label: 'Example menu',
       callback: function () {
         alert('example menu item from heads up menu');
-        item.label(this.label() + ' Foo Bar');
+        item.label(self.label() + ' Foo Bar');
       }
     };
     return item;

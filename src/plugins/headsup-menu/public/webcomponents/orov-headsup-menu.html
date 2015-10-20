@@ -709,7 +709,7 @@
                     {
                       name: 'headsupMenu.next',
                       description: 'select the next element of the heads up menu',
-                      defaults: { keyboard: '.', gamepad: 'DPAD_DOWN' },
+                      defaults: { keyboard: 'c', gamepad: 'DPAD_DOWN' },
                           down: function(){self.moveSelectionNext();}
                     },
                     {
@@ -757,7 +757,9 @@
         },
         executeMenuItem: function(){
           var listItem = this.$.menuItemList.itemForElement(this.elementArray[this.currentSelected]);
-          listItem.callback();
+          if (listItem !== undefined){
+            listItem.callback();
+          }
         }
       })
     })();

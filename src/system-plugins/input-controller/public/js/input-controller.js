@@ -99,6 +99,8 @@
       self.registerdCommands[command.name] = command;
 
       self.model.commands.push(command);
+      self.cockpit.emit('InputController.registeredCommand',command);
+
       console.log('InputController: Registering control ' + command.name);
       self.controllers.forEach(function (controller) {
         if (command.active) {

@@ -43,9 +43,13 @@ function pluginFinder(name, deps) {
 
   deps.cockpit.on('plugin.pluginFinder.install', function (name,callback) {
     bower.commands
-    .install([name], { save: false}, { cwd: '/usr/share/cockpit' })
+    .install([name], { save: false}, { cwd: '/usr/share/cockpit', force:true })
     .on('error', function(err){
         console.log(err);
+        deps.cockpit.emit('plugin.pluginFinder.installStatus',err);
+        if (typeof(callback) == "function"){
+          callback(err);
+        }
     })
     .on('log', function(info){
         console.log(info);

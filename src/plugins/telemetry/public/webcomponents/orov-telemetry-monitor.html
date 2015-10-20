@@ -109,7 +109,8 @@
           importantTelemetry: {type:Object, value: {}},
           expandedTelemetry: {type: Object, value: {}},
           titles: {type:Object, value: {}},
-          textcolor: {type: Number, value: 0}
+          textcolor: {type: Number, value: 0},
+          define: {type: Object}
         },
         behaviors: [namespace('behaviors').oROVStandard],
         registerEmitterHanlders: function(emitter){
@@ -117,13 +118,17 @@
           emitter.on('status',function(status){
             self.logStatusData(status);
           });
+
+          this.define = function(item,callback){
+            emitter.emit('telemetry.getDefinition',item,callback);
+          }
         },
-        ready: function () {
+        attached: function () {
           var self = this;
           this.list = this.$.TelemetryList;
           this.ilist = this.$.ImportantList;
-          self.telemetryList = this.list.length > 0 ? this.list[0] : undefined;
-
+          //self.telemetryList = this.list.length > 0 ? this.list[0] : undefined;
+          this.telemetryList = this.$.TelemetryList;
           if (self.telemetryList) {
             self.telemetryList.addEventListener('click', function (e) {
               self.handleDescendantEvent(e);

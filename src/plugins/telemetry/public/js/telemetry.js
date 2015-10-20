@@ -24,7 +24,7 @@
         down: function() { cockpit.rov.emit('plugin.telemetry.cycleTextColor'); }
       });
 */
-    self.cockpit.rov.on('telemetry.getDefinition',function(name,callback){
+    self.cockpit.on('telemetry.getDefinition',function(name,callback){
       if (self.definitions[name]!==undefined){
         callback(self.definitions[name]);
       } else {
@@ -36,7 +36,7 @@
       self.cockpit.emit('plugin.telemetry.logData',data);
     });
 
-    self.cockpit.rov.on('telemetry.registerDefinition',function(data){
+    self.cockpit.on('telemetry.registerDefinition',function(data){
       if('name' in data){
         self.definitions[data.name]=data;
       }

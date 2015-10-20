@@ -58,17 +58,23 @@
     //when the settings first and last name options get
     //changed
 
-    //Requests the settings-change message gets sent
-    this.rov.emit('plugin.settings-manager.getSettings','example');
-
-    //Response from the getSettings call
-    this.rov.on('settings-change.example',function(settings){
+    var updateAttributesFromSettings = function(settings){
       var first = settings.example.firstName;
       var last = settings.example.lastName;
 
       //This Name is the closure variable that is private
       _name = first+' '+last;
       self.cockpit.emit('plugin.example.attributes-changed',getAttributes());
+    }
+
+    //Requests the settings-change message gets sent
+    this.rov.emit('plugin.settings-manager.getSettings','example',function(settings){
+     updateAttributesFromSettings(settings);
+    });
+
+    //Response from the getSettings call
+    this.rov.on('settings-change.example',function(settings){
+     updateAttributesFromSettings(settings);
     });
 
     this.cockpit.on('plugin.example.getAttributes',function(fn){

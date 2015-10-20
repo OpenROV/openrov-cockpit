@@ -7,9 +7,13 @@
             <ul>
             <template is="dom-repeat" items="{{commands}}">
               <li>
-                <b><span>{{item.name}}</span>:</b>
-                Key: <span>{{item.bindings.keyboard}}</span>
-                Game: <span>{{item.bindings.gamepad}};</span>
+                <div>{{item.name}}</div>
+                <div>{{item.description}}</div>
+                <div>
+                  <b><span>{{item.name}}</span>:</b>
+                  Key: <span>{{item.bindings.keyboard}}</span>
+                  Game: <span>{{item.bindings.gamepad}}</span>
+                </div>
               </li>
             </template>
             </ul>

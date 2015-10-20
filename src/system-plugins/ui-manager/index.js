@@ -2,6 +2,8 @@ var PREFERENCES = 'plugins:ui-manager';
 function UIManager(name, deps) {
   console.log('UI Manager plugin started.');
   var preferences = getPreferences(deps.config);
+  this.UIs = [];
+  this.deps = deps;
 
 }
 function getPreferences(config) {
@@ -14,12 +16,31 @@ function getPreferences(config) {
   return preferences;
 }
 
-UIManager.prototype.getSettingSchema = function getSettingSchema(){
-  UIOptions = [];
-  UIOptions.push("theme_r2");
-  UIOptions.push("new-ui");
-  UIOptions.push("standard");
+UIManager.prototype.start = function start(){
+  var self = this;
 
+  /* Crawl the plugins looking for those with settings definitions */
+  this.deps.loadedPlugins.forEach(function(plugin){
+    if (plugin !== undefined){
+      if ((plugin.plugin !== undefined )&& (plugin.plugin.type === "theme")){
+        this.UIs.push(plugin);
+      }
+    }
+
+  });
+
+}
+
+UIManager.prototype.getSettingSchema = function getSettingSchema(){
+  var UIOptions = [];
+  this.deps.loadedPlugins.forEach(function(plugin){
+    if (plugin !== undefined){
+      if ((plugin.plugin !== undefined )&& (plugin.plugin.type === "theme")){
+        UIOptions.push(plugin.plugin.name);
+      }
+    }
+
+  });
 
   return [{
 	"title": "UI Manager",
@@ -28,6 +49,7 @@ UIManager.prototype.getSettingSchema = function getSettingSchema(){
 	"properties": {
 		"selectedUI": {
 			"type": "string",
+      "default": "theme_r2",
       "enum": UIOptions //Added default
 		}
 	},

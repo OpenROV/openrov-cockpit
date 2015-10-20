@@ -60,7 +60,9 @@ app.get('/config.js', function (req, res) {
   res.send('var CONFIG = ' + JSON.stringify(CONFIG));
 });
 app.get('/', function (req, res) {
-  var view =  __dirname + '/plugins/theme_r2/index.ejs'
+  var viewname = CONFIG.preferences.get("plugins:ui-manager").selectedUI;
+  viewname = viewname === undefined ? "theme_r2" : viewname;
+  var view =  __dirname + '/plugins/'+viewname+'/index.ejs';
   res.render(view, {
     title: 'OpenROV Cockpit',
     scripts: scripts,

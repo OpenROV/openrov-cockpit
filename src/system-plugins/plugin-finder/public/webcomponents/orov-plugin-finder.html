@@ -17,8 +17,8 @@
   </style>
   <template>
     <div id="pluginFinder-settings">
-      <label>Add new plugins</label>
-      <p>A direct internet connection to the ROV is required for installation to work.</p>
+      <label>{{__('Add new plugins')}}</label>
+      <p>{{__('A direct internet connection to the ROV is required for installation to work.')}}</p>
       <input placeholder="Filter…" type="search" value={{query}} autocomplete="off" on-keyup="keypressed">
       <div class="pre-scrollable loader" hidden$={{!loading(isLoading,isInstalling)}}></div>
       <div class="pre-scrollable" hidden$={{loading(isLoading,isInstalling)}}>
@@ -28,12 +28,12 @@
               <tr>
                   <td>
                         <div><strong>{{item.name}}</strong></div>
-                        <div><span>{{item.description}}</span> <a target="_blank" href:"{{item.homepage}}">more...</a></div>
+                        <div><span>{{item.description}}</span> <a target="_blank" href:"{{item.homepage}}">{{__('more...')}}</a></div>
                         <span class="badge" ><span>{{item.raiting}}</span> stars</span>
                   </td>
                   <td>
-                    <button type="button" class="btn btn-xs btn-default pull-right hide" hidden?={{!item.installed}} click='installPlugin'>Install</button>
-                    <button type="button" class="btn btn-xs btn-default pull-right hide" hidden?={{item.installed}} click='uninstallPlugin'>Uninstall</button>
+                    <button type="button" class="btn btn-xs btn-default pull-right hide" hidden?={{!item.installed}} click='installPlugin'>{{__('Install')}}</button>
+                    <button type="button" class="btn btn-xs btn-default pull-right hide" hidden?={{item.installed}} click='uninstallPlugin'>{{__('Uninstall')}}</button>
                   </td>
               </tr>
             </template>

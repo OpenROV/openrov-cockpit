@@ -4,17 +4,17 @@
   <style>
   </style>
   <template>
-    <lable>Black Box Controls</label>
-    <button on-click='start'>Start</button>
-    <button on-click='stop'>Stop</button>
-    <paper-dropdown-menu label="Choose format:">
+    <lable>{{__('Black Box Controls')}}</label>
+    <button on-click='start'>{{__('Start')}}</button>
+    <button on-click='stop'>{{__('Stop')}}</button>
+    <paper-dropdown-menu label="{{__('Choose format:')}}">
       <paper-menu class="dropdown-content" selected="{{format}}">
-        <paper-item>csv</paper-item>
-        <paper-item>json</paper-item>
-        <paper-item>xml</paper-item>
+        <paper-item>{{__('csv')}}</paper-item>
+        <paper-item>{{__('json')}}</paper-item>
+        <paper-item>{{__('xml')}}</paper-item>
       </paper-menu>
     </paper-dropdown-menu>
-    <button on-click='export'>Export</button>
+    <button on-click='export'>{{__('Export')}}</button>
 
   </template>
   <script>

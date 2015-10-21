@@ -1,0 +1,49 @@
+<script>
+(function(window) {
+  'use strict';
+  var behaviors = namespace('behaviors');
+
+  behaviors.oROVGlobalization = {
+
+    properties: {
+    },
+
+    created: function() {
+      console.log('oROV Globalization behavior for ', this, 'enabled!');
+//      if(this.eventEmitter !== undefined){
+        //var result = this.notifyPath('eventEmitter',this.eventEmitter);
+//        this.eventEmitterHasChanged(null,this.eventEmitter);
+//      }
+      var self=this;
+      if(this.__ === null){
+        window.cockpit_int.i18n.loadNamespace(this.is, function() {  });
+        var key_s = window.cockpit_int.i18n.options.keyseparator;
+        var ns_s =  window.cockpit_int.i18n.options.nsseparator;
+        var prefix = self.is;
+        self.__=function(str){
+          window.cockpit_int.i18n.options.ns.defaultNs = prefix
+          return window.cockpit_int.__(str);
+        };
+
+      }
+
+    },
+    __:null,
+    ready: function() {
+      //Added a new lifecycle event for the control:
+//      this.__=function(str){console.log("translate: "+str);return str};
+
+      if (this.globalizationFunctions !== undefined){
+  //      this.__ = this.globalizationFunctions.__;
+      }
+    },
+    _globalizationFunctionsChanged:function(){
+      //Attempt to set a global function for the scope of the webcontrol
+      if(this.globalizationFunctions!==undefined){
+//        __ = this.globalizationFunctions.__;
+      }
+    }
+  };
+
+})(window);
+</script>

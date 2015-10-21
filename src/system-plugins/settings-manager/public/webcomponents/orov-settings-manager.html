@@ -4,7 +4,7 @@
 <template>
   <div id='form1'>
   </div>
-  <button on-click='save'>Save</button>
+  <button on-click='save'>{{__('Save')}}</button>
 </template>
 <script>
 (function() {
@@ -40,6 +40,7 @@
           _self.value = settings;
           _self.editorOptions['schema'] = schema;
           _self.editor = new JSONEditor(_self.$.form1, _self.editorOptions);
+          //JSONEditor.defaults.language = "es"; for localizing local error messages
           var defaults = _self.editor.getValue();
           console.log("Defaults")
           console.log(JSON.stringify(defaults));

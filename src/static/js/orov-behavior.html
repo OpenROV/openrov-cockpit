@@ -1,8 +1,10 @@
+<link rel="import" href="orov-globalization-behavior.html">
+<script>
 (function(window) {
   'use strict';
   var behaviors = namespace('behaviors');
 
-  behaviors.oROVStandard = {
+  behaviors.oROVStandardImpl = {
 
     properties: {
       eventEmitter: {type: Object, observer: '_eventEmitterChanged'},
@@ -69,4 +71,7 @@
 
   };
 
+  behaviors.oROVStandard = [behaviors.oROVStandardImpl,behaviors.oROVGlobalization]
+
 })(window);
+</script>

@@ -11,7 +11,7 @@
 }
 </style>
   <template>
-    <label>{{telemetryItem}}</label>
+    <label>{{__(telemetryItem)}}</label>
   <div on-click="toggle">
   <!--link href="../grapp-graph-epoch/grapp-graph-epoch.html" rel="import"-->
     <grapp-graph-epoch id="timegraph" hidden="{{!enabled}}" type="time.line" axis="" width="100" height="40">
@@ -47,7 +47,7 @@
           this.importHref(this.resolveUrl('../grapp-graph-epoch/grapp-graph-epoch.html'), function(e) {
               console.log("Imported grapp");
           });
-        },        
+        },
         logStatusData: function (data) {
           var t = Object.keys(data)
           for (var i in t) {

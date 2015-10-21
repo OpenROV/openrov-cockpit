@@ -184,7 +184,7 @@
               var titles = this.titles;
               if(this.titles[telemetry_name] === undefined) {
                 this.define(telemetry_name,function(data){
-                  titles[data.name]=data.description || '';
+                  titles[data.name]=__(data.description) || '';
                 });
               }
             }

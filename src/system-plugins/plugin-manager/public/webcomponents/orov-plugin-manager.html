@@ -3,15 +3,15 @@
   <style>
   </style>
   <template>
-            <label>Plugins to enable/disable</label>
+            <label>{{__('Plugins to enable/disable')}}</label>
                     <ul>
                       <template is="dom-repeat" items="{{controlablePlugins}}">
 
                         <li>
                             <div>
-                                <span>{{item.viewName}}</span><span>Enabled:</span><span>{{item.isEnabled}}</span>
-                                <button type="button" class="btn btn-xs btn-default" hidden="{{item.isEnabled}}" on-click="enable" >Enable</button>
-                                <button type="button" class="btn btn-xs btn-default" hidden="{{!item.isEnabled}}" on-click="disable">Disable</button>
+                                <span>{{__(item.viewName)}}</span><span>{{__('Enabled:')}}</span><span>{{item.isEnabled}}</span>
+                                <button type="button" class="btn btn-xs btn-default" hidden="{{item.isEnabled}}" on-click="enable" >{{__('Enable')}}</button>
+                                <button type="button" class="btn btn-xs btn-default" hidden="{{!item.isEnabled}}" on-click="disable">{{__('Disable')}}</button>
                             </div>
                         </li>
                       </template>

@@ -650,13 +650,13 @@
   <template>
 <div id="headsup-menu-base" hidden={{!visible}}>
   <div id="headsup-menu-container">
-      <div class="heading">Heads-Up Menu</div>
+      <div class="heading">{{__('Heads-Up Menu')}}</div>
       <div id="headsup-menu-items">
 
           <div id="headsup-menu-templates" class="btn-group-vertical" role="group">
               <template id="menuItemList" is="dom-repeat" items="{{menuItems}}">
                       <div class="menuRow">
-                          <button class="btn btn-lg btn-block" on-mouseover="menu_hover" on-mouseout="menu_nohover" on-click="menu_click">{{item.label}}</button>
+                          <button class="btn btn-lg btn-block" on-mouseover="menu_hover" on-mouseout="menu_nohover" on-click="menu_click">{{__(item.label)}}</button>
                       </div>
               </template>
           </div>

@@ -3,16 +3,16 @@
   <style>
   </style>
   <template>
-    <label>Input (keyboard/gamepad) configuration</label>
+    <label>{{__(Input (keyboard/gamepad) configuration)}}</label>
             <ul>
             <template is="dom-repeat" items="{{commands}}">
               <li>
-                <div>{{item.name}}</div>
-                <div>{{item.description}}</div>
+                <div>{{__(item.name)}}</div>
+                <div>{{__(item.description)}}</div>
                 <div>
-                  <b><span>{{item.name}}</span>:</b>
-                  Key: <span>{{item.bindings.keyboard}}</span>
-                  Game: <span>{{item.bindings.gamepad}}</span>
+                  <b><span>{{__(item.name)}}</span>:</b>
+                  <span>{{__('Key')}}</span>: <span>{{item.bindings.keyboard}}</span>
+                  <span>{{__('Game')}}</span>: <span>{{__(item.bindings.gamepad)}}</span>
                 </div>
               </li>
             </template>
@@ -23,7 +23,7 @@
       Polymer({
         is: "orov-inputs-list",
         properties: {
-          commands: {type: Array},
+          commands: {type: Array, value:[]},
         },
         behaviors: [namespace('behaviors').oROVStandard],
         attached: function () {

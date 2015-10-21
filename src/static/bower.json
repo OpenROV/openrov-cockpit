@@ -2,6 +2,7 @@
   "name": "static openrov",
   "dependencies": {
     "fpsmeter": "~0.3.1",
+    "i18next": "~1.10.3",
     "iron-ajax": "PolymerElements/iron-ajax#~1.0.4",
     "jquery": "1.11",
     "jquery-ui": "1.11",

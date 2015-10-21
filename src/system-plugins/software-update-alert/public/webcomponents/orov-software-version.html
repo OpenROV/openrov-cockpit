@@ -4,23 +4,23 @@
   <style>
   </style>
   <template>
-      <label>OpenROV Version Information</label>
+      <label>{{__('OpenROV Version Information')}}</label>
       <template is="dom-repeat" items="{{sn}}">
-        <label>Serial Number:</label><span>{{item.bbSerial}}</span>
+        <label>{{__('Serial Number')}}</label>:<span>{{item.bbSerial}}</span>
       </template>
       <template is="dom-repeat" items="{{version}}">
-        <label>Current ROV Suite Version:</label><span>{{item.version}}</span>
+        <label>{{__('Current ROV Suite Version')}}</label>:<span>{{item.version}}</span>
       </template>
       <div hidden$={{calculateUpdateAvailable(data)}}>
-        <label>No Updates Pending</label>
+        <label>{{__('No Updates Pending')}}</label>
       </div>
 
       <div hidden$={{!calculateUpdateAvailable(data)}}>
-        <label>Update Available:<label>
+        <label>{{__('Update Available:')}}<label>
       <template is="dom-repeat" items="{{data}}">
         <span>{{item.package}}</span>:<span>{{item.version}}</span>
       </template>
-      <a target='_blank' href?='{{}}'>update</a>
+      <a target='_blank' href?='{{}}'>{{__('update')}}</a>
     </div>
 
       <iron-ajax

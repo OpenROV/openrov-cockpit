@@ -53,6 +53,10 @@
   inputController.InputController.prototype.register = function (control) {
     this._register(control, true);
   };
+  
+  inputController.InputController.prototype.commands = function() {
+    return this.model.commands();
+  };
 
   inputController.InputController.prototype._register = function (control, doCheck) {
     var self = this;

@@ -1,11 +1,7 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../polymer/polymer.html">
 
-<polymer-element name="rov-video">
-  <template>
-    <link rel="stylesheet" href="../../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../../themes/OpenROV/css/style.css">
-
-    <style type="text/css">
+<dom-module id="rov-video">
+  <style type="text/css">
       #container {
         height: 100%;
         width: 100%;
@@ -45,23 +41,21 @@
       }
 
     </style>
+  <template>
 
     <div id="container">
-      <img class="hidden" id="video" src="../../themes/OpenROV/img/no_camera.jpg"/>
-      <img class="hidden center" id="noVideo" src="../../themes/OpenROV/img/no_camera.jpg"/>
-      <canvas id='videoCanvas'></canvas>
+      <img class="hidden" id="video" src="../../themes/OpenROV/img/no_camera.jpg">
+      <img class="hidden center" id="noVideo" src="../../themes/OpenROV/img/no_camera.jpg">
+      <canvas id="videoCanvas"></canvas>
       <content></content>
     </div>
 
   </template>
   <script>
-    (function() {
-
-      var socket = window.io.connect(window.location.protocol + '//' +
-              window.location.hostname+ ':8080');
+    (function () {
+      var socket = window.io.connect(window.location.protocol + '//' + window.location.hostname + ':8080');
       var srcAddress = undefined;
-
-      var videoStarted = function() {
+      var videoStarted = function () {
         var address = 'http://' + socket.io.engine.hostname + ':' + CONFIG.video_port + '/?action=stream';
         srcAddress = address;
         console.log('video enabled');
@@ -73,24 +67,29 @@
         srcAddress = undefined;
         console.log('video stopped');
       });
-
       Polymer({
-        interval: undefined,
-        domReady: function () {
-
+        is: 'rov-video',
+        properties: {
+          interval: {
+            value: function () {
+              return undefined;
+            }
+          }
+        },
+        detached: function () {
+          clearInterval(this.interval);
+        },
+        attached: function () {
           var canvas = this.$.videoCanvas;
           var srcImg = this.$.video;
           var noVideoImg = this.$.noVideo;
           var videocontainer = $(this.$.container);
           var isRendering = false;
-
           var startRendering = function () {
             var self = this;
             $(srcImg).attr('src', srcAddress);
-
             $(canvas).removeClass('hidden');
             $(noVideoImg).addClass('hidden');
-
             var interval = setInterval(function () {
               var internalinterval = interval;
               var width = videocontainer.innerWidth();
@@ -100,54 +99,42 @@
               var ctx = canvas.getContext('2d');
               ctx.fillRect(0, 0, canvas.width, canvas.height);
               var proportionalHeight = width * srcImg.height / srcImg.width;
-
-
               try {
                 ctx.drawImage(srcImg, 0, (canvas.height - proportionalHeight) / 2, width, proportionalHeight);
                 isRendering = true;
-              }
-              catch (e) {
+              } catch (e) {
                 clearInterval(internalinterval);
                 $(canvas).addClass('hidden');
                 $(noVideoImg).removeClass('hidden');
                 isRendering = false;
               }
-            }, 64);  //only need to redraw at the framerate of source video
+            }, 64);
           };
-
+          //only need to redraw at the framerate of source video
           if (srcAddress) {
             startRendering();
-          }
-          else {
-            socket.once('videoStarted', function() {
+          } else {
+            socket.once('videoStarted', function () {
               startRendering();
             });
-            socket.on('VideoStopped', function() {
+            socket.on('VideoStopped', function () {
               clearInterval(this.interval);
             });
-            socket.emit('videoStatus', function(status) {
+            socket.emit('videoStatus', function (status) {
               if (status) {
                 videoStarted();
                 startRendering();
               }
             });
-
-            window.cockpit.rov.on('plugin.capestatus.connection.connected', function() {
+            window.cockpit.rov.on('plugin.capestatus.connection.connected', function () {
               if (!isRendering) {
                 videoStarted();
                 startRendering();
               }
             });
           }
-        },
-        detached: function() {
-          clearInterval(this.interval);
         }
       });
-    })();
+    }());
   </script>
-
-</polymer-element>
-  
-
-
+</dom-module>

@@ -61,6 +61,8 @@
 
 
   }
-  
-  module.exports = ExternalLights;
+  module.exports = function (name, deps) {
+    return new ExternalLights(name,deps);
+  };
+
 })();

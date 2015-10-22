@@ -62,7 +62,7 @@ var OpenROVController = function (eventLoop, client) {
     }
     if ('cmd' in status) {
       if (status.com != 'ping(0)'){
-        console.log('cmd: ' + status.cmd);
+        //console.log('cmd: ' + status.cmd);
         controller.emit('command', status.cmd);
       }
     }
@@ -88,8 +88,12 @@ var OpenROVController = function (eventLoop, client) {
     controller.Capabilities = val;
   });
 
-  globalEventLoop.on('SerialMonitor_toggle_rawSerial', function () {
-    controller.hardware.toggleRawSerialData();
+  globalEventLoop.on('SerialMonitor_start_rawSerial', function () {
+    controller.hardware.startRawSerialData();
+  });
+
+  globalEventLoop.on('SerialMonitor_stop_rawSerial', function () {
+    controller.hardware.stopRawSerialData();
   });
 
   globalEventLoop.on('serial-stop', function () {
@@ -139,7 +143,7 @@ OpenROVController.prototype.send = function (cmd) {
     return;
 
   var command = cmd + ';';
-  console.log('Sending command to arduino: ' + command);
+//  console.log('Sending command to arduino: ' + command);
 
   controller.hardware.write(command);
 };

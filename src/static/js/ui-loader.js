@@ -15,7 +15,7 @@
       if (this.currentUI && this.currentUI.disable) {
         this.currentUI.disable();
       }
-
+/*
       Polymer.import([newUi[0].polymerTemplateFile], function() {
         $('#UI').append(newUi[0].template);
         self.currentUI = newUi[0];
@@ -26,7 +26,7 @@
           done();
         });
       });
-
+*/
     }
     else {
       alert('New UI "' + name + '" could not be found!');

@@ -1,8 +1,7 @@
 (function (window, $, undefined) {
   'use strict';
   var TankControl;
-  TankControl = function Example(cockpit) {
-    var self = this;
+  TankControl = function TankControl(cockpit) {
     console.log('Loading TankControl plugin in the browser.');
     // Instance variables
     this.cockpit = cockpit;
@@ -22,30 +21,37 @@
       starboardThrottle: 'tankControl.starboardThrottle'
     };
 
-    // Add required UI elements
-    cockpit.extensionPoints.keyboardInstructions.append('<p><i>t</i> to toggle tank control</p>');
-    
-    cockpit.rov.on('plugin.tankControl.toggle', function() {
-      self.toggleControl();
-    });
-  };
-  TankControl.prototype.listen = function listen() {
-    var rov = this;
+    // for plugin management:
+    this.name = 'TankControl';   // for the settings
+    this.viewName = 'Tank GamePad Controls'; // for the UI
+    this.canBeDisabled = true; //allow enable/disable
+    var self = this;
+    this.enable = function () {
+      if (!self.tankControlActive){
+        self.toggleControl();
+      }
+    };
+    this.disable = function () {
+      if (self.tankControlActive){
+        self.toggleControl();
+      }
+    };
 
-    // Toggle tank control
-    rov.cockpit.extensionPoints.inputController.register(
+
+  };
+
+
+  TankControl.prototype.inputDefaults = function inputDefaults() {
+    var rov = this;
+    return [
       {
         name: 'tankcontrol.toggleTankControl',
         description: 'Toggles the tank control mode on/off',
         defaults: { keyboard: 't' },
-        down: function() { rov.cockpit.rov.emit('plugin.tankControl.toggle'); }
-      });
-
-    // register controls
-    rov.cockpit.extensionPoints.inputController.register(
-      [
+        down: function() { rov.toggleControl(); }
+      },
         {
-          name: rov.controlNames.leftLift,
+          name: 'rov.controlNames.leftLift',
           description: 'Tankcontrol: Lift control control for the left hand gamepad.',
           defaults: { gamepad: 'LEFT_STICK_X' },
           active: false,
@@ -62,7 +68,7 @@
           }
         },
         {
-          name: rov.controlNames.portThrottle,
+          name: 'rov.controlNames.portThrottle',
           description: 'Tankcontrol: Throttle control for the port prop.',
           defaults: { gamepad: 'LEFT_STICK_Y' },
           active: false,
@@ -72,7 +78,7 @@
           }
         },
         {
-          name: rov.controlNames.rightLift,
+          name: 'rov.controlNames.rightLift',
           description: 'Tankcontrol: Lift control control for the right hand gamepad.',
           defaults: { gamepad: 'RIGHT_STICK_X' },
           active: false,
@@ -90,7 +96,7 @@
           }
         },
         {
-          name: rov.controlNames.starboardThrottle,
+          name: 'rov.controlNames.starboardThrottle',
           description: 'Tankcontrol: Throttle control for the starboard prop.',
           defaults: { gamepad: 'RIGHT_STICK_Y' },
           active: false,
@@ -99,8 +105,13 @@
             rov.cockpit.rov.emit('plugin.rovpilot.manualMotorThrottle', rov.lefty, rov.lift, rov.righty);
           }
         }
-      ]);
+    ];
+  }
+
+  TankControl.prototype.listen = function listen() {
+    var rov = this;
   };
+
   TankControl.prototype.toggleControl = function toggleControl() {
     var rov = this;
     var controls = [];
@@ -109,16 +120,19 @@
     }
 
     if (!this.tankControlActive) {
-      self.cockpit.extensionPoints.inputController.activate(controls);
-      rov.cockpit.rov.emit('plugin.tankControl.enabled');
-      rov.tankControlActive = true;
-      console.log('Tank Control Active');
+      //TODO: Be sure to upgrade input controller for message activation
+      rov.cockpit.emit('inputController.activate',controls,function(){
+        rov.cockpit.rov.emit('plugin.tankControl.enabled');
+        rov.tankControlActive = true;
+        console.log('Tank Control Active');
+      });
     }
     else {
-      self.cockpit.extensionPoints.inputController.deactivate(controls);
-      rov.tankControlActive = false;
-      rov.cockpit.rov.emit('plugin.tankControl.disabled');
-      console.log('Tank Control Deactivated');
+      rov.cockpit.emit('inputController.deactivate',controls,function(){
+        rov.tankControlActive = false;
+        rov.cockpit.rov.emit('plugin.tankControl.disabled');
+        console.log('Tank Control Deactivated');
+      });
     }
   };
   window.Cockpit.plugins.push(TankControl);

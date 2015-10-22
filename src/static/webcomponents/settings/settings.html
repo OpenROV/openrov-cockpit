@@ -1,17 +1,30 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../drop-in-dialog/drop-in-dialog.html">
 
 
-<polymer-element name="rov-settings" attributes="" extends="drop-in-dialog">
+<!--
+    TODO(polyup): Inheriting from other custom elements is not yet supported.
+    See: https://www.polymer-project.org/1.0/docs/migration.html#inheritance
+ -->
+<dom-module id="rov-settings">
   <template>
     <shadow></shadow>
   </template>
   <script>
-    (function() {
+    (function () {
       Polymer({
-        header: 'Settings',
-        childId: 'settings-container',
-        open: function() {
+        is: 'rov-settings',
+        properties: {
+          childId: {
+            type: String,
+            value: 'settings-container'
+          },
+          header: {
+            type: String,
+            value: 'Settings'
+          }
+        },
+        open: function () {
           window.cockpit.sendUpdateEnabled = false;
           this.super();
           $('html /deep/ #capestatus-settings').collapse('show');
@@ -19,12 +32,8 @@
         hide: function () {
           window.cockpit.sendUpdateEnabled = true;
           this.super();
-        }
-      })
-    })();
+        },
+      });
+    }());
   </script>
-
-</polymer-element>
-  
-
-
+</dom-module>

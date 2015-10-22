@@ -1,0 +1,16 @@
+body.theme_r2 #system-panel > * {
+  height: 30px;
+  width: 30px;
+  margin: auto;
+  line-height: 20px;
+  display: block;
+  float: none;
+}
+
+body.theme_r2 #main-row > * {
+  border: 1px;
+  border-style: dashed;
+  overflow:auto;
+  width:80%;
+  margin-left: 10%;
+}

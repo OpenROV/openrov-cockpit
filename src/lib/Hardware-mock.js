@@ -14,12 +14,15 @@ function Hardware() {
   hardware.connect = function () {
     console.log('!Serial port opened');
   };
-  hardware.toggleRawSerialData = function toggleRawSerialData() {
-    emitRawSerial = !emitRawSerial;
+  hardware.startRawSerialData = function startRawSerialData() {
+    emitRawSerial = true;
+  };
+  hardware.stopRawSerialData = function stopRawSerialData() {
+    emitRawSerial = false;;
   };
 
   hardware.write = function (command) {
-    console.log('HARDWARE-MOCK:' + command);
+    //console.log('HARDWARE-MOCK:' + command);
     var commandParts = command.split(/\(|\)/);
     var commandText = commandParts[0];
     if (commandText === 'rcap') {
@@ -27,11 +30,11 @@ function Hardware() {
     }
     if (commandText === 'ligt') {
       hardware.emitStatus('LIGP:' + commandParts[1] / 255);
-      console.log('HARDWARE-MOCK return light status');
+  //    console.log('HARDWARE-MOCK return light status');
     }
     if (commandText === 'tilt') {
       hardware.emitStatus('servo:' + commandParts[1]);
-      console.log('HARDWARE-MOCK return servo status');
+  //    console.log('HARDWARE-MOCK return servo status');
     }
     if (commandText === 'claser') {
         if (hardware.laserEnabled) {
@@ -115,6 +118,7 @@ function Hardware() {
 
   var currentDepth = 0;
   var currentHeading = 0;
+  var currentServo = 1500;
   var interval = setInterval(function() {
     currentDepth += 0.5;
     hardware.emit('status', reader.parseStatus('deap:' + currentDepth));
@@ -128,6 +132,11 @@ function Hardware() {
       currentHeading = 0;
     }
 
+    currentServo +=50;
+    hardware.emit('status', reader.parseStatus('servo:' + currentServo));
+    if (currentServo >= 2000) {
+      currentServo = 1000;
+    }
   }, 2000);
 
 

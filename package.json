@@ -9,27 +9,31 @@
   },
   "scripts": {
     "test": "./node_modules/grunt-cli/bin/grunt test",
-    "install": "install.sh"
+    "install": "node install_lib/bower_install_all.js"
   },
   "dependencies": {
     "bower": "",
+    "crc": "",
     "ejs": "~0.8.3",
     "eventemitter2": "^0.4.14",
     "express": "= 3.4.8",
+    "findit": "^2.0.0",
     "forever-monitor": "",
     "jquery-file-upload-middleware": "",
+    "json-schema-defaults": "^0.1.1",
     "lazy": ">= 1.0.11",
     "mkdirp": "",
     "moment": "",
     "nconf": "",
+    "object-assign": "^4.0.1",
     "optimist": "",
     "os-utils": "",
+    "q": "^1.4.1",
     "request": "",
     "serialport": ">= 1.0.8",
     "socket.io": "~1.1.0",
     "sync": "",
-    "systemd": "git://github.com/plietar/node-systemd",    
-    "crc" : ""
+    "systemd": "git://github.com/plietar/node-systemd"
   },
   "bundleDependencies": [
     "express",
@@ -43,6 +47,7 @@
     "grunt": "^0.4.5",
     "grunt-cli": "^0.1.13",
     "grunt-contrib-jshint": "^0.11.0",
+    "grunt-contrib-watch": "^0.6.1",
     "grunt-mocha": "^0.4.11",
     "grunt-simple-mocha": "^0.4.0",
     "mocha": "^1.21.4",

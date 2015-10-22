@@ -14,9 +14,10 @@ var FirmwareInstallerPath = './lib/FirmwareInstaller';
 var HardwarePath = './lib/Hardware';
 var argv = require('optimist').argv;
 
+nconf.argv().env(); //Also look for overrides in environment settings
 // Will essentially rewrite the file when a change to the defaults are made if there is a parsing error.
 try {
-  nconf.use('file', { file: './etc/rovconfig.json' });
+  nconf.use('file', { file: (nconf.get('configfile') ? nconf.get('configfile') : '/etc/rovconfig.json') });
 } catch (err) {
   console.log('Unable to load the configuration file, resetting to defaults');
   console.log(err);

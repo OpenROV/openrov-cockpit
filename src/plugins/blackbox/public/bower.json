@@ -1,0 +1,22 @@
+{
+  "name": "blackbox",
+  "version": "1.0.0",
+  "homepage": "https://github.com/BrianAdams/openrov-cockpit",
+  "authors": [
+    "BrianAdams <brian@babastik.com>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "dexie": "~1.1.0",
+    "comma-separated-values": "~3.6.1",
+    "fontawesome-iconset": "philya/font-awesome-polymer-icons#master"
+  }
+}

@@ -629,5 +629,5 @@
     }
     return value;
   };
-  window.Gamepad = Gamepad;
+  window.HTML5Gamepad = Gamepad;
 }(window));

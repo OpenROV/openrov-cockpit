@@ -1,82 +1,100 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../polymer/polymer.html">
 
-<polymer-element name="drop-in-dialog" attributes="header, childId">
-  <template>
+<dom-module id="drop-in-dialog">
 
-    <link rel="stylesheet" href="../../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../../themes/OpenROV/css/style.css">
-
-    <style>
+  <style>
       .contentContainer {
         height: 90%;
         overflow: auto;
       }
     </style>
+  <template>
 
       <div class="drop-in-right" id="{{childId}}">
       <div class="back-button"></div>
       <h2>{{ header }}</h2>
-      <div class="accordion contentContainer" id="{{childId}}_">
+      <div class="accordion contentContainer" id="{{_computeId(childId)}}">
         <content id="childItems" select="div"></content>
       </div>
     </div>
 
   </template>
   <script>
-    (function() {
+    (function () {
       Polymer({
-        header: '',
-        childId: '',
-        settings: undefined,
-        closeHandlers: [],
-        collapseHandlerRegistered: false,
-        open: function() {
+        is: 'drop-in-dialog',
+        properties: {
+          childId: {
+            type: String,
+            value: '',
+            notify: true
+          },
+          closeHandlers: {
+            type: Array,
+            value: function () {
+              return [];
+            }
+          },
+          collapseHandlerRegistered: {
+            type: Boolean,
+            value: false
+          },
+          header: {
+            type: String,
+            value: ''
+          },
+          settings: {
+            value: function () {
+              return undefined;
+            }
+          }
+        },
+        open: function () {
           this.settings.css('display', 'block');
           var self = this;
-          Mousetrap.bind('esc',  function() { self.hide(); });
+          Mousetrap.bind('esc', function () {
+            self.hide();
+          });
           this.registerCollapseHandler();
         },
-        registerCloseHandler: function(handler) {
+        registerCloseHandler: function (handler) {
           this.closeHandlers.push(handler);
         },
         hide: function () {
           this.settings.css('display', 'none');
           Mousetrap.unbind('esc');
-          this.closeHandlers.forEach(function(handler) {
+          this.closeHandlers.forEach(function (handler) {
             handler();
           });
         },
-        domReady: function () {
-          var self = this;
-          this.settings = $(this.$[this.childId]);
-          this.settings.find('.back-button').click(function() {
-            self.hide();
-          });
-        },
-        registerCollapseHandler: function() {
+        registerCollapseHandler: function () {
           if (this.collapseHandlerRegistered) {
             return;
           }
-          var distNodes = this.$.childItems.getDistributedNodes();
-          distNodes.array().forEach(function(node) {
+          var distNodes = Polymer.dom(this.$.childItems).getDistributedNodes();
+          distNodes.array().forEach(function (node) {
             var res = $(node).find('a.accordion-toggle');
             if (res && res.length > 0) {
-              var href= res.attr('href');
+              var href = res.attr('href');
               var element = $(node).find(href);
-
-              res.click(function() {
+              res.click(function () {
                 element.collapse('toggle');
-              })
+              });
             }
           });
           this.collapseHandlerRegistered = true;
-
+        },
+        attached: function () {
+          var self = this;
+          this.settings = $(this.$[this.childId]);
+          this.settings.find('.back-button').click(function () {
+            self.hide();
+          });
+        },
+        _computeId: function (childId) {
+          return childId + '_';
         }
-      })
-    })();
+      });
+    }());
   </script>
-
-</polymer-element>
-  
-
-
+</dom-module>

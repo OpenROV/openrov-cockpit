@@ -1,31 +1,28 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../polymer/polymer.html">
 
-<polymer-element name="serial-monitor" attributes="maxLines">
-  <template>
-    <style type="text/css">
+<dom-module id="serial-monitor">
+  <style type="text/css">
       #serialMonitorList {
         width: 100%; height: 400px;
       }
     </style>
+  <template>
 
     <div class="controller well well-small">
-      <textarea id="serialMonitorList">
-      </textarea>
+      <textarea id="serialMonitorList">      </textarea>
     </div>
 
   </template>
   <script>
-    (function() {
+    (function () {
       Polymer({
-        maxLines: 100,
-        domReady: function () {
-          var self = this;
-          var list = $(this.$.serialMonitorList);
-          window.cockpit.rov.on('plugin.serial-monitor.serial-received', function (data) {
-            var text = self.tail(self.maxLines, list.val() + data);
-            list.val(text);
-            list.scrollTop(list[0].scrollHeight);
-          });
+        is: 'serial-monitor',
+        properties: {
+          maxLines: {
+            type: Number,
+            value: 100,
+            notify: true
+          }
         },
         countNewlines: function countNewlines(haystack) {
           return this.count('\n', haystack);
@@ -45,12 +42,17 @@
             return haystack.split('\n').slice(-limit).join('\n');
           }
           return haystack;
+        },
+        attached: function () {
+          var self = this;
+          var list = $(this.$.serialMonitorList);
+          window.cockpit.rov.on('plugin.serial-monitor.serial-received', function (data) {
+            var text = self.tail(self.maxLines, list.val() + data);
+            list.val(text);
+            list.scrollTop(list[0].scrollHeight);
+          });
         }
       });
-    })();
+    }());
   </script>
-
-</polymer-element>
-  
-
-
+</dom-module>

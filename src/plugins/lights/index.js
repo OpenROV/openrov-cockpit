@@ -1,5 +1,5 @@
 (function() {
-  function Laser(name, deps) {
+  function Lights(name, deps) {
     console.log('Lights plugin loaded');
     var lights = 0;
     var ArduinoHelper = require('../../lib/ArduinoHelper')();
@@ -31,7 +31,7 @@
       }
       setLights(lights);
     };
-    
+
     var toggleLights = function() {
       if (lights > 0) {
         setLights(0);
@@ -53,5 +53,8 @@
     };
 
   }
-  module.exports = Laser;
+  module.exports = function (name, deps) {
+    return new Lights(name,deps);
+  };
+
 })();

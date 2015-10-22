@@ -4,24 +4,7 @@ var PREFERENCES = 'plugins:globalization';
 function Globalization(name, deps) {
   console.log('Globalization Finder plugin loaded.');
   var preferences = getPreferences(deps.config);
-
-
-
-  deps.app.post('/locales/add/dev/translation', function (req, res) {
-    console.log(req.body);
-    res.status(200);
-    res.end();
-  });
-
-  deps.app.get('/locales/dev/translation.json', function (req, res) {
-    res.send(JSON.stringify(
-      {
-        key1: 'value of key 1'
-      }
-    ));
-    res.status(200);
-  });
-
+  this.deps = deps;
 
 };
 
@@ -35,6 +18,33 @@ function getPreferences(config) {
   console.log('Plugin Finder loaded preferences: ' + JSON.stringify(preferences));
   return preferences;
 }
+
+Globalization.prototype.getSettingSchema = function getSettingSchema(){
+  var availableLocals = [];
+  this.deps.loadedPlugins.forEach(function(plugin){
+    if (plugin !== undefined){
+      if (plugin.lang !== undefined){
+        availableLocals.push(plugin.lang);
+      }
+    }
+
+  });
+
+  return [{
+	"title": "Globalization",
+	"type": "object",
+  "id": "globalization", //Added to support namespacing configurations
+	"properties": {
+		"selectedLocal": {
+			"type": "string",
+      "default": "en-US",
+      "enum": availableLocals //Added default
+		}
+	},
+	"required": ["selectedLocal"]
+}];
+};
+
 
 module.exports = function (name, deps) {
   return new Globalization(name,deps);

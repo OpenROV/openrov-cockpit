@@ -25,12 +25,15 @@ TranslationResourceManager.prototype.monitorMissingData = function monitorMissin
     var nskeys = Object.keys(self.updatesCache);
     nskeys.forEach(function(key){
       var file = self.dirname + '/' + key + '.json';
-      fs.existsSync(file,function(exists){
+      fs.exists(file,function(exists){
         if (exists) return;
         fs.writeFileSync(file, '{}');
       });
       var _updates = self.updatesCache[key];
       fs.readFile(file,function (err, data){
+        if (err) {
+          return console.log(err);
+        }
         var itemkeys = Object.keys(_updates);
         var json = JSON.parse(data);
         itemkeys.forEach(function(ikeys){
@@ -54,12 +57,18 @@ TranslationResourceManager.prototype.setRoutes = function setRoutes(){
     }
     var file = self.dirname + '/' + namespace;
 
-    fs.existsSync(file,function(exists){
+    fs.exists(file,function(exists){
       if (exists) return;
       fs.writeFileSync(file, '{}');
     });
 
     fs.readFile(file,function (err, data){
+        if (err) {
+          res.status(500);
+//          res.write(err)
+          res.end;
+          return console.log(err);
+        }
         res.writeHead(200, {'Content-Type': 'text/html','Content-Length':data.length});
         res.write(data);
         res.end();

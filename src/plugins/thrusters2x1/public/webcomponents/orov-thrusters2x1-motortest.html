@@ -28,21 +28,18 @@
   Polymer({
     is:'orov-thrusters2x1-motortest',
     properties: {
-      eventEmitter: {type: Object, readOnly: true, observer: 'eventEmitterChange'},
       motors: {type: Array, value: [
         {name:'port', percent: 0},
         {name:'vertical', percent: 0},
         {name:'starboard', percent: 0}
       ]}
     },
+    behaviors: [namespace('behaviors').oROVStandard],
+    registerEmitterHanlders: function(emitter){
+      var self = this;
+    },    
     resolveMotorPercent: function(change,item){
       return this.motorPercent[item];
-    },
-    eventEmitterChange: function(){
-      var self = this;
-      if (this.eventEmitter !== undefined){
-
-      }
     },
     MotorPercentChange: function(e){
       var motor = e.srcElement.id;

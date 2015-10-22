@@ -5,6 +5,7 @@
   var plugins = namespace('plugins');
 
     $.getScript('../../components/i18next/i18next-latest.js',function(){
+      //http://i18next.com/pages/doc_init.html
       i18n.init({
         lng: "en-US",
         sendMissing: true,
@@ -28,6 +29,7 @@
   plugins.Globalization = function(cockpit) {
     var self = this;
     self.cockpit = cockpit;
+    self.rov = cockpit.rov;
     console.log("Globalization Plugin running");
 
 
@@ -38,6 +40,17 @@
   //so that the reference to this instance is available for further processing
   plugins.Globalization.prototype.listen = function listen() {
     var self = this;
+
+    var changeLanguage =  function changeLanguage(settings){
+      var lang = settings.selectedLocal;
+      if (lang!==undefined){
+        window.cockpit_int.i18n.setLng(lang);
+      }
+    };
+    //Get the preferred language from settings
+    self.cockpit.emit('plugin.settings-manager.getSettings','globalization',changeLanguage);
+
+    self.rov.on('settings-change.globalization',changeLanguage);
   };
 
   window.Cockpit.plugins.push(plugins.Globalization);

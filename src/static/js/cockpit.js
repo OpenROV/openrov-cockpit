@@ -128,14 +128,25 @@
         cockpit.loadedPlugins.push(loadedPlugin);
       }
     });
-    setTimeout(function(){ //give a pause for constructor activities before calling listen
+    var plugins_done_loading = false;
+    $(document).ready(function(event) {
+      console.log("#### What Up ####");
+      if (plugins_done_loading) return; //find a way to unload instead?
+      plugins_done_loading = true;
+      cockpit.loadedPlugins.forEach(function(plugin){
+        if (plugin.listen !== undefined){
+          plugin.listen();
+        }
+      });
+    });
+/*    setTimeout(function(){ //give a pause for constructor activities before calling listen
       cockpit.loadedPlugins.forEach(function(plugin){
         if (plugin.listen !== undefined){
           plugin.listen();
         }
       });
     },1000);
-
+*/
 
     Cockpit.plugins = [];  //flush them out for now. May move to a loaded array if we use in the future
     cockpit.rov.emit('cockpit.pluginsLoaded');

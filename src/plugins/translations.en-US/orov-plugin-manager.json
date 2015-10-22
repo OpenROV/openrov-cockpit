@@ -1,3 +1,9 @@
 {
-  "Plugins to enable/disable": "Plugins to enable/disable"
+  "Plugins to enable/disable": "Plugins to enable/disable",
+  "Enabled:": "Enabled:",
+  "Enable": "Enable",
+  "Disable": "Disable",
+  "Example plugin": "Example plugin",
+  "Heads up menu": "Heads up menu",
+  "Tank GamePad Controls": "Tank GamePad Controls"
 }

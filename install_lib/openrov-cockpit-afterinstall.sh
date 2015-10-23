@@ -1,8 +1,6 @@
 #!/bin/bash
 set -x
 set -e
-# compile the device tree files
-/opt/openrov/cockpit/linux/update-devicetree-oberlays.sh
 
 # set the openrov startup
 ln -s /opt/openrov/cockpit/linux/openrov.service /etc/init.d/openrov

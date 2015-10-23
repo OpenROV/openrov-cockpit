@@ -1,0 +1,106 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<polymer-element name="orov-input-configurator" attributes="time">
+  <template>
+    <link rel="stylesheet" href="../../../css/bootstrap.min.css">
+    <style type="text/css">
+      #controls {
+        max-height: 150px;
+        border: solid 1px black;
+        overflow: scroll;
+      }
+
+    </style>
+    <div id="controls" class="center">
+
+      <table id="commands" class="table">
+        <thead>
+          <tr>
+            <th>Command</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template repeat="{{item in commands}}">
+            <tr>
+              <td>{{item.name}}</td>
+              <td>{{item.description}}</td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+    <label for="find">Find:</label>
+    <input id="find" type="text" value="{{find}}" />
+    <div class="{{ selectedItem == undefined ? 'hidden' : '' }}">
+      <p>{{selectedItem.name}}: {{ selectedItem.description }}</p>
+      <label for="keyboard">Keyboard:</label>
+      <input id="keyboard" type="text" value="{{selectedItem.bindings.keyboard}}" />
+      <label for="gamepad">Keyboard:</label>
+      <input id="gamepad" type="text" value="{{selectedItem.bindings.gamepad}}" />
+    </div>
+  </template>
+  <script>
+    Polymer({
+      commands: [],
+      find: '',
+      selectedItem: undefined,
+      findChanged: function() {
+        this.updateCommands();
+      },
+      commandsChanged: function() {
+        var self = this;
+        $(this.$.commands).find('tr').each(function(){
+          $(this).css('cursor','pointer').hover(
+              function(){ 
+                  $(this).addClass('info');
+                   
+              },  
+              function(){ 
+                  $(this).removeClass('info'); 
+              }).click( function(){ 
+                  $(self.$.commands).find('tr').each(function(){
+                    $(this).removeClass('success');  
+                  });
+                  $(this).addClass('success');
+                  self.selectedItem = this.templateInstance.model.item; 
+              }
+          );
+        });
+      },
+      ready: function() {
+        var self = this;
+
+        this._commands = window.cockpit.extensionPoints.inputController.commands();
+        this.updateCommands();            
+      },
+      domReady: function() {
+        var self = this;
+        this.commandsChanged();
+      },
+      updateCommands: function() {
+        var self = this;
+        var filtered = this._commands;
+        if (this.find.length > 0) { 
+          filtered = 
+            this._commands.filter(function(item) {
+              var search = self.find.toLowerCase();
+              var nameContains = item.name.toLowerCase().indexOf(search) >= 0 ;
+              var descContains = item.description.toLowerCase().indexOf(search) >= 0;
+              return nameContains || descContains;
+            });
+        }
+        self.commands = [];
+        filtered.forEach(function(item) {
+          if (self.commands.indexOf(item) < 0) {
+            self.commands.push(item);
+          }
+        });        
+      }
+    });
+  </script>
+
+</polymer-element>
+  
+
+

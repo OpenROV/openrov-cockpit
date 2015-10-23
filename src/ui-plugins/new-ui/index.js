@@ -26,7 +26,9 @@ function newUi(name, deps) {
       {
         title: 'Serial Monitor',
         uiElement: 'serial-monitor',
-        webComponent: '/webcomponents/serial-monitor.html'
+        uiId: 'serialMonitor',
+        webComponent: '../webcomponents/serial-monitor.html',
+        scriptBlock: ''
       });
   });
 }

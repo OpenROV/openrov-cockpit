@@ -1,18 +1,20 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="/ui-plugin/new-ui/time.html" />
-<link rel="import" href="/ui-plugin/new-ui/compass.html" />
-<link rel="import" href="/ui-plugin/new-ui/depth.html" />
-<link rel="import" href="/ui-plugin/new-ui/switches.html" />
-<link rel="import" href="/ui-plugin/new-ui/power.html" />
+<link rel="import" href="time.html" />
+<link rel="import" href="compass.html" />
+<link rel="import" href="depth.html" />
+<link rel="import" href="throttle.html" />
+<link rel="import" href="switches.html" />
+<link rel="import" href="power.html" />
 <link rel="import" href="../../webcomponents/settings/settings.html">
 <link rel="import" href="../../webcomponents/diagnostics/diagnostics.html">
 <link rel="import" href="../../webcomponents/video/video.html">
 <link rel="import" href="../../webcomponents/horizon/horizon.html">
+<link rel="import" href="../../webcomponents/ping.html">
 
 <polymer-element name="x-newui">
   <template>
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/themes/OpenROV/css/style.css">
+    <link rel="stylesheet" href="../../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../themes/OpenROV/css/style.css">
     <link rel="stylesheet" href="css/style.css">
     <div id="newuiBody" class="full-height">
       <div id="newuiContainer">
@@ -21,14 +23,15 @@
             <a class="brand" href="#"><img src="../../themes/OpenROV/img/openrov.png" class="logo"><span class="navbar-titel">Cockpit</span></a>
             <div id="menu">
               <rov-menu id="menuitems" class="nav pull-right">
-                <li><a href="/#" id="show-settings" onclick="document.querySelector('html /deep/ rov-settings').open();">Settings</a></li>
-                <li><a href="/#" id="show-diagnostic" onclick="document.querySelector('html /deep/ rov-diagnostics').open();" >Diagnostic</a></li>
+                <li><a href="#" id="show-settings" onclick="document.querySelector('html /deep/ rov-settings').open();">Settings</a></li>
+                <li><a href="#" id="show-diagnostic" onclick="document.querySelector('html /deep/ rov-diagnostics').open();" >Diagnostic</a></li>
               </rov-menu>
             </div>
           </div>
         </div>
       </div>
       <div id="mainContent">
+        <bb-ping></bb-ping>
         <div id="newuiVideo" class="full-height">
           <rov-video id="videoElement"></rov-video>
           <rov-horizon id="horizon"></rov-horizon>
@@ -49,10 +52,10 @@
               <newui-depth id="newui-depth" class="center control"></newui-depth>
             </div>
           </div>
-          <div class="newui-item hidden" id="throttle-item">
+          <div class="newui-item" id="throttle-item">
             <div class="center">
               <H4>Throttle</H4>
-              <div id="newui-throttle" class="center control"></div>
+              <newui-throttle id="newui-throttle" class="center control"></newui-throttle>
             </div>
           </div>
           <div class="newui-item" id="power-item">
@@ -123,17 +126,25 @@
             defaults: { keyboard: 'alt+t' },
             down: function() {
               var telemetryWindow =
-                window.open('/new-ui/telemetry',
+                window.open('new-ui/telemetry',
                 '__telemetry',"menubar=no, status=no, titlebar=no, toolbar=no, width=300, height=400, location=no");
               telemetryWindow.cockpit = window.cockpit;
             }
           });
 
+        var serialMonitorWindow = undefined;
         window.cockpit.rov.on('plugin.serial-monitor.toggle', function() {
-          var newWindow =
-            window.open('/new-ui/serial-monitor',
-              '__telemetry',"menubar=no, status=no, titlebar=no, toolbar=no, width=300, height=400, location=no");
-          newWindow.cockpit = window.cockpit;
+          if (serialMonitorWindow) {
+            serialMonitorWindow.close();
+            serialMonitorWindow = undefined;
+          }
+          else {
+            serialMonitorWindow =
+              window.open('new-ui/serial-monitor',
+                '__telemetry',"menubar=no, status=no, titlebar=no, toolbar=no, width=300, height=400, location=no");
+            serialMonitorWindow.cockpit = window.cockpit;
+            serialMonitorWindow.onclose = function() { window.cockpit.rov.emit('plugin.serial-monitor.toggle'); }
+          }
         })
       },
       setMenu: function(menuItem) {

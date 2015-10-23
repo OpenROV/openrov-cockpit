@@ -81,7 +81,7 @@
           X: -16.43,
           Y: { min: 56, max: -6.1}
         },
-        current: { min: 0.0, max: 1.0 },
+        current: { min: 0.0, max: 2.0 },
         domReady: function () {
           var self = this;
           this.setVoltage(this.voltage);
@@ -116,6 +116,12 @@
           this.rightCurrent = current;
         },
         setCurrent: function(element, config, current) {
+          if (current > this.current.max) {
+            this.current.max = current;
+          }
+          if (current < this.current.min) {
+            this.current.min = current;
+          }
           var val = current.map(
             this.current.min,
             this.current.max,

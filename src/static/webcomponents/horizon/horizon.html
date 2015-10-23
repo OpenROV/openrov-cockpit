@@ -33,6 +33,7 @@
 <polymer-element name="rov-horizon" attributes="videoElement">
   <template>
     <style type="text/css">
+      .hidden { display: none }
     </style>
 
     <canvas id="horizon" class="hud" width="640" height="360"></canvas>
@@ -97,6 +98,16 @@
           window.cockpit.rov.on('plugin.navigationData.data', function (data) {
             self.setData(data);
           });
+          cockpit.extensionPoints.keyboardInstructions.append('<p><i>\\</i> to toggle heads up display</p>');
+          cockpit.extensionPoints.inputController.register(
+            {
+              name: 'main.toggleHeadsUpDisplay',
+              description: 'Toggle the heads-up-display on/off',
+              defaults: { keyboard: '\\' },
+              down: function () {
+                $(self.$.horizon).toggleClass('hidden');
+              }
+            });          
           this.draw();
         },
         render: function (data) {

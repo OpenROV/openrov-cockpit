@@ -24,11 +24,12 @@
     <link rel="stylesheet" href="../../css/bootstrap.min.css">
     <link rel="stylesheet" href="../../themes/OpenROV/css/style.css">
 
+
     <div id="header" class="navbar navbar-inverse navbar-fixed-top nav-collapse">
       <div class="navbar-inner">
         <a class="brand" href="#"><img src="../../themes/OpenROV/img/openrov.png" class="logo"/><span class="navbar-titel">Cockpit</span></a>
         <ul class="nav" id="navtoolbar">
-          <li><a href="#"><img id="keyboardpopover" src="../../themes/OpenROV/img/keyboard.png" data-trigger="hover" data-placement="bottom" rel='popover' title="keyboard commands" html="true" /></a></li>
+          <li><a href="#"><img id="keyboardpopover" src="../../themes/OpenROV/img/keyboard.png" data-trigger="hover" data-container="html /deep/ #keyboardInstructions" data-placement="bottom" rel='popover' title="keyboard commands" html="true" data-template='<div class="popover" role="tooltip" style="width: 500px;"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div class="data-content"></div></div></div>'/></a></li>
           <li><a href="#" id="servoTilt"><servo-tilt class="pull-left"></servo-tilt></a></li>
           <li><brightness-indicator  class="pull-left"></brightness-indicator></li>
           <li><rov-gamepad class="pull-left"></rov-gamepad></li>
@@ -83,21 +84,73 @@
     <rov-diagnostics id="diagnostic">
     </rov-diagnostics>
 
-    <div class="hidden" id="keyboardInstructions">
-      <p>
-        Use the <i>Up</i>, <i>Down</i>, <i>Left</i>, <i>Right</i>, <i>Shift</i> and <i>Ctrl</i> keys to maneuver.
-        Use <i>1</i>-<i>5</i> to set power. <i>7</i>,<i>8</i> (lift) and <i>9</i>,<i>0</i> (thrust) trim. Space for all stop.
-      </p>
-      <p>Use <i>Q</i>, <i>A</i>, <i>Z</i> to tilt servo.</p>
-      <p>Use <i>o</i>, <i>p</i> to increase brightness of lights.</p>
-      <p>Use <i>l</i> to toggle callibration lasers.</p>
+    <div class="hidden" id="keyboardInstructions_">
+      <template repeat="{{item in keyboardCommands}}" id="menu">
+        <p>
+          <span style="font-weight: bold">{{item.description}}: </span>{{item.bindings.keyboard}}
+        </p>
+    </template>
     </div>
 
 
 
   </template>
   <script>
+    
+    // The JQuery function we use does not implement offset correctly for shadow root 
+    function getWindow( elem ) {
+    	return jQuery.isWindow( elem ) ? elem : elem.nodeType === 9 && elem.defaultView;
+    }
+    
+    // The JQuery function we use does not implement offset correctly for shadow root
+    // The following offset function comes from https://github.com/jquery/jquery/blob/c9cf250daafe806818da1dd207a88a8e94a4ad16/src/offset.js 
+    jQuery.fn.extend({
+      offset: function( options ) {
+      
+      		// Preserve chaining for setter
+      		if ( arguments.length ) {
+      			return options === undefined ?
+      				this :
+      				this.each( function( i ) {
+      					jQuery.offset.setOffset( this, options, i );
+      				} );
+      		}
+      
+      		var docElem, win, rect, doc,
+      			elem = this[ 0 ];
+      
+      		if ( !elem ) {
+      			return;
+      		}
+      
+      		// Support: IE<=11+
+      		// Running getBoundingClientRect on a
+      		// disconnected node in IE throws an error
+      		if ( !elem.getClientRects().length ) {
+      			return { top: 0, left: 0 };
+      		}
+      
+      		rect = elem.getBoundingClientRect();
+      
+      		// Make sure element is not hidden (display: none)
+      		if ( rect.width || rect.height ) {
+      			doc = elem.ownerDocument;
+      			win = getWindow( doc );
+      			docElem = doc.documentElement;
+      
+      			return {
+      				top: rect.top + win.pageYOffset - docElem.clientTop,
+      				left: rect.left + win.pageXOffset - docElem.clientLeft
+      			};
+      		}
+      
+      		// Return zeros for disconnected and hidden elements (gh-2310)
+      		return rect;
+      	},
+      });
+    
     Polymer({
+      keyboardCommands: [ ],
       domReady: function() {
         var self = this;
         var bodyWidth = $(this.$.newuiBody).innerWidth();
@@ -120,6 +173,21 @@
         self.$.telemetry.define = function(name,callback){
           window.cockpit.rov.emit('telemetry.getDefinition',name,callback);
         };
+        
+        //We have a contract for centralizing all keyboad instructions. This code
+        //wires that content to where we display it in a popover.
+        $(self.$.keyboardpopover).hover(function () {
+          //var kb =  window.cockpit.extensionPoints.rovSettings.find('#inputcontroller-settings').find('ul');
+          var kb =  $(self.$.keyboardInstructions_);
+          $(self.$.keyboardpopover).attr('data-content', kb.html());
+        });
+        $(self.$.keyboardpopover).popover();
+        window.cockpit.extensionPoints.inputController.commands().forEach(function(item) {
+          self.keyboardCommands.push(item);  
+        })
+        
+        
+        
       },
       setMenu: function(menuItem) {
         menuItem.appendTo($(this.$.menu));

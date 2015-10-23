@@ -25,6 +25,7 @@ var StatusReader = function () {
           settingsCollection[lastParts[0]] = lastParts[1];
         }
         reader.emit('Arduino-settings-reported', settingsCollection);
+        status.settings = settingsCollection;
         break;
       default:
         status[subParts[0]] = subParts[1];

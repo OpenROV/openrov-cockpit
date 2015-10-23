@@ -142,11 +142,28 @@
         self._register(oldcommand, false);
         console.log('re-activated ' + oldcommand.name);
       });
-      command.replaced = null;
+      command.replaced = [];
       console.log('Deactivated command ' + command.name);
     });
-
   };
+
+  inputController.InputController.prototype.suspend = function(controlName) {
+    var self = this;
+    self.previouslyActiveCommands = self.commands()
+      .filter(function(command) {return command.active});
+    
+     self.controllers.forEach(function (controller) {
+       controller.reset();
+     });
+  };
+
+  inputController.InputController.prototype.resume = function(controlName) {
+    var self = this;
+    self.previouslyActiveCommands.forEach(function(command) {
+      self.register(command);
+    })
+  };
+
 
   window.Cockpit.plugins.push(inputController.InputController);
 }(window, document));

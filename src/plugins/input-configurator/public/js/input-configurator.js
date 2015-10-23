@@ -16,6 +16,11 @@
       self.cockpit.extensionPoints.rovSettings.find('#inputConfigurator').find('button#show').click(function() {
         $('body').find('#inputConfiguratorDialogContainer')  
           .find('#inputConfiguratorDialog').modal('show');
+        self.cockpit.extensionPoints.inputController.suspend();
+        $('body').find('#inputConfiguratorDialogContainer')  
+          .find('#inputConfiguratorDialog').on('hidden.bs.modal', function (e) {
+            self.cockpit.extensionPoints.inputController.resume();
+          })
       })
       $('body').find('#inputConfiguratorDialogContainer')
         .load(jsFileLocation + '../configuratorDialog.html', function () {

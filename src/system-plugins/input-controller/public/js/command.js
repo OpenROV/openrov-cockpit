@@ -13,6 +13,7 @@ inputController.Command = function(control) {
     self.name = control.name;
   }
 
+  self.replaced = [];
   self.description = control.description || self.name;
   if (control.down !== undefined) self.down = control.down;
   if (control.up !== undefined) self.up = control.up;

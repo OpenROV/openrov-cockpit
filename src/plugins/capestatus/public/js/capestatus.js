@@ -171,10 +171,11 @@
       capes.UpdateStatusIndicators(data);
     });
   };
-  capestatus.Capestatus.prototype.UpdateStatusIndicators = function UpdateStatusIndicators(data) {
-    var self = this;
 
-    this.lastPing = new Date();
+  capestatus.Capestatus.prototype.UpdateStatusIndicators = function UpdateStatusIndicators(data) {		
+    var self = this;		
+    
+    this.lastPing = new Date();		
   };
 
   capestatus.Capestatus.prototype.updateConnectionStatus = function () {

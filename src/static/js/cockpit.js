@@ -81,7 +81,7 @@
       try {
         loadedPlugin = new plugin(cockpit);
       } catch (err) {
-        console.log('error loading a plugin!!!' + err);
+        console.error('error loading a plugin!!!' + err);
       }
       if (loadedPlugin != null && loadedPlugin !== undefined) {
         if (loadedPlugin.canBeDisabled != undefined) {

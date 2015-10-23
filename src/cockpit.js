@@ -23,6 +23,7 @@ app.configure(function () {
   app.use(express.logger('dev'));
   app.use(app.router);
   app.use('/components', express.static(path.join(__dirname, 'bower_components')));
+  app.use('/bower_components', express.static(path.join(__dirname, 'bower_components')));
   app.use('/plugin_components', express.static('/usr/share/cockpit/bower_components'));
 });
 // Keep track of plugins js and css to load them in the view

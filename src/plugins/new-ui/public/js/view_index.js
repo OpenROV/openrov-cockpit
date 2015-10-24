@@ -34,4 +34,16 @@ $(function () {
   cockpit.rov.on('cockpit.pluginsLoaded', function() {
   });
   window.cockpit = cockpit;
+
+/*  window.addEventListener('WebComponentsReady', function(e) {
+    //Manually wire up the event emitter to any element with
+    //that attribute
+    $('*[event-emitter]').each(function(){
+      this.eventEmitter = window.cockpit;
+    })
+  });
+*/
+  $( document ).ready(function() {
+    $('#t')[0]['cockpit-event-emitter'] = window.cockpit;
+  });
 });

@@ -32,6 +32,7 @@
     _eventEmitterChanged: function(newvalue,oldvalue){
       var self=this;
 
+      if (newvalue.on === undefined) return;
       if (oldvalue===newvalue) return;
 
       //Move any existing listeners across to the new

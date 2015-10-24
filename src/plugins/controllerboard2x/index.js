@@ -1,4 +1,6 @@
 (function() {
+  var sharedFunctions = require('./public/js/telemetryToSystemPower.js');
+
   var PREFERENCES_NS="plugins"
   var SystemEnvionment = function SystemEnvironment(name, deps) {
     console.log('Controllerboard2x:SystemEnvironment plugin loaded');
@@ -16,9 +18,10 @@
     console.log('Controllerboard2x:SystemPower plugin loaded');
 
     this.config = deps.config;
-
+    var cockpit = deps.cockpit;
     deps.rov.on('status', function(data) {
-//      if ('')
+      var mappedPowerObject = sharedFunctions.telemetryToSystemPower(data);
+//      if (mappedPowerObject !== null){console.dir(mappedPowerObject)}
     });
 
     deps.cockpit.on('plugin.systemPower.powerOnESCs', function () {
@@ -32,6 +35,7 @@
 
       deps.cockpit.emit('plugin.rovpilot.esc.disabled'); // should be handled through status
     });
+
 
 
   };

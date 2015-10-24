@@ -55,6 +55,15 @@
   //so that the reference to this instance is available for further processing
   plugins.SystemPower.prototype.listen = function listen() {
     var self = this;
+
+    this.cockpit.on('plugin.systemPower.powerOffESCs',function(){
+      self.cockpit.rov.emit('plugin.systemPower.powerOffESCs');
+    });
+
+    this.cockpit.on('plugin.systemPower.powerOnESCs',function(){
+      self.cockpit.rov.emit('plugin.systemPower.powerOnESCs');
+    });
+
     this.cockpit.rov.on('status',function(status){
       //Work around not having the explicit status in the MCU code
       if ('log' in status){
@@ -63,9 +72,8 @@
         }
       }
 
-      if ('vout' in status){
-        //do math to estimate the power remaining
-      }
+      var powerObject = window.controllerboard2x.telemetryToSystemPower(status);
+      if (powerObject !== null) { self.cockpit.emit('plugin.controllerboard2x.systemPower.update',powerObject)};
     });
 
   };

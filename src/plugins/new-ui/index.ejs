@@ -88,7 +88,7 @@
   </style>
 
   <body>
-
+<template id="t" is="dom-bind">
     <div id="UI" class="full-height">
       <div id="newuiBody" class="full-height">
         <div id="newuiContainer">
@@ -108,14 +108,14 @@
           <bb-ping></bb-ping>
           <div id="newuiVideo" class="full-height">
             <rov-video id="videoElement"></rov-video>
-            <orov-horizon id="horizon"></orov-horizon>
+            <orov-horizon id="horizon" event-emitter={{cockpit-event-emitter}}></orov-horizon>
           </div>
           <div id="newuiControlpad">
             <div class="newui-item" id="heading-item">
               <div class="center">
                 <h4>Heading</h4>
                 <div id="newui-compass" class="center control">
-                  <orov-newui-compass class="center" heading="0"></orov-newui-compass>
+                  <orov-newui-compass class="center" heading="0" event-emitter={{cockpit-event-emitter}}></orov-newui-compass>
                 </div>
               </div>
             </div>
@@ -123,20 +123,20 @@
               <div class="center">
                 <h4>Depth</h4>
                 <!--<div id="newui-depth" class="center control"></div>-->
-                <newui-depth id="newui-depth" class="center control"></newui-depth>
+                <orov-newui-depth id="newui-depth" class="center control" event-emitter={{cockpit-event-emitter}}></orov-newui-depth>
               </div>
             </div>
             <div class="newui-item" id="throttle-item">
               <div class="center">
                 <h4>Throttle</h4>
-                <newui-throttle id="newui-throttle" class="center control"></newui-throttle>
+                <orov-newui-throttle id="newui-throttle" class="center control" event-emitter={{cockpit-event-emitter}}></orov-newui-throttle>
               </div>
             </div>
             <div class="newui-item" id="power-item">
               <div class="center">
                 <h4>Battery</h4>
                 <div id="newui-power" class="center control">
-                  <newui-power id="power"></newui-power>
+                  <orov-newui-power id="power" event-emitter={{cockpit-event-emitter}}></orov-newui-power>
                 </div>
               </div>
             </div>
@@ -144,7 +144,7 @@
               <div class="center">
                 <h4>Switches</h4>
                 <div id="newui-switches" class="center control">
-                  <newui-switches id="newui-switches" class="center"></newui-switches>
+                  <orov-newui-switches id="newui-switches" class="center" event-emitter={{cockpit-event-emitter}}></orov-newui-switches>
                 </div>
               </div>
             </div>
@@ -174,7 +174,7 @@
       </div>
 
     </div> <!--Placeholder for the UI plugin-->
-
+</template>
   </body>
   <script type='text/javascript' src="plugin/new-ui/js/view_index.js"></script>
 </html>

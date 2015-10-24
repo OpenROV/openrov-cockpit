@@ -1,5 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
-<dom-module id="newui-switches">
+<dom-module id="orov-newui-switches">
   <style type="text/css">
       #switchesContainer {
         display: table;
@@ -54,7 +54,7 @@
   <script>
     (function () {
       Polymer({
-        is: 'newui-switches',
+        is: 'orov-newui-switches',
         properties: {
           lastPing: {
             value: function () {
@@ -64,13 +64,14 @@
           switches: {
             type: Object,
             value: function () {
+              var self = this;
               return {
                 COM: {
                   switchable: false,
                   state: false,
                   message: {
-                    enabled: 'plugin.capestatus.connection.connected',
-                    disabled: 'capestatus.connection.disconnected'
+                    enabled: 'plugin.connection-health.connection.connected',
+                    disabled: 'capestatus.connection-health.disconnected'
                   },
                   description: 'Communication status'
                 },
@@ -89,7 +90,9 @@
                   message: 'plugin.tankControl',
                   description: 'Tank control active/inactive',
                   switch: function () {
-                    window.cockpit.rov.emit('plugin.tankControl.toggle');
+                    if (self.eventEmitter !== undefined){
+                      self.eventEmitter.emit('plugin.tankControl.toggle');
+                    }
                   }
                 },
                 DLK: {
@@ -98,7 +101,9 @@
                   message: 'plugin.rovpilot.depthHold',
                   description: 'Depthhold active/inactive',
                   switch: function () {
-                    window.cockpit.rov.emit('plugin.rovpilot.depthHold.toggle');
+                    if (self.eventEmitter !== undefined){
+                      self.eventEmitter.emit('plugin.rovpilot.depthHold.toggle');
+                    }
                   }
                 },
                 HLK: {
@@ -107,7 +112,9 @@
                   message: 'plugin.rovpilot.headingHold',
                   description: 'Heading lock active/inactive',
                   switch: function () {
-                    window.cockpit.rov.emit('plugin.rovpilot.headingHold.toggle');
+                    if (self.eventEmitter !== undefined){
+                      self.eventEmitter.emit('plugin.rovpilot.headingHold.toggle');
+                    }
                   }
                 },
                 LSR: {
@@ -116,7 +123,9 @@
                   message: 'plugin.laser',
                   description: 'Lasers on/off',
                   switch: function () {
-                    window.cockpit.rov.emit('plugin.laser.toggle');
+                    if (self.eventEmitter !== undefined){
+                      self.eventEmitter.emit('plugin.laser.toggle');
+                    }
                   }
                 },
                 LED: {
@@ -124,25 +133,53 @@
                   state: false,
                   description: 'LED lights on/off',
                   switch: function () {
-                    window.cockpit.rov.emit('plugin.lights.toggle');
+                    if (self.eventEmitter !== undefined){
+                      self.eventEmitter.emit('plugin.lights.toggle');
+                    }
                   }
                 },
                 ESC: {
                   switchable: true,
                   state: true,
-                  message: 'plugin.rovpilot.esc',
+                  message: 'plugin.systemPower.esc',
                   description: 'ROV ESCs active/inactive',
                   switch: function (state) {
-                    if (state) {
-                      window.cockpit.rov.emit('plugin.rovpilot.powerOffESCs');
-                    } else {
-                      window.cockpit.rov.emit('plugin.rovpilot.powerOnESCs');
+                    if (self.eventEmitter !== undefined){
+                      if (state) {
+                        self.eventEmitter.emit('plugin.systemPower.powerOffESCs');
+                      } else {
+                        self.eventEmitter.emit('plugin.systemPower.powerOnESCs');
+                      }
                     }
                   }
                 }
               };
             }
           }
+        },
+        behaviors: [namespace('behaviors').oROVStandard],
+        registerEmitterHanlders: function(emitter) {
+          var self = this;
+          var container = $(this.$.switchesContainer);
+          for (var aSwitch in self.switches) {
+            container.append('<div class="switches-row ' + (self.switches[aSwitch].switchable ? 'switchable' : '') + '" id="' + aSwitch + '" title="' + self.switches[aSwitch].description + '">' + '<div class="switches-switch-on">' + aSwitch + '</div>' + '<div class="switches-switch-off">' + aSwitch + '</div>' + '</div>');
+            if (self.switches[aSwitch].switchable) {
+              container.find('#' + aSwitch).click(function () {
+                var property = $(this).attr('id');
+                self.switch(property);
+                self.onSwitch(property);
+              });
+            }
+            this.registerListeners(aSwitch,emitter);
+          }
+          emitter.on('plugin.lights.level', function (level) {
+            var state = false;
+            if (Number(level) !== 0) {
+              state = true;
+            }
+            self.switches.LED.state = state;
+            self.update();
+          });
         },
         update: function () {
           for (var aSwitch in this.switches) {
@@ -158,7 +195,7 @@
           self.switches[aSwitch].state = !self.switches[aSwitch].state;
           self.update();
         },
-        registerListeners: function (aSwitch) {
+        registerListeners: function (aSwitch,emitter) {
           var self = this;
           // register the enabled/disabled messages
           if (self.switches[aSwitch].message) {
@@ -171,11 +208,12 @@
               enabledKey = self.switches[aSwitch].message.enabled;
               disabledKey = self.switches[aSwitch].message.disabled;
             }
-            window.cockpit.rov.on(enabledKey, function () {
+            console.log("Registering switch listener: " + enabledKey);
+            emitter.on(enabledKey, function () {
               self.switches[aSwitch].state = true;
               self.update();
             });
-            window.cockpit.rov.on(disabledKey, function () {
+            emitter.on(disabledKey, function () {
               self.switches[aSwitch].state = false;
               self.update();
             });
@@ -183,32 +221,13 @@
         },
         attached: function () {
           var self = this;
-          var container = $(this.$.switchesContainer);
           self.onSwitch = function (aSwitch) {
             if (self.switches[aSwitch].switch) {
               self.switches[aSwitch].state = !self.switches[aSwitch].state;
               self.switches[aSwitch].switch(self.switches[aSwitch].state);
             }
           };
-          for (var aSwitch in self.switches) {
-            container.append('<div class="switches-row ' + (self.switches[aSwitch].switchable ? 'switchable' : '') + '" id="' + aSwitch + '" title="' + self.switches[aSwitch].description + '">' + '<div class="switches-switch-on">' + aSwitch + '</div>' + '<div class="switches-switch-off">' + aSwitch + '</div>' + '</div>');
-            if (self.switches[aSwitch].switchable) {
-              container.find('#' + aSwitch).click(function () {
-                var property = $(this).attr('id');
-                self.switch(property);
-                self.onSwitch(property);
-              });
-            }
-            this.registerListeners(aSwitch);
-          }
-          window.cockpit.rov.on('plugin.lights.level', function (level) {
-            var state = false;
-            if (Number(level) !== 0) {
-              state = true;
-            }
-            self.switches.LED.state = state;
-            self.update();
-          });
+
         }
       });
     }());

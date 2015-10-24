@@ -18,6 +18,9 @@
       var _starttime = performance.now();
       self.cockpit.emit('ping',_starttime);
       self.cockpit.rov.emit('ping', _starttime);
+
+      var isConnected = self.pingtime <= 3000;
+      self.cockpit.emit('plugin.connection-health.connection.' + (isConnected ? 'connected' : 'disconnected'));
     }, 1000);
 
     this.cockpit.rov.on('pong', function (id) {

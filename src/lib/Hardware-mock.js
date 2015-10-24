@@ -116,27 +116,43 @@ function Hardware() {
     hardware.emit('status', status);
   }
 
-  var currentDepth = 0;
+  var currentDepth = 1;
   var currentHeading = 0;
   var currentServo = 1500;
+  var current = 2;
+
   var interval = setInterval(function() {
-    currentDepth += 0.5;
-    hardware.emit('status', reader.parseStatus('deap:' + currentDepth));
-    if (currentDepth > 50) {
-      currentDepth = 0;
-    }
+    var result = "";
+    var rnd = (Math.random() * 20 - 10)/100;
+    currentDepth += currentDepth*rnd;
+    currentDepth = Math.min(Math.max(currentDepth, 1), 100);
+    result+='deep:' + currentDepth + ';'
+
 
     currentHeading += 5;
-    hardware.emit('status', reader.parseStatus('hdgd:' + currentHeading));
+    result+='hdgd:' + currentHeading + ';'
     if (currentHeading >= 360) {
       currentHeading = 0;
     }
 
+    rnd = (Math.random() * 20 - 10)/100;
+    current += current*rnd;
+    current = Math.min(Math.max(current, 1), 10);
+    result+='bt1i:' + current + ';'
+
+    rnd = (Math.random() * 20 - 10)/100;
+    current += current*rnd;
+    current = Math.min(Math.max(current, 1), 10);
+    result+='bt2i:' + current + ';'
+
     currentServo +=50;
-    hardware.emit('status', reader.parseStatus('servo:' + currentServo));
+    result+='servo:' + currentServo + ';'
     if (currentServo >= 2000) {
       currentServo = 1000;
     }
+
+    hardware.emit('status', reader.parseStatus(result));
+
   }, 2000);
 
 

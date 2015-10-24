@@ -1,5 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
-<dom-module id="newui-depth">
+<dom-module id="orov-newui-depth">
   <style type="text/css">
 
       .unit {
@@ -99,7 +99,7 @@
       <div id="depthLock" class="unit hidden" style="">LK</div>
       <div id="numberContainer">
         <div id="depth" class="center text-center">
-          <span>{{depth}}</span>
+          <span>{{formatDepth(depth)}}</span>
         </div>
         <div id="depthTarget" title="Depthhold target depth" class="center text-center hidden">{{target}}</div>
       </div>
@@ -131,7 +131,7 @@
   <script>
     (function () {
       Polymer({
-        is: 'newui-depth',
+        is: 'orov-newui-depth',
         properties: {
           change: {
             type: String,
@@ -143,13 +143,11 @@
           },
           options: {
             type: Object,
-            value: function () {
-              return {
+            value:  {
                 indicatorActive: '#ffffff',
                 indicatorInactive: '#000000',
                 strokeActive: '#ffffff',
                 strokeInactive: '#ffffff'
-              };
             }
           },
           target: {
@@ -161,13 +159,37 @@
             value: 'salt'
           }
         },
-        attached: function () {
+        behaviors: [namespace('behaviors').oROVStandard],
+        registerEmitterHanlders: function(emitter) {
           var self = this;
-          var oldDepth = 0;
-          var currentDepth = 0;
+          emitter.on('plugin.navigationData.data', function (data) {
+            if ('depth' in data) {
+              self.set('depth',Number(data.depth));//.toFixed(1);
+            }
+          });
+          emitter.on('plugin.rovpilot.depthHold.target', function (target) {
+            self.target = Number(target).toFixed(1);
+            $(self.$.depth).addClass('inverted');
+            $(self.$.depthTarget).removeClass('hidden');
+            $(self.$.depthLock).removeClass('hidden');
+          });
+          emitter.on('plugin.rovpilot.depthHold.disabled', function () {
+            self.target = 0;
+            $(self.$.depth).removeClass('inverted');
+            $(self.$.depthTarget).addClass('hidden');
+            $(self.$.depthLock).addClass('hidden');
+          });
+          emitter.on('plugin.diveprofile.watertype', function (data) {
+            self.waterType = data.watertype;
+          });
+        },
+        attached: function(){
+          var self = this;
           var depthChangeUp = $(this.$.depthChangeUp).find('svg polygon');
           var depthChangeDown = $(this.$.depthChangeDown).find('svg polygon');
+          var oldDepth = 0;
           var update = function () {
+            var currentDepth = self.depth;
             if (currentDepth > oldDepth) {
               // descending
               depthChangeUp.animate({ svgFill: self.options.indicatorInactive }, { duration: 600 });
@@ -181,7 +203,6 @@
               depthChangeUp.animate({ svgFill: self.options.indicatorInactive }, { duration: 600 });
               depthChangeDown.animate({ svgFill: self.options.indicatorInactive }, { duration: 600 });
             }
-            self.depth = currentDepth;
             var difference = oldDepth - currentDepth;
             var changeText = '';
             if (difference > 0) {
@@ -191,35 +212,20 @@
             self.change = changeText;
             oldDepth = currentDepth;
           };
+
+
+          setInterval(update, 1000);
           depthChangeUp.css({
-            fill: self.options.indicatorInactive,
-            stroke: self.options.strokeInactive
+            fill: this.options.indicatorInactive,
+            stroke: this.options.strokeInactive
           });
           depthChangeDown.css({
-            fill: self.options.indicatorInactive,
-            stroke: self.options.strokeInactive
+            fill: this.options.indicatorInactive,
+            stroke: this.options.strokeInactive
           });
-          setInterval(update, 1000);
-          window.cockpit.rov.on('plugin.navigationData.data', function (data) {
-            if ('depth' in data) {
-              currentDepth = Number(data.depth).toFixed(1);
-            }
-          });
-          window.cockpit.rov.on('plugin.rovpilot.depthHold.target', function (target) {
-            self.target = Number(target).toFixed(1);
-            $(self.$.depth).addClass('inverted');
-            $(self.$.depthTarget).removeClass('hidden');
-            $(self.$.depthLock).removeClass('hidden');
-          });
-          window.cockpit.rov.on('plugin.rovpilot.depthHold.disabled', function () {
-            self.target = 0;
-            $(self.$.depth).removeClass('inverted');
-            $(self.$.depthTarget).addClass('hidden');
-            $(self.$.depthLock).addClass('hidden');
-          });
-          window.cockpit.rov.on('plugin.diveprofile.watertype', function (data) {
-            self.waterType = data.watertype;
-          });
+        },
+        formatDepth : function(depth){
+          return depth.toFixed(1);
         }
       });
     }());

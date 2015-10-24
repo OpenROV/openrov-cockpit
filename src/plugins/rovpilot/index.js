@@ -13,6 +13,9 @@
     self.sendToROVEnabled = true;
     self.sendUpdateEnabled = true;
     self.priorControls = {};
+    self.powerLevel = 2;
+    self.setPowerLevel(2);
+    //rov.powerLevel = 2;
 
     self.positions = {
       throttle: 0,
@@ -22,6 +25,23 @@
       roll: 0,
       strafe: 0
     };
+
+    deps.cockpit.on('plugin.rovpilot.getState',function(callback){
+      var state = {
+        senToROVEnabled : self.sendToROVEnabled,
+        sendUpdateEnabled : self.sendUpdateEnabled,
+        powerLevel : self.powerLevel,
+        positions: self.positions
+      }
+      callback(state);
+    });
+
+    deps.cockpit.on('plugin.rovpilot.setPowerLevel',function(value){
+      self.setPowerLevel(value);
+    });
+
+    //Send initial state
+    deps.cockpit.emit('plugin.rovpilot.setPowerLevel', 2);
 
     deps.cockpit.on('plugin.rovpilot.allStop', function () {
       self.allStop();
@@ -79,6 +99,39 @@
     return this;
   };
 
+  ROVPilot.prototype.adjustForPowerLimit = function adjustForPowerLimit(value){
+    return value * this.power;
+  }
+
+  ROVPilot.prototype.adjustYawForPowerLimit = function adjustYawForPowerLimit(value){
+    return Math.min(Math.max(value * this.power * 1.5,-1),1);
+  }
+
+
+  ROVPilot.prototype.setPowerLevel = function setPowerLevel(value) {
+
+    switch (value) {
+      case 1:
+        this.power = 0.12;
+        break;
+      case 2:
+        this.power = 0.25;
+        break;
+      case 3:
+        this.power = 0.40;
+        break;
+      case 4:
+        this.power = 0.70;
+        break;
+      case 5:
+        this.power = 1;
+        break;
+    }
+
+    this.powerLevel = value;
+  };
+
+
   ROVPilot.prototype.allStop = function allStop() {
     this.positions.throttle = 0;
     this.positions.yaw = 0;
@@ -95,12 +148,12 @@
     var updateRequired = false;
     //Only send if there is a change
     var controls = {};
-    controls.throttle = positions.throttle
-    controls.yaw = positions.yaw;
-    controls.lift = positions.lift;
-    controls.pitch = positions.pitch;
-    controls.roll = positions.roll;
-    controls.strafe = positions.strafe;
+    controls.throttle = this.adjustForPowerLimit(positions.throttle);
+    controls.yaw = this.adjustYawForPowerLimit(positions.yaw);
+    controls.lift = this.adjustForPowerLimit(positions.lift);
+    controls.pitch = this.adjustForPowerLimit(positions.pitch);
+    controls.roll = this.adjustForPowerLimit(positions.roll);
+    controls.strafe = this.adjustForPowerLimit(positions.strafe);
     for (var i in positions) {
       if (controls[i] != this.priorControls[i]) {
         updateRequired = true;
@@ -118,9 +171,9 @@
         }
       }
       this.priorControls = controls;
-//      Apparent code from Dom's merge. Still needs a home.
-//      var motorCommands = this.physics.mapMotors(controls.throttle, controls.yaw, controls.lift);
-//      this.cockpit.emit('plugin.rovpilot.controls', motorCommands);
+      //report back the actual commands after power restrictions
+      var motorCommands = this.physics.mapMotors(controls.throttle, controls.yaw, controls.lift);
+      this.cockpit.emit('plugin.rovpilot.controls', motorCommands);
     }
   };
 

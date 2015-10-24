@@ -265,6 +265,11 @@
           self.setPort(Number(data.port));
           self.setStarboard(Number(data.starbord));
         });
+        emitter.emit('plugin.rovpilot.getState',function(state){
+          if (state.powerLevel !== undefined){
+            self.setPowerLevel(state.powerLevel);
+          }
+        });
       },
       attached: function () {
         var self = this;

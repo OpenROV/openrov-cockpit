@@ -9,13 +9,10 @@
     this.rov = cockpit.rov;
     rov.cockpit = cockpit;
 
-    this.setPowerLevel(2);
-    //rov.powerLevel = 2;
-
     this.priorControls = {};
     this.sendToROVEnabled = true;
     this.sendUpdateEnabled = true;
-
+    this.powerLevel;
     this.positions = {
       throttle: 0,
       yaw: 0,
@@ -27,37 +24,6 @@
 
   };
 
-  ROVpilot.prototype.adjustForPowerLimit = function adjustForPowerLimit(value){
-    return value * this.power;
-  }
-
-  ROVpilot.prototype.adjustYawForPowerLimit = function adjustYawForPowerLimit(value){
-    return Math.min(Math.max(value * this.power * 1.5,-1),1);
-  }
-
-
-  ROVpilot.prototype.setPowerLevel = function setPowerLevel(value) {
-
-    switch (value) {
-      case 1:
-        this.power = 0.12;
-        break;
-      case 2:
-        this.power = 0.25;
-        break;
-      case 3:
-        this.power = 0.40;
-        break;
-      case 4:
-        this.power = 0.70;
-        break;
-      case 5:
-        this.power = 1;
-        break;
-    }
-
-    this.powerLevel = value;
-  };
 
   ROVpilot.prototype.defaultInputs = function defaultInputs() {
     self = this;
@@ -245,12 +211,6 @@
   ROVpilot.prototype.listen = function listen() {
     var self = this;
 
-    this.cockpit.on('plugin.rovpilot.setPowerLevel',function(value){
-      self.setPowerLevel(value);
-    });
-
-    //Send initial state
-    this.cockpit.emit('plugin.rovpilot.setPowerLevel', 2);
 
     //As a general rule, we want to set a desired state before going over the
     //the wire to deliver control signals.  All kinds of problems from late arriving
@@ -266,6 +226,27 @@
     //We can also send our state updates with a timestamp if we figure out a way
     //to deal with the clocks not being in sync between the computer and the ROV.
 
+    //initial sync of state information
+    this.rov.emit('plugin.rovpilot.getState', function(state){
+      this.powerLevel = state.powerLevel;
+      self.cockpit.emit('plugin.rovpilot.setPowerLevel',this.powerLevel);
+    });
+
+    this.cockpit.on('plugin.rovpilot.getState', function(callback){
+      var state = {
+        powerLevel : self.powerLevel
+      };
+      callback(state);
+    });
+
+    this.rov.on('plugin.rovpilot.controls', function(controls){
+      self.cockpit.emit('plugin.rovpilot.controls', controls);
+    });
+
+
+    this.rov.on('plugin.rovpilot.setPowerLevel', function(level){
+      self.cockpit.emit('plugin.rovpilot.setPowerLevel',level);
+    });
 
     this.cockpit.on('plugin.rovpilot.setThrottle',function(value){
       this.positions.throttle = value;
@@ -313,12 +294,12 @@
     var updateRequired = (this.ack == null) ? false : true ;
     //Only send if there is a change
     var controls = {};
-    controls.throttle = this.adjustForPowerLimit(positions.throttle);
-    controls.yaw = this.adjustYawForPowerLimit(positions.yaw);
-    controls.lift = this.adjustForPowerLimit(positions.lift);
-    controls.pitch = this.adjustForPowerLimit(positions.pitch);
-    controls.roll = this.adjustForPowerLimit(positions.roll);
-    controls.strafe = this.adjustForPowerLimit(positions.strafe);
+    controls.throttle = positions.throttle
+    controls.yaw = positions.yaw;
+    controls.lift = positions.lift;
+    controls.pitch = positions.pitch;
+    controls.roll = positions.roll;
+    controls.strafe = positions.strafe;
     for (var i in positions) {
       if (controls[i] != this.priorControls[i]) {
         updateRequired = true;

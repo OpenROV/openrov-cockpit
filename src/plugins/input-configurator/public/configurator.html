@@ -78,53 +78,6 @@
         
          $(self.$.keyboard).keydown(function(event) {
            var value = keyboardMap[event.which].toLowerCase();
-          // var value = String.fromCharCode(event.which).toLowerCase();
-          //  switch (event.which) {
-          //    case(13) : {
-          //      value = 'enter';
-          //      break;
-          //    }
-          //    case(38): {
-          //      value = 'up';
-          //      break;
-          //    }
-          //    case(40): {
-          //      value = 'down';
-          //      break;
-          //    }
-          //    case(39): {
-          //      value = 'right';
-          //      break;
-          //    }
-          //    case(37): {
-          //      value = 'left';
-          //      break;
-          //    }
-          //    case(38): {
-          //      value = 'up';
-          //      break;
-          //    }
-          //    case(32): {
-          //      value = 'space';
-          //      break;
-          //    }
-          //    case(17): {
-          //      value = 'ctrl';
-          //      break;
-          //    }
-          //    case(18): {
-          //      value = 'alt';
-          //      break;
-          //    }
-          //    case(16): {
-          //      value = 'shift';
-          //      break;
-          //    }
-          //    case(27): { //ESC
-          //      //value = 'up';
-          //      return;
-          //    }
-          //    default: {
                 if (value !== 'alt' && event.altKey) {
                   value = "alt+" + value;
                 }
@@ -134,11 +87,20 @@
                 if (value !== 'shift' && event.shiftKey) {
                   value = "shift+" + value;
                 }
-            //  }
-           //}
            $(self.$.keyboard).val(value);
            event.preventDefault();
-         });           
+         });
+
+         window.cockpit.on('systemPlugin.inputController.gamepad.buttonDown', function(button) {
+           if (self.selectedItem) {
+            $(self.$.gamepad).val(button);   
+           }
+         });         
+         window.cockpit.on('systemPlugin.inputController.gamepad.axisChanged', function(axis) {
+           if (self.selectedItem) {
+            $(self.$.gamepad).val(axis);   
+           }
+         });         
       },
       domReady: function() {
         var self = this;

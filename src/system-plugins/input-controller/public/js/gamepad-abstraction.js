@@ -27,8 +27,10 @@ inputController.GamepadAbstraction = function (cockpit) {
     else {
       control = gp.currentButton + '+' + e.control;
     }
-    if (gp.assignment[control] !== undefined)
+    if (gp.assignment[control] !== undefined) {
       gp.assignment[control].BUTTON_DOWN();
+    }
+    cockpit.emit('systemPlugin.inputController.gamepad.buttonDown', control);    
   });
   gamepad.bind(Gamepad.Event.BUTTON_UP, function (e) {
     if (gp.currentButton === e.control) { gp.currentButton = undefined; }
@@ -37,13 +39,16 @@ inputController.GamepadAbstraction = function (cockpit) {
         gp.assignment[e.control].BUTTON_UP();
       }
     }
+    cockpit.emit('systemPlugin.inputController.gamepad.buttonUp', e.control);
   });
   gamepad.bind(Gamepad.Event.AXIS_CHANGED, function (e) {
     if (new Date().getTime() < ignoreInputUntil)
       return;
     //avoids inacurrate readings when the gamepad has just been connected from affecting the ROV
-    if (gp.assignment[e.axis] !== undefined)
+    if (gp.assignment[e.axis] !== undefined) {
       gp.assignment[e.axis].AXIS_CHANGED(e.value);
+    }
+    cockpit.emit('systemPlugin.inputController.gamepad.axisChanged', e.axis);
   });
   var updateStatus = function () {
     window.requestAnimationFrame(updateStatus);

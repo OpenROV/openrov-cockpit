@@ -73,11 +73,14 @@
   <link rel="import" href="components/new-ui/throttle.html">
   <link rel="import" href="components/new-ui/switches.html">
   <link rel="import" href="components/new-ui/power.html">
-  <link rel="import" href="components/settings/settings.html">
   <link rel="import" href="components/diagnostics/diagnostics.html">
   <link rel="import" href="components/video/video.html">
   <link rel="import" href="components/navigation-data/orov-horizon.html">
   <link rel="import" href="components/ping.html">
+
+  <link rel="import" href="components/settings-manager/orov-settings-manager.html">
+  <link rel="import" href="components/thrusters2x1/orov-thrusters2x1-motortest.html">
+
   <% for(var i=0; i<scripts.length; i++) {%>
   <script type="text/javascript" src="<%= scripts[i] %>"></script><% } %>
 
@@ -97,8 +100,8 @@
               <a class="brand" href="#"><img src="../../themes/OpenROV/img/openrov.png" class="logo"><span class="navbar-titel">Cockpit</span></a>
               <div id="menu">
                 <rov-menu id="menuitems" class="nav pull-right">
-                  <li><a href="#" id="show-settings" onclick="document.querySelector('html /deep/ rov-settings').open();">Settings</a></li>
-                  <li><a href="#" id="show-diagnostic" onclick="document.querySelector('html /deep/ rov-diagnostics').open();">Diagnostic</a></li>
+                  <li><a href="#" id="show-settings" onclick="document.querySelector('#plugin-settings').open();">Settings</a></li>
+                  <li><a href="#" id="show-diagnostic" onclick="document.querySelector('#diagnostic').open();">Diagnostic</a></li>
                 </rov-menu>
               </div>
             </div>
@@ -158,12 +161,13 @@
             </div>
           </div>
         </div>
-        <rov-settings id="plugin-settings">
-        </rov-settings>
 
         <rov-diagnostics id="diagnostic">
           <div class="settings-block">
             <h4>Pre-Flight Check</h4>
+          </div>
+          <div class="settings-block">
+            <orov-thrusters2x1-motortest event-emitter={{cockpit-event-emitter}}></orov-thrusters2x1-motortest>
           </div>
           <div class="settings-block">
             <h4>Callibration</h4>
@@ -171,6 +175,12 @@
             <a href="#" class="btn" id="zero_depth">Zero Depth</a>
           </div>
         </rov-diagnostics>
+
+        <drop-in-dialog id="plugin-settings" header="Settings">
+          <div>
+          <orov-settings-manager event-emitter={{cockpit-event-emitter}}></orov-settings-manager>
+        </div>
+        </drop-in-dialog>
       </div>
 
     </div> <!--Placeholder for the UI plugin-->

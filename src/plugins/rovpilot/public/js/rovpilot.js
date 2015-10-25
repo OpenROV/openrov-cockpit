@@ -25,8 +25,9 @@
   };
 
 
-  ROVpilot.prototype.defaultInputs = function defaultInputs() {
-    self = this;
+  ROVpilot.prototype.inputDefaults = function inputDefaults() {
+    var self = this;
+    var rov = this;
     return [
       // Increment power level
       {
@@ -249,36 +250,36 @@
     });
 
     this.cockpit.on('plugin.rovpilot.setThrottle',function(value){
-      this.positions.throttle = value;
+      self.positions.throttle = value;
     });
 
     this.cockpit.on('plugin.rovpilot.setYaw',function(value){
-      this.positions.yaw = value;
+      self.positions.yaw = value;
     });
 
     this.cockpit.on('plugin.rovpilot.setLift',function(value){
-      this.positions.lift = value;
+      self.positions.lift = value;
     });
 
     this.cockpit.on('plugin.rovpilot.setPitch',function(value){
-      this.positions.pitch = value;
+      self.positions.pitch = value;
     });
 
     this.cockpit.on('plugin.rovpilot.setRoll',function(value){
-      this.positions.roll = value;
+      self.positions.roll = value;
     });
 
     this.cockpit.on('plugin.rovpilot.setStrafe',function(value){
-      this.positions.strafe = value;
+      self.positions.strafe = value;
     });
 
     this.cockpit.on('plugin.rovpilot.allStop', function allStop() {
-      this.positions.throttle = 0;
-      this.positions.yaw = 0;
-      this.positions.lift = 0;
-      this.positions.pitch = 0;
-      this.positions.roll = 0;
-      this.postitions.strafe = 0;
+      self.positions.throttle = 0;
+      self.positions.yaw = 0;
+      self.positions.lift = 0;
+      self.positions.pitch = 0;
+      self.positions.roll = 0;
+      self.postitions.strafe = 0;
     });
 
     this.rovsendPilotingDataTimer = setInterval(function(){

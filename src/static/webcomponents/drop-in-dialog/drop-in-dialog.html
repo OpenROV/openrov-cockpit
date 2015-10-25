@@ -1,3 +1,8 @@
+//TODO:
+//  Either replace the MouseTrap or make it a bower dependency
+//  Create a way to make contained elements in to accordian items automatically
+//  Make the Acordian behavior optional?
+
 <link rel="import" href="../polymer/polymer.html">
 
 <dom-module id="drop-in-dialog">
@@ -7,11 +12,52 @@
         height: 90%;
         overflow: auto;
       }
+      .drop-in-right {
+        position: fixed;
+        top: 0px;
+        bottom: 0px;
+        right: 0px;
+        width: 500px;
+        border: solid 1px #606060;
+        border-left: solid 4px #606060;
+        z-index: 1039;
+        background-color: white;
+        padding: 5px;
+        padding-left: 15px;
+
+      }
+      .drop-in-right h3 {
+        float: left;
+        clear: right;
+        margin-top: -4px;
+      }
+
+      .settings-block {
+        clear: left;
+        margin-bottom: 30px;
+      }
+
+
+      .back-button {
+        position: relative;
+        width: 48px;
+        height: 48px;
+        top: -15px;
+        left: -15px;
+        cursor: pointer;
+        background-image: url(data:image/png;base64,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);
+        float: left;
+        z-index: 100;
+      }
+
+      .back-button:hover {
+        background-image: url(data:image/png;base64,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);
+      }
     </style>
   <template>
 
-      <div class="drop-in-right" id="{{childId}}">
-      <div class="back-button"></div>
+      <div class="drop-in-right" id="{{childId}}" hidden$="{{hidden}}">
+      <div on-click='handleBackButton' class="back-button"></div>
       <h2>{{ header }}</h2>
       <div class="accordion contentContainer" id="{{_computeId(childId)}}">
         <content id="childItems" select="div"></content>
@@ -47,10 +93,11 @@
             value: function () {
               return undefined;
             }
-          }
+          },
+          hidden: {type: Boolean, value: true}
         },
         open: function () {
-          this.settings.css('display', 'block');
+          this.hidden=false;
           var self = this;
           Mousetrap.bind('esc', function () {
             self.hide();
@@ -61,7 +108,7 @@
           this.closeHandlers.push(handler);
         },
         hide: function () {
-          this.settings.css('display', 'none');
+          this.hidden=true;
           Mousetrap.unbind('esc');
           this.closeHandlers.forEach(function (handler) {
             handler();
@@ -72,7 +119,7 @@
             return;
           }
           var distNodes = Polymer.dom(this.$.childItems).getDistributedNodes();
-          distNodes.array().forEach(function (node) {
+          distNodes.forEach(function (node) {
             var res = $(node).find('a.accordion-toggle');
             if (res && res.length > 0) {
               var href = res.attr('href');
@@ -93,6 +140,9 @@
         },
         _computeId: function (childId) {
           return childId + '_';
+        },
+        handleBackButton: function (e){
+          this.hide();
         }
       });
     }());

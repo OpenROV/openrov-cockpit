@@ -2,13 +2,24 @@
 <link rel="import" href="../drop-in-dialog/drop-in-dialog.html">
 
 
-<!--
-    TODO(polyup): Inheriting from other custom elements is not yet supported.
-    See: https://www.polymer-project.org/1.0/docs/migration.html#inheritance
- -->
 <dom-module id="rov-settings">
+
+  <style>
+      #calibrations > a{
+        float: left;
+      }
+    </style>
   <template>
-    <shadow></shadow>
+
+    <drop-in-dialog id="dropIn" childid="{{ childId }}" header="{{ header }}">
+      <div class="settings-block">
+        <h4>Calibration</h4>
+        <div id="calibrations">
+        </div>
+      </div>
+      <content></content>
+    </drop-in-dialog>
+
   </template>
   <script>
     (function () {
@@ -17,7 +28,7 @@
         properties: {
           childId: {
             type: String,
-            value: 'settings-container'
+            value: 'diagnostics-settings'
           },
           header: {
             type: String,
@@ -26,13 +37,12 @@
         },
         open: function () {
           window.cockpit.sendUpdateEnabled = false;
-          this.super();
-          $('html /deep/ #capestatus-settings').collapse('show');
+          this.$.dropIn.open();
         },
         hide: function () {
           window.cockpit.sendUpdateEnabled = true;
-          this.super();
-        },
+          this.$.dropIn.hide();
+        }
       });
     }());
   </script>

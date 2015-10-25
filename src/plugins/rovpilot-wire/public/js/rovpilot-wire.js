@@ -27,7 +27,7 @@
         description: 'Toggles the heading hold on/off',
         defaults: { keyboard: 'm' },
         down: function () {
-          rov.cockpit.rov.emit('plugin.rovpilot.headingHold.toggle');
+          self.cockpit.rov.emit('plugin.rovpilot.headingHold.toggle');
         }
       },
 
@@ -37,7 +37,7 @@
         description: 'Toggles the depth hold on/off',
         defaults: { keyboard: 'n' },
         down: function () {
-          rov.cockpit.rov.emit('plugin.rovpilot.depthHold.toggle');
+          self.cockpit.rov.emit('plugin.rovpilot.depthHold.toggle');
         }
       }
     ]
@@ -69,49 +69,34 @@
   ROVpilotWire.prototype.listen = function listen() {
     var self = this;
 
-    this.cockpit.on('plugin.rovpilot.allStop',function allStop() {
-      this.positions.throttle = 0;
-      this.positions.yaw = 0;
-      this.positions.lift = 0;
-      this.positions.pitch = 0;
-      this.positions.roll = 0;
-      this.postitions.strafe = 0;
+    this.rov.on('plugin.rovpilot.depthHold.enabled', function(){
+      self.cockpit.emit('plugin.rovpilot.depthHold.enabled');
+    });
+
+    this.rov.on('plugin.rovpilot.depthHold.disabled', function(){
+      self.cockpit.emit('plugin.rovpilot.depthHold.disabled');
+    });
+
+    this.rov.on('plugin.rovpilot.depthHold.target', function(target){
+      self.cockpit.emit('plugin.rovpilot.depthHold.target',target);
+    });
+
+    this.rov.on('plugin.rovpilot.headingHold.enabled', function(){
+      self.cockpit.emit('plugin.rovpilot.headingHold.enabled');
+    });
+
+    this.rov.on('plugin.rovpilot.headingHold.disabled', function(){
+      self.cockpit.emit('plugin.rovpilot.headingHold.disabled');
+    });
+
+    this.rov.on('plugin.rovpilot.headingHold.target', function(target){
+      self.cockpit.emit('plugin.rovpilot.headingHold.target',target);
     });
 
 //    this.rovsendPilotingDataTimer = setInterval(function(){
 //      self.rovsendPilotingData();
 //    },100); //Todo: Make configurable
 
-  };
-
-  ROVpilotWire.prototype.sendPilotingData = function sendPilotingData() {
-    var positions = this.positions;
-    var self = this;
-    //force an update if the ack has not been cleared
-    var updateRequired = (this.ack == null) ? false : true ;
-    //Only send if there is a change
-    var controls = {};
-    controls.throttle = this.adjustForPowerLimit(positions.throttle);
-    controls.yaw = this.adjustYawForPowerLimit(positions.yaw);
-    controls.lift = this.adjustForPowerLimit(positions.lift);
-    controls.pitch = this.adjustForPowerLimit(positions.pitch);
-    controls.roll = this.adjustForPowerLimit(positions.roll);
-    controls.strafe = this.adjustForPowerLimit(positions.strafe);
-    for (var i in positions) {
-      if (controls[i] != this.priorControls[i]) {
-        updateRequired = true;
-        break;
-      }
-    }
-    if (this.sendUpdateEnabled && updateRequired || this.sendToROVEnabled === false) {
-      if (this.sendToROVEnabled) {
-        this.ack = performance.now();
-        this.rov.emit('plugin.rovpilot.desiredControlRates',controls,function(ack){
-          if (ack===self.ack) {self.ack = null;}
-        });
-      }
-      this.priorControls = controls;
-    }
   };
 
 

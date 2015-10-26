@@ -14,7 +14,7 @@
         is: 'bb-ping',
         attached: function () {
           var self = this;
-          $.getScript('bower_components/fpsmeter/dist/fpsmeter.js', function () {
+          $.getScript('components/fpsmeter/dist/fpsmeter.js', function () {
             self.beagletoBrowserMeter = new FPSMeter(self.$.fpsmeter, {
               interval: 1000,
               smoothing: 20,

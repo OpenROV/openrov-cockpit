@@ -1,0 +1,103 @@
+<link rel="import" href="../polymer/polymer.html">
+
+
+<dom-module id="capestatus-footer">
+  <template>
+
+    <div class="container-fluid">
+      <div class="span2 pull-right">
+        <h2>{{formattedRunTime}}</h2>
+        <h4>{{ theLocaltime }}</h4>
+      </div>
+      <div class="span2 pull-right">
+        <h2><span>{{ currentCpuUsage }}</span>%</h2>
+      </div>
+      <div class="span2 pull-right">
+        <h2><span>{{ currentVoltage }}</span>v</h2>
+        <div id="batteryIndicator" class$="{{ batteryLevel }}"></div>
+      </div>
+      <div class="span2 pull-right">
+        <h2><span>{{ currentCurrent }}</span>A</h2>
+      </div>
+    </div>
+
+
+  </template>
+  <script>
+    (function () {
+      Polymer({
+        is: 'capestatus-footer',
+        properties: {
+          batteryLevel: { computed: 'getBatteryLevel(currentVoltage, minVoltage, maxVoltage)' },
+          currentCpuUsage: {
+            type: String,
+            value: '10%'
+          },
+          currentCurrent: {
+            type: String,
+            value: '0.1'
+          },
+          currentVoltage: {
+            type: Number,
+            value: 0
+          },
+          formattedRunTime: {
+            type: String,
+            value: 'runtime'
+          },
+          maxVoltage: {
+            type: Number,
+            value: 0
+          },
+          minVoltage: {
+            type: Number,
+            value: 0
+          },
+          theLocaltime: {
+            type: String,
+            value: 'localtime'
+          }
+        },
+        getBatteryLevel: function (voltage, min, max) {
+          var minVoltage = parseFloat(min);
+          var maxVoltage = parseFloat(max);
+          var difference = maxVoltage - minVoltage;
+          var steps = difference / 5;
+          if (voltage < minVoltage + steps)
+            return 'level1';
+          if (voltage < minVoltage + steps * 2)
+            return 'level2';
+          if (voltage < minVoltage + steps * 3)
+            return 'level3';
+          if (voltage < minVoltage + steps * 4)
+            return 'level4';
+          return 'level5';
+        },
+        ready: function () {
+          var self = this;
+          var setBatteryConfig = function (config) {
+            self.minVoltage = config.minVoltage;
+            self.maxVoltage = config.maxVoltage;
+          };
+          window.cockpit.rov.emit('plugin.capestatus.request.battery.config', setBatteryConfig);
+          window.cockpit.rov.on('plugin.capestatus.battery.config', setBatteryConfig);
+          window.cockpit.rov.on('plugin.capestatus.time.runtime', function (runtime) {
+            self.formattedRunTime = runtime.formatted;
+          });
+          window.cockpit.rov.on('plugin.capestatus.time.time', function (time) {
+            self.theLocaltime = time.formatted;
+          });
+          window.cockpit.rov.on('plugin.capestatus.cpu', function (cpu) {
+            self.currentCpuUsage = cpu;
+          });
+          window.cockpit.rov.on('plugin.capestatus.battery.voltage', function (voltage) {
+            self.currentVoltage = voltage;
+          });
+          window.cockpit.rov.on('plugin.capestatus.battery.current.out', function (current) {
+            self.currentCurrent = current;
+          });
+        }
+      });
+    }());
+  </script>
+</dom-module>

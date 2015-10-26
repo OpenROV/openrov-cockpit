@@ -12,7 +12,7 @@
     "install": "node install_lib/bower_install_all.js"
   },
   "dependencies": {
-    "bower": "",
+    "bower": "^1.6.5",
     "crc": "",
     "ejs": "~0.8.3",
     "eventemitter2": "^0.4.14",
@@ -29,11 +29,11 @@
     "optimist": "",
     "os-utils": "",
     "q": "^1.4.1",
-    "request": "",
-    "serialport": ">= 1.0.8",
+    "request": "^2.65.0",
+    "serialport": "^2.0.2",
     "socket.io": "~1.1.0",
     "sync": "",
-    "systemd": "git://github.com/plietar/node-systemd"
+    "systemd": "git://github.com/plietar/node-systemd.git"
   },
   "bundleDependencies": [
     "express",

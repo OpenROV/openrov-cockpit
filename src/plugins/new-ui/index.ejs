@@ -86,12 +86,12 @@
         <div id="newuiBody" class="full-height">
           <div id="newuiContainer">
             <div class="navbar navbar-inverse navbar-fixed-top navbar-collapse">
-              <div id="newuiTopbar" class="container"><div class="navbar-header"><a class="navbar-brand" href="#"><img src="../../themes/OpenROV/img/openrov.png" class="logo"><span class="navbar-titel">Cockpit</span></a></div>
+              <div id="newuiTopbar" class="container"><div class="navbar-header"><a class="navbar-brand" href="#"><img src="../../themes/OpenROV/img/openrov.png" class="logo"><span class="navbar-titel">{{__('Cockpit')}}</span></a></div>
 
                 <div id="menu">
                   <rov-menu id="menuitems" class="nav pull-right navbar-nav">
-                    <li><a href="#" id="show-settings" onclick="document.querySelector('#plugin-settings').open();">Settings</a></li>
-                    <li><a href="#" id="show-diagnostic" onclick="document.querySelector('#diagnostic').open();">Diagnostic</a></li>
+                    <li><a href="#" id="show-settings" onclick="document.querySelector('#plugin-settings').open();">{{__('Settings')}}</a></li>
+                    <li><a href="#" id="show-diagnostic" onclick="document.querySelector('#diagnostic').open();">{{__('Diagnostic')}}</a></li>
                   </rov-menu>
                 </div>
               </div>
@@ -106,7 +106,7 @@
             <div id="newuiControlpad">
               <div class="newui-item" id="heading-item">
                 <div class="center">
-                  <h4>Heading</h4>
+                  <h4>{{__('Heading')}}</h4>
                   <div id="newui-compass" class="center control">
                     <orov-newui-compass class="center" heading="0" event-emitter="{{cockpit-event-emitter}}"></orov-newui-compass>
                   </div>
@@ -114,20 +114,20 @@
               </div>
               <div class="newui-item" id="depth-item">
                 <div class="center">
-                  <h4>Depth</h4>
+                  <h4>{{__('Depth')}}</h4>
                   <!--<div id="newui-depth" class="center control"></div>-->
                   <orov-newui-depth id="newui-depth" class="center control" event-emitter="{{cockpit-event-emitter}}"></orov-newui-depth>
                 </div>
               </div>
               <div class="newui-item" id="throttle-item">
                 <div class="center">
-                  <h4>Throttle</h4>
+                  <h4>{{__('Throttle')}}</h4>
                   <orov-newui-throttle id="newui-throttle" class="center control" event-emitter="{{cockpit-event-emitter}}"></orov-newui-throttle>
                 </div>
               </div>
               <div class="newui-item" id="power-item">
                 <div class="center">
-                  <h4>Battery</h4>
+                  <h4>{{__('Battery')}}</h4>
                   <div id="newui-power" class="center control">
                     <orov-newui-power id="power" event-emitter="{{cockpit-event-emitter}}"></orov-newui-power>
                   </div>
@@ -135,7 +135,7 @@
               </div>
               <div class="newui-item" id="switches-item">
                 <div class="center">
-                  <h4>Switches</h4>
+                  <h4>{{__('Switches')}}</h4>
                   <div id="newui-switches" class="center control">
                     <orov-newui-switches id="newui-switches" class="center" event-emitter="{{cockpit-event-emitter}}"></orov-newui-switches>
                   </div>
@@ -143,7 +143,7 @@
               </div>
               <div class="newui-item" id="time-item">
                 <div class="center">
-                  <h4>Time</h4>
+                  <h4>{{__('Time')}}</h4>
                   <div id="newui-time" class="center control">
                     <newui-time></newui-time>
                   </div>
@@ -154,15 +154,15 @@
 
           <rov-diagnostics id="diagnostic">
             <div class="settings-block">
-              <h4>Pre-Flight Check</h4>
+              <h4>{{__('Pre-Flight Check')}}</h4>
             </div>
             <div>
               <orov-thrusters2x1-motortest event-emitter="{{cockpit-event-emitter}}"></orov-thrusters2x1-motortest>
             </div>
             <div class="settings-block">
-              <h4>Callibration</h4>
-              <a href="#" class="btn btn-default" id="callibrate_compass">Callibrate Compass</a>
-              <a href="#" class="btn btn-default" id="zero_depth">Zero Depth</a>
+              <h4>{{__('Callibration')}}</h4>
+              <a href="#" class="btn btn-default" id="callibrate_compass">{{__('Callibrate Compass')}}</a>
+              <a href="#" class="btn btn-default" id="zero_depth">{{__('Zero Depth')}}</a>
             </div>
           </rov-diagnostics>
 

@@ -104,12 +104,12 @@
         <div id="depthTarget" title="Depthhold target depth" class="center text-center hidden">{{target}}</div>
       </div>
       <div id="depth-footer">
-        <div id="water-type" class="unit" title="Water type">{{waterType}}</div>
-        <div id="depth-unit" class="unit">m</div>
+        <div id="water-type" class="unit" title="Water type">{{__(waterType)}}</div>
+        <div id="depth-unit" class="unit">{{__('m')}}</div>
       </div>
       <div class="depth-line-container">
         <span class="depth-line"><hr></span>
-        <span class="depth-line-text">VSI</span>
+        <span class="depth-line-text">{{__('VSI')}}</span>
         <span class="depth-line"><hr></span>
       </div>
       <div id="depth-change-container">
@@ -125,7 +125,7 @@
           </svg>
         </div>
       </div>
-      <div id="depth-change-unit" class="center text-center unit">m/s</div>
+      <div id="depth-change-unit" class="center text-center unit">{{__('m/s')}}</div>
     </div>
   </template>
   <script>

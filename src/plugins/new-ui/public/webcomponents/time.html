@@ -47,7 +47,7 @@
       <div class="time-row">
         <div class="time-cell">
           <span class="line-cell"><hr></span>
-          <span class="time-cell description-cell text-center">RUN</span>
+          <span class="time-cell description-cell text-center">{{__('RUN')}}</span>
           <span class="line-cell"><hr></span>
         </div>
       </div>
@@ -72,6 +72,7 @@
           notify: true
         }
       },
+      behaviors: [namespace('behaviors').oROVStandard],      
       attached: function () {
         var self = this;
         window.cockpit.rov.on('plugin.capestatus.time.time', function (time) {

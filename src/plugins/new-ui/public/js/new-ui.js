@@ -31,5 +31,4 @@
     ];
   };
   window.Cockpit.plugins.push(plugins.NewUI);
-
 }(window, jQuery));

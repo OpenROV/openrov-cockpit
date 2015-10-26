@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <!-- The following viewport code is intended to fullscreen the cockpit and prevent scrolling -->
+    <meta id="Viewport" name="viewport" width="initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <script type='text/javascript' src="components/jquery/dist/jquery.min.js"></script>
+    <script type='text/javascript' src="components/jquery-ui/jquery-ui.min.js"></script>
+
+    <title>TEST</title>
+    <% for(var i=0; i<styles.length; i++) {%>
+    <link rel="stylesheet" href="<%= styles[i] %>"><% } %>
+
+    <!-- hard coding while developing -->
+    <link rel="stylesheet" href="plugin/theme_r2/css/theme_r2.css">
+    <script type="text/javascript" src="components/webcomponentsjs/webcomponents-lite.js"></script>
+    <script>
+      window.Polymer = window.Polymer || {};
+      window.Polymer.dom = 'shadow';
+    </script>
+    <link rel="import" href="components/polymer/polymer.html">
+
+  <% for(var i=0; i<sysscripts.length; i++) {%>
+  <script type="text/javascript" src="<%= sysscripts[i] %>"></script><% } %>
+
+  <!--
+-->
+  <script type="text/javascript" src="js/no-scroll-fullscreen-viewport.js"></script>
+  </head>
+  <body class='theme_r2'>
+  <p>Some text to translate</p>
+  <script type="text/javascript" src="js/utilities.js"></script>
+  <link rel="import" href="components/orov-behavior.html"> <!--for orov webcontrols -->
+  <script type="text/javascript" src="js/libs/gamepad.js"></script> <!--for gamepad-abstraction -->
+  <script type="text/javascript" src="components/mousetrap/mousetrap.js"></script> <!--for gamepad-abstraction -->
+  <script type="text/javascript" src="components/dexie/dist/latest/Dexie.min.js"></script>
+  <script type="text/javascript" src="components/comma-separated-values/csv.min.js"></script>
+
+
+<!-- The template serves as the model for databinding, javascript is
+     interecpting all of the socket.io inbound messages and placing
+     them in the template model for one-way data binding.
+-->
+  <template id="t" is="dom-bind">
+  <!--link rel="import" href="bower_components/mjpeg-video-webcomponents/mjpeg-video.html">
+  <link rel="import" href="components/telemetry/telemetry-graph.html">
+  <link rel="import" href="components/telemetry/telemetry-item.html">
+  <link rel="import" href="components/host-diagnostics/javascript-loopspeed.html">
+-->
+
+
+<!-- define the overall page layout with named sections. -->
+      <div id="header">
+        <div class="navbar-inner">
+          <a class="brand" href="#">
+            <img src="../../themes/OpenROV/img/openrov.png" class="logo"/>
+            <span class="navbar-title">Cockpit</span>
+          </a>
+        </div>
+      </div>
+
+
+      <!-- Main ROW -->
+      <div id="main-row">
+        <div id="system-panel">
+        </div>
+        <div id="nav-display"></div>
+        <div id="primary-flight-display"></div>
+        <div id="standy-flight-display"></div>
+        <div id="warning-display"></div>
+        <div id="systems-display">
+        </div>
+
+        <div id="flight-control-state"></div>
+        <div id="multipurpose-display">
+        </div>
+
+        <div id="flight-control-unit"></div>
+        <div id="data-control-unit">
+        </div>
+        <div id="camera-display">
+          <!--mjpeg-video id="camera1" src='<%= config.video_url %>'  border='1' style='width: 100%; height:100%' menuState='on'></mjpeg-video>
+          <rov-horizon id="horizon"></rov-horizon-->
+        </div>
+      </div>
+      <script>
+
+      </script>
+ </template>
+
+ <script type="text/javascript" src="js/libs/eventemitter2.js"></script>
+ <script type='text/javascript' src="socket.io/socket.io.js"></script>
+
+  <script type='text/javascript' src='js/message-manager.js'></script>
+ <script type="text/javascript" src="js/cockpit.js"></script>
+ <script type="text/javascript" src="js/app.js"></script>
+
+
+
+<!-- I am loading these manually.. but they should be populated through the
+     plugin manager -->
+ <script type="text/javascript" src="plugin/theme_r2/js/theme_r2_index.js"></script>
+<!--
+ <script type="text/javascript" src="plugin/lasers/js/laser-widgets-autodiscovery.js"></script>
+ <script type="text/javascript" src="plugin/lasers/js/laser.js"></script>
+
+ <script type="text/javascript" src="plugin/settings-manager/js/settings-manager.js"></script>
+ <script type="text/javascript" src="plugin/settings-manager/js/settings-manager-widgets-autodiscovery.js"></script>
+
+ <script type="text/javascript" src="plugin/thrusters2x1/js/thrusters2x1.js"></script>
+ <script type="text/javascript" src="plugin/thrusters2x1/js/thrusters2x1-widgets-autodiscovery.js"></script>
+
+ <script type="text/javascript" src="plugin/camera-tilt/js/camera-tilt-widgets-autodiscovery.js"></script>
+ <script type="text/javascript" src="plugin/camera-tilt/js/camera-tilt.js"></script>
+
+ <script type="text/javascript" src="plugin/telemetry/js/telemetry.js"></script>
+  <script type="text/javascript" src="plugin/connection-health/js/connection-health.js"></script>
+  <script type="text/javascript" src="plugin/connection-health/js/connection-health-widgets-autodiscovery.js"></script>
+
+  <script type="text/javascript" src="plugin/externallights/js/externallights.js"></script>
+  <script type="text/javascript" src="plugin/externallights/js/externallights-widgets-autodiscovery.js"></script>
+
+  <script type="text/javascript" src="plugin/rovpilot/js/rovpilot.js"></script>
+  <script type="text/javascript" src="plugin/rovpilot/js/rovpilot-widgets-autodiscovery.js"></script>
+-->
+ <!--Auto Added -->
+ <% for(var i=0; i<scripts.length; i++) {%>
+ <script type="text/javascript" src="<%= scripts[i] %>"></script><% } %>
+
+
+
+ <!--script type="text/javascript" src="js/widget-layout-manager.js"></script-->
+
+
+</body>
+</html>

@@ -7,7 +7,7 @@
 
   };
 
-  plugins.ExternalLights.prototype.getTelemetryDefintions = function getTelemetryDefintions() {
+  plugins.Laser.prototype.getTelemetryDefintions = function getTelemetryDefintions() {
     return([
       {name: 'claser', description: 'Scaling Laser power 0 to 255'}
     ]);
@@ -17,6 +17,8 @@
   //so that the reference to this instance is available for further processing
   plugins.Laser.prototype.listen = function listen() {
     var self = this;
+
+    /*
     self.cockpit.extensionPoints.inputController.register(
       [
         {
@@ -28,7 +30,18 @@
           }
         }
       ]);
+    */
+    /* Forward calls on the COCKPIT emitter to the ROV  */
+    self.cockpit.on('plugin.laser.toggle',function(){
+        alert("boom");
+        cockpit.rov.emit('plugin.laser.toggle');
+    });
 
+    self.cockpit.rov.on('plugin.laser.state', function(data){
+      cockpit.emit('plugin.laser.state',data);
+    });
+
+/*
     if (self.cockpit.extensionPoints.headsUpMenu) {
       self.cockpit.extensionPoints.headsUpMenu.register({
         label: 'Toggle lasers',
@@ -37,6 +50,7 @@
         }
       });
     }
+*/
   };
 
   window.Cockpit.plugins.push(plugins.Laser);

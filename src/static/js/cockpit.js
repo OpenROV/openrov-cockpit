@@ -12,13 +12,48 @@
   //Cockpit is inheriting from EventEmitter2.
   var Cockpit = function Cockpit(csocket) {
     var self = this;
-    this.uiLoader = new window.UiLoader();
+//    this.uiLoader = new window.UiLoader();
     this.rov = new window.MessageManager(csocket);
+/*    var onevent = csocket.onevent;
+    csocket.onevent = function (packet) {
+        var args = packet.data || [];
+        onevent.call (this, packet);    // original call
+        switch(args.length){
+          case 1: self.rov.emit(args.shift());      // additional call to catch-all
+          break;
+          case 2: self.rov.emit(args.shift(),args.shift());      // additional call to catch-all
+          break;
+          case 3: self.rov.emit(args.shift(),args.shift(),args.shift());
+          break;
+          case 4: self.rov.emit(args.shift(),args.shift(),args.shift(),args.shift());
+          break;
+          case 5: self.rov.emit(args.shift(),args.shift(),args.shift(),args.shift(),args.shift());
+          break;
+          case 6: self.rov.emit(args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift());
+          break;
+          case 7: self.rov.emit(args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift());
+          break;
+          case 8: self.rov.emit(args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift());
+          break;
+          case 9: self.rov.emit(args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift());
+          break;
+          case 10: self.rov.emit(args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift());
+          break;
+
+
+        }
+    };
+*/
     this.sendUpdateEnabled = true;
     this.capabilities = 0;
     this.loadedPlugins = [];
 
     this.loadUiTheme(function() {
+      self.loadPlugins();
+      console.log('loaded plugins');
+      // Register the various event handlers
+      self.listen();
+       /*
       self.extensionPoints = {
         rovSettings: $('html /deep/ rov-settings'),
         rovDiagnostics: $('html /deep/ rov-diagnostics /deep/ #dropIn'),
@@ -28,7 +63,7 @@
         menu: $('html /deep/ rov-menu'),
         inputController: undefined //will be set by the plugin
       };
-
+(
       self.extensionPoints.rovSettings.registerCloseHandler = function(handler) {
         if (self.extensionPoints.rovSettings[0]) {
           self.extensionPoints.rovSettings[0].registerCloseHandler(handler);
@@ -39,12 +74,9 @@
           self.extensionPoints.rovDiagnostics[0].registerCloseHandler(handler);
         }
       };
-
-      self.loadPlugins();
-      console.log('loaded plugins');
-      // Register the various event handlers
-      self.listen();
+    */
     });
+
   };
   Cockpit.prototype = new EventEmitter2();
   Cockpit.prototype.constructor = Cockpit;
@@ -60,6 +92,9 @@
   };
 
   Cockpit.prototype.loadUiTheme = function(done) {
+    done();
+    return;
+    /*short circuit */
     var defaultUiName = 'standard-ui'; //temp
     var self = this;
     $.get('plugin/ui-selector', function (config) {
@@ -82,6 +117,7 @@
         loadedPlugin = new plugin(cockpit);
       } catch (err) {
         console.log('error loading a plugin!!!' + err);
+        console.dir(err);
       }
       if (loadedPlugin != null && loadedPlugin !== undefined) {
         if (loadedPlugin.canBeDisabled != undefined) {
@@ -92,11 +128,25 @@
         cockpit.loadedPlugins.push(loadedPlugin);
       }
     });
-    cockpit.loadedPlugins.forEach(function(plugin){
-      if (plugin.listen !== undefined){
-        plugin.listen();
-      }
+    var plugins_done_loading = false;
+    $(document).ready(function(event) {
+      console.log("#### What Up ####");
+      if (plugins_done_loading) return; //find a way to unload instead?
+      plugins_done_loading = true;
+      cockpit.loadedPlugins.forEach(function(plugin){
+        if (plugin.listen !== undefined){
+          plugin.listen();
+        }
+      });
     });
+/*    setTimeout(function(){ //give a pause for constructor activities before calling listen
+      cockpit.loadedPlugins.forEach(function(plugin){
+        if (plugin.listen !== undefined){
+          plugin.listen();
+        }
+      });
+    },1000);
+*/
 
     Cockpit.plugins = [];  //flush them out for now. May move to a loaded array if we use in the future
     cockpit.rov.emit('cockpit.pluginsLoaded');

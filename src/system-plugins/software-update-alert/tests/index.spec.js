@@ -4,8 +4,9 @@ var request = require('supertest');
 var express = require('express');
 var Testee = require('../');
 
-
-describe('Example plugin constructor', function() {
+//TODO: Figure out how to label the integration tests so they only run when
+//in an integrated environment.  Not unit tests.
+describe('software-update-alert plugin constructor', function() {
   var app = express();
   app.use(express.json());
   var setPreferences = sinon.spy();

@@ -1,23 +1,20 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../polymer/polymer.html">
 
-<polymer-element name="bb-ping">
-  <template>
-    <link rel="stylesheet" href="../css/bootstrap.min.css">
-
-    <style type="text/css">
+<dom-module id="bb-ping">
+  <style type="text/css">
     </style>
+  <template>
 
-    <span class='pull-left' id='fpsmeter'></span>
+    <span class="pull-left" id="fpsmeter"></span>
 
   </template>
   <script>
-    (function() {
-
+    (function () {
       Polymer({
-        ready: function () {
+        is: 'bb-ping',
+        attached: function () {
           var self = this;
-          $.getScript('bower_components/fpsmeter/dist/fpsmeter.js', function () {
-
+          $.getScript('components/fpsmeter/dist/fpsmeter.js', function () {
             self.beagletoBrowserMeter = new FPSMeter(self.$.fpsmeter, {
               interval: 1000,
               smoothing: 20,
@@ -38,25 +35,18 @@
               graph: 1,
               history: 20
             });
-
             //This is now also used for the deadman switch.
             setInterval(function () {
               var _starttime = new Date();
               self.beagletoBrowserMeter.tickStart();
               window.cockpit.rov.emit('ping', _starttime);
             }, 500);
-
             window.cockpit.rov.on('pong', function (id) {
               self.beagletoBrowserMeter.tick();
             });
-
           });
         }
       });
-    })();
+    }());
   </script>
-
-</polymer-element>
-  
-
-
+</dom-module>

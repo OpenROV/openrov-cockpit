@@ -1,0 +1,44 @@
+{
+  "name": "epoch",
+  "description": "A general purpose, real-time visualization library.",
+  "version": "0.6.0",
+  "main": [
+    "/epoch.min.js",
+    "/epoch.min.css"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "/src",
+    "/sass",
+    "/tests",
+    "/Cakefile",
+    "/CHANGELOG.md",
+    "/package.json"
+  ],
+  "authors": [
+    "Ryan Sandor Richards <sandor.richards@gmail.com>"
+  ],
+  "keywords": [
+    "fastly",
+    "realtime",
+    "graph",
+    "chart",
+    "stats",
+    "visualization"
+  ],
+  "homepage": "https://fastly.github.io/epoch/",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/fastly/epoch.git"
+  },
+  "_release": "0.6.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "0.6.0",
+    "commit": "42ff7da12942d8747f4cbf63d196c35b28a88a79"
+  },
+  "_source": "git://github.com/fastly/epoch.git",
+  "_target": "0.6.0",
+  "_originalSource": "epoch"
+}

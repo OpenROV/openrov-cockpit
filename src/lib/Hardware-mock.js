@@ -14,12 +14,15 @@ function Hardware() {
   hardware.connect = function () {
     console.log('!Serial port opened');
   };
-  hardware.toggleRawSerialData = function toggleRawSerialData() {
-    emitRawSerial = !emitRawSerial;
+  hardware.startRawSerialData = function startRawSerialData() {
+    emitRawSerial = true;
+  };
+  hardware.stopRawSerialData = function stopRawSerialData() {
+    emitRawSerial = false;;
   };
 
   hardware.write = function (command) {
-    console.log('HARDWARE-MOCK:' + command);
+    //console.log('HARDWARE-MOCK:' + command);
     var commandParts = command.split(/\(|\)/);
     var commandText = commandParts[0];
     if (commandText === 'rcap') {
@@ -27,11 +30,11 @@ function Hardware() {
     }
     if (commandText === 'ligt') {
       hardware.emitStatus('LIGP:' + commandParts[1] / 255);
-      console.log('HARDWARE-MOCK return light status');
+  //    console.log('HARDWARE-MOCK return light status');
     }
     if (commandText === 'tilt') {
       hardware.emitStatus('servo:' + commandParts[1]);
-      console.log('HARDWARE-MOCK return servo status');
+  //    console.log('HARDWARE-MOCK return servo status');
     }
     if (commandText === 'claser') {
         if (hardware.laserEnabled) {
@@ -113,20 +116,42 @@ function Hardware() {
     hardware.emit('status', status);
   }
 
-  var currentDepth = 0;
+  var currentDepth = 1;
   var currentHeading = 0;
+  var currentServo = 1500;
+  var current = 2;
+
   var interval = setInterval(function() {
-    currentDepth += 0.5;
-    hardware.emit('status', reader.parseStatus('deap:' + currentDepth));
-    if (currentDepth > 50) {
-      currentDepth = 0;
-    }
+    var result = "";
+    var rnd = (Math.random() * 20 - 10)/100;
+    currentDepth += currentDepth*rnd;
+    currentDepth = Math.min(Math.max(currentDepth, 1), 100);
+    result+='deep:' + currentDepth + ';'
+
 
     currentHeading += 5;
-    hardware.emit('status', reader.parseStatus('hdgd:' + currentHeading));
+    result+='hdgd:' + currentHeading + ';'
     if (currentHeading >= 360) {
       currentHeading = 0;
     }
+
+    rnd = (Math.random() * 20 - 10)/100;
+    current += current*rnd;
+    current = Math.min(Math.max(current, 1), 10);
+    result+='bt1i:' + current + ';'
+
+    rnd = (Math.random() * 20 - 10)/100;
+    current += current*rnd;
+    current = Math.min(Math.max(current, 1), 10);
+    result+='bt2i:' + current + ';'
+
+    currentServo +=50;
+    result+='servo:' + currentServo + ';'
+    if (currentServo >= 2000) {
+      currentServo = 1000;
+    }
+
+    hardware.emit('status', reader.parseStatus(result));
 
   }, 2000);
 

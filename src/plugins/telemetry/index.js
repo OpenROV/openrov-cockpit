@@ -21,4 +21,6 @@ function telemetry(name, deps) {
 
 
 }
-module.exports = telemetry;
+module.exports = function (name, deps) {
+  return new telemetry(name,deps);
+};

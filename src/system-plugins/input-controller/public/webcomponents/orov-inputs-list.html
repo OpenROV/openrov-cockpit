@@ -1,0 +1,47 @@
+<link rel="import" href="../polymer/polymer.html">
+<dom-module name="orov-inputs-list">
+  <style>
+  </style>
+  <template>
+    <label>{{__(Input (keyboard/gamepad) configuration)}}</label>
+            <ul>
+            <template is="dom-repeat" items="{{commands}}">
+              <li>
+                <div>{{__(item.name)}}</div>
+                <div>{{__(item.description)}}</div>
+                <div>
+                  <b><span>{{__(item.name)}}</span>:</b>
+                  <span>{{__('Key')}}</span>: <span>{{item.bindings.keyboard}}</span>
+                  <span>{{__('Game')}}</span>: <span>{{__(item.bindings.gamepad)}}</span>
+                </div>
+              </li>
+            </template>
+            </ul>
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        is: "orov-inputs-list",
+        properties: {
+          commands: {type: Array, value:[]},
+        },
+        behaviors: [namespace('behaviors').oROVStandard],
+        attached: function () {
+          var self = this;
+          if (this.eventEmitter !== undefined){
+            this.eventEmitter.emit('InputController.getCommands',function(results){
+              self.commands = results;
+            });
+          }
+        },
+        registerEmitterHanlders: function(emitter){
+          var self = this;
+          emitter.on('InputController.registeredCommand',function(command){
+            self.push('commands',command);
+          });
+        },
+      })
+    })();
+  </script>
+
+</dom-module>

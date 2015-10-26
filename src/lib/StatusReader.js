@@ -10,26 +10,19 @@ var StatusReader = function () {
       currCpuUsage = v;
     });
   }, 1000);
-  reader.parseStatus = function (rawStatus) {
-    var parts = rawStatus.split(';');
-    var status = {};
-    for (var i = 0; i < parts.length; i++) {
-      var subParts = parts[i].split(':');
-      switch (subParts[0]) {
-      case '*settings':
-        console.log(subParts[1]);
-        var setparts = subParts[1].split(',');
-        var settingsCollection = {};
-        for (var s = 0; s < setparts.length; s++) {
-          var lastParts = setparts[s].split('|');
-          settingsCollection[lastParts[0]] = lastParts[1];
-        }
-        reader.emit('Arduino-settings-reported', settingsCollection);
-        break;
-      default:
-        status[subParts[0]] = subParts[1];
-      }
+
+  var processSettings = function processSettings(parts){
+    var setparts = parts.split(',');
+    var settingsCollection = {};
+    for (var s = 0; s < setparts.length; s++) {
+      var lastParts = setparts[s].split('|');
+      settingsCollection[lastParts[0]] = lastParts[1];
     }
+    reader.emit('Arduino-settings-reported', settingsCollection);
+    return settingsCollection;
+  }
+
+  var processItemsInStatus = function processItemsInStatus(status){
     if ('iout' in status) {
       status.iout = parseFloat(status.iout);
     }
@@ -40,6 +33,22 @@ var StatusReader = function () {
       status.vout = parseFloat(status.vout);
       status.cpuUsage = currCpuUsage;
     }
+  }
+
+  reader.parseStatus = function parseStatus(rawStatus) {
+    var parts = rawStatus.split(';');
+    var status = {};
+    for (var i = 0; i < parts.length; i++) {
+      var subParts = parts[i].split(':');
+      switch (subParts[0]) {
+      case '*settings':
+        status.settings = processSettings(subParts[1]);
+        break;
+      default:
+        status[subParts[0]] = subParts[1];
+      }
+    }
+    processItemsInStatus(status);
     return status;
   };
   return reader;

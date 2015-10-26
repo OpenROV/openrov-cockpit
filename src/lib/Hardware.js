@@ -33,6 +33,7 @@ function Hardware() {
       if (emitRawSerialData)
         hardware.emit('serial-recieved', data + '\n');
     });
+
   };
 
 
@@ -63,9 +64,14 @@ function Hardware() {
       logger.log('DID NOT SEND');
     }
   };
-  hardware.toggleRawSerialData = function toggleRawSerialData() {
-    emitRawSerialData = !emitRawSerialData;
+  hardware.startRawSerialData = function startRawSerialData() {
+    emitRawSerialData = true;
   };
+
+  hardware.stopRawSerialData = function stopRawSerialData() {
+    emitRawSerialData = false;
+  };
+
   hardware.close = function () {
     serialConnected = false;
     //This code is a work around for a race condition in the serial port code https://github.com/voodootikigod/node-serialport/issues/241#issuecomment-43058353

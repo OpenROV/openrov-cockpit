@@ -1,0 +1,80 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-slider/paper-slider.html">
+<dom-module name="orov-thrusters2x1-motortest">
+<style>
+   paper-slider {
+      width: 80%;
+   }
+</style>
+<template>
+
+<h4>Manually test motors</h4>
+<div id="motordiags" style="width: 80%">
+ <template is="dom-repeat" items="{{motors}}">
+   <div class="control-group">
+      <label class="control-label" for="{{item.name}}">{{__(item.name)}} {{__('Motor')}}</label>
+      <paper-slider pin="true" min="-1" max="1" step="0.001" id="{{item.name}}" on-immediate-value-change='MotorPercentChange'></paper-slider>
+      <span>[[formatPercent(item.percent)]]</span>
+      <div>
+        <button on-click='reverseFull'>-1</button>
+        <button on-click='neutral'>0</button>
+        <button on-click='forwardFull'>1</button>
+      </div>
+   </div>
+ </template>
+</div>
+</template>
+<script>
+(function() {
+  Polymer({
+    is:'orov-thrusters2x1-motortest',
+    properties: {
+      motors: {type: Array, value: [
+        {name:'port', percent: 0},
+        {name:'vertical', percent: 0},
+        {name:'starboard', percent: 0}
+      ]}
+    },
+    behaviors: [namespace('behaviors').oROVStandard],
+    registerEmitterHanlders: function(emitter){
+      var self = this;
+    },
+    resolveMotorPercent: function(change,item){
+      return this.motorPercent[item];
+    },
+    MotorPercentChange: function(e){
+      var motor = e.srcElement.id;
+
+      //this.motorPercent[motor] = e.srcElement.immediateValue;
+      this.set('motors.'+e.model.index+'.percent', e.srcElement.immediateValue);
+      var motor_state =  {
+                  port: this.motors[0].percent,
+                  vertical: this.motors[1].percent,
+                  starboard: this.motors[2].percent
+                }
+      if (this.eventEmitter !== undefined){
+        this.eventEmitter.emit('plugin.thrusters2x1.motorTest',motor_state);
+      }
+      this.fire('motor-state-change',motor_state);
+    },
+    reverseFull: function(e){
+      this.set('motors.'+e.model.index+'.percent', -1.0);
+      this.$$('#'+ e.model.item.name).value=-1.0;
+    },
+    neutral: function(e){
+      this.set('motors.'+e.model.index+'.percent', 0);
+      this.$$('#'+ e.model.item.name).value=0;
+    },
+    forwardFull: function(e){
+      this.set('motors.'+e.model.index+'.percent', 1.0);
+      this.$$('#'+ e.model.item.name).value=1.0;
+    },
+    formatPercent: function(value){
+      return value.toFixed(3);
+
+    }
+
+  })
+})();
+</script>
+</dom-module>

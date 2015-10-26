@@ -4,19 +4,6 @@
   plugins.NavigatoinData = function(cockpit) {
     var self = this;
     self.cockpit = cockpit;
-
-    var jsFileLocation = urlOfJsFile('navigation-data.js');
-    cockpit.extensionPoints.rovDiagnostics.find('#calibrations').append('<div id="navigation-diag"></div>');
-
-    var diag = cockpit.extensionPoints.rovDiagnostics.find('#navigation-diag');
-    diag.load(jsFileLocation + '../diagnostics.html', function () {
-      cockpit.extensionPoints.rovDiagnostics.find('#zero_depth').click(function () {
-        cockpit.rov.emit('plugin.navigationData.zeroDepth');
-      });
-      cockpit.extensionPoints.rovDiagnostics.find('#calibrate_compass').click(function () {
-        cockpit.rov.emit('plugin.navigationData.calibrateCompass');
-      });
-    });
   };
 
   plugins.NavigatoinData.prototype.getTelemetryDefintions = function getTelemetryDefintions() {
@@ -35,7 +22,9 @@
   //so that the reference to this instance is available for further processing
   plugins.NavigatoinData.prototype.listen = function listen() {
     var self = this;
-
+    this.cockpit.rov.on('plugin.navigationData.data',function(navdata){
+      self.cockpit.emit('plugin.navigationData.data',navdata);
+    });
   };
 
   window.Cockpit.plugins.push(plugins.NavigatoinData);

@@ -1,6 +1,6 @@
 var find = require('findit');
 var finder = find(process.cwd());
-var bower = require('bower');
+var ncu = require('npm-check-updates');
 
 var currentdirectory = process.cwd();
 var bowersToInstall = [];
@@ -8,7 +8,7 @@ var bowersToInstall = [];
 finder.on('file', function(file,stat){
   if(file.indexOf("bower.json")>-1){
     console.log("Execute bower install on " + file)
-    bowersToInstall.push(file.substring(0, file.lastIndexOf("/")) );
+    bowersToInstall.push(file);
   }
 });
 
@@ -29,27 +29,30 @@ finder.on('directory', function(dir,stat,stop){
 });
 
 finder.on('end', function(){
+  console.log('====== upgrading ======');
   installbower(0,bowersToInstall);
+  //console.dir(bowersToInstall);
 });
 
+var result = "";
 var installbower = function(index, array){
-  var dir = array[index];
-  console.log(dir);
-  bower.commands
-  .install(['bower.json'],{ save: false}, { cwd: dir, force:true})
-  .on('error', function(err){
-      console.error(err.message);
-      process.exit(1);
-  })
-  .on('log', function(info){
-      console.log(info.message);
-  })
-  .on('end', function(installed){
-      console.log('done processing plugin install');
+  var file = array[index];
+  console.log(file);
+  ncu.run({
+      packageFile: file,
+      packageManager: 'bower',
+      upgrade: true
+      // Any command-line option can be specified here.
+      // These are set by default:
+      // silent: true,
+      // jsonUpgraded: true
+  }).then(function(upgraded) {
+      console.log('dependencies to upgrade:', upgraded);
       index++;
       if (index<array.length-1){
         installbower(index,array);
       }
   });
+
 
 };

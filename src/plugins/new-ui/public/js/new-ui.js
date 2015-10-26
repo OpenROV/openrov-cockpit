@@ -25,7 +25,7 @@
       defaults: { keyboard: 'alt+s' },
       down: function () {
         var serialWindow = window.open('new-ui/serial-monitor', '__serial-monitor', 'menubar=no, status=no, titlebar=no, toolbar=no, width=300, height=400, location=no');
-        telemetryWindow.cockpit = window.cockpit;
+        serialWindow.cockpit = window.cockpit;
       }
     }
     ];

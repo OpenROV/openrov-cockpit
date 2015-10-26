@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-slider/paper-slider.html">
 <dom-module name="orov-thrusters2x1-motortest">
 <style>
    paper-slider {
@@ -13,7 +14,7 @@
    <div class="control-group">
       <label class="control-label" for="{{item.name}}">{{__(item.name)}} {{__('Motor')}}</label>
       <paper-slider pin="true" min="-1" max="1" step="0.001" id="{{item.name}}" on-immediate-value-change='MotorPercentChange'></paper-slider>
-      <span>[[item.percent]]</span>
+      <span>[[formatPercent(item.percent)]]</span>
       <div>
         <button on-click='reverseFull'>-1</button>
         <button on-click='neutral'>0</button>
@@ -37,7 +38,7 @@
     behaviors: [namespace('behaviors').oROVStandard],
     registerEmitterHanlders: function(emitter){
       var self = this;
-    },    
+    },
     resolveMotorPercent: function(change,item){
       return this.motorPercent[item];
     },
@@ -67,6 +68,10 @@
     forwardFull: function(e){
       this.set('motors.'+e.model.index+'.percent', 1.0);
       this.$$('#'+ e.model.item.name).value=1.0;
+    },
+    formatPercent: function(value){
+      return value.toFixed(3);
+
     }
 
   })

@@ -9,9 +9,6 @@
     <script type='text/javascript' src="components/jquery-ui/jquery-ui.min.js"></script>
 
     <title>TEST</title>
-        <link href="css/bootstrap.min.css" rel="stylesheet">
-        <link href="css/bootstrap-responsive.css" rel="stylesheet">
-        <link href="css/ui-lightness/jquery-ui-1.8.23.custom.css" rel="stylesheet" />
     <% for(var i=0; i<styles.length; i++) {%>
     <link rel="stylesheet" href="<%= styles[i] %>"><% } %>
 
@@ -34,7 +31,7 @@
   <body class='theme_r2'>
   <p>Some text to translate</p>
   <script type="text/javascript" src="js/utilities.js"></script>
-  <link rel="import" href="js/orov-behavior.html"> <!--for orov webcontrols -->
+  <link rel="import" href="components/orov-behavior.html"> <!--for orov webcontrols -->
   <script type="text/javascript" src="js/libs/gamepad.js"></script> <!--for gamepad-abstraction -->
   <script type="text/javascript" src="components/mousetrap/mousetrap.js"></script> <!--for gamepad-abstraction -->
   <script type="text/javascript" src="components/dexie/dist/latest/Dexie.min.js"></script>
@@ -133,7 +130,7 @@
 
 
 
- <script type="text/javascript" src="widget-layout-manager.js"></script>
+ <!--script type="text/javascript" src="js/widget-layout-manager.js"></script-->
 
 
 </body>

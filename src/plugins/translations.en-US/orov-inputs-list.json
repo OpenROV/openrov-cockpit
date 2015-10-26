@@ -87,5 +87,7 @@
   "rovPilot.toggleDepthHold": "rovPilot.toggleDepthHold",
   "Toggles the depth hold on/off": "Toggles the depth hold on/off",
   "newUi.showTelemetry": "newUi.showTelemetry",
-  "Show the telemetry window.": "Show the telemetry window."
+  "Show the telemetry window.": "Show the telemetry window.",
+  "newUi.showSerialMonitor": "newUi.showSerialMonitor",
+  "Show the serial port window.": "Show the serial port window."
 }

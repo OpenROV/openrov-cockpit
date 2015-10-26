@@ -631,6 +631,7 @@
           _self.editorOptions['schema'] = schema;
           _self.editorOptions['theme'] = 'bootstrap3';
           _self.editorOptions['no_additional_properties'] = true;
+          _self.editorOptions['collapsed'] = true;
           _self.editor = new JSONEditor(_self.$.form1, _self.editorOptions);
           //JSONEditor.defaults.language = "es"; for localizing local error messages
           var defaults = _self.editor.getValue();

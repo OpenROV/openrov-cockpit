@@ -7,7 +7,7 @@
     <meta id="Viewport" name="viewport" width="initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
     <!--<script type='text/javascript' src="bower_components/jquery/dist/jquery.min.js"></script>-->
     <script type='text/javascript' src="components/jquery/dist/jquery.js"></script>
-    <script type='text/javascript' src="components/jquery-ui/jquery-ui.min.js"></script>
+    <!--script type='text/javascript' src="components/jquery-ui/jquery-ui.min.js"></script-->
 
     <script type="text/javascript">
     // this code again helps prevent scrolling and sets viewport for mobile
@@ -26,39 +26,30 @@
     </script>
 
     <title><%= title %></title>
-        <link href="css/bootstrap.min.css" rel="stylesheet">
-        <link href="css/bootstrap-responsive.css" rel="stylesheet">
-        <link rel="stylesheet" href="themes/OpenROV/css/style.css">
-        <link href="css/ui-lightness/jquery-ui-1.8.23.custom.css" rel="stylesheet" />
+    <link href="components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="themes/OpenROV/css/style.css">
+    <!--link href="components/jquery/css/ui-lightness/jquery-ui-1.8.23.custom.css" rel="stylesheet" /-->
     <% for(var i=0; i<styles.length; i++) {%>
     <link rel="stylesheet" href="<%= styles[i] %>"><% } %>
-    <link rel="import" type="css" href="../../css/bootstrap.min.css">
-    <link rel="import" type="css" href="../../themes/OpenROV/css/style.css">
     <link rel="import" type="css" href="plugin/new-ui/css/style.css">
 
   </head>
 
   <script type='text/javascript' src="js/libs/eventemitter2.js"></script>
   <!--<script type='text/javascript' src="js/libs/bootstrap.min.js"></script>-->
-  <script type='text/javascript' src="js/libs/bootstrap.js"></script>
+  <script type='text/javascript' src="components/bootstrap/dist/js/bootstrap.js"></script>
   <script type='text/javascript' src="js/libs/mousetrap.min.js"></script>
-
-  <script type='text/javascript' src='components/knockoutjs/dist/knockout.js'></script>
-  <script type='text/javascript' src="components/knockout.validation/Dist/knockout.validation.js"></script>
 
   <script type='text/javascript' src='js/libs/gamepad.js'></script>
   <script type='text/javascript' src='js/utilities.js'></script>
   <script type='text/javascript' src='js/ui-loader.js'></script>
   <script type='text/javascript' src='js/message-manager.js'></script>
   <script type='text/javascript' src="js/cockpit.js"></script>
-  <script type='text/javascript' src='js/libs/db.js'></script>
-  <script type='text/javascript' src="js/libs/IndexedDBShim.min.js"></script>
   <script type='text/javascript' src="config.js"></script>
   <script type='text/javascript' src="socket.io/socket.io.js"></script>
   <script type='text/javascript' src="system-plugin/globalization/js/initGlobalization.js"></script>
 
 
-  <script type='text/javascript' src='js/knockout-extentions.js'></script>
   <script type="text/javascript" src="components/webcomponentsjs/webcomponents-lite.js"></script>
   <script>
     window.Polymer = window.Polymer || {};
@@ -92,98 +83,98 @@
 
   <body>
 <template id="t" is="dom-bind">
-    <div id="UI" class="full-height">
-      <div id="newuiBody" class="full-height">
-        <div id="newuiContainer">
-          <div class="navbar navbar-inverse navbar-fixed-top nav-collapse">
-            <div id="newuiTopbar" class="navbar-inner">
-              <a class="brand" href="#"><img src="../../themes/OpenROV/img/openrov.png" class="logo"><span class="navbar-titel">Cockpit</span></a>
-              <div id="menu">
-                <rov-menu id="menuitems" class="nav pull-right">
-                  <li><a href="#" id="show-settings" onclick="document.querySelector('#plugin-settings').open();">Settings</a></li>
-                  <li><a href="#" id="show-diagnostic" onclick="document.querySelector('#diagnostic').open();">Diagnostic</a></li>
-                </rov-menu>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div id="mainContent">
-          <bb-ping></bb-ping>
-          <div id="newuiVideo" class="full-height">
-            <rov-video id="videoElement"></rov-video>
-            <orov-horizon id="horizon" event-emitter={{cockpit-event-emitter}}></orov-horizon>
-          </div>
-          <div id="newuiControlpad">
-            <div class="newui-item" id="heading-item">
-              <div class="center">
-                <h4>Heading</h4>
-                <div id="newui-compass" class="center control">
-                  <orov-newui-compass class="center" heading="0" event-emitter={{cockpit-event-emitter}}></orov-newui-compass>
-                </div>
-              </div>
-            </div>
-            <div class="newui-item" id="depth-item">
-              <div class="center">
-                <h4>Depth</h4>
-                <!--<div id="newui-depth" class="center control"></div>-->
-                <orov-newui-depth id="newui-depth" class="center control" event-emitter={{cockpit-event-emitter}}></orov-newui-depth>
-              </div>
-            </div>
-            <div class="newui-item" id="throttle-item">
-              <div class="center">
-                <h4>Throttle</h4>
-                <orov-newui-throttle id="newui-throttle" class="center control" event-emitter={{cockpit-event-emitter}}></orov-newui-throttle>
-              </div>
-            </div>
-            <div class="newui-item" id="power-item">
-              <div class="center">
-                <h4>Battery</h4>
-                <div id="newui-power" class="center control">
-                  <orov-newui-power id="power" event-emitter={{cockpit-event-emitter}}></orov-newui-power>
-                </div>
-              </div>
-            </div>
-            <div class="newui-item" id="switches-item">
-              <div class="center">
-                <h4>Switches</h4>
-                <div id="newui-switches" class="center control">
-                  <orov-newui-switches id="newui-switches" class="center" event-emitter={{cockpit-event-emitter}}></orov-newui-switches>
-                </div>
-              </div>
-            </div>
-            <div class="newui-item" id="time-item">
-              <div class="center">
-                <h4>Time</h4>
-                <div id="newui-time" class="center control">
-                  <newui-time></newui-time>
+  <div id="UI" class="full-height">
+        <div id="newuiBody" class="full-height">
+          <div id="newuiContainer">
+            <div class="navbar navbar-inverse navbar-fixed-top navbar-collapse">
+              <div id="newuiTopbar" class="container"><div class="navbar-header"><a class="navbar-brand" href="#"><img src="../../themes/OpenROV/img/openrov.png" class="logo"><span class="navbar-titel">Cockpit</span></a></div>
+
+                <div id="menu">
+                  <rov-menu id="menuitems" class="nav pull-right navbar-nav">
+                    <li><a href="#" id="show-settings" onclick="document.querySelector('#plugin-settings').open();">Settings</a></li>
+                    <li><a href="#" id="show-diagnostic" onclick="document.querySelector('#diagnostic').open();">Diagnostic</a></li>
+                  </rov-menu>
                 </div>
               </div>
             </div>
           </div>
+          <div id="mainContent">
+            <bb-ping></bb-ping>
+            <div id="newuiVideo" class="full-height">
+              <rov-video id="videoElement"></rov-video>
+              <orov-horizon id="horizon" event-emitter="{{cockpit-event-emitter}}"></orov-horizon>
+            </div>
+            <div id="newuiControlpad">
+              <div class="newui-item" id="heading-item">
+                <div class="center">
+                  <h4>Heading</h4>
+                  <div id="newui-compass" class="center control">
+                    <orov-newui-compass class="center" heading="0" event-emitter="{{cockpit-event-emitter}}"></orov-newui-compass>
+                  </div>
+                </div>
+              </div>
+              <div class="newui-item" id="depth-item">
+                <div class="center">
+                  <h4>Depth</h4>
+                  <!--<div id="newui-depth" class="center control"></div>-->
+                  <orov-newui-depth id="newui-depth" class="center control" event-emitter="{{cockpit-event-emitter}}"></orov-newui-depth>
+                </div>
+              </div>
+              <div class="newui-item" id="throttle-item">
+                <div class="center">
+                  <h4>Throttle</h4>
+                  <orov-newui-throttle id="newui-throttle" class="center control" event-emitter="{{cockpit-event-emitter}}"></orov-newui-throttle>
+                </div>
+              </div>
+              <div class="newui-item" id="power-item">
+                <div class="center">
+                  <h4>Battery</h4>
+                  <div id="newui-power" class="center control">
+                    <orov-newui-power id="power" event-emitter="{{cockpit-event-emitter}}"></orov-newui-power>
+                  </div>
+                </div>
+              </div>
+              <div class="newui-item" id="switches-item">
+                <div class="center">
+                  <h4>Switches</h4>
+                  <div id="newui-switches" class="center control">
+                    <orov-newui-switches id="newui-switches" class="center" event-emitter="{{cockpit-event-emitter}}"></orov-newui-switches>
+                  </div>
+                </div>
+              </div>
+              <div class="newui-item" id="time-item">
+                <div class="center">
+                  <h4>Time</h4>
+                  <div id="newui-time" class="center control">
+                    <newui-time></newui-time>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <rov-diagnostics id="diagnostic">
+            <div class="settings-block">
+              <h4>Pre-Flight Check</h4>
+            </div>
+            <div>
+              <orov-thrusters2x1-motortest event-emitter="{{cockpit-event-emitter}}"></orov-thrusters2x1-motortest>
+            </div>
+            <div class="settings-block">
+              <h4>Callibration</h4>
+              <a href="#" class="btn btn-default" id="callibrate_compass">Callibrate Compass</a>
+              <a href="#" class="btn btn-default" id="zero_depth">Zero Depth</a>
+            </div>
+          </rov-diagnostics>
+
+          <drop-in-dialog id="plugin-settings" header="Settings">
+            <div>
+            <orov-settings-manager event-emitter="{{cockpit-event-emitter}}"></orov-settings-manager>
+          </div>
+          </drop-in-dialog>
         </div>
 
-        <rov-diagnostics id="diagnostic">
-          <div class="settings-block">
-            <h4>Pre-Flight Check</h4>
-          </div>
-          <div>
-            <orov-thrusters2x1-motortest event-emitter={{cockpit-event-emitter}}></orov-thrusters2x1-motortest>
-          </div>
-          <div class="settings-block">
-            <h4>Callibration</h4>
-            <a href="#" class="btn" id="callibrate_compass">Callibrate Compass</a>
-            <a href="#" class="btn" id="zero_depth">Zero Depth</a>
-          </div>
-        </rov-diagnostics>
-
-        <drop-in-dialog id="plugin-settings" header="Settings">
-          <div>
-          <orov-settings-manager event-emitter={{cockpit-event-emitter}}></orov-settings-manager>
-        </div>
-        </drop-in-dialog>
-      </div>
-
-    </div> <!--Placeholder for the UI plugin-->
+      </div> <!--Placeholder for the UI plugin-->
 </template>
   </body>
   <script type='text/javascript' src="plugin/new-ui/js/view_index.js"></script>

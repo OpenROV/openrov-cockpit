@@ -27,15 +27,6 @@
         };
         size();
         $(window).resize(size);
-        window.cockpit.extensionPoints.inputController.register({
-          name: 'newUi.showTelemetry',
-          description: 'Show the telemetry window.',
-          defaults: { keyboard: 'alt+t' },
-          down: function () {
-            var telemetryWindow = window.open('new-ui/telemetry', '__telemetry', 'menubar=no, status=no, titlebar=no, toolbar=no, width=300, height=400, location=no');
-            telemetryWindow.cockpit = window.cockpit;
-          }
-        });
         var serialMonitorWindow = undefined;
         window.cockpit.rov.on('plugin.serial-monitor.toggle', function () {
           if (serialMonitorWindow) {

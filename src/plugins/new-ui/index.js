@@ -8,31 +8,28 @@ function newUi(name, deps) {
 
   deps.app.get('/new-ui/telemetry', function(req, res) {
     var scriptBlock = [
-      'window.opener.cockpit.rov.on("plugin.telemetry.logData", function (data) { ',
-      'document.getElementById("telementrymontor").logStatusData(data);',
-      '});',
       '  document.getElementById("telementrymontor").define = function(name,callback){',
-      'window.opener.cockpit.rov.emit("telemetry.getDefinition",name,callback);',
+      'window.opener.cockpit.emit("telemetry.getDefinition",name,callback);',
       '        };'
     ].join("\n");
 
-    res.render('../ui-plugins/new-ui/public/popup.ejs',
+    res.render(__filename.substring(0, __filename.lastIndexOf("/")) + '/popup.ejs',
       {
         title: 'Telemetry',
-        uiElement: 'telemetry-monitor',
+        uiElement: 'orov-telemetry-monitor',
         uiId: 'telementrymontor',
-        webComponent: '../plugin/telemetry/webcomponents/telemetry-monitor.html',
+        webComponent: '../components/telemetry/orov-telemetry-monitor.html',
         scriptBlock: scriptBlock
       });
   });
 
   deps.app.get('/new-ui/serial-monitor', function(req, res) {
-    res.render('../ui-plugins/new-ui/public/popup.ejs',
+    res.render(__filename.substring(0, __filename.lastIndexOf("/")) + '/popup.ejs',
       {
         title: 'Serial Monitor',
-        uiElement: 'serial-monitor',
+        uiElement: 'orov-serial-monitor',
         uiId: 'serialMonitor',
-        webComponent: '../webcomponents/serial-monitor.html',
+        webComponent: '../components/serial-monitor/orov-serial-monitor.html',
         scriptBlock: ''
       });
   });

@@ -135,7 +135,7 @@
       {
         name: 'example.testMessage',
         description: 'another example',
-        defaults: { keyboard: 'alt+t' },
+        defaults: { keyboard: 'alt+T' },
         down: function() {
           showMessageFoo = true;
           showMessageBar = true;

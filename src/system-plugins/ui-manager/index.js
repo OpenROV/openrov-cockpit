@@ -49,7 +49,7 @@ UIManager.prototype.getSettingSchema = function getSettingSchema(){
 	"properties": {
 		"selectedUI": {
 			"type": "string",
-      "default": "theme_r2",
+      "default": "new-ui",
       "enum": UIOptions //Added default
 		}
 	},

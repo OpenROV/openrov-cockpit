@@ -4,8 +4,8 @@
     var claserstate = 0;
 
     // Cockpit
-    deps.cockpit.on('plugin.laser.toggle', function () {
-      sendLaser();
+    deps.cockpit.on('plugin.laser.set', function (value) {
+      sendLaser(value);
     });
 
     // Arduino
@@ -16,8 +16,9 @@
       }
     });
 
-    var sendLaser = function () {
-      if (claserstate === 0) {
+    var sendLaser = function (state) {
+      var claserstate;
+      if (state === 1) {
         claserstate = 255;
       } else {
         claserstate = 0;
@@ -28,5 +29,5 @@
   }
   module.exports = function (name, deps) {
     return new Laser(name,deps);
-  };  
+  };
 })();

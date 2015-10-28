@@ -81,10 +81,10 @@
         },
         registerEmitterHanlders: function(emitter){
           var self = this;
-          emitter.on('plugin.lights.level',function(level){
+          emitter.withHistory.on('plugin.lights.level',function(level){
             self.internal_brightnessLevel = level;
           });
-          emitter.on('plugin.externalLights.level',function(level){
+          emitter.withHistory.on('plugin.externalLights.level',function(level){
             self.external_brightnessLevel = level;
           });
         }

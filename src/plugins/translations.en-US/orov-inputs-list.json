@@ -89,5 +89,7 @@
   "newUi.showTelemetry": "newUi.showTelemetry",
   "Show the telemetry window.": "Show the telemetry window.",
   "newUi.showSerialMonitor": "newUi.showSerialMonitor",
-  "Show the serial port window.": "Show the serial port window."
+  "Show the serial port window.": "Show the serial port window.",
+  "plugin.laser.Toggle": "plugin.laser.Toggle",
+  "Toggles the lasers on or off.": "Toggles the lasers on or off."
 }

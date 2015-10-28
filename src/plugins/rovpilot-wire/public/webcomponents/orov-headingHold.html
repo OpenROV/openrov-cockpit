@@ -1,0 +1,69 @@
+<link rel="import" href="../polymer/polymer.html">
+<dom-module id="orov-headingHold">
+  <style>
+      .indicator {
+        height: 40px;
+        width: 40px;
+        line-height: 20px;
+        font-family: Helvetica;
+        padding: 10px 10px;
+        background-color: transparent;
+      }
+
+      #headingHold {
+        color: white;
+        border: 1px solid green;
+      }
+
+      #headingHold.enabled {
+        background-color: green;
+      }
+
+      #headingHold.disabled {
+        background-color: gray;
+      }
+    </style>
+  <template>
+    <div on-click="toggleHeadingHold" id="headingHold" class$="{{_computeClass(headingHoldEnabled)}}">
+      <div>{{__('Hdg')}}<div>
+      <div hidden$={{!headingHoldEnabled}}>{{_formatHeading(targetHeading)}}</div>
+    </div>
+  </template>
+  <script>
+    (function () {
+      Polymer({
+        is: 'orov-headingHold',
+        properties: {
+          headingHoldEnabled: {
+            type: Boolean,
+            value: false
+          },
+          targetHeading:{type: Number}
+        },
+        behaviors: [namespace('behaviors').oROVStandard],
+        registerEmitterHanlders: function(emitter){
+          var self = this;
+          emitter.withHistory.on('plugin.rovpilot.headingHold.state',function(state){
+            self.headingHoldEnabled=state.enabled;
+            self.targetHeading=state.targetHeading;
+          });
+        },
+        isEnabled: function (isEnabeld) {
+          return isEnabeld ? 'enabled' : 'disabled';
+        },
+        toggleHeadingHold: function () {
+          if (this.eventEmitter !== undefined){
+            this.eventEmitter.emit('plugin.rovpilot.headingHold.set-enabled',!this.headingHoldEnabled);
+          }
+        },
+        _computeClass: function (headingHoldEnabled) {
+          return this.isEnabled(headingHoldEnabled) + ' indicator';
+        },
+        _formatHeading: function(heading){
+          if (heading===null) return '--'
+          return heading.toFixed(1);
+        }
+      });
+    }());
+  </script>
+</dom-module>

@@ -48,18 +48,24 @@ function Hardware() {
     }
 
     // Depth hold
-    if (commandText === 'holdDepth_toggle') {
+    if (commandText === 'holdDepth_on') {
         var targetDepth = 0;
         if (!hardware.depthHoldEnabled) {
             targetDepth = currentDepth;
             hardware.depthHoldEnabled = true;
             console.log('HARDWARE-MOCK depth hold enabled');
         }
-        else {
+        hardware.emitStatus(
+          'targetDepth:' +
+          (hardware.depthHoldEnabled ? targetDepth.toString() : DISABLED)
+        );
+      }
+
+      if (commandText === 'holdDepth_off') {
             targetDepth = -500;
             hardware.depthHoldEnabled = false;
             console.log('HARDWARE-MOCK depth hold DISABLED');
-        }
+
         hardware.emitStatus(
           'targetDepth:' +
           (hardware.depthHoldEnabled ? targetDepth.toString() : DISABLED)
@@ -67,18 +73,23 @@ function Hardware() {
     }
 
     // Heading hold
-    if (commandText === 'holdHeading_toggle') {
+    if (commandText === 'holdHeading_on') {
         var targetHeading = 0;
-        if (!hardware.targetHoldEnabled) {
-            targetHeading = currentHeading;
-            hardware.targetHoldEnabled= true;
-            console.log('HARDWARE-MOCK heading hold enabled');
-        }
-        else {
+        targetHeading = currentHeading;
+        hardware.targetHoldEnabled= true
+        console.log('HARDWARE-MOCK heading hold enabled');
+
+        hardware.emitStatus(
+          'targetHeading:' + (hardware.targetHoldEnabled ? targetHeading.toString() : DISABLED)
+        );
+    }
+
+    // Heading hold
+    if (commandText === 'holdHeading_off') {
+        var targetHeading = 0;
             targetHeading = -500;
             hardware.targetHoldEnabled = false;
             console.log('HARDWARE-MOCK heading hold DISABLED');
-        }
         hardware.emitStatus(
           'targetHeading:' + (hardware.targetHoldEnabled ? targetHeading.toString() : DISABLED)
         );
@@ -152,6 +163,7 @@ function Hardware() {
     }
 
     hardware.emit('status', reader.parseStatus(result));
+    hardware.write('');
 
   }, 2000);
 

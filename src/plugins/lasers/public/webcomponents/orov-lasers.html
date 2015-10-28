@@ -54,7 +54,7 @@
         toggle: function() {
           this.fire('toggle-lasers');
           if (this.eventEmitter !== undefined){
-            this.eventEmitter.emit("plugin.laser.toggle");
+            this.eventEmitter.emit("plugin.laser.set",!self.lasersEnabled);
           }
         },
         attached: function(){

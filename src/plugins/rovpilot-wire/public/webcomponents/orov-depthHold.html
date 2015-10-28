@@ -1,0 +1,69 @@
+<link rel="import" href="../polymer/polymer.html">
+<dom-module id="orov-depthHold">
+  <style>
+      .indicator {
+        height: 40px;
+        width: 40px;
+        line-height: 20px;
+        font-family: Helvetica;
+        padding: 10px 10px;
+        background-color: transparent;
+      }
+
+      #depthHold {
+        color: white;
+        border: 1px solid green;
+      }
+
+      #depthHold.enabled {
+        background-color: green;
+      }
+
+      #depthHold.disabled {
+        background-color: gray;
+      }
+    </style>
+  <template>
+    <div on-click="toggleDepthHold" id="depthHold" class$="{{_computeClass(depthHoldEnabled)}}">
+      <div>{{__('Depth')}}<div>
+      <div hidden$={{!depthHoldEnabled}}>{{_formatDepth(targetDepth)}}</div>
+    </div>
+  </template>
+  <script>
+    (function () {
+      Polymer({
+        is: 'orov-depthHold',
+        properties: {
+          depthHoldEnabled: {
+            type: Boolean,
+            value: false
+          },
+          targetDepth:{type: Number}
+        },
+        behaviors: [namespace('behaviors').oROVStandard],
+        registerEmitterHanlders: function(emitter){
+          var self = this;
+          emitter.withHistory.on('plugin.rovpilot.depthHold.state',function(state){
+            self.depthHoldEnabled=state.enabled;
+            self.targetDepth=state.targetDepth;
+          });
+        },
+        isEnabled: function (isEnabeld) {
+          return isEnabeld ? 'enabled' : 'disabled';
+        },
+        toggleDepthHold: function () {
+          if (this.eventEmitter !== undefined){
+            this.eventEmitter.emit('plugin.rovpilot.depthHold.set-enabled',!this.depthHoldEnabled);
+          }
+        },
+        _computeClass: function (depthHoldEnabled) {
+          return this.isEnabled(depthHoldEnabled) + ' indicator';
+        },
+        _formatDepth: function(depth){
+          if (depth===null) return '--'
+          return depth.toFixed(1);
+        }
+      });
+    }());
+  </script>
+</dom-module>

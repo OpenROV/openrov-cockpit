@@ -130,9 +130,23 @@ $(document).ready(function() {
       "tag": "javascript-latency",
       "settings": {
 
+      }
       },
-        "_linkhref": "host-diagnostics/javascript-loopspeed.html"
-    }, {
+      {
+        "tag": "orov-depthHold",
+        "settings": {
+
+        },
+        "_linkhref": "rovpilot-wire/orov-depthHold.html"
+      },
+      {
+        "tag": "orov-headingHold",
+        "settings": {
+
+        },
+        "_linkhref": "rovpilot-wire/orov-headingHold.html"
+      },
+      {
       "tag": "orov-thrustfactor",
       "settings": {
 

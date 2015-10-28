@@ -209,11 +209,11 @@
               disabledKey = self.switches[aSwitch].message.disabled;
             }
             console.log("Registering switch listener: " + enabledKey);
-            emitter.on(enabledKey, function () {
+            emitter.withHistory.on(enabledKey, function () {
               self.switches[aSwitch].state = true;
               self.update();
             });
-            emitter.on(disabledKey, function () {
+            emitter.withHistory.on(disabledKey, function () {
               self.switches[aSwitch].state = false;
               self.update();
             });

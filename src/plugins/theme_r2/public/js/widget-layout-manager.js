@@ -197,7 +197,7 @@ $(document).ready(function() {
       for (var j in savedConfig[k[i]]){
         var el = document.createElement(savedConfig[k[i]][j].tag);
         if (savedConfig[k[i]][j].tag.startsWith('orov')){
-           el.eventEmitter = window.cockpit;
+           el.eventEmitter = window.cockpit.storeAndForward;
         }
         area.append(el);
 
@@ -227,7 +227,7 @@ $(document).ready(function() {
     for( var i in wid){
       var el1 = document.createElement(wid[i].name);
       if(wid[i].name.startsWith('orov')){
-        el1.eventEmitter = window.cockpit;
+  //      el1.eventEmitter = window.cockpit.storeAndForward;
       }
       el1._linkhref = wid[i].url;
       $('#'+wid[i].defaultUISymantic).append(el1);

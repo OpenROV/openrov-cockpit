@@ -6,6 +6,10 @@ This is based on the post by  @estackpole here: https://forum.openrov.com/t/more
 
 CSS framework used: BootStrap v3
 
+Special keys
+alt-t : opens up a seperate telemetry window.
+alt-s : opens the serial Monitor
+
 Todo:
 ---
 -[ ] Add the status icons along the top.

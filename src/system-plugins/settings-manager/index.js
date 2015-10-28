@@ -53,6 +53,13 @@ settingsManager.prototype.loadSettings = function loadSettings(callback){
   this.preferences = getNameSpacedPreferences(this.deps.config);
   objectAssign(this.settings,this.preferences);
 //  console.log(JSON.stringify(this.settings));
+  for (var key in this.settings) {
+    if (this.settings.hasOwnProperty(key)) {
+      var result = {}
+      result[key]=this.settings[key];
+      this.deps.cockpit.emit('settings-change.'+key,result);
+    }
+  }
 
   if(typeof(callback)==="function"){
     callback();

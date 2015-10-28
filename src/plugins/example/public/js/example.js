@@ -65,20 +65,15 @@
       //This Name is the closure variable that is private
       _name = first+' '+last;
       self.cockpit.emit('plugin.example.attributes-changed',getAttributes());
+      console.log('Emitted plugin.example.attributes-changed');
     }
 
-    //Requests the settings-change message gets sent
-    this.rov.emit('plugin.settings-manager.getSettings','example',function(settings){
+    //Response from the getSettings call. Using the withHistory will call the
+    //update function with the last copy of this message that had been sent.
+    //The settings manager sends a change message for each section when
+    //first read in.
+    this.rov.withHistory.on('settings-change.example',function(settings){
      updateAttributesFromSettings(settings);
-    });
-
-    //Response from the getSettings call
-    this.rov.on('settings-change.example',function(settings){
-     updateAttributesFromSettings(settings);
-    });
-
-    this.cockpit.on('plugin.example.getAttributes',function(fn){
-      fn(getAttributes());
     });
 
     this.cockpit.on("plugin.example.example-clicked",function(){

@@ -64,7 +64,7 @@
       self.cockpit.rov.emit('plugin.systemPower.powerOnESCs');
     });
 
-    this.cockpit.rov.on('status',function(status){
+    this.cockpit.rov.withHistory.on('status',function(status){
       //Work around not having the explicit status in the MCU code
       if ('log' in status){
         if (status[log].indexOf('log:escpower=') > 0){

@@ -60,6 +60,7 @@ settingsManager.prototype.loadSettings = function loadSettings(callback){
       this.deps.cockpit.emit('settings-change.'+key,result);
     }
   }
+  this.deps.cockpit.emit('settings-change',this.settings);
 
   if(typeof(callback)==="function"){
     callback();
@@ -132,12 +133,13 @@ settingsManager.prototype.listen = function listen(){
   })
 
   this.deps.cockpit.on('plugin.settings-manager.saveSettings',function(settings,fn){
-    self.deps.config.preferences.set(PREFERENCES_NS, settings);
-    self.deps.config.savePreferences();
+//    self.deps.config.preferences.set(PREFERENCES_NS, settings);
     self.loadSettings(function(){
       for(var item in settings){
         var result = {}
         result[item]=settings[item];
+        self.deps.config.preferences.set(PREFERENCES_NS+":"+item, settings[item]);
+        self.deps.config.savePreferences();
         self.deps.cockpit.emit('settings-change.'+item,result);
       };
       self.deps.cockpit.emit('settings-change',self.settings);

@@ -165,7 +165,13 @@ $(document).ready(function() {
         "settings": {
         },
         "_linkhref": "headsup-menu/orov-headsup-menu.html"
-     }
+     },
+     {
+       "tag": "orov-video",
+       "settings": {
+       },
+       "_linkhref": "video/orov-video.html"
+    }
     ]
   };
 

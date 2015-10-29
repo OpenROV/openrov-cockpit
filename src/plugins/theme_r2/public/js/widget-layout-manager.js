@@ -171,7 +171,13 @@ $(document).ready(function() {
        "settings": {
        },
        "_linkhref": "video/orov-video.html"
-    }
+    },
+    {
+      "tag": "orov-horizon",
+      "settings": {
+      },
+      "_linkhref": "navigation-data/orov-horizon.html"
+   }
     ]
   };
 

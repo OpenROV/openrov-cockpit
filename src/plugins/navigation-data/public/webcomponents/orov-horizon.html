@@ -89,20 +89,41 @@
           emitter.on('plugin.navigationData.data',function(data){
             self.setData(data);
           });
+
+          emitter.withHistory.on('video.forward.canvas-changed',function(canvas){
+            self.videoElement = canvas;
+          });
         },
         attached: function () {
           this.roll = 0;
           this.pitch = 0;
           this.altitude = 0;
           this.speed = 0;
+          this.overlayPosition={left:0,top:0};
           // Add required UI elements
           this.ctx = this.$.horizon.getContext('2d');
           var ah = this;
-          // Bind on window events to resize
-          $(window).resize(function (event) {
-            ah.draw();
-          });
+          function findPos(obj) {
+
+              var curleft = curtop = 0;
+
+              if (obj.offsetParent)
+              do {
+                  curleft += obj.offsetLeft;
+                  curtop += obj.offsetTop;
+
+              } while (obj = obj.offsetParent);
+
+              return [curleft,curtop];
+          }
           var self = this;
+          // Bind on window events to resize
+          setInterval(function () {
+            if(self.videoElement===undefined) return;
+            var pos = findPos(self.videoElement);
+            self.overlayPosition={left:pos[0],top:pos[1]};
+          },1000);
+
           if (this.eventEmitter !== undefined){
             this.eventEmitter.emit('InputController.register',
             {
@@ -341,8 +362,20 @@
           this.ctx.restore();
         },
         draw: function draw() {
-          var width = $(Polymer.dom(Polymer.dom(this.$.horizon).parentNode.host).parentNode).innerWidth();
-          var height = $(Polymer.dom(Polymer.dom(this.$.horizon).parentNode.host).parentNode).innerHeight();
+
+          //var width = $(Polymer.dom(Polymer.dom(this.$.horizon).parentNode.host).parentNode).innerWidth();
+          //var height = $(Polymer.dom(Polymer.dom(this.$.horizon).parentNode.host).parentNode).innerHeight();
+          width = this.videoElement.width;
+          height = this.videoElement.height;
+          var rect = this.videoElement.getBoundingClientRect();
+        //  var rowPos = this.videoElement.position();
+          this.$.horizon.style.position='absolute';
+          //var pos = findPos(this.videoElement);
+          this.$.horizon.style.top=this.overlayPosition.top+'px';
+          this.$.horizon.style.left=this.overlayPosition.left+'px';
+
+
+
           this.set('ctx.canvas.width', width);
           this.set('ctx.canvas.height', height);
           this.pixelsPerDeg = height / (frontCameraFovY / 2);

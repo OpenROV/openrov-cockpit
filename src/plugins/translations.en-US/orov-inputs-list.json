@@ -91,5 +91,9 @@
   "newUi.showSerialMonitor": "newUi.showSerialMonitor",
   "Show the serial port window.": "Show the serial port window.",
   "plugin.laser.Toggle": "plugin.laser.Toggle",
-  "Toggles the lasers on or off.": "Toggles the lasers on or off."
+  "Toggles the lasers on or off.": "Toggles the lasers on or off.",
+  "video.keyBoardMapping": "video.keyBoardMapping",
+  "Video for keymapping.": "Video for keymapping.",
+  "video.testMessage": "video.testMessage",
+  "another video": "another video"
 }

@@ -6,6 +6,11 @@
     console.log('Loading thrusters2x1 plugin in the browser.');
     // Instance variables
     this.cockpit = cockpit;
+    this.state = {
+          port: 0,
+          starboard: 0,
+          vertical: 0
+        }
 
     // Add required UI elements
   };
@@ -18,15 +23,15 @@
     this.cockpit.on('plugin.thrusters2x1.motorTest', function(data){
       self.sendTestMotorMessage(data);
     });
+
+    this.cockpit.on('plugin.thrusters2x1.set', function(state){
+      self.sendTestMotorMessage(data);
+    });
   };
 
 
   Thrusters2x1.prototype.sendTestMotorMessage = function sendTestMotorMessage(motor_values) {
-    this.cockpit.rov.emit('plugin.thurster2x1.motorTest', {
-      port: motor_values.port,
-      starboard: motor_values.starboard,
-      vertical: motor_values.vertical
-    });
+    this.cockpit.rov.emit('plugin.thurster2x1.set', motor_values);
   };
   Thrusters2x1.prototype.setMotorTestSpeed = function setMotorTestSpeed(propertyName, value) {
     this[propertyName](value);

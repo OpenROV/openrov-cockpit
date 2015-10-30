@@ -72,15 +72,18 @@
           notify: true
         }
       },
-      behaviors: [namespace('behaviors').oROVStandard],      
-      attached: function () {
+      behaviors: [namespace('behaviors').oROVStandard],
+      registerEmitterHanlders: function(emitter) {
         var self = this;
-        window.cockpit.rov.on('plugin.capestatus.time.time', function (time) {
+        emitter.withHistory.on('plugin.capestatus.time.time', function (time) {
           self.time = time.formatted;
         });
-        window.cockpit.rov.on('plugin.capestatus.time.runtime', function (runtime) {
+        emitter.withHistory.on('plugin.capestatus.time.runtime', function (runtime) {
           self.runtime = runtime.formatted;
         });
+      },
+      attached: function () {
+
       }
     });
   </script>

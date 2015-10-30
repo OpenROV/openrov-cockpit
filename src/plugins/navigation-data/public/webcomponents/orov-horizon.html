@@ -35,7 +35,7 @@
     </style>
   <template>
 
-    <canvas id="horizon" class="hud" width="640" height="360"></canvas>
+    <canvas id="horizon" class="hud" style="width: 100%; height:100%"></canvas>
 
   </template>
   <script>
@@ -90,6 +90,8 @@
             self.setData(data);
           });
 
+          //Not used currently, but it is a reference if we need raw
+          //access to the video canvas.
           emitter.withHistory.on('video.forward.canvas-changed',function(canvas){
             self.videoElement = canvas;
           });
@@ -362,23 +364,9 @@
           this.ctx.restore();
         },
         draw: function draw() {
-
-          //var width = $(Polymer.dom(Polymer.dom(this.$.horizon).parentNode.host).parentNode).innerWidth();
-          //var height = $(Polymer.dom(Polymer.dom(this.$.horizon).parentNode.host).parentNode).innerHeight();
-          width = this.videoElement.width;
-          height = this.videoElement.height;
-          var rect = this.videoElement.getBoundingClientRect();
-        //  var rowPos = this.videoElement.position();
-          this.$.horizon.style.position='absolute';
-          //var pos = findPos(this.videoElement);
-          this.$.horizon.style.top=this.overlayPosition.top+'px';
-          this.$.horizon.style.left=this.overlayPosition.left+'px';
-
-
-
-          this.set('ctx.canvas.width', width);
-          this.set('ctx.canvas.height', height);
-          this.pixelsPerDeg = height / (frontCameraFovY / 2);
+          this.set('ctx.canvas.width', this.ctx.canvas.clientWidth);
+          this.set('ctx.canvas.height', this.ctx.canvas.clientHeight);
+          this.pixelsPerDeg = this.ctx.canvas.height / (frontCameraFovY / 2);
           this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
           this.drawHorizon();
           this.drawZero();

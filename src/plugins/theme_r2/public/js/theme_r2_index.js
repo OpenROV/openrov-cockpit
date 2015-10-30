@@ -1,4 +1,6 @@
 (function (window, $, undefined) {
+$.getScript('lib/widget-layout-manager.js');
+
   'use strict';
   var ThemeR2;
   ThemeR2 = function ThemeR2(cockpit) {

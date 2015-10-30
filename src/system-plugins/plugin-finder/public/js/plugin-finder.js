@@ -67,12 +67,12 @@
           .replace('.git','')
           .replace('git://github.com/','https://api.github.com/repos/');
 
-        $.getJSON( giturl, function( data ) {
+/*        $.getJSON( giturl, function( data ) {
           p.description = data.description;
           p.raiting = data.stargazers_count;
           p.homepage = data.homepage !== null ? data.homepage : data.html_url;
         });
-      });
+*/      });
     });
   }
 

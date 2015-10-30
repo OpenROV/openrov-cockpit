@@ -45,11 +45,13 @@
 
   <script type='text/javascript' src="config.js"></script>
   <script type='text/javascript' src="socket.io/socket.io.js"></script>
-  <script type='text/javascript' src="js/cockpit.js"></script>
+  <script type='text/javascript' src="system-plugin/globalization/js/initGlobalization.js"></script>
   <script type='text/javascript' src='js/message-manager.js'></script>
   <script type='text/javascript' src='js/eventEmitterStoreAndForward.js'></script>
   <script type='text/javascript' src='js/SocketIOStoreAndForward.js'></script>
-  <script type='text/javascript' src="system-plugin/globalization/js/initGlobalization.js"></script>
+  <script type='text/javascript' src="js/cockpit.js"></script>
+  <script type="text/javascript" src="js/app.js"></script>
+
 
 
   <script type="text/javascript" src="components/webcomponentsjs/webcomponents-lite.js"></script>
@@ -67,9 +69,9 @@
   <link rel="import" href="components/new-ui/switches.html">
   <link rel="import" href="components/new-ui/power.html">
   <link rel="import" href="components/diagnostics/diagnostics.html">
-  <link rel="import" href="components/mjpeg-video-webcomponents/mjpeg-video.html">
+  <link rel="import" href="components/video/orov-video.html">
   <link rel="import" href="components/navigation-data/orov-horizon.html">
-  <link rel="import" href="components/ping.html">
+  <link rel="import" href="components/connection-health/orov-ping-graph.html">
 
   <link rel="import" href="components/settings-manager/orov-settings-manager.html">
   <link rel="import" href="components/thrusters2x1/orov-thrusters2x1-motortest.html">
@@ -101,10 +103,12 @@
             </div>
           </div>
           <div id="mainContent">
-            <bb-ping></bb-ping>
+
             <div id="newuiVideo" class="full-height">
-              <mjpeg-video id="camera1" border='1' style='width: 100%; height:100%' menuState='on' src={{video_source}}></mjpeg-video>
-              <orov-horizon id="horizon" event-emitter="{{cockpit-event-emitter}}"></orov-horizon>
+              <orov-video id="camera1" border='1' style='width: 100%; height:100%; position:relative' event-emitter="{{cockpit-event-emitter}}">
+                <orov-ping-graph style='position:absolute; top:0px; left:0px; z-index:33;' event-emitter="{{cockpit-event-emitter}}"></orov-ping-graph>
+                <orov-horizon id="horizon" style='position:absolute; top:0px; left:0px; z-index:33; width:100%; height:100%' event-emitter="{{cockpit-event-emitter}}"></orov-horizon>
+              </orov-video>
             </div>
             <div id="newuiControlpad">
               <div class="newui-item" id="heading-item">

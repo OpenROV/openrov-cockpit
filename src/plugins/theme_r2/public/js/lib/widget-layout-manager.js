@@ -170,14 +170,17 @@ $(document).ready(function() {
        "tag": "orov-video",
        "settings": {
        },
-       "_linkhref": "video/orov-video.html"
-    },
-    {
-      "tag": "orov-horizon",
-      "settings": {
-      },
-      "_linkhref": "navigation-data/orov-horizon.html"
-   }
+       "_linkhref": "video/orov-video.html",
+       "content" : [
+         {
+           "tag": "orov-horizon",
+           "settings": {
+           },
+           "style": "position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:33;",
+           "_linkhref": "navigation-data/orov-horizon.html"
+         }
+        ]
+       }
     ]
   };
 
@@ -217,28 +220,48 @@ $(document).ready(function() {
 
   window.addEventListener('WebComponentsReady', function(e) {
     var savedConfig =  window.OROV.layoutConfig
+
+    var addelement= function(document,area,elementDefinition){
+
+      var el = document.createElement(elementDefinition.tag);
+      if (elementDefinition.tag.startsWith('orov')){
+         el.eventEmitter = window.cockpit.storeAndForward;
+      }
+      area.appendChild(el);
+
+      for (var s in elementDefinition.settings){
+        el[s] = elementDefinition.settings[s];
+      }
+
+      if ('style' in elementDefinition){
+        el.setAttribute("style",elementDefinition.style);
+      }
+
+      if ('content' in elementDefinition){
+        for (var c in elementDefinition.content){
+          addelement(document,el,elementDefinition.content[c]);
+        }
+      }
+
+      var link = document.createElement('link');
+      link.href = 'components/'+ elementDefinition._linkhref;
+      link.rel = "import";
+      link.async = false;
+      document.head.appendChild(link);
+
+      //        for (var l in el.properties){
+      //          if ((el.properties[l].persisted) && (l in savedConfig[k[i]][j].settings )){
+      //            el[l] = savedConfig[k[i]][j].settings[l];
+      //          }
+      //        }
+
+
+    }
     var k = Object.keys(savedConfig);
     for (var i in k){
       var area = $('#' + k[i]);
       for (var j in savedConfig[k[i]]){
-        var el = document.createElement(savedConfig[k[i]][j].tag);
-        if (savedConfig[k[i]][j].tag.startsWith('orov')){
-           el.eventEmitter = window.cockpit.storeAndForward;
-        }
-        area.append(el);
-
-        for (var s in savedConfig[k[i]][j].settings){
-          el[s] = savedConfig[k[i]][j].settings[s];
-        }
-
-//        for (var l in el.properties){
-//          if ((el.properties[l].persisted) && (l in savedConfig[k[i]][j].settings )){
-//            el[l] = savedConfig[k[i]][j].settings[l];
-//          }
-//        }
-
-
-
+        addelement(document,area[0],savedConfig[k[i]][j]);
       }
     }
   });

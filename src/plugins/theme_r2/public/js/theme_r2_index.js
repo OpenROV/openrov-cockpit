@@ -1,5 +1,5 @@
 (function (window, $, undefined) {
-$.getScript('lib/widget-layout-manager.js');
+  if (window.openrovtheme!=='theme_r2') return;
 
   'use strict';
   var ThemeR2;
@@ -93,4 +93,4 @@ $('#telemetry').define = function(name,callback){
           <<%ui.systempanel[i].name %> event-emitter={{cockpit-event-emitter}}></<%ui.systempanel[i].name %>>
           <% } %>
 */
-});
+})(window,$,undefined);

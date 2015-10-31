@@ -105,26 +105,8 @@
           // Add required UI elements
           this.ctx = this.$.horizon.getContext('2d');
           var ah = this;
-          function findPos(obj) {
-
-              var curleft = curtop = 0;
-
-              if (obj.offsetParent)
-              do {
-                  curleft += obj.offsetLeft;
-                  curtop += obj.offsetTop;
-
-              } while (obj = obj.offsetParent);
-
-              return [curleft,curtop];
-          }
           var self = this;
-          // Bind on window events to resize
-          setInterval(function () {
-            if(self.videoElement===undefined) return;
-            var pos = findPos(self.videoElement);
-            self.overlayPosition={left:pos[0],top:pos[1]};
-          },1000);
+
 
           if (this.eventEmitter !== undefined){
             this.eventEmitter.emit('InputController.register',
@@ -364,6 +346,8 @@
           this.ctx.restore();
         },
         draw: function draw() {
+          //TODO: Research better attributes for width and height as these don't
+          //appear to scale down when the window shrinks.
           this.set('ctx.canvas.width', this.ctx.canvas.clientWidth);
           this.set('ctx.canvas.height', this.ctx.canvas.clientHeight);
           this.pixelsPerDeg = this.ctx.canvas.height / (frontCameraFovY / 2);

@@ -18,6 +18,7 @@
     <script>
       window.Polymer = window.Polymer || {};
       window.Polymer.dom = 'shadow';
+      window.openrovtheme = 'theme_r2';
     </script>
     <link rel="import" href="components/polymer/polymer.html">
 
@@ -99,10 +100,9 @@
  <script type="text/javascript" src="js/app.js"></script>
 
 
-
+ <script type="text/javascript" src="plugin/theme_r2/js/lib/widget-layout-manager.js"></script>
 <!-- I am loading these manually.. but they should be populated through the
      plugin manager -->
- <script type="text/javascript" src="plugin/theme_r2/js/theme_r2_index.js"></script>
 <!--
  <script type="text/javascript" src="plugin/lasers/js/laser-widgets-autodiscovery.js"></script>
  <script type="text/javascript" src="plugin/lasers/js/laser.js"></script>
@@ -129,11 +129,6 @@
  <!--Auto Added -->
  <% for(var i=0; i<scripts.length; i++) {%>
  <script type="text/javascript" src="<%= scripts[i] %>"></script><% } %>
-
-
-
- <!--script type="text/javascript" src="js/widget-layout-manager.js"></script-->
-
 
 </body>
 </html>

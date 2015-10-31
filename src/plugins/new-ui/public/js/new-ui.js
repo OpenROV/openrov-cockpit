@@ -1,7 +1,9 @@
 (function (window, $, undefined) {
   'use strict';
+  if (window.openrovtheme!=='new-ui') return;
   var plugins = namespace('plugins');
   plugins.NewUI = function NewUI(cockpit) {
+
     var jsFileLocation = urlOfJsFile('new-ui.js');
     this.cockpit = cockpit;
     this.name = 'new-ui';   // for the settings

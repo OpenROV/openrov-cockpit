@@ -72,6 +72,13 @@
         }
       }
 
+      //TODO: Make sure the firmware sends ESCP
+      if ('ESCP' in status){
+        var result = true;
+        if (status.ESCP === 0) result = false;
+        self.cockpit.emit('plugin.systemPower.state',{escs_powered:result});
+      }
+
       var powerObject = window.controllerboard2x.telemetryToSystemPower(status);
       if (powerObject !== null) { self.cockpit.emit('plugin.controllerboard2x.systemPower.update',powerObject)};
     });

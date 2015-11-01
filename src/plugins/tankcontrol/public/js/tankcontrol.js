@@ -122,7 +122,7 @@
     if (!this.tankControlActive) {
       //TODO: Be sure to upgrade input controller for message activation
       rov.cockpit.emit('inputController.activate',controls,function(){
-        rov.cockpit.rov.emit('plugin.tankControl.enabled');
+        rov.cockpit.emit('plugin.tankControl.state',{enabled:true});
         rov.tankControlActive = true;
         console.log('Tank Control Active');
       });
@@ -130,7 +130,7 @@
     else {
       rov.cockpit.emit('inputController.deactivate',controls,function(){
         rov.tankControlActive = false;
-        rov.cockpit.rov.emit('plugin.tankControl.disabled');
+        rov.cockpit.emit('plugin.tankControl.state',{enabled:false});
         console.log('Tank Control Deactivated');
       });
     }

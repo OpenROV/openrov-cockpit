@@ -69,25 +69,27 @@
                 COM: {
                   switchable: false,
                   state: false,
-                  message: {
-                    enabled: 'plugin.connection-health.connection.connected',
-                    disabled: 'capestatus.connection-health.disconnected'
-                  },
+                  events: [
+                    {message:'plugin.connection-health.connection.connected',fn: function(){return true;}},
+                    {message:'capestatus.connection-health.disconnected', fn: function(){return false;}}
+                  ],
                   description: 'Communication status'
                 },
                 GPD: {
                   switchable: false,
                   state: false,
-                  message: {
-                    enabled: 'plugin.input.gamepad.connected',
-                    disabled: 'plugin.input.gamepad.disconnected'
-                  },
+                  events: [
+                    {message:'plugin.input.gamepad.connected', fn: function(){return true;}},
+                    {message: 'plugin.input.gamepad.disconnected', fn: function(){return false;}}
+                  ],
                   description: 'Gamepad active/inactive'
                 },
                 TNK: {
                   switchable: true,
                   state: false,
-                  message: 'plugin.tankControl',
+                  events: [
+                    {message:'plugin.tankControl.state', fn: function(state){return state.enabled;}}
+                  ],
                   description: 'Tank control active/inactive',
                   switch: function () {
                     if (self.eventEmitter !== undefined){
@@ -98,33 +100,39 @@
                 DLK: {
                   switchable: true,
                   state: false,
-                  message: 'plugin.rovpilot.depthHold',
+                  events: [
+                    {message:'plugin.rovpilot.depthHold.state',fn: function(state){return state.enabled;}}
+                  ],
                   description: 'Depthhold active/inactive',
-                  switch: function () {
+                  switch: function (state) {
                     if (self.eventEmitter !== undefined){
-                      self.eventEmitter.emit('plugin.rovpilot.depthHold.toggle');
+                      self.eventEmitter.emit('plugin.rovpilot.depthHold.set-enabled',!state);
                     }
                   }
                 },
                 HLK: {
                   switchable: true,
                   state: false,
-                  message: 'plugin.rovpilot.headingHold',
+                  events: [
+                    {message:'plugin.rovpilot.headingHold.state',fn: function(state){return state.enabled;}}
+                  ],
                   description: 'Heading lock active/inactive',
-                  switch: function () {
+                  switch: function (state) {
                     if (self.eventEmitter !== undefined){
-                      self.eventEmitter.emit('plugin.rovpilot.headingHold.toggle');
+                      self.eventEmitter.emit('plugin.rovpilot.headingHold.set-enabled',!state);
                     }
                   }
                 },
                 LSR: {
                   switchable: true,
                   state: false,
-                  message: 'plugin.laser',
+                  events: [
+                    {message:'plugin.laser.state',fn: function(state){return state.lasersEnabled;}}
+                  ],
                   description: 'Lasers on/off',
-                  switch: function () {
+                  switch: function (state) {
                     if (self.eventEmitter !== undefined){
-                      self.eventEmitter.emit('plugin.laser.toggle');
+                      self.eventEmitter.emit('plugin.laser.set',!state);
                     }
                   }
                 },
@@ -132,16 +140,21 @@
                   switchable: true,
                   state: false,
                   description: 'LED lights on/off',
-                  switch: function () {
+                  events: [
+                    {message:'plugin.lights.state',fn: function(state){return state.lightsEnabled;}}
+                  ],
+                  switch: function (state) {
                     if (self.eventEmitter !== undefined){
-                      self.eventEmitter.emit('plugin.lights.toggle');
+                      self.eventEmitter.emit('plugin.lights.set',!state);
                     }
                   }
                 },
                 ESC: {
                   switchable: true,
-                  state: true,
-                  message: 'plugin.systemPower.esc',
+                  state: false,
+                  events: [
+                    {message:'plugin.systemPower.state', fn: function(state){return state.escs_powered;}}
+                  ],
                   description: 'ROV ESCs active/inactive',
                   switch: function (state) {
                     if (self.eventEmitter !== undefined){
@@ -172,14 +185,6 @@
             }
             this.registerListeners(aSwitch,emitter);
           }
-          emitter.on('plugin.lights.level', function (level) {
-            var state = false;
-            if (Number(level) !== 0) {
-              state = true;
-            }
-            self.switches.LED.state = state;
-            self.update();
-          });
         },
         update: function () {
           for (var aSwitch in this.switches) {
@@ -198,25 +203,15 @@
         registerListeners: function (aSwitch,emitter) {
           var self = this;
           // register the enabled/disabled messages
-          if (self.switches[aSwitch].message) {
-            var enabledKey;
-            var disabledKey;
-            if (typeof self.switches[aSwitch].message == 'string') {
-              enabledKey = self.switches[aSwitch].message + '.enabled';
-              disabledKey = self.switches[aSwitch].message + '.disabled';
-            } else {
-              enabledKey = self.switches[aSwitch].message.enabled;
-              disabledKey = self.switches[aSwitch].message.disabled;
+          if (self.switches[aSwitch].events !== undefined){
+            for(i in self.switches[aSwitch].events){
+              var e = self.switches[aSwitch].events[i];
+              console.log("Registering switch listener: " + e.message);
+              emitter.withHistory.on(e.message,function(){
+                self.switches[aSwitch].state = e.fn.apply(this,arguments);
+                self.update();
+              })// e.fn.bind(self.switches[aSwitch]));
             }
-            console.log("Registering switch listener: " + enabledKey);
-            emitter.withHistory.on(enabledKey, function () {
-              self.switches[aSwitch].state = true;
-              self.update();
-            });
-            emitter.withHistory.on(disabledKey, function () {
-              self.switches[aSwitch].state = false;
-              self.update();
-            });
           }
         },
         attached: function () {

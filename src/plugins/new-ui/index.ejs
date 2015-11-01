@@ -9,21 +9,8 @@
     <script type='text/javascript' src="components/jquery/dist/jquery.js"></script>
     <!--script type='text/javascript' src="components/jquery-ui/jquery-ui.min.js"></script-->
 
-    <script type="text/javascript">
-    // this code again helps prevent scrolling and sets viewport for mobile
-    $(function(){
-    if( /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ) {
-      var ww = ( $(window).width() < window.screen.width ) ? $(window).width() : window.screen.width; //get proper width
-      var mw = 480; // min width of site
-      var ratio =  ww / mw; //calculate ratio
-      if( ww < mw){ //smaller than minimum size
-       $('#Viewport').attr('content', 'initial-scale=' + ratio + ', maximum-scale=' + ratio + ', minimum-scale=' + ratio + ', user-scalable=yes, width=' + ww);
-      }else{ //regular size
-       $('#Viewport').attr('content', 'initial-scale=1.0, maximum-scale=2, minimum-scale=1.0, user-scalable=yes, width=' + ww);
-      }
-    }
-    });
-    </script>
+    <script type='text/javascript' src="js/no-scroll-fullscreen-viewport.js"></script>
+
 
     <title><%= title %></title>
     <link href="components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">

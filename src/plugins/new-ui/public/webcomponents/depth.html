@@ -167,17 +167,18 @@
               self.set('depth',Number(data.depth));//.toFixed(1);
             }
           });
-          emitter.on('plugin.rovpilot.depthHold.target', function (target) {
-            self.target = Number(target).toFixed(1);
+          emitter.withHistory.on('plugin.rovpilot.depthHold.state', function (state) {
+            if(state.enabled){
+            self.target = Number(state.targetDepth).toFixed(1);
             $(self.$.depth).addClass('inverted');
             $(self.$.depthTarget).removeClass('hidden');
             $(self.$.depthLock).removeClass('hidden');
-          });
-          emitter.on('plugin.rovpilot.depthHold.disabled', function () {
+          } else{
             self.target = 0;
             $(self.$.depth).removeClass('inverted');
             $(self.$.depthTarget).addClass('hidden');
             $(self.$.depthLock).addClass('hidden');
+}
           });
           emitter.on('plugin.diveprofile.watertype', function (data) {
             self.waterType = data.watertype;

@@ -1,6 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
 
-<dom-module id="newui-time">
+<dom-module id="orov-newui-time">
   <style type="text/css">
 
       #time-container {
@@ -59,7 +59,7 @@
   </template>
   <script>
     Polymer({
-      is: 'newui-time',
+      is: 'orov-newui-time',
       properties: {
         runtime: {
           type: String,
@@ -75,15 +75,15 @@
       behaviors: [namespace('behaviors').oROVStandard],
       registerEmitterHanlders: function(emitter) {
         var self = this;
-        emitter.withHistory.on('plugin.capestatus.time.time', function (time) {
-          self.time = time.formatted;
-        });
-        emitter.withHistory.on('plugin.capestatus.time.runtime', function (runtime) {
-          self.runtime = runtime.formatted;
+        emitter.withHistory.on('systemEnvironment.state', function (state) {
+          if ('runTime' in state.mcu){
+            self.runtime = state.mcu.runTime;
+          }
         });
       },
       attached: function () {
-
+        var self=this;
+        setInterval(function(){self.time = new Date().toLocaleTimeString();},1000);
       }
     });
   </script>

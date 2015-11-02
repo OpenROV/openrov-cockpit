@@ -29,8 +29,12 @@ function Hardware() {
       hardware.emitStatus('CAPA:255');
     }
     if (commandText === 'ligt') {
-      hardware.emitStatus('LIGP:' + commandParts[1] / 255);
-  //    console.log('HARDWARE-MOCK return light status');
+      hardware.emitStatus('LIGP:' + commandParts[1]);
+      console.log('HARDWARE-MOCK return light status:'+  commandParts[1]/100);
+    }
+    if (commandText === 'escp') {
+      hardware.emitStatus('ESCP:' + commandParts[1]);
+      console.log('HARDWARE-MOCK return ESC status:'+commandParts[1]);
     }
     if (commandText === 'tilt') {
       hardware.emitStatus('servo:' + commandParts[1]);
@@ -45,6 +49,7 @@ function Hardware() {
           hardware.laserEnabled = true;
           hardware.emitStatus('claser:255');
         }
+      console.log('HARDWARE-MOCK return laser status');
     }
 
     // Depth hold
@@ -117,7 +122,7 @@ function Hardware() {
   };
   var time = 1000;
   setInterval(function () {
-    hardware.emit('status', reader.parseStatus('time:' + time));
+    hardware.emit('status', reader.parseStatus('utim:' + time));
     time += 1000;
   }, 1000);
   setInterval(sendEvent, 3000);

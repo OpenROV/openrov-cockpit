@@ -42,7 +42,7 @@
           this.importHref(this.resolveUrl('../grapp-graph-epoch/grapp-graph-epoch.html'), function(e) {
               console.log("Imported grapp");
           });
-        },        
+        },
         registerEmitterHanlders: function(emitter){
           var self = this;
           emitter.on('plugin.connection-health.ping-latency',function(ms){

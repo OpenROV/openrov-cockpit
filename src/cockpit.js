@@ -126,9 +126,6 @@ deps.cockpit.on('disconnect', function () {
   if (connections === 0)
     controller.stop();
 });
-controller.on('status', function (status) {
-  deps.cockpit.volatile.emit('status', status);
-});
 controller.on('rovsys', function (data) {
   deps.cockpit.emit('rovsys', data);
 });

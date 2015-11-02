@@ -18,7 +18,10 @@
     console.log('Controllerboard2x:SystemPower plugin loaded');
 
     this.config = deps.config;
-    var cockpit = deps.cockpit;
+    this.cockpit = deps.cockpit;
+    this.rov = deps.rov;
+    var self = this;
+
     deps.rov.on('status', function(data) {
       var mappedPowerObject = sharedFunctions.telemetryToSystemPower(data);
 //      if (mappedPowerObject !== null){console.dir(mappedPowerObject)}
@@ -26,14 +29,10 @@
 
     deps.cockpit.on('plugin.systemPower.powerOnESCs', function () {
       self.rov.send('escp(1)');
-
-      deps.cockpit.emit('plugin.rovpilot.esc.enabled'); // should be handled through status
     });
 
     deps.cockpit.on('plugin.systemPower.powerOffESCs', function () {
       self.rov.send('escp(0)');
-
-      deps.cockpit.emit('plugin.rovpilot.esc.disabled'); // should be handled through status
     });
 
 

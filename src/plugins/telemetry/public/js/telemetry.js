@@ -32,8 +32,9 @@
       }
     });
 
-    self.cockpit.rov.on('plugin.telemetry.logData',function(data){
+    self.cockpit.rov.withHistory.on('plugin.telemetry.logData',function(data){
       self.cockpit.emit('plugin.telemetry.logData',data);
+      self.cockpit.emit('status',data);
     });
 
     self.cockpit.on('telemetry.registerDefinition',function(data){
@@ -41,11 +42,6 @@
         self.definitions[data.name]=data;
       }
     });
-
-    self.cockpit.rov.on('status',function(data){
-      self.cockpit.emit('status',data);
-    });
-
 
     /* Crawl the plugins looking for those with telemetry definitions */
     self.cockpit.loadedPlugins.forEach(function(plugin){

@@ -4,5 +4,5 @@
   }
   module.exports = function (name, deps) {
     return new PhotoCapture(name,deps);
-  };  
+  };
 })();

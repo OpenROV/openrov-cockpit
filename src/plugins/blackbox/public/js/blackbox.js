@@ -38,7 +38,7 @@
         self.logNavData(data);
       }
     });
-    this.cockpit.rov.on('status', function (data) {
+    this.cockpit.withHistory.on('status', function (data) {
       if (!jQuery.isEmptyObject(data)) {
         self.logStatusData(data);
       }

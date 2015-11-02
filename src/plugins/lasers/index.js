@@ -12,7 +12,7 @@
     deps.rov.on('status', function (data) {
       if ('claser' in data) {
         var enabled = data.claser == 255;
-        deps.cockpit.emit('plugin.laser.state', (enabled ? 'true' : 'false'));
+        deps.cockpit.emit('plugin.laser.state', {enabled:(enabled ? true : false)});
       }
     });
 

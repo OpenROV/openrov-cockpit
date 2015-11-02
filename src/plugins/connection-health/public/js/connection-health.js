@@ -20,7 +20,7 @@
       self.cockpit.rov.emit('ping', _starttime);
 
       var isConnected = self.pingtime <= 3000;
-      self.cockpit.emit('plugin.connection-health.connection.' + (isConnected ? 'connected' : 'disconnected'));
+      self.cockpit.emit('plugin.connection-health.state',{connected:(isConnected ? 'connected' : 'disconnected')});
     }, 1000);
 
     this.cockpit.rov.on('pong', function (id) {
@@ -34,7 +34,7 @@
             return total+number;
           },0);
       self.cockpit.emit('plugin.connection-health.ping-latency',self.pingtime);
-    //  console.log("ping:" +self.pingtime);
+      console.log("ping:" +self.pingtime);
     });
   };
   window.Cockpit.plugins.push(ConnectionHealth);

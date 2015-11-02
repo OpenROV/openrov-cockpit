@@ -70,8 +70,7 @@
                   switchable: false,
                   state: false,
                   events: [
-                    {message:'plugin.connection-health.connection.connected',fn: function(){return true;}},
-                    {message:'capestatus.connection-health.disconnected', fn: function(){return false;}}
+                    {message:'plugin.connection-health.state',fn: function(state){return state.connected;}}
                   ],
                   description: 'Communication status'
                 },
@@ -79,8 +78,7 @@
                   switchable: false,
                   state: false,
                   events: [
-                    {message:'plugin.input.gamepad.connected', fn: function(){return true;}},
-                    {message: 'plugin.input.gamepad.disconnected', fn: function(){return false;}}
+                    {message:'plugin.input.gamepad.state', fn: function(state){return state.connected;}}
                   ],
                   description: 'Gamepad active/inactive'
                 },
@@ -127,7 +125,7 @@
                   switchable: true,
                   state: false,
                   events: [
-                    {message:'plugin.laser.state',fn: function(state){return state.lasersEnabled;}}
+                    {message:'plugin.laser.state',fn: function(state){return state.enabled;}}
                   ],
                   description: 'Lasers on/off',
                   switch: function (state) {
@@ -141,11 +139,13 @@
                   state: false,
                   description: 'LED lights on/off',
                   events: [
-                    {message:'plugin.lights.state',fn: function(state){return state.lightsEnabled;}}
+                    {message:'plugin.lights.state',fn: function(state){return state.level>0;}}
                   ],
                   switch: function (state) {
                     if (self.eventEmitter !== undefined){
-                      self.eventEmitter.emit('plugin.lights.set',!state);
+                      var level = 1;
+                      if (state==true) level = 0;
+                      self.eventEmitter.emit('plugin.lights.set',level);
                     }
                   }
                 },

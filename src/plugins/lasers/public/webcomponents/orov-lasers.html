@@ -40,7 +40,7 @@
 
   <template>
 
-    <span id="laserIcon" on-click="toggle" class="indicator {{ lasersEnabled ? 'enabled' : '' }}" class="indicator"></span>
+    <span id="laserIcon" on-click="toggle" class$="{{computedLaserClass(lasersEnabled)}}"></span>
     <comment>{{lasersEnabled.type}}</comment>
   </template>
   <script>
@@ -73,9 +73,12 @@
         },
         registerEmitterHanlders: function(emitter){
           var self = this;
-          emitter.on('plugin.laser.state',function(data){
-            self.lasersEnabled = data;
+          emitter.on('plugin.laser.state',function(state){
+            self.lasersEnabled = state.enabled;
           });
+        },
+        computedLaserClass(value){
+          return 'indicator ' + (value ? 'enabled' : '')
         }
       })
     })();

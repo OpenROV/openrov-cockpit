@@ -69,7 +69,7 @@ $(document).ready(function() {
     {
       "tag": "orov-telemetry-item",
       "settings": {
-        "telemetryItem" : "vout",
+        "telemetryItem" : "deep",
 
       },
         "_linkhref": "telemetry/telemetry-item.html"
@@ -160,12 +160,7 @@ $(document).ready(function() {
         "_linkhref": "serial-monitor/orov-serial-monitor.html"
     }],
     "camera-display" : [
-      {
-        "tag": "orov-headsup-menu",
-        "settings": {
-        },
-        "_linkhref": "headsup-menu/orov-headsup-menu.html"
-     },
+
      {
        "tag": "orov-video",
        "settings": {
@@ -178,7 +173,20 @@ $(document).ready(function() {
            },
            "style": "position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:33;",
            "_linkhref": "navigation-data/orov-horizon.html"
-         }
+         },
+         {
+           "tag": "orov-topdowncompass",
+           "settings": {
+           },
+           "style": "position:absolute; bottom:0px; right:0px; width:100%; height:100%; z-index:33;",
+           "_linkhref": "navigation-data/topdowncompass.html"
+         },
+         {
+           "tag": "orov-headsup-menu",
+           "settings": {
+           },
+           "_linkhref": "headsup-menu/orov-headsup-menu.html"
+        }
         ]
        }
     ]

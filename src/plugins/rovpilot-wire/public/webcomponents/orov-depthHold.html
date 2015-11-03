@@ -26,7 +26,7 @@
   <template>
     <div on-click="toggleDepthHold" id="depthHold" class$="{{_computeClass(depthHoldEnabled)}}">
       <div>{{__('Depth')}}<div>
-      <div hidden$={{!depthHoldEnabled}}>{{_formatDepth(targetDepth)}}</div>
+      <div hidden$={{!depthHoldEnabled}}><span>{{_formatDepth(targetDepth)}}</span>{{__('m')}}</div>
     </div>
   </template>
   <script>
@@ -61,7 +61,7 @@
         },
         _formatDepth: function(depth){
           if (depth===null) return '--'
-          return depth.toFixed(1);
+          return (depth*100).toFixed(1); //cm -> m
         }
       });
     }());

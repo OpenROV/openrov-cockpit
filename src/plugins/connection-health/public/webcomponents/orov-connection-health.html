@@ -16,7 +16,7 @@
 
 
 
-        <div id="connectionHealth" class="{{ isConnected ? 'connected' : '' }}"></div>
+        <div id="connectionHealth" class$="{{computedClass(isConnected)}}"></div>
 
   </template>
   <script>
@@ -37,9 +37,12 @@
         },
         registerEmitterHanlders: function(emitter){
           var self = this;
-          emitter.on('plugin.connection-health.connect-state',function(connected){
-            self.isConnected = connected;
+          emitter.withHistory.on('plugin.connection-health.state',function(state){
+            self.isConnected = state.connected;
           });
+        },
+        computedClass: function(value){
+           return value ? 'connected' : '';
         }
       })
     })();

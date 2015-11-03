@@ -24,7 +24,7 @@
         //value of 0-1.0 representing percent
         var level = data.LIGPE;
         self.lights = level;
-        deps.cockpit.emit('plugin.externalLights.state', {state:level});
+        deps.cockpit.emit('plugin.externalLights.state', {level:level});
       }
     });
 

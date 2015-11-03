@@ -60,8 +60,8 @@
 }
 </style>
   <template>
-    <div id="internal_lights_indicator" class="level{{computedInternalClass}}" ></div>
-    <div id="external_lights_indicator" class="level{{computedExternalClass}}" ></div>
+    <div id="internal_lights_indicator" class$="{{computedLevelClass(internal_brightnessLevel)}}" ></div>
+    <div id="external_lights_indicator" class$="{{computedLevelClass(external_brightnessLevel)}}" ></div>
   </template>
   <script>
     (function() {
@@ -73,19 +73,16 @@
           external_brightnessLevel: {type: Number, value:0}
         },
         behaviors: [orovbehaviors.oROVStandard],
-        computedInternalClass : function(){
-          return internal_brightnessLevel;
-        },
-        computedExternalClass : function(){
-          return external_brightnessLevel;
+        computedLevelClass : function(value){
+          return 'level'+(Number(value).toFixed(1)*10);
         },
         registerEmitterHanlders: function(emitter){
           var self = this;
-          emitter.withHistory.on('plugin.lights.level',function(level){
-            self.internal_brightnessLevel = level;
+          emitter.withHistory.on('plugin.lights.state',function(state){
+            self.internal_brightnessLevel = state.level;
           });
-          emitter.withHistory.on('plugin.externalLights.level',function(level){
-            self.external_brightnessLevel = level;
+          emitter.withHistory.on('plugin.externalLights.state',function(state){
+            self.external_brightnessLevel = state,level;
           });
         }
 

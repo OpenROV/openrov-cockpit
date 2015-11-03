@@ -20,7 +20,7 @@
       self.cockpit.rov.emit('ping', _starttime);
 
       var isConnected = self.pingtime <= 3000;
-      self.cockpit.emit('plugin.connection-health.state',{connected:(isConnected ? 'connected' : 'disconnected')});
+      self.cockpit.emit('plugin.connection-health.state',{connected:isConnected});
     }, 1000);
 
     this.cockpit.rov.on('pong', function (id) {

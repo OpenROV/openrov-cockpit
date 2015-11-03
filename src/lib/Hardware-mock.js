@@ -29,7 +29,7 @@ function Hardware() {
       hardware.emitStatus('CAPA:255');
     }
     if (commandText === 'ligt') {
-      hardware.emitStatus('LIGP:' + commandParts[1]);
+      hardware.emitStatus('LIGP:' + commandParts[1]/100);
       console.log('HARDWARE-MOCK return light status:'+  commandParts[1]/100);
     }
     if (commandText === 'escp') {

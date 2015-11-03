@@ -1,3 +1,5 @@
 {
-  "vout": "vout"
+  "vout": "vout",
+  "iout": "iout",
+  "cpu": "cpu"
 }

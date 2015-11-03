@@ -1,0 +1,90 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id="orov-time">
+  <style type="text/css">
+
+      #time-container {
+        display: table;
+        color: #ffffff;
+        width: 100%;
+      }
+      .time-row {
+        display: table-row;
+      }
+      .time-cell {
+        display: table-cell;
+      }
+      #time-container #time,
+      #time-container #runtime
+      {
+        font-size: 1.6vw;
+      }
+      .line-cell {
+        display: table-cell;
+        width: 50%; height: 5px
+      }
+      .description-cell {
+        padding-left: 4px;
+        padding-right: 4px;
+        font-size: 0.9em;
+      }
+      .line-cell hr {
+        display: block;
+        height: 1px;
+        border: 0;
+        border-top: 0.1em solid white;
+        margin: 0 0 .2em;
+        padding: 0;
+      }
+      .text-center { text-align: center;}
+
+    </style>
+  <template>
+    <div id="time-container" class="center">
+      <div class="time-row">
+        <div id="time" class="time-cell text-center">{{time}}</div>
+      </div>
+      <div class="time-row">
+        <div class="time-cell">
+          <span class="line-cell"><hr></span>
+          <span class="time-cell description-cell text-center">{{__('RUN')}}</span>
+          <span class="line-cell"><hr></span>
+        </div>
+      </div>
+      <div class="time-row">
+        <div id="runtime" class="time-cell text-center">{{ runtime }}</div>
+      </div>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'orov-time',
+      properties: {
+        runtime: {
+          type: String,
+          value: '00:00:00'
+        },
+        time: {
+          value: function () {
+            return new Date().toLocaleTimeString();
+          },
+          notify: true
+        }
+      },
+      behaviors: [namespace('behaviors').oROVStandard],
+      registerEmitterHanlders: function(emitter) {
+        var self = this;
+        emitter.withHistory.on('systemEnvironment.state', function (state) {
+          if ('runTime' in state.mcu){
+            self.runtime = state.mcu.runTime;
+          }
+        });
+      },
+      attached: function () {
+        var self=this;
+        setInterval(function(){self.time = new Date().toLocaleTimeString();},1000);
+      }
+    });
+  </script>
+</dom-module>

@@ -34,7 +34,6 @@
             return total+number;
           },0);
       self.cockpit.emit('plugin.connection-health.ping-latency',self.pingtime);
-      console.log("ping:" +self.pingtime);
     });
   };
   window.Cockpit.plugins.push(ConnectionHealth);

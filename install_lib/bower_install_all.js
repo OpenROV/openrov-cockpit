@@ -34,6 +34,7 @@ finder.on('end', function(){
 
 var installbower = function(index, array){
   var dir = array[index];
+  console.log('======== installing =======');
   console.log(dir);
   bower.commands
   .install(['bower.json'],{ save: false}, { cwd: dir, force:true})

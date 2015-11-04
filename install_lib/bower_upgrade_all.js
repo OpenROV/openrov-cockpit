@@ -37,6 +37,7 @@ finder.on('end', function(){
 var result = "";
 var installbower = function(index, array){
   var file = array[index];
+  console.log('======== installing =======');
   console.log(file);
   ncu.run({
       packageFile: file,

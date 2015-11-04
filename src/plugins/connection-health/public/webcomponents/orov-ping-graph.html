@@ -9,10 +9,15 @@
     height: 40px;
     line-height: 40px;
     font-size: 2vw;
+    position:absolute;
+    top:0;
+    left:0;
+    mix-blend-mode: multiply;
+    z-index: 2;
   }
   </style>
     <template>
-    <div on-click="toggle">
+    <div on-click="toggle" style="position:relative;">
     <!--link href="../grapp-graph-epoch/grapp-graph-epoch.html" rel="import"-->
       <grapp-graph-epoch id="timegraph" hidden="{{!enabled}}" type="time.bar" window-size="10" history-size="10" axis="" width="100" height="40">
         <grapp-graph-epoch-series label="Time Series 1"

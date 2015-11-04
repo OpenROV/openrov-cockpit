@@ -1,8 +1,16 @@
 <link rel="import" href="../polymer/polymer.html">
 <dom-module name="orov-thrustfactor">
   <style>
-  tf {
-    background-color: black;
+  :host {
+    padding: 4px;
+  }
+  label {
+    font-size: var(--thrustfactor-label-font-size,1vw);
+    color: var(--thrustfactor-label-color,white);
+    @apply(--thrustfactor-label);
+  }
+  #tf {
+    background-color: inherit;
     color: white;
     width: 40px;
     height: 40px;
@@ -11,7 +19,7 @@
   }
   </style>
   <template>
-    <label for="tf">{{__('Thrust Factor')}}</label>
+    <label hidden$="{{!displayLabel}}" for="tf">{{__('Thrust Factor')}}</label>
     <span id='tf'>{{thrustFactor}}</span>
 
   </template>
@@ -23,7 +31,8 @@
           thrustFactor: {
             type: Number,
             value: 2
-          }
+          },
+          displayLabel: {type:Boolean, value:false}
         },
         behaviors: [namespace('behaviors').oROVStandard],
         registerEmitterHanlders: function(emitter){

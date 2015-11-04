@@ -33,6 +33,7 @@
     <link rel="import" href="components/telemetry/orov-telemetry-monitor.html">
     <link rel="import" href="components/telemetry/telemetry-item.html">
     <link rel="import" href="components/controllerboard2x/orov-time.html">
+    <link rel="import" href="components/controllerboard2x/orov-battery-status.html">
     <link rel="import" href="components/connection-health/orov-connection-health.html">
     <link rel="import" href="components/camera-tilt/orov-servo-tilt.html">
     <link rel="import" href="components/externallights/orov-external-brightness-indicator.html">
@@ -312,45 +313,13 @@
 
   #footer{
     height: 150px;
-      bottom: -10px;
+    bottom: -10px;
   }
 
   .full-height{
     height: 100%;
   }
 
-
-  .battery0 {
-      background: #ffffff;
-  }
-
-  #batteryIndicator{
-      width:50px;
-      height: 22px;
-      background-image: url('../img/batterylevel.png');
-      background-repeat:no-repeat;
-      background-position:0px 0px;
-  }
-
-  #batteryIndicator.level1 {
-      background-position:0px 0px;
-  }
-
-  #batteryIndicator.level2 {
-      background-position: 0px -24px;
-  }
-
-  #batteryIndicator.level3 {
-      background-position: 0px -49px;
-  }
-
-  #batteryIndicator.level4 {
-      background-position:0px -73px;
-  }
-
-  #batteryIndicator.level5 {
-      background-position:0px -96px;
-  }
 
   #arduiniFirmware-details {
     width: 95%;
@@ -387,7 +356,41 @@
       display: block;
       min-height: inherit;
   }
+
+  orov-time {
+    width:100px;
+  }
+
+  orov-connection-health {
+    display: inline;
+    float: none;
+  }
+
+  #footercontent {
+  }
+
+  #footercontent label {
+    font-size: 1vw;
+    color: white;
+  }
+
+  #footercontent > div {
+    margin: 4px;
+    width: 80px;
+    position: relative;
+  }
+
   </style>
+  <style is="custom-style">
+  orov-thrustfactor{
+    --thrustfactor-label: {
+      font-size: 1vw;
+    };
+
+    --thrustfactor-label-color: white;
+  }
+  </style>
+
   <body>
 
     <div id="UI" class="full-height">
@@ -437,15 +440,37 @@
         <div id="footer" class="navbar navbar-inverse navbar-fixed-bottom nav-collapse collapse visible-desktop">
           <div class="navbar-inner">
             <div id="footercontent" class="container-fluid" style="height: 100%">
-              <orov-thrustfactor class="pull-left"  event-emitter="{{cockpit-event-emitter}}"></orov-thrustfactor>
-              <orov-connection-health class="pull-left"  event-emitter="{{cockpit-event-emitter}}"></orov-connection-health>
-              <orov-topdowncompass class="pull-left" event-emitter="{{cockpit-event-emitter}}"></orov-topdowncompass>
-              <orov-ping-graph class="pull-left" event-emitter="{{cockpit-event-emitter}}"></orov-ping-graph>
-              <orov-telemetry-item class="pull-right" telemetry-item="iout" event-emitter="{{cockpit-event-emitter}}"></orov-telemetry-item>
-              <orov-telemetry-item class="pull-right" telemetry-item="vout" event-emitter="{{cockpit-event-emitter}}"></orov-telemetry-item>
-              <orov-telemetry-item  class="pull-right" telemetry-item="cpu" event-emitter="{{cockpit-event-emitter}}"></orov-telemetry-item>
-              <orov-time  class="pull-right" event-emitter="{{cockpit-event-emitter}}"></orov-time>
-              <capestatus-footer class="pull-right"></capestatus-footer>
+              <div class="pull-left text-center">
+                <label for='orov-thrustfactor'>{{__('ThrustFactor')}}</label>
+                <orov-thrustfactor event-emitter="{{cockpit-event-emitter}}"></orov-thrustfactor>
+              </div>
+              <div class="pull-left text-center">
+                <label>{{__('Connection')}}</label>
+                <orov-connection-health event-emitter="{{cockpit-event-emitter}}"></orov-connection-health>
+              </div>
+              <div class="pull-left text-center">
+                <orov-topdowncompass event-emitter="{{cockpit-event-emitter}}"></orov-topdowncompass>
+              </div>
+              <div class="pull-left text-center">
+                <label>{{__('Latency')}}</label>
+                <orov-ping-graph event-emitter="{{cockpit-event-emitter}}"></orov-ping-graph>
+              </div>
+              <div class="pull-right text-center">
+                <label>{{__('Clock')}}</label>              
+                <orov-time event-emitter="{{cockpit-event-emitter}}"></orov-time>
+              </div>
+              <div class="pull-right text-center">
+                <label>{{__('CPU %')}}</label>
+                <orov-telemetry-item  telemetry-item="cpu" event-emitter="{{cockpit-event-emitter}}"></orov-telemetry-item>
+              </div>
+              <div class="pull-right text-center">
+                <label>{{__('Battery')}}</label>
+                <orov-battery-status event-emitter="{{cockpit-event-emitter}}"></orov-battery-status>
+              </div>
+              <div class="pull-right text-center">
+                <label>{{__('Board Current')}}</label>
+                <orov-telemetry-item telemetry-item="iout" event-emitter="{{cockpit-event-emitter}}"></orov-telemetry-item>
+              </div>
             </div>
           </div>
         </div>

@@ -15,8 +15,8 @@
     "tests"
   ],
   "dependencies": {
-    "dexie": "~1.1.0",
-    "comma-separated-values": "~3.6.1",
+    "dexie": "~1.2.0",
+    "comma-separated-values": "~3.6.4",
     "fontawesome-iconset": "philya/font-awesome-polymer-icons#master"
   }
 }

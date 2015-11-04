@@ -2,7 +2,7 @@
   "name": "static openrov",
   "dependencies": {
     "fpsmeter": "~0.3.1",
-    "i18next": "~1.10.3",
+    "i18next": "~1.11.0",
     "iron-ajax": "PolymerElements/iron-ajax#~1.0.4",
     "jquery": "2.1",
     "jquery-ui": "1.11",
@@ -14,7 +14,7 @@
     "polymer": "~1.2.0"
   },
   "resolutions": {
-    "polymer": "~1.1.5",
+    "polymer": "~1.2.1",
     "webcomponentsjs": "0.7.14"
   }
 }

@@ -1,14 +1,22 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../paper-tooltip/paper-tooltip.html">
+
 <dom-module name="orov-blackbox-status">
   <!--link rel="import" type="css" href="components-font-awesome/css/font-awesome.min.css"-->
   <link rel="import" href="../fontawesome-iconset/fa-all.html">
   <style>
+    iron-icon {
+      padding-top: 20%;
+      padding-bottom: 20%;
+    }
     .recording{
       color: green;
     }
   </style>
   <template>
-    <iron-icon id='icon2' icon="fa:database"></iron-icon>
+    <paper-tooltip for="icon2">{{__('Data Recorder')}}</paper-tooltip>
+    <iron-icon on-click="handleClick" id='icon2' icon="fa:database"></iron-icon>
     <!--i id='icon' class="fa fa-database fa-2x"></i-->
   </template>
   <script>
@@ -35,6 +43,15 @@
             this.$.icon2.className = this.$.icon2.className + ' recording';
           } else {
             this.$.icon2.className = this.$.icon2.className.replace(/\brecording\b/,'');
+          }
+        },
+        handleClick: function(){
+          if (this.eventEmitter !== undefined){
+            if (status===true) {
+              this.eventEmitter.emit('plugin-blackbox-recording-stop');
+            } else {
+              this.eventEmitter.emit('plugin-blackbox-recording-start');
+            }
           }
         }
       })

@@ -41,7 +41,11 @@
     <link rel="import" href="components/classic-ui/gamepad.html">
     <link rel="import" href="components/classic-ui/holds.html">
     <link rel="import" href="components/rovpilot/orov-thrustfactor.html">
+    <link rel="import" href="components/rovpilot-wire/orov-depthHold.html">
+    <link rel="import" href="components/rovpilot-wire/orov-headingHold.html">
     <link rel="import" href="components/blackbox/orov-blackbox-status.html">
+    <link rel="import" href="components/input-controller/orov-inputs-list.html">
+
 
   </head>
 
@@ -117,6 +121,29 @@
   .navbar .nav>li>a {
       padding-left: 5px;
       padding-right: 5px;
+      height: 20px;
+  }
+
+  #switches {
+    height: 100%;
+  }
+
+  #switches >li>a{
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 5px;
+    padding-right: 5px;
+    height: 100%;
+    width:50px;
+  }
+
+  #switches >li>a>*{
+    width:100%;
+    height: 100%;
+  }
+
+  #switches >li{
+    height: 100%;
   }
 
   ul.nav>li>* {
@@ -370,7 +397,7 @@
   }
 
   #footercontent label {
-    font-size: 1vw;
+    font-size: .7vw;
     color: white;
   }
 
@@ -398,17 +425,19 @@
         <div id="header" class="navbar navbar-inverse navbar-fixed-top nav-collapse">
           <div class="navbar-inner">
             <a class="brand" href="#"><img src="../../themes/OpenROV/img/openrov.png" class="logo"/><span class="navbar-titel">Cockpit</span></a>
-            <ul class="nav" id="navtoolbar">
-              <li><a href="#"><img id="keyboardpopover" src="../../themes/OpenROV/img/keyboard.png" data-trigger="hover" data-container="html /deep/ #keyboardInstructions" data-placement="bottom" rel='popover' title="keyboard commands" html="true" /></a></li>
+            <ul class="nav pull-left" id="navtoolbar">
+              <li><a href="#"><img id="keyboardpopover" src="../../themes/OpenROV/img/keyboard.png" onclick="document.querySelector('#keyboard-listing').open();"/></a></li>
               <!--<li><a href="#"><img id="keyboardpopover" src="../../themes/OpenROV/img/keyboard.png" data-placement="bottom" rel='popover' title="keyboard commands" html="true" /></a></li>-->
               <li><a href="#" id="servoTilt" ><orov-servo-tilt class="pull-left" event-emitter="{{cockpit-event-emitter}}"></orov-servo-tilt></a></li>
-              <li><orov-external-brightness-indicator  class="pull-left"  event-emitter="{{cockpit-event-emitter}}"></orov-external-brightness-indicator></li>
-              <li><rov-gamepad class="pull-left"></rov-gamepad></li>
-              <li><orov-lasers class="pull-left"  event-emitter="{{cockpit-event-emitter}}"></orov-lasers></li>
-              <li><rov-depth-and-heading-hold class="pull-left"></rov-depth-and-heading-hold></li>
-              <li><orov-blackbox-status class="pull-left" event-emitter="{{cockpit-event-emitter}}"></orov-blackbox-status></li>
+              <li><a href="#"><orov-external-brightness-indicator  class="pull-left"  event-emitter="{{cockpit-event-emitter}}"></orov-external-brightness-indicator></a></li>
+              <li><a href="#"><rov-gamepad class="pull-left"></rov-gamepad></a></li>
             </ul>
-
+            <ul class="nav center" id="switches">
+              <li><a href="#"><orov-lasers class="pull-left"  event-emitter="{{cockpit-event-emitter}}"></orov-lasers></a></li>
+              <li><a href="#"><orov-depthHold class="pull-left"  event-emitter="{{cockpit-event-emitter}}"></rov-depthHold></a></li>
+              <li><a href="#"><orov-headingHold class="pull-left"  event-emitter="{{cockpit-event-emitter}}"></rov-headingHold></a></li>
+              <li><a href="#"><orov-blackbox-status class="pull-left" event-emitter="{{cockpit-event-emitter}}"></orov-blackbox-status></a></li>
+            </ul>
             <rov-menu id="menuitems" class="nav pull-right">
               <li><a href="#" id="show-settings" onclick="document.querySelector('#plugin-settings').open();">{{__('Settings')}}</a></li>
               <li><a href="#" id="show-diagnostic" onclick="document.querySelector('#diagnostic').open();">{{__('Diagnostic')}}</a></li>
@@ -456,12 +485,11 @@
                 <orov-ping-graph event-emitter="{{cockpit-event-emitter}}"></orov-ping-graph>
               </div>
               <div class="pull-right text-center">
-                <label>{{__('Clock')}}</label>              
                 <orov-time event-emitter="{{cockpit-event-emitter}}"></orov-time>
               </div>
               <div class="pull-right text-center">
                 <label>{{__('CPU %')}}</label>
-                <orov-telemetry-item  telemetry-item="cpu" event-emitter="{{cockpit-event-emitter}}"></orov-telemetry-item>
+                <orov-telemetry-item  showAsGraph=false telemetry-item="cpu" event-emitter="{{cockpit-event-emitter}}"></orov-telemetry-item>
               </div>
               <div class="pull-right text-center">
                 <label>{{__('Battery')}}</label>
@@ -469,7 +497,7 @@
               </div>
               <div class="pull-right text-center">
                 <label>{{__('Board Current')}}</label>
-                <orov-telemetry-item telemetry-item="iout" event-emitter="{{cockpit-event-emitter}}"></orov-telemetry-item>
+                <orov-telemetry-item as-graph=false telemetry-item="iout" event-emitter="{{cockpit-event-emitter}}"></orov-telemetry-item>
               </div>
             </div>
           </div>
@@ -489,6 +517,12 @@
           <div>
           <orov-settings-manager event-emitter="{{cockpit-event-emitter}}"></orov-settings-manager>
         </div>
+        </drop-in-dialog>
+
+        <drop-in-dialog id="keyboard-listing" header="Key Mappings">
+          <div>
+            <orov-inputs-list id="keyboardInstructions" event-emitter="{{cockpit-event-emitter}}"></orov-inputs-list>
+          </div>
         </drop-in-dialog>
 
         <drop-in-dialog id="diagnostic" header="Diagnostics">

@@ -2,16 +2,17 @@
 <dom-module name="orov-telemetry-item">
 <style>
 .std {
-  background-color: black;
-  color: white;
-  width: 100px;
+  background-color: var(--telemetry-item-text-background-color, inherit);
+  color: var(--telemetry-item-text-color, white);
+  width: var(--telemetry-item-text-width, 100px);
+  font-size: var(--telemetry-item-text-font-size, 2vw);
   height: 40px;
   line-height: 40px;
-  font-size: 2vw;
+  @apply(--telemetry-item-text);
 }
 
 label {
-  background-color: black;
+  background-color: inherit;
   color: white;
   height: 40px;
   line-height: 40px;
@@ -22,12 +23,12 @@ label {
     <label  hidden$="{{!showLabel}}">{{__(telemetryItem)}}</label>
   <div on-click="toggle">
   <!--link href="../grapp-graph-epoch/grapp-graph-epoch.html" rel="import"-->
-    <grapp-graph-epoch id="timegraph" hidden="{{!enabled}}" type="time.line" axis="" width="100" height="40">
+    <grapp-graph-epoch id="timegraph" hidden="{{!asGraph}}" type="time.line" axis="" width="100" height="40">
       <grapp-graph-epoch-series label="Time Series 1"
         data='[{"time":1370044800,"y":1},{"time":1370044801,"y":10}]'>
       </grapp-graph-epoch-series>
     </grapp-graph-epoch>
-  <span id="instantvalue" hidden="{{enabled}}" class="std">{{telemetryItemValue}}</span>
+  <span id="instantvalue" hidden="{{asGraph}}" class="std">{{telemetryItemValue}}</span>
 </div>
   </template>
 
@@ -40,7 +41,8 @@ label {
           showLabel: {type:Boolean, value:false, presisted: true},
           telemetryItem: {type:String, persisted: true},
           telemetryItemValue: {type:String, observer: 'telemetryItemValueChanged'},
-          enabled: {type: Boolean, value: true}
+          asGraph: {type: Boolean, value: true, persisted: true},
+          toggleEnabled: {type:Boolean, value: true}
         },
         behaviors: [namespace('behaviors').oROVStandard],
         registerEmitterHanlders: function(emitter){
@@ -71,7 +73,9 @@ label {
           }
         },
         toggle: function(){
-          this.enabled = !this.enabled;
+          if (this.toggleEnabled){
+            this.asGraph = !this.asGraph;
+          }
         }
       })
     })();

@@ -10,6 +10,7 @@
     "mousetrap": "~1.5.3",
     "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#~1.0.2",
     "paper-slider": "PolymerElements/paper-slider#^1.0.4",
+    "paper-tooltip": "PolymerElements/paper-tooltip#~1.1.1",
     "polymer": "~1.2.0"
   },
   "resolutions": {

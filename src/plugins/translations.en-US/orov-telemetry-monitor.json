@@ -3,5 +3,6 @@
   "Internal lights percent of power": "Internal lights percent of power",
   "Camera tilt reported in microseconds": "Camera tilt reported in microseconds",
   "Depth in meters": "Depth in meters",
-  "Heading in degrees 0 to 360": "Heading in degrees 0 to 360"
+  "Heading in degrees 0 to 360": "Heading in degrees 0 to 360",
+  "Scaling Laser power 0 to 255": "Scaling Laser power 0 to 255"
 }

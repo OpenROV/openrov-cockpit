@@ -1,19 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
 <dom-module name="orov-lasers">
 <style>
-  .indicator {
-    top: 5px;
-    height: 20px;
-    line-height: 20px;
-    padding: 10px 2px;
-    background-color: transparent;
-  }
-
-  #laser {
-    color: white;
-    border: 1px solid #cd0a0a;
-    display: list-item;
-  }
 
   #laserIcon.enabled {
     background-color: #cd0a0a;
@@ -22,25 +9,19 @@
   #laserIcon {
     color: white;
     border: 1px solid #cd0a0a;
-    display: list-item;
-    width: 40px;
-    height: 35px;
-    margin-top: -7px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-image: url('data:image/png;base64,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');
+    width: auto;
+    height: 100%;
   }
 
-  #laserIcon.enabled {
-    background-image: url('data:image/png;base64,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');
-
-  }
 </style>
 
   <template>
 
-    <span id="laserIcon" on-click="toggle" class="indicator {{ lasersEnabled ? 'enabled' : '' }}" class="indicator"></span>
+    <img id="laserIcon" on-click="toggle"
+     class$="{{computedLaserClass(lasersEnabled)}}"
+     src="data:image/png;base64,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"
+    >
+    </img>
     <comment>{{lasersEnabled.type}}</comment>
   </template>
   <script>
@@ -54,7 +35,7 @@
         toggle: function() {
           this.fire('toggle-lasers');
           if (this.eventEmitter !== undefined){
-            this.eventEmitter.emit("plugin.laser.toggle");
+            this.eventEmitter.emit("plugin.laser.set",!self.lasersEnabled);
           }
         },
         attached: function(){
@@ -73,9 +54,12 @@
         },
         registerEmitterHanlders: function(emitter){
           var self = this;
-          emitter.on('plugin.laser.state',function(data){
-            self.lasersEnabled = data;
+          emitter.on('plugin.laser.state',function(state){
+            self.lasersEnabled = state.enabled;
           });
+        },
+        computedLaserClass(value){
+          return 'indicator ' + (value ? 'enabled' : '')
         }
       })
     })();

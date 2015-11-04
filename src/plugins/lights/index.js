@@ -13,10 +13,16 @@
       adjustLights(value);
     });
 
+    deps.cockpit.on('plugin.lights.set', function (value) {
+      setLights(value);
+    });
+
     // Arduino
     deps.rov.on('status', function (data) {
       if ('LIGP' in data) {
-        deps.cockpit.emit('plugin.lights.level', data.LIGP);
+        //value of 0-1.0 representing percent
+        var level = data.LIGP;
+        deps.cockpit.emit('plugin.lights.state', {level:level});
       }
     });
 

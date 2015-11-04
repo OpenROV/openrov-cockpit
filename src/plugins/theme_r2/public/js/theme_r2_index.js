@@ -1,4 +1,6 @@
 (function (window, $, undefined) {
+  if (window.openrovtheme!=='theme_r2') return;
+
   'use strict';
   var ThemeR2;
   ThemeR2 = function ThemeR2(cockpit) {
@@ -91,4 +93,4 @@ $('#telemetry').define = function(name,callback){
           <<%ui.systempanel[i].name %> event-emitter={{cockpit-event-emitter}}></<%ui.systempanel[i].name %>>
           <% } %>
 */
-});
+})(window,$,undefined);

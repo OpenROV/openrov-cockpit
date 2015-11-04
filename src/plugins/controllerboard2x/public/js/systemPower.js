@@ -64,12 +64,20 @@
       self.cockpit.rov.emit('plugin.systemPower.powerOnESCs');
     });
 
-    this.cockpit.rov.on('status',function(status){
+    this.cockpit.withHistory.on('status',function(status){
       //Work around not having the explicit status in the MCU code
       if ('log' in status){
         if (status[log].indexOf('log:escpower=') > 0){
           //Check for 1 or 0 and return as an on/off message
         }
+      }
+
+      //TODO: Make sure the firmware sends ESCP
+      if ('ESCP' in status){
+        var result = true;
+        //since we are pulling text values from status we use == instead of ===
+        if (status.ESCP == 0) result = false;
+        self.cockpit.emit('plugin.systemPower.state',{escs_powered:result});
       }
 
       var powerObject = window.controllerboard2x.telemetryToSystemPower(status);

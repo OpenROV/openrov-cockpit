@@ -69,7 +69,7 @@ $(document).ready(function() {
     {
       "tag": "orov-telemetry-item",
       "settings": {
-        "telemetryItem" : "vout",
+        "telemetryItem" : "deep",
 
       },
         "_linkhref": "telemetry/telemetry-item.html"
@@ -130,9 +130,23 @@ $(document).ready(function() {
       "tag": "javascript-latency",
       "settings": {
 
+      }
       },
-        "_linkhref": "host-diagnostics/javascript-loopspeed.html"
-    }, {
+      {
+        "tag": "orov-depthHold",
+        "settings": {
+
+        },
+        "_linkhref": "rovpilot-wire/orov-depthHold.html"
+      },
+      {
+        "tag": "orov-headingHold",
+        "settings": {
+
+        },
+        "_linkhref": "rovpilot-wire/orov-headingHold.html"
+      },
+      {
       "tag": "orov-thrustfactor",
       "settings": {
 
@@ -146,12 +160,35 @@ $(document).ready(function() {
         "_linkhref": "serial-monitor/orov-serial-monitor.html"
     }],
     "camera-display" : [
-      {
-        "tag": "orov-headsup-menu",
-        "settings": {
-        },
-        "_linkhref": "headsup-menu/orov-headsup-menu.html"
-     }
+
+     {
+       "tag": "orov-video",
+       "settings": {
+       },
+       "_linkhref": "video/orov-video.html",
+       "content" : [
+         {
+           "tag": "orov-horizon",
+           "settings": {
+           },
+           "style": "position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:33;",
+           "_linkhref": "navigation-data/orov-horizon.html"
+         },
+         {
+           "tag": "orov-topdowncompass",
+           "settings": {
+           },
+           "style": "position:absolute; bottom:0px; right:0px; width:100%; height:100%; z-index:33;",
+           "_linkhref": "navigation-data/topdowncompass.html"
+         },
+         {
+           "tag": "orov-headsup-menu",
+           "settings": {
+           },
+           "_linkhref": "headsup-menu/orov-headsup-menu.html"
+        }
+        ]
+       }
     ]
   };
 
@@ -191,28 +228,48 @@ $(document).ready(function() {
 
   window.addEventListener('WebComponentsReady', function(e) {
     var savedConfig =  window.OROV.layoutConfig
+
+    var addelement= function(document,area,elementDefinition){
+
+      var el = document.createElement(elementDefinition.tag);
+      if (elementDefinition.tag.startsWith('orov')){
+         el.eventEmitter = window.cockpit.storeAndForward;
+      }
+      area.appendChild(el);
+
+      for (var s in elementDefinition.settings){
+        el[s] = elementDefinition.settings[s];
+      }
+
+      if ('style' in elementDefinition){
+        el.setAttribute("style",elementDefinition.style);
+      }
+
+      if ('content' in elementDefinition){
+        for (var c in elementDefinition.content){
+          addelement(document,el,elementDefinition.content[c]);
+        }
+      }
+
+      var link = document.createElement('link');
+      link.href = 'components/'+ elementDefinition._linkhref;
+      link.rel = "import";
+      link.async = false;
+      document.head.appendChild(link);
+
+      //        for (var l in el.properties){
+      //          if ((el.properties[l].persisted) && (l in savedConfig[k[i]][j].settings )){
+      //            el[l] = savedConfig[k[i]][j].settings[l];
+      //          }
+      //        }
+
+
+    }
     var k = Object.keys(savedConfig);
     for (var i in k){
       var area = $('#' + k[i]);
       for (var j in savedConfig[k[i]]){
-        var el = document.createElement(savedConfig[k[i]][j].tag);
-        if (savedConfig[k[i]][j].tag.startsWith('orov')){
-           el.eventEmitter = window.cockpit;
-        }
-        area.append(el);
-
-        for (var s in savedConfig[k[i]][j].settings){
-          el[s] = savedConfig[k[i]][j].settings[s];
-        }
-
-//        for (var l in el.properties){
-//          if ((el.properties[l].persisted) && (l in savedConfig[k[i]][j].settings )){
-//            el[l] = savedConfig[k[i]][j].settings[l];
-//          }
-//        }
-
-
-
+        addelement(document,area[0],savedConfig[k[i]][j]);
       }
     }
   });
@@ -227,7 +284,7 @@ $(document).ready(function() {
     for( var i in wid){
       var el1 = document.createElement(wid[i].name);
       if(wid[i].name.startsWith('orov')){
-        el1.eventEmitter = window.cockpit;
+  //      el1.eventEmitter = window.cockpit.storeAndForward;
       }
       el1._linkhref = wid[i].url;
       $('#'+wid[i].defaultUISymantic).append(el1);

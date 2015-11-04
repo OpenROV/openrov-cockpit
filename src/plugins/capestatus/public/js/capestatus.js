@@ -22,7 +22,7 @@
   //so that the reference to this instance is available for further processing
   capestatus.Capestatus.prototype.listen = function listen() {
     var capes = this;
-    this.cockpit.rov.on('status', function (data) {
+    this.cockpit.withHistory.on('status', function (data) {
       capes.UpdateStatusIndicators(data);
     });
   };

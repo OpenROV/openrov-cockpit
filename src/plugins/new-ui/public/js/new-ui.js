@@ -1,12 +1,28 @@
 (function (window, $, undefined) {
   'use strict';
+  if (window.openrovtheme!=='new-ui') return;
   var plugins = namespace('plugins');
   plugins.NewUI = function NewUI(cockpit) {
-    var jsFileLocation = urlOfJsFile('new-ui.js');
 
+    var jsFileLocation = urlOfJsFile('new-ui.js');
+    this.cockpit = cockpit;
     this.name = 'new-ui';   // for the settings
     this.viewName = 'New UI'; // for the UI
   };
+
+  plugins.NewUI.prototype.listen = function listen(){
+    $('#t')[0]['cockpit-event-emitter'] = this.cockpit;
+
+    window.cockpit_int.i18n.loadNamespace('new-ui', function() {  });
+    var key_s = window.cockpit_int.i18n.options.keyseparator;
+    var ns_s =  window.cockpit_int.i18n.options.nsseparator;
+    var prefix = 'new-ui';
+    $('#t')[0]['__']=function(str){
+      window.cockpit_int.i18n.options.ns.defaultNs = prefix
+      return window.cockpit_int.__(str);
+    };
+
+  }
 
   plugins.NewUI.prototype.inputDefaults = function inputDefaults(){
     var self = this;

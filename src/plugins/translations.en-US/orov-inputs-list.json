@@ -89,5 +89,13 @@
   "newUi.showTelemetry": "newUi.showTelemetry",
   "Show the telemetry window.": "Show the telemetry window.",
   "newUi.showSerialMonitor": "newUi.showSerialMonitor",
-  "Show the serial port window.": "Show the serial port window."
+  "Show the serial port window.": "Show the serial port window.",
+  "plugin.laser.Toggle": "plugin.laser.Toggle",
+  "Toggles the lasers on or off.": "Toggles the lasers on or off.",
+  "video.keyBoardMapping": "video.keyBoardMapping",
+  "Video for keymapping.": "Video for keymapping.",
+  "video.testMessage": "video.testMessage",
+  "another video": "another video",
+  "main.toggleHeadsUpDisplay": "main.toggleHeadsUpDisplay",
+  "Toggle the heads-up-display on/off": "Toggle the heads-up-display on/off"
 }

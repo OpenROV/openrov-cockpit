@@ -6,7 +6,7 @@
 (function() {
   var MessageManager = function(socket) {
     this.socket = socket;
-
+    var self = this;
     //Apparently socket checks the last variable for a function callback and
     //does magic.  Have to send only the right number of arguments.
     this.onAny(function(data1, data2, data3, data4, data5) {
@@ -25,6 +25,11 @@
       }
     });
 
+    this.withHistory = {
+      on: function on(aType, aListener){
+            self.socket.withHistory.on(aType,aListener);
+          }
+    }
 
     this.on('newListener', function(aType, aListener) {
       if (aType!=='*'){

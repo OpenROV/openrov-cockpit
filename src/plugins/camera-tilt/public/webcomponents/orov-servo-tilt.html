@@ -42,7 +42,7 @@
         },
         registerEmitterHanlders: function(emitter){
           var self = this;
-          emitter.on('plugin.cameraTilt.angle',function(angle){
+          emitter.withHistory.on('plugin.cameraTilt.angle',function(angle){
             self.servoAngle = angle;
           });
         }

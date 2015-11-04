@@ -33,14 +33,9 @@
         registerEmitterHanlders: function(emitter){
           var self = this;
 
-          //For requesting initial state information
-          emitter.emit('plugin.example.getAttributes',function(attr){
-            self.Name=attr.name;
-          })
-
           //For subscribing to changes on state information
-          emitter.on('plugin.example.attributes-changed',function(attr){
-            self.Name=attr.name
+          emitter.withHistory.on('plugin.example.attributes-changed',function(attr){
+            self.Name=attr.name;
           });
         }
 
@@ -48,4 +43,4 @@
     })();
   </script>
 
-</polymer-element>
+</dom-module>

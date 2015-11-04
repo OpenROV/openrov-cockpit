@@ -47,7 +47,7 @@
   //so that the reference to this instance is available for further processing
   plugins.CameraTilt.prototype.listen = function listen() {
     var self = this;
-    this.cockpit.rov.on('plugin.cameraTilt.angle',function(angle){
+    this.cockpit.rov.withHistory.on('plugin.cameraTilt.angle',function(angle){
       self.cockpit.emit('plugin.cameraTilt.angle',angle);
     });
 

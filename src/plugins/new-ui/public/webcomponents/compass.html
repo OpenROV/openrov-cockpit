@@ -103,15 +103,16 @@
       behaviors: [namespace('behaviors').oROVStandard],
       registerEmitterHanlders: function(emitter) {
         var self = this;
-        emitter.on('plugin.rovpilot.headingHold.target', function(target) {
-          self.setBearing(target);
-          self.options.headingFill = 'none';
-          self.options.headingStrokeWidth = self.options.headingStrokeWidthTargetHold;
-        });
-        emitter.on('plugin.rovpilot.headingHold.disabled', function() {
-          self.setBearing(undefined);
-          self.options.headingFill = self.options.bezel;
-          self.options.headingStrokeWidth = 0;
+        emitter.withHistory.on('plugin.rovpilot.headingHold.state', function(state) {
+          if (state.enabled){
+            self.setBearing(state.targetHeading);
+            self.options.headingFill = 'none';
+            self.options.headingStrokeWidth = self.options.headingStrokeWidthTargetHold;
+          } else {
+            self.setBearing(undefined);
+            self.options.headingFill = self.options.bezel;
+            self.options.headingStrokeWidth = 0;
+          }
         });
         emitter.on('plugin.navigationData.data', function(data) {
           self.setHeading(self.pad(parseFloat(data.heading).toFixed(0), 3));

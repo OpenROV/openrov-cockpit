@@ -26,6 +26,16 @@
       self.rov.emit('plugin.settings-manager.getSettings',module,fn);
     })
 
+    //Forward all save settings and changes to the cockpit emitter
+    self.rov.withHistory.on('settings-change',function(settings){
+      self.cockpit.emit('settings-change',settings);
+      for(var item in settings){
+        var result = {}
+        result[item]=settings[item];
+        self.cockpit.emit('settings-change.'+item,result);
+      }
+    });
+
 
 
   };

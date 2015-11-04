@@ -176,13 +176,18 @@
               };
           });
 
-          var setBatteryConfig = function (config) {
-            self.minVoltage = config.minVoltage;
-            self.maxVoltage = config.maxVoltage;
-            self.setVoltage(self.voltage);
-          };
-          emitter.emit('plugin.capestatus.request.battery.config', setBatteryConfig);
-          emitter.on('plugin.capestatus.battery.config', setBatteryConfig);
+          emitter.withHistory.on('settings-change.batteryDefintions', function(settings){
+            var selectedBattery = settings.batteryDefintions.selectedBattery;
+            var definition = settings.batteryDefintions.batteries.find(function(element,index,array){
+              if(element.name == selectedBattery) return true;
+              return false;
+            });
+            if (definition!==undefined){
+              self.minVoltage = definition.minVoltage;
+              self.maxVoltage = definition.maxVoltage;
+            }
+          });
+          
         },
         setLeftBattery: function (current) {
           this.setCurrent($(this.$.left), this.leftIndicator, current);

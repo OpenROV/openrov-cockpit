@@ -49,7 +49,9 @@ process.env.NODE_ENV = true;
 var globalEventLoop = new EventEmitter();
 var DELAY = Math.round(1000 / CONFIG.video_frame_rate);
 var camera = new OpenROVCamera({ delay: DELAY });
+io= require('./static/js/socketIOStoreAndForward.js')(io);
 var client = new CockpitMessaging(io);
+client = require('./static/js/eventEmitterStoreAndForward.js')(client);
 var controller = new OpenROVController(globalEventLoop, client);
 
 // Prepare dependency map for plugins
@@ -70,7 +72,7 @@ app.get('/config.js', function (req, res) {
 });
 app.get('/', function (req, res) {
   var viewname = CONFIG.preferences.get("plugins:ui-manager").selectedUI;
-  viewname = viewname === undefined ? "new_ui" : viewname;
+  viewname = viewname === undefined ? "new-ui" : viewname;
   var view =  __dirname + '/plugins/'+viewname+'/index.ejs';
   res.render(view, {
     title: 'OpenROV Cockpit',
@@ -123,9 +125,6 @@ deps.cockpit.on('disconnect', function () {
   console.log('disconnect detected');
   if (connections === 0)
     controller.stop();
-});
-controller.on('status', function (status) {
-  deps.cockpit.volatile.emit('status', status);
 });
 controller.on('rovsys', function (data) {
   deps.cockpit.emit('rovsys', data);

@@ -7,39 +7,49 @@
     self.SAMPLE_PERIOD = 1000 / deps.config.sample_freq;
 
     self.rov = deps.rov;
+    self.state = {depth:{enabled:false, targetDepth:0},
+                  heading: {enabled:false, targetHeading:0}}
 
-    deps.cockpit.on('plugin.rovpilot.headingHold.toggle', function () {
-      deps.rov.send('holdHeading_toggle()');
+
+    deps.cockpit.on('plugin.rovpilot.depthHold.set', function (value) {
+      //TODO: Tunnel the off/on up through the arduino code
+      if ('enabled' in value){
+        if (value.enabled===true){
+          deps.rov.send('holdDepth_on()');
+        } else {
+          deps.rov.send('holdDepth_off()');
+        }
+      }
+      if ('targetDepth' in value){
+        deps.rov.send('holdDepth('+value.targetDepth+')')
+      }
     });
 
     deps.cockpit.on('plugin.rovpilot.headingHold.set', function (value) {
-      deps.rov.send('holdHeading_toggle('+ value +')');
-    });
-
-    deps.cockpit.on('plugin.rovpilot.depthHold.toggle', function () {
-      deps.rov.send('holdDepth_toggle()');
-    });
-
-    deps.cockpit.on('plugin.rovpilot.depthHold.set', function (value) {
-      deps.rov.send('holdDepth_toggle('+ value +')');
+      //TODO: Tunnel the off/on up through the arduino code
+      if ('enabled' in value){
+        if (value.enabled===true){
+          deps.rov.send('holdHeading_on()');
+        } else {
+          deps.rov.send('holdHeading_off()');
+        }
+      }
+      if ('targetHeading' in value){
+        deps.rov.send('holdHeading('+value.targetHeading+')')
+      }
     });
 
     // Arduino
     deps.rov.on('status', function (status) {
-      var enabled;
       if ('targetDepth' in status) {
-        enabled = status.targetDepth != DISABLED;
-        deps.cockpit.emit('plugin.rovpilot.depthHold.' + (enabled ? 'enabled' : 'disabled'));
-        if (enabled) {
-           deps.cockpit.emit('plugin.rovpilot.depthHold.target', Number(status.targetDepth)/100);
-       }
+        self.state.depth.enabled = status.targetDepth != DISABLED;
+        self.state.depth.targetDepth = Number(status.targetDepth)/100;
+        deps.cockpit.emit('plugin.rovpilot.depthHold.state',self.state.depth);
       }
       if ('targetHeading' in status) {
-        enabled = status.targetHeading != DISABLED;
-        deps.cockpit.emit('plugin.rovpilot.headingHold.' + (enabled ? 'enabled' : 'disabled'));
-        if (enabled) {
-          deps.cockpit.emit('plugin.rovpilot.headingHold.target', status.targetHeading);
-        }
+        self.state.heading.enabled = status.targetHeading != DISABLED;
+        self.state.heading.targetHeading = Number(status.targetHeading);
+        deps.cockpit.emit('plugin.rovpilot.headingHold.state',self.state.heading);
       }
     });
 

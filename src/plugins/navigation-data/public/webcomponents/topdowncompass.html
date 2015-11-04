@@ -45,7 +45,7 @@
     (function () {
       Polymer({
         is: 'orov-topdowncompass',
-        behaviors: [namespace('behaviors').oROVStandard],        
+        behaviors: [namespace('behaviors').oROVStandard],
         registerEmitterHanlders: function(emitter){
           var self = this;
           emitter.on('plugin.navigationData.data',function(data){

@@ -51,6 +51,15 @@
   //so that the reference to this instance is available for further processing
   plugins.Lights.prototype.listen = function listen() {
     var self = this;
+
+    self.cockpit.rov.withHistory.on('plugin.lights.state', function(state) {
+      self.cockpit.emit('plugin.lights.state',state);
+    });
+
+    self.cockpit.on('plugin.lights.set',function(value){
+        cockpit.rov.emit('plugin.lights.set',value);
+    });
+
   };
 
   window.Cockpit.plugins.push(plugins.Lights);

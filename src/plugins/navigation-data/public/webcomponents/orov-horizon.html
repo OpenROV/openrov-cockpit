@@ -35,7 +35,7 @@
     </style>
   <template>
 
-    <canvas id="horizon" class="hud" width="640" height="360"></canvas>
+    <canvas id="horizon" class="hud" style="width: 100%; height:100%"></canvas>
 
   </template>
   <script>
@@ -89,20 +89,25 @@
           emitter.on('plugin.navigationData.data',function(data){
             self.setData(data);
           });
+
+          //Not used currently, but it is a reference if we need raw
+          //access to the video canvas.
+          emitter.withHistory.on('video.forward.canvas-changed',function(canvas){
+            self.videoElement = canvas;
+          });
         },
         attached: function () {
           this.roll = 0;
           this.pitch = 0;
           this.altitude = 0;
           this.speed = 0;
+          this.overlayPosition={left:0,top:0};
           // Add required UI elements
           this.ctx = this.$.horizon.getContext('2d');
           var ah = this;
-          // Bind on window events to resize
-          $(window).resize(function (event) {
-            ah.draw();
-          });
           var self = this;
+
+
           if (this.eventEmitter !== undefined){
             this.eventEmitter.emit('InputController.register',
             {
@@ -341,11 +346,11 @@
           this.ctx.restore();
         },
         draw: function draw() {
-          var width = $(Polymer.dom(Polymer.dom(this.$.horizon).parentNode.host).parentNode).innerWidth();
-          var height = $(Polymer.dom(Polymer.dom(this.$.horizon).parentNode.host).parentNode).innerHeight();
-          this.set('ctx.canvas.width', width);
-          this.set('ctx.canvas.height', height);
-          this.pixelsPerDeg = height / (frontCameraFovY / 2);
+          //TODO: Research better attributes for width and height as these don't
+          //appear to scale down when the window shrinks.
+          this.set('ctx.canvas.width', this.ctx.canvas.clientWidth);
+          this.set('ctx.canvas.height', this.ctx.canvas.clientHeight);
+          this.pixelsPerDeg = this.ctx.canvas.height / (frontCameraFovY / 2);
           this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
           this.drawHorizon();
           this.drawZero();

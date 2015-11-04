@@ -20,8 +20,29 @@
   //so that the reference to this instance is available for further processing
   plugins.SystemEnvironment.prototype.listen = function listen() {
     var self = this;
-    this.cockpit.rov.on('status',function(data){
+
+    //Status messages only come out a 1hz from the Node layer but it contains
+    //an entire copy of the state information from the ROV.
+    this.cockpit.withHistory.on('status',function(data){
 //      self.cockpit.emit('plugin.cameraTilt.angle',angle);
+      var state = {mcu:{},cpu:{}};
+
+      if ('utim' in data) {
+        var formattedRuntime = msToTime(data.utim);
+        state.mcu.runTime = formattedRuntime;
+      }
+      if ('cpu' in data) {
+        state.cpu.utilization = data.cpuUsage
+      }
+      if ('mcu' in data) {
+        state.mcu.utilization = data.mcuUsage
+      }
+      if ('fmem' in data) {
+        state.mcu.freememory = data.fmem
+      }
+
+      cockpit.emit('systemEnvironment.state', state);
+
     });
 
   };

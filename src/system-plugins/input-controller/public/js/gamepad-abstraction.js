@@ -51,11 +51,11 @@ inputController.GamepadAbstraction = function (cockpit) {
   gamepad.bind(HTML5Gamepad.Event.CONNECTED, function (device) {
     ignoreInputUntil = new Date().getTime() + 1000;
     console.log('Controller connected', device);
-    gp.cockpit.emit('plugin.input.gamepad.connected');
+    gp.cockpit.emit('plugin.input.gamepad.state',{connected:true});
   });
   gamepad.bind(HTML5Gamepad.Event.DISCONNECTED, function (device) {
     console.log('Controller disconnected', device);
-    gp.cockpit.emit('plugin.input.gamepad.disconnected');
+    gp.cockpit.emit('plugin.input.gamepad.state',{connected:false});
   });
   gamepad.bind(HTML5Gamepad.Event.UNSUPPORTED, function (device) {
     console.log('Unsupported controller connected', device);

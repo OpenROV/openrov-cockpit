@@ -11,11 +11,6 @@
     this.sendToROVEnabled = true;
     this.sendUpdateEnabled = true;
 
-    this.setPoints = {
-      heading: 0,
-      depth: 0
-    };
-
   };
 
   ROVpilotWire.prototype.inputDefaults = function inputDefaults() {
@@ -69,33 +64,21 @@
   ROVpilotWire.prototype.listen = function listen() {
     var self = this;
 
-    this.rov.on('plugin.rovpilot.depthHold.enabled', function(){
-      self.cockpit.emit('plugin.rovpilot.depthHold.enabled');
+    this.rov.withHistory.on('plugin.rovpilot.depthHold.state', function(state){
+      self.cockpit.emit('plugin.rovpilot.depthHold.state',state);
     });
 
-    this.rov.on('plugin.rovpilot.depthHold.disabled', function(){
-      self.cockpit.emit('plugin.rovpilot.depthHold.disabled');
+    this.rov.withHistory.on('plugin.rovpilot.headingHold.state', function(state){
+      self.cockpit.emit('plugin.rovpilot.headingHold.state',state);
     });
 
-    this.rov.on('plugin.rovpilot.depthHold.target', function(target){
-      self.cockpit.emit('plugin.rovpilot.depthHold.target',target);
+    this.cockpit.on('plugin.rovpilot.depthHold.set-enabled',function(value){
+      self.rov.emit('plugin.rovpilot.depthHold.set',{enabled: value});
     });
 
-    this.rov.on('plugin.rovpilot.headingHold.enabled', function(){
-      self.cockpit.emit('plugin.rovpilot.headingHold.enabled');
+    this.cockpit.on('plugin.rovpilot.headingHold.set-enabled',function(value){
+      self.rov.emit('plugin.rovpilot.headingHold.set',{enabled: value});
     });
-
-    this.rov.on('plugin.rovpilot.headingHold.disabled', function(){
-      self.cockpit.emit('plugin.rovpilot.headingHold.disabled');
-    });
-
-    this.rov.on('plugin.rovpilot.headingHold.target', function(target){
-      self.cockpit.emit('plugin.rovpilot.headingHold.target',target);
-    });
-
-//    this.rovsendPilotingDataTimer = setInterval(function(){
-//      self.rovsendPilotingData();
-//    },100); //Todo: Make configurable
 
   };
 

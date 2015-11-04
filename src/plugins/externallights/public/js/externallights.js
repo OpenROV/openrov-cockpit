@@ -55,8 +55,8 @@ plugins.ExternalLights.prototype.inputDefaults = function (){
   plugins.ExternalLights.prototype.listen = function listen() {
     var self = this;
 
-      self.cockpit.rov.on('plugin.externalLights.level', function(level) {
-        self.cockpit.emit('plugin.externalLights.level',level);
+      self.cockpit.rov.withHistory.on('plugin.externalLights.state', function(state) {
+        self.cockpit.emit('plugin.externalLights.level',state.level);
       });
 
   };

@@ -29,8 +29,12 @@ function Hardware() {
       hardware.emitStatus('CAPA:255');
     }
     if (commandText === 'ligt') {
-      hardware.emitStatus('LIGP:' + commandParts[1] / 255);
-  //    console.log('HARDWARE-MOCK return light status');
+      hardware.emitStatus('LIGP:' + commandParts[1]/100);
+      console.log('HARDWARE-MOCK return light status:'+  commandParts[1]/100);
+    }
+    if (commandText === 'escp') {
+      hardware.emitStatus('ESCP:' + commandParts[1]);
+      console.log('HARDWARE-MOCK return ESC status:'+commandParts[1]);
     }
     if (commandText === 'tilt') {
       hardware.emitStatus('servo:' + commandParts[1]);
@@ -45,21 +49,28 @@ function Hardware() {
           hardware.laserEnabled = true;
           hardware.emitStatus('claser:255');
         }
+      console.log('HARDWARE-MOCK return laser status');
     }
 
     // Depth hold
-    if (commandText === 'holdDepth_toggle') {
+    if (commandText === 'holdDepth_on') {
         var targetDepth = 0;
         if (!hardware.depthHoldEnabled) {
             targetDepth = currentDepth;
             hardware.depthHoldEnabled = true;
             console.log('HARDWARE-MOCK depth hold enabled');
         }
-        else {
+        hardware.emitStatus(
+          'targetDepth:' +
+          (hardware.depthHoldEnabled ? targetDepth.toString() : DISABLED)
+        );
+      }
+
+      if (commandText === 'holdDepth_off') {
             targetDepth = -500;
             hardware.depthHoldEnabled = false;
             console.log('HARDWARE-MOCK depth hold DISABLED');
-        }
+
         hardware.emitStatus(
           'targetDepth:' +
           (hardware.depthHoldEnabled ? targetDepth.toString() : DISABLED)
@@ -67,18 +78,23 @@ function Hardware() {
     }
 
     // Heading hold
-    if (commandText === 'holdHeading_toggle') {
+    if (commandText === 'holdHeading_on') {
         var targetHeading = 0;
-        if (!hardware.targetHoldEnabled) {
-            targetHeading = currentHeading;
-            hardware.targetHoldEnabled= true;
-            console.log('HARDWARE-MOCK heading hold enabled');
-        }
-        else {
+        targetHeading = currentHeading;
+        hardware.targetHoldEnabled= true
+        console.log('HARDWARE-MOCK heading hold enabled');
+
+        hardware.emitStatus(
+          'targetHeading:' + (hardware.targetHoldEnabled ? targetHeading.toString() : DISABLED)
+        );
+    }
+
+    // Heading hold
+    if (commandText === 'holdHeading_off') {
+        var targetHeading = 0;
             targetHeading = -500;
             hardware.targetHoldEnabled = false;
             console.log('HARDWARE-MOCK heading hold DISABLED');
-        }
         hardware.emitStatus(
           'targetHeading:' + (hardware.targetHoldEnabled ? targetHeading.toString() : DISABLED)
         );
@@ -106,7 +122,7 @@ function Hardware() {
   };
   var time = 1000;
   setInterval(function () {
-    hardware.emit('status', reader.parseStatus('time:' + time));
+    hardware.emit('status', reader.parseStatus('utim:' + time));
     time += 1000;
   }, 1000);
   setInterval(sendEvent, 3000);
@@ -152,6 +168,7 @@ function Hardware() {
     }
 
     hardware.emit('status', reader.parseStatus(result));
+    hardware.write('');
 
   }, 2000);
 

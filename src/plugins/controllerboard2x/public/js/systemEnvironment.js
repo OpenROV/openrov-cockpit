@@ -28,7 +28,7 @@
       var state = {mcu:{},cpu:{}};
 
       if ('time' in data) {
-        var formattedRuntime = msToTime(data.utim);
+        var formattedRuntime = msToTime(data.time);
         state.mcu.runTime = formattedRuntime;
       }
       if ('cpu' in data) {

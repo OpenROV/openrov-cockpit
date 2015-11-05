@@ -50,7 +50,7 @@ var installbower = function(index, array){
   }).then(function(upgraded) {
       console.log('dependencies to upgrade:', upgraded);
       index++;
-      if (index<array.length-1){
+      if (index<array.length){
         installbower(index,array);
       }
   });

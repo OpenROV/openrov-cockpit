@@ -53,7 +53,7 @@ var installbower = function(index, array){
     .on('end', function(installed){
         console.log('done processing plugin install');
         index++;
-        if (index<array.length-1){
+        if (index<array.length){
           installbower(index,array);
         }
     });

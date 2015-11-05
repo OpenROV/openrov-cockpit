@@ -15,6 +15,6 @@
     "tests"
   ],
   "dependencies": {
-    "json-editor": "https://github.com/BrianAdams/json-editor.git#bug/522-theme-fail-on-docfragment"
+    "json-editor": "https://github.com/BrianAdams/json-editor.git#patched"
   }
 }

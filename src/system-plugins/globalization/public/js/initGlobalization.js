@@ -1,4 +1,4 @@
-$.getScript('../../components/i18next/i18next-latest.js',function(){
+$.getScript('components/i18next/i18next-latest.js',function(){
   //http://i18next.com/pages/doc_init.html
   if (window.cockpit_int !== undefined) return;
   i18n.init({

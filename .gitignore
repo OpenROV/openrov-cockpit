@@ -41,3 +41,7 @@ temp
 etc/rovconfig.json
 share
 bower_components
+
+**/bower_components/*
+
+src/plugins/telemetry/public/bower_components

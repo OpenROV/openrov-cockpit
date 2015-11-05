@@ -67,8 +67,9 @@
     this.cockpit.withHistory.on('status',function(status){
       //Work around not having the explicit status in the MCU code
       if ('log' in status){
-        if (status[log].indexOf('log:escpower=') > 0){
+        if (status.log.indexOf('log:escpower=') > 0){
           //Check for 1 or 0 and return as an on/off message
+          console.log("escpower");
         }
       }
 

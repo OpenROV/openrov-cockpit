@@ -37,6 +37,7 @@ finder.on('end', function(){
 var result = "";
 var installbower = function(index, array){
   var file = array[index];
+  console.log('======== installing =======');
   console.log(file);
   ncu.run({
       packageFile: file,
@@ -49,7 +50,7 @@ var installbower = function(index, array){
   }).then(function(upgraded) {
       console.log('dependencies to upgrade:', upgraded);
       index++;
-      if (index<array.length-1){
+      if (index<array.length){
         installbower(index,array);
       }
   });

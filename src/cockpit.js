@@ -9,16 +9,20 @@
 
 //To eliminate hard coding paths for require, we are modifying the NODE_PATH to include
 //out lib folder
-if (process.env['NODE_PATH']===undefined){ //just in case already been set leave it alone
-  process.env['NODE_PATH']=__dirname+'/lib';
+var oldpath = '';
+if (process.env['NODE_PATH']!==undefined){
+  oldpath = process.env['NODE_PATH'];
+}
+ //just in case already been set leave it alone
+  process.env['NODE_PATH']=__dirname+'/lib:'+oldpath;
   require('module').Module._initPaths();
   console.log("Set NODE_PATH to: "+process.env['NODE_PATH'] );
-}
+
 
 var CONFIG = require('./lib/config'), fs = require('fs'), express = require('express'), app = express(), server = require('http').createServer(app), io = require('socket.io').listen(server, { log: false, origins: '*:*' }), EventEmitter = require('events').EventEmitter, OpenROVCamera = require(CONFIG.OpenROVCamera), OpenROVController = require(CONFIG.OpenROVController), logger = require('./lib/logger').create(CONFIG), mkdirp = require('mkdirp'), path = require('path');
 var PluginLoader = require('./lib/PluginLoader');
 var CockpitMessaging = require('./lib/CockpitMessaging');
-var Q=require('Q');
+var Q=require('q');
 require('systemd');
 app.configure(function () {
   app.use(express.static(__dirname + '/static/'));

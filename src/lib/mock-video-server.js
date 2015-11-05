@@ -25,9 +25,10 @@ http.createServer(function (req, res) {
     res.writeHead(200, {
       'Content-Type': 'multipart/x-mixed-replace;boundary="' + boundary + '"',
       'Connection': 'keep-alive',
-      'Expires': 'Fri, 01 Jan 1990 00:00:00 GMT',
+      'Expires': 'Fri, 01 Jan 1991 00:00:00 GMT',
       'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate',
-      'Pragma': 'no-cache'
+      'Pragma': 'no-cache',
+      'Access-Control-Allow-Origin': '*'
     });
     res.write('--' + boundary + '\n');
     res.write('--' + boundary + '\n');

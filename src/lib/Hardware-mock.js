@@ -122,7 +122,7 @@ function Hardware() {
   };
   var time = 1000;
   setInterval(function () {
-    hardware.emit('status', reader.parseStatus('utim:' + time));
+    hardware.emit('status', reader.parseStatus('time:' + time));
     time += 1000;
   }, 1000);
   setInterval(sendEvent, 3000);

@@ -14,6 +14,6 @@
     "tests"
   ],
   "dependencies" : {
-    "mjpeg-video-webcomponents": "~2.0.0"
+    "mjpeg-video-webcomponents": "~2.0.1"
   }
 }

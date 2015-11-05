@@ -11,7 +11,7 @@
   plugins.SystemEnvironment.prototype.getTelemetryDefintions = function getTelemetryDefintions() {
     return([
       {name: 'FMEM', description: 'Free memory (bytes) reported by the MCU'},
-      {name: 'UTIM', description: 'Uptime (ms) reported by the MCU'},
+      {name: 'TIME', description: 'Uptime (ms) reported by the MCU'},
       {name: 'BRDT', description: 'Air temperature (degrees C) reported Arduino'} //only works on cape
     ]);
   }
@@ -27,7 +27,7 @@
 //      self.cockpit.emit('plugin.cameraTilt.angle',angle);
       var state = {mcu:{},cpu:{}};
 
-      if ('utim' in data) {
+      if ('time' in data) {
         var formattedRuntime = msToTime(data.utim);
         state.mcu.runTime = formattedRuntime;
       }

@@ -1,6 +1,6 @@
 var fs = require('fs');
 var path = require('path');
-var Q =require('Q');
+var Q =require('q');
 
 if (typeof path.existsSync === 'undefined'){
   //forward compatibiltiy to node 12+ from 10. Remove

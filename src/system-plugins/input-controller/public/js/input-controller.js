@@ -34,7 +34,8 @@
         });
       });
       if (duplicateInformation.length > 0) {
-        alert('Found duplicate commands: \n' + duplicateInformation.join('\n'));
+        self.cockpit.emit('plugin-input-controller-duplicates',duplicateInformation);
+        console.log('Found duplicate commands: \n' + duplicateInformation.join('\n'));
       }
     };
 

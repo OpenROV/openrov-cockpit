@@ -3,7 +3,15 @@
   <style>
   </style>
   <template>
-    <label>{{__(Input (keyboard/gamepad) configuration)}}</label>
+    <label>{{__('Duplicates')}}</label>
+            <ul>
+            <template is="dom-repeat" items="{{duplicates}}">
+              <li>
+                <b><span>{{__(item)}}</span>:</b>
+              </li>
+            </template>
+            </ul>
+        <label>{{__('Input (keyboard/gamepad) configuration')}}</label>
             <ul>
             <template is="dom-repeat" items="{{commands}}">
               <li>
@@ -24,6 +32,7 @@
         is: "orov-inputs-list",
         properties: {
           commands: {type: Array, value:[]},
+          duplicates: {type: Array, value:[]}
         },
         behaviors: [namespace('behaviors').oROVStandard],
         attached: function () {
@@ -38,6 +47,9 @@
           var self = this;
           emitter.on('InputController.registeredCommand',function(command){
             self.push('commands',command);
+          });
+          emitter.withHistory.on('plugin-input-controller-duplicates',function(duplicates){
+            self.duplicates = duplicates;
           });
         },
       })

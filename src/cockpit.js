@@ -14,7 +14,7 @@ if (process.env['NODE_PATH']!==undefined){
   oldpath = process.env['NODE_PATH'];
 }
  //just in case already been set leave it alone
-  process.env['NODE_PATH']=__dirname+'/lib;'+oldpath;
+  process.env['NODE_PATH']=__dirname+'/lib:'+oldpath;
   require('module').Module._initPaths();
   console.log("Set NODE_PATH to: "+process.env['NODE_PATH'] );
 

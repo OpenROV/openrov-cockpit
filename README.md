@@ -35,7 +35,7 @@ npm install
 Start with the mock hardware abstraction. On windows you will have to `SET USE_MOCK=true`
 ```
 cd openrov-cockpit
-USE_MOCK=true node app.js 
+USE_MOCK=true node app.js
 ```
 
 Key Related Projects
@@ -68,3 +68,5 @@ How to Contribute
 5) Send a pull request back to the Master repository.
 
 Someone on the team will review the pull request and ensure the changes work on the ROVs before approving the pull request.
+
+env 'plugins__ui-manager__selectedUI=new-ui' USE_MOCK=true video_port=8092 photoDirectory="/tmp" plugins__video__forward_camera_url="http://localhost:8092/?action=stream" configfile="/tmp/rovconfig.js" forever -w -c 'node --debug' cockpit.js

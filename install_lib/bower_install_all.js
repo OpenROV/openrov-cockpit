@@ -1,6 +1,7 @@
 var find = require('findit');
 var finder = find(process.cwd());
 var bower = require('bower');
+var rimraf = require('rimraf');
 
 var currentdirectory = process.cwd();
 var bowersToInstall = [];
@@ -34,23 +35,28 @@ finder.on('end', function(){
 
 var installbower = function(index, array){
   var dir = array[index];
-  console.log('======== installing =======');
-  console.log(dir);
-  bower.commands
-  .install(['bower.json'],{ save: false}, { cwd: dir, force:true})
-  .on('error', function(err){
-      console.error(err.message);
-      process.exit(1);
-  })
-  .on('log', function(info){
-      console.log(info.message);
-  })
-  .on('end', function(installed){
-      console.log('done processing plugin install');
-      index++;
-      if (index<array.length-1){
-        installbower(index,array);
-      }
+  console.log('======== cleaning =======');
+  console.log(dir+'/bower_components');
+
+  rimraf(dir+'/bower_components',function(){
+    console.log('======== installing =======');
+    console.log(dir);
+    bower.commands
+    .install(['bower.json'],{ save: false, forceLatest:true}, { cwd: dir})
+    .on('error', function(err){
+        console.error(err.message);
+        process.exit(1);
+    })
+    .on('log', function(info){
+        console.log(info.message);
+    })
+    .on('end', function(installed){
+        console.log('done processing plugin install');
+        index++;
+        if (index<array.length-1){
+          installbower(index,array);
+        }
+    });
   });
 
 };

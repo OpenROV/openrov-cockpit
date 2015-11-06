@@ -92,9 +92,9 @@
           <div id="mainContent">
 
             <div id="newuiVideo" class="full-height">
-              <orov-video id="camera1" border='1' style='width: 100%; height:100%; position:relative' event-emitter="{{cockpit-event-emitter}}">
-                <orov-ping-graph style='position:absolute; top:0px; left:0px; z-index:33;' event-emitter="{{cockpit-event-emitter}}"></orov-ping-graph>
-                <orov-horizon id="horizon" style='position:absolute; top:0px; left:0px; z-index:33; width:100%; height:100%' event-emitter="{{cockpit-event-emitter}}"></orov-horizon>
+              <orov-video id="camera1" border='1' style='width: 100%; height:100%; position:relative' event-emitter="{{cockpitEventEmitter}}">
+                <orov-ping-graph style='position:absolute; top:0px; left:0px; z-index:33;' event-emitter="{{cockpitEventEmitter}}"></orov-ping-graph>
+                <orov-horizon id="horizon" style='position:absolute; top:0px; left:0px; z-index:33; width:100%; height:100%' event-emitter="{{cockpitEventEmitter}}"></orov-horizon>
               </orov-video>
             </div>
             <div id="newuiControlpad">
@@ -102,7 +102,7 @@
                 <div class="center">
                   <h4>{{__('Heading')}}</h4>
                   <div id="newui-compass" class="center control">
-                    <orov-newui-compass class="center" heading="0" event-emitter="{{cockpit-event-emitter}}"></orov-newui-compass>
+                    <orov-newui-compass class="center" heading="0" event-emitter="{{cockpitEventEmitter}}"></orov-newui-compass>
                   </div>
                 </div>
               </div>
@@ -110,20 +110,20 @@
                 <div class="center">
                   <h4>{{__('Depth')}}</h4>
                   <!--<div id="newui-depth" class="center control"></div>-->
-                  <orov-newui-depth id="newui-depth" class="center control" event-emitter="{{cockpit-event-emitter}}"></orov-newui-depth>
+                  <orov-newui-depth id="newui-depth" class="center control" event-emitter="{{cockpitEventEmitter}}"></orov-newui-depth>
                 </div>
               </div>
               <div class="newui-item" id="throttle-item">
                 <div class="center">
                   <h4>{{__('Throttle')}}</h4>
-                  <orov-newui-throttle id="newui-throttle" class="center control" event-emitter="{{cockpit-event-emitter}}"></orov-newui-throttle>
+                  <orov-newui-throttle id="newui-throttle" class="center control" event-emitter="{{cockpitEventEmitter}}"></orov-newui-throttle>
                 </div>
               </div>
               <div class="newui-item" id="power-item">
                 <div class="center">
                   <h4>{{__('Battery')}}</h4>
                   <div id="newui-power" class="center control">
-                    <orov-newui-power id="power" event-emitter="{{cockpit-event-emitter}}"></orov-newui-power>
+                    <orov-newui-power id="power" event-emitter="{{cockpitEventEmitter}}"></orov-newui-power>
                   </div>
                 </div>
               </div>
@@ -131,7 +131,7 @@
                 <div class="center">
                   <h4>{{__('Switches')}}</h4>
                   <div id="newui-switches" class="center control">
-                    <orov-newui-switches id="newui-switches" class="center" event-emitter="{{cockpit-event-emitter}}"></orov-newui-switches>
+                    <orov-newui-switches id="newui-switches" class="center" event-emitter="{{cockpitEventEmitter}}"></orov-newui-switches>
                   </div>
                 </div>
               </div>
@@ -139,7 +139,7 @@
                 <div class="center">
                   <h4>{{__('Time')}}</h4>
                   <div id="newui-time" class="center control">
-                    <orov-newui-time event-emitter="{{cockpit-event-emitter}}"></orov-newui-time>
+                    <orov-newui-time event-emitter="{{cockpitEventEmitter}}"></orov-newui-time>
                   </div>
                 </div>
               </div>
@@ -151,7 +151,7 @@
               <h4>{{__('Pre-Flight Check')}}</h4>
             </div>
             <div>
-              <orov-thrusters2x1-motortest event-emitter="{{cockpit-event-emitter}}"></orov-thrusters2x1-motortest>
+              <orov-thrusters2x1-motortest event-emitter="{{cockpitEventEmitter}}"></orov-thrusters2x1-motortest>
             </div>
             <div class="settings-block">
               <h4>{{__('Callibration')}}</h4>
@@ -162,7 +162,7 @@
 
           <drop-in-dialog id="plugin-settings" header="Settings">
             <div>
-            <orov-settings-manager event-emitter="{{cockpit-event-emitter}}"></orov-settings-manager>
+            <orov-settings-manager event-emitter="{{cockpitEventEmitter}}"></orov-settings-manager>
           </div>
           </drop-in-dialog>
         </div>

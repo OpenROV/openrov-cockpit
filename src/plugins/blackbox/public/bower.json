@@ -18,5 +18,9 @@
     "dexie": "~1.2.0",
     "comma-separated-values": "~3.6.4",
     "fontawesome-iconset": "philya/font-awesome-polymer-icons#master"
+  },
+  "resolutions": {
+    "polymer": "^1.1.0",
+    "webcomponentsjs": "^0.7.20"
   }
 }

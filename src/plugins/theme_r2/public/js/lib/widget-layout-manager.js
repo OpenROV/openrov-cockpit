@@ -4,7 +4,7 @@ $(document).ready(function() {
 
   window.OROV.layoutConfig = {
     "multipurpose-display": [
-      {      //          <telemetry-graph series-to-graph="['deap']" event-emitter={{cockpit-event-emitter}}></telemetry-graph>
+      {      //          <telemetry-graph series-to-graph="['deap']" event-emitter={{cockpitEventEmitter}}></telemetry-graph>
         "tag": "orov-telemetry-graph",
         "settings": {
           "seriesToGraph" : "['deap']"

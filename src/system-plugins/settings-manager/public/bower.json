@@ -16,5 +16,8 @@
   ],
   "dependencies": {
     "json-editor": "https://github.com/BrianAdams/json-editor.git#patched"
+  },
+  "resolutions": {
+    "webcomponentsjs": "^0.6.0"
   }
 }

@@ -90,7 +90,7 @@ $('#telemetry').define = function(name,callback){
 
 
 /*          <% for(var i=0; i<ui.systempanel.length; i++) {%>
-          <<%ui.systempanel[i].name %> event-emitter={{cockpit-event-emitter}}></<%ui.systempanel[i].name %>>
+          <<%ui.systempanel[i].name %> event-emitter={{cockpitEventEmitter}}></<%ui.systempanel[i].name %>>
           <% } %>
 */
 })(window,$,undefined);

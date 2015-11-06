@@ -492,7 +492,7 @@
               </div>
               <div class="pull-right text-center">
                 <label>{{__('CPU %')}}</label>
-                <orov-telemetry-item  showAsGraph=false telemetry-item="cpuUsage" event-emitter="{{cockpit-event-emitter}}"></orov-telemetry-item>
+                <orov-telemetry-item  telemetry-item="cpuUsage" event-emitter="{{cockpit-event-emitter}}"></orov-telemetry-item>
               </div>
               <div class="pull-right text-center">
                 <label>{{__('Battery')}}</label>
@@ -500,7 +500,7 @@
               </div>
               <div class="pull-right text-center">
                 <label>{{__('Board Current')}}</label>
-                <orov-telemetry-item as-graph=false telemetry-item="iout" event-emitter="{{cockpit-event-emitter}}"></orov-telemetry-item>
+                <orov-telemetry-item telemetry-item="iout" event-emitter="{{cockpit-event-emitter}}"></orov-telemetry-item>
               </div>
             </div>
           </div>

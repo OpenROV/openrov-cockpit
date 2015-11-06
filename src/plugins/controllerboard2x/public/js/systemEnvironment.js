@@ -12,7 +12,10 @@
     return([
       {name: 'FMEM', description: 'Free memory (bytes) reported by the MCU'},
       {name: 'TIME', description: 'Uptime (ms) reported by the MCU'},
-      {name: 'BRDT', description: 'Air temperature (degrees C) reported Arduino'} //only works on cape
+      {name: 'UTIM', description: 'Uptime (ms) reported by the MCU'},
+      {name: 'BRDT', description: 'Air temperature (degrees C) reported Arduino'}, //only works on cape
+      {name: 'CPU', description: 'CPU Utilization percentage'},
+      {name: 'CPUUSAGE', description: 'CPU Utilization percentage'},
     ]);
   }
 
@@ -27,11 +30,20 @@
 //      self.cockpit.emit('plugin.cameraTilt.angle',angle);
       var state = {mcu:{},cpu:{}};
 
+      //Remove once the Arduino firmware is updated to use utim
       if ('time' in data) {
         var formattedRuntime = msToTime(data.time);
         state.mcu.runTime = formattedRuntime;
       }
+      if ('utim' in data) {
+        var formattedRuntime = msToTime(data.utim);
+        state.mcu.runTime = formattedRuntime;
+      }
       if ('cpu' in data) {
+        state.cpu.utilization = data.cpu
+      }
+      //Removed once the node code is changed to send cpu
+      if ('cpuUsage' in data) {
         state.cpu.utilization = data.cpuUsage
       }
       if ('mcu' in data) {

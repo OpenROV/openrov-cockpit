@@ -13,17 +13,19 @@
 //plugin.connection-health.connect-state
   ConnectionHealth.prototype.listen = function listen() {
     var self = this;
+    var lastpong = 0;
     //This is now also used for the deadman switch.
     this.pinger = setInterval(function () {
       var _starttime = performance.now();
       self.cockpit.emit('ping',_starttime);
       self.cockpit.rov.emit('ping', _starttime);
 
-      var isConnected = self.pingtime <= 3000;
+      var isConnected = (_starttime - lastpong) <= 3000;
       self.cockpit.emit('plugin.connection-health.state',{connected:isConnected});
     }, 1000);
 
     this.cockpit.rov.on('pong', function (id) {
+      lastpong = id;
       var t = performance.now();
       var tprime = id;
       self.cockpit.emit('pong',id);

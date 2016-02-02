@@ -12,11 +12,11 @@
     "install": "node install_lib/bower_install_all.js"
   },
   "dependencies": {
-    "bower": "^1.6.5",
+    "bower": "^1.7.7",
     "crc": "",
-    "ejs": "~0.8.3",
+    "ejs": "~2.4.1",
     "eventemitter2": "^0.4.14",
-    "express": "= 3.4.8",
+    "express": "=4.13.4",
     "findit": "^2.0.0",
     "forever-monitor": "",
     "jquery-file-upload-middleware": "",
@@ -29,10 +29,10 @@
     "optimist": "",
     "os-utils": "",
     "q": "^1.4.1",
-    "request": "^2.65.0",
-    "rimraf": "^2.4.3",
-    "serialport": "^2.0.2",
-    "socket.io": "~1.1.0",
+    "request": "^2.69.0",
+    "rimraf": "^2.5.1",
+    "serialport": "^2.0.6",
+    "socket.io": "~1.4.5",
     "sync": "",
     "systemd": "git://github.com/plietar/node-systemd.git"
   },
@@ -47,16 +47,16 @@
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-cli": "^0.1.13",
-    "grunt-contrib-jshint": "^0.11.0",
+    "grunt-contrib-jshint": "^0.12.0",
     "grunt-contrib-watch": "^0.6.1",
-    "grunt-mocha": "^0.4.11",
-    "grunt-simple-mocha": "^0.4.0",
-    "mocha": "^1.21.4",
-    "phantomjs": "^1.9.9",
-    "should": "^4.0.4",
-    "sinon": "^1.10.3",
+    "grunt-mocha": "^0.4.15",
+    "grunt-simple-mocha": "^0.4.1",
+    "mocha": "^2.4.5",
+    "phantomjs": "^2.1.3",
+    "should": "^8.2.1",
+    "sinon": "^1.17.3",
     "spec": "^1.0.1",
-    "supertest": "^0.13.0",
-    "tap": "^0.4.12"
+    "supertest": "^1.1.0",
+    "tap": "^5.4.2"
   }
 }

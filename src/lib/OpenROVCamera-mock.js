@@ -13,6 +13,7 @@
  *
  */
 var spawn = require('child_process').spawn, EventEmitter = require('events').EventEmitter, fs = require('fs'), path = require('path'), CONFIG = require('./config'), logger = require('./logger').create(CONFIG);
+var request = require('request');
 var OpenROVCamera = function (options) {
   var camera = new EventEmitter();
   var _capturing = false;
@@ -35,11 +36,16 @@ var OpenROVCamera = function (options) {
     });
     camera.emit('started');
     camera.IsCapturing = true;
+  
   };
   camera.snapshot = function(callback) {
     logger.log('Snapshot function called. Not implemented in the mock');
     callback('SomeFileName' + Date.now() + '.jpg');
   };
+
+  options.app.get('/rov/camera1', function(req, res) {
+    req.pipe(request('http://localhost:8090/?action=stream')).pipe(res);
+  });
 
   return camera;
 };

@@ -24,27 +24,33 @@ var PluginLoader = require('./lib/PluginLoader');
 var CockpitMessaging = require('./lib/CockpitMessaging');
 var Q=require('q');
 require('systemd');
-app.configure(function () {
-  app.use(express.static(__dirname + '/static/'));
-  app.use(express.json());
-  app.use(express.urlencoded());
-  app.use('/photos', express.directory(CONFIG.preferences.get('photoDirectory')));
-  app.use('/photos', express.static(CONFIG.preferences.get('photoDirectory')));
-  app.set('port', process.env.LISTEN_FDS > 0 ? 'systemd' : CONFIG.port);
-  app.set('views', __dirname + '/views');
-  app.set('view engine', 'ejs', { pretty: true });
-  app.use(express.favicon(__dirname + '/static/favicon.icon'));
-  app.use(express.logger('dev'));
-  app.use(app.router);
-  app.use('/components', express.static(path.join(__dirname, 'static/bower_components')));
-  app.use('/components', express.static('/usr/share/cockpit/bower_components'));
-  app.use('/components', express.static(path.join(__dirname, 'static/webcomponents')));
 
-  app.use('/components', express.static(path.join(__dirname,'plugins/telemetry/public/bower_components')));
-  app.use('/components/telemetry', express.static(path.join(__dirname,'plugins/telemetry/public/webcomponents')));
-  app.use('/components/telemetry', express.directory(path.join(__dirname,'plugins/telemetry/public/webcomponents')));
-  console.log("!!!"+ path.join(__dirname, 'src/static/bower_components'));
-});
+var serveIndex = require('serve-index');
+var favicon = require('serve-favicon');
+var logger = require('morgan');
+var methodOverride = require('method-override');
+var session = require('express-session');
+var bodyParser = require('body-parser');
+var multer = require('multer');
+var errorHandler = require('errorhandler');
+app.use(express.static(__dirname + '/static/'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use('/photos', serveIndex(CONFIG.preferences.get('photoDirectory')));
+app.use('/photos', express.static(CONFIG.preferences.get('photoDirectory')));
+app.set('port', process.env.LISTEN_FDS > 0 ? 'systemd' : CONFIG.port);
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs', { pretty: true });
+app.use(favicon(__dirname + '/static/favicon.ico'));
+app.use(logger('dev'));
+app.use('/components', express.static(path.join(__dirname, 'static/bower_components')));
+app.use('/components', express.static('/usr/share/cockpit/bower_components'));
+app.use('/components', express.static(path.join(__dirname, 'static/webcomponents')));
+
+app.use('/components', express.static(path.join(__dirname,'plugins/telemetry/public/bower_components')));
+app.use('/components/telemetry', express.static(path.join(__dirname,'plugins/telemetry/public/webcomponents')));
+app.use('/components/telemetry', serveIndex(path.join(__dirname,'plugins/telemetry/public/webcomponents')));
+console.log("!!!"+ path.join(__dirname, 'src/static/bower_components'));
 // Keep track of plugins js and css to load them in the view
 var scripts = [], styles = [];
 // setup required directories

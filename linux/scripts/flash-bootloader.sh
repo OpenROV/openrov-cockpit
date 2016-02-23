@@ -2,7 +2,7 @@
 set -e
 
 # Load the config variables for the attached board
-source /opt/openrov/cockpit/linux/get-board-config.sh
+source /opt/openrov/cockpit/linux/scripts/get-board-config.sh
 
 # Run the bootloader script provided
 if [ ! -z "$BOOTLOADER_SCRIPT" ] ; then

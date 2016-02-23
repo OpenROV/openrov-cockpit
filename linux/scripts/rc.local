@@ -8,13 +8,13 @@
 # bits.
 
 # Grow partition and set up swap file, if necessary
-source /opt/openrov/cockpit/linux/configure-filesystem.sh
+source /opt/openrov/cockpit/linux/scripts/configure-filesystem.sh
 
 # Start the nightrider program to indicate that we have successfully booted
-nice -n 19 /opt/openrov/cockpit/linux/knight-rider.js &
+nice -n 19 /opt/openrov/cockpit/linux/scripts/knight-rider.js &
 
 # Load device tree overlays
-source /opt/openrov/cockpit/linux/load-device-tree-overlays.sh
+source /opt/openrov/cockpit/linux/scripts/load-device-tree-overlays.sh
 
 exit 0
 

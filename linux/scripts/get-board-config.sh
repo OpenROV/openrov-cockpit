@@ -2,7 +2,7 @@
 
 # Check to see if board detection was already done, if not run the detection script
 if [ ! -f /var/run/rov_board ]; then
-    sudo /opt/openrov/cockpit/linux/detect-board.sh
+    sudo /opt/openrov/cockpit/linux/scripts/detect-board.sh
 fi
 
 # Get board name

@@ -38,7 +38,7 @@ if [ ! -f /var/swapfile ]; then
   echo 255 > ${led2}//brightness || true
   echo none > ${led3}/trigger || true
 
-  bash /opt/openrov/cockpit/linux/add-swap-file.sh
+  bash /opt/openrov/cockpit/linux/scripts/add-swap-file.sh
 fi
 
 exit 0

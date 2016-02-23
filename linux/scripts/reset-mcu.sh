@@ -2,7 +2,7 @@
 set -e
 
 # Load the config variables for the attached board
-source /opt/openrov/cockpit/linux/get-board-config.sh
+source /opt/openrov/cockpit/linux/scripts/get-board-config.sh
 
 echo "Initiating MCU Reset..."
 

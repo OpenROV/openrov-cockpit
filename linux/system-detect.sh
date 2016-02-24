@@ -15,13 +15,11 @@ canTalkToATMEGAviaSPI(){
 
 export ROV_BOARD=custom
 
-# Temporary trident detection
-if grep -q "trident" /opt/board ; then
-	export ROV_BOARD=trident
-elif canTalkToATMEGAviaSPI ; then
-    	export ROV_BOARD=board25
+if canTalkToATMEGAviaSPI
+then
+    export ROV_BOARD=board25
 else
-    	export ROV_BOARD=cape
+    export ROV_BOARD=cape
 fi
 
 echo "$ROV_BOARD" > /var/run/rov_board

@@ -53,7 +53,7 @@ nconf.defaults({
   'serial_baud': 115200,
   'dashboardURL': '',
   'USE_MOCK' : false,
-  'video_url' : '/cockpit/camera1'
+  'video_url' : '/rov/forward-camera'
 });
 
 function savePreferences() {

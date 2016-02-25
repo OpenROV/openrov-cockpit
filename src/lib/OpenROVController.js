@@ -55,7 +55,7 @@ var OpenROVController = function (eventLoop, client) {
     }
     if ('CAPA' in status) {
       var s = rovsys;
-      console.log('RovSys: ' + status.CAPA);
+//      console.log('RovSys: ' + status.CAPA);
       s.capabilities = parseInt(status.CAPA);
       controller.Capabilities = s.capabilities;
       controller.emit('rovsys', s);
@@ -67,7 +67,7 @@ var OpenROVController = function (eventLoop, client) {
       }
     }
     if ('log' in status) {
-      console.log('log: ' + status.log);
+//      console.log('log: ' + status.log);
     }
     if ('boot' in status){
       this.Capabilities = 0;
@@ -106,7 +106,7 @@ var OpenROVController = function (eventLoop, client) {
     controller.updateSetting();
     controller.requestSettings();
     controller.requestCapabilities();
-    logger.log('Opened serial connection after firmware upload');
+//    logger.log('Opened serial connection after firmware upload');
   });
 
   //Every few seconds we check to see if capabilities or settings changes on the arduino.
@@ -130,9 +130,9 @@ OpenROVController.prototype.notSafeToControl = function () {
   if (this.Capabilities !== 0)
     return false;
   //This feature added after the swap to ms on the Arduino
-  console.log('Waiting for the capability response from Arduino before sending command.');
-  console.log('Arduno Version: ' + this.ArduinoFirmwareVersion);
-  console.log('Capability bitmap: ' + this.Capabilities);
+//  console.log('Waiting for the capability response from Arduino before sending command.');
+//  console.log('Arduno Version: ' + this.ArduinoFirmwareVersion);
+//  console.log('Capability bitmap: ' + this.Capabilities);
   return true;
 };
 
@@ -149,7 +149,7 @@ OpenROVController.prototype.send = function (cmd) {
 };
 
 OpenROVController.prototype.requestCapabilities = function () {
-  console.log('Sending rcap to arduino');
+  //console.log('Sending rcap to arduino');
   var command = 'rcap();';
   this.hardware.write(command);
 };

@@ -32,12 +32,32 @@
   Video.prototype.listen = function listen() {
     var self=this;
 
-
     this.cockpit.on("plugin.video.video-clicked",function(){
       alert('Video plugin.\nThere will be a message sent to the ROV in 5 seconds.');
       setTimeout(function() {
         cockpit.rov.emit('plugin.video.foo');
       }, 5000);
+    });
+    
+    //CameraRegistration
+    this.rov.withHistory.on('CameraRegistration',function(data){
+      if (data.videoMimeType=='video/mp4'){
+        var http = location.protocol;
+        var slashes = http.concat("//");
+        var host = slashes.concat(window.location.hostname);
+
+        var connection = window.io.connect(host + ':' + data.sourcePort);
+        connection.on("connect",function(){
+          //TODO: Remove the histHistory use inside the polymer control
+          var videosocket=connection;
+          //videosocket.withHistory = connection; 
+          data.sourceAddress = videosocket;
+          self.cockpit.emit('CameraRegistration',data);
+        });
+        
+      } else {
+        self.cockpit.emit('CameraRegistration',data);
+      }
     });
 
   };

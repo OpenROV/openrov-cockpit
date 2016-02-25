@@ -23,7 +23,7 @@ UIManager.prototype.start = function start(){
   this.deps.loadedPlugins.forEach(function(plugin){
     if (plugin !== undefined){
       if ((plugin.plugin !== undefined )&& (plugin.plugin.type === "theme")){
-        this.UIs.push(plugin);
+        self.UIs.push(plugin);
       }
     }
 

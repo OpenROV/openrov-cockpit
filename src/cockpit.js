@@ -38,7 +38,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/photos', serveIndex(CONFIG.preferences.get('photoDirectory')));
 app.use('/photos', express.static(CONFIG.preferences.get('photoDirectory')));
-app.set('port', process.env.LISTEN_FDS > 0 ? 'systemd' : CONFIG.port);
+app.set('port', ((process.env.LISTEN_FDS > 0) && (process.env.LISTEN_PID == process.PID)) ? 'systemd' : CONFIG.port);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs', { pretty: true });
 app.use(favicon(__dirname + '/static/favicon.ico'));
@@ -257,9 +257,12 @@ Q.allSettled(funcs).then(function(results){
 
   deps.loadedPlugins.forEach(function(plugin){
     if (plugin.start !== undefined){
+      console.log("Starting ");
+      console.dir(plugin)
       plugin.start();
     }
   });
+  
 })
 .fail(function (error) {
     console.log("Executing Error");
@@ -268,6 +271,7 @@ Q.allSettled(funcs).then(function(results){
     }
     process.exit -1;
     throw new Error("Error in loading plugins");
+    console.assert(false);  
 
 //    console.log(error);
 //    throw error;

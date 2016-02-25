@@ -25,6 +25,7 @@
     "jquery-file-upload-middleware": "",
     "json-schema-defaults": "^0.1.1",
     "lazy": ">= 1.0.11",
+    "mdns": "^2.3.0",
     "method-override": "^2.3.5",
     "mkdirp": "",
     "moment": "",

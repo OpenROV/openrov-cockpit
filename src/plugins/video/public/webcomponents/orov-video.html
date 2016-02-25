@@ -1,9 +1,12 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../mjpeg-video-webcomponents/mjpeg-video.html">
+<link rel="import" href="../socket-video-h264/socket-video-h264.html">
 <dom-module name="orov-video">
   <style>
   </style>
   <template>
+    
+    <template is="dom-if" if="{{displayPlayer(videoMimeType,'video/x-motion-jpeg')}}" iff="{{videoMimeType == 'video/x-motion-jpeg'}}">
     <mjpeg-video id="camera1" border='1' style='width: 100%; height:100%'
       menuState='on'
       src='{{videoSource}}'
@@ -13,15 +16,36 @@
       showMenu='true'>
       <content></content>
      </mjpeg-video>
+    </template>    
+
+    <template id="mp4template" is="dom-if" if="{{displayPlayer(videoMimeType,'video/mp4')}}" dom-change="handleMP4DomChange" iff="{{videoMimeType == 'video/mp4'}}">
+      <x-h264-video id="camera1" border='1' style='width: 100%; height:100%'
+        menuState='on'
+        src='{{videoSource}}'
+        framespersecond='{{framesPerSecond}}'
+        canvas='{{canvas}}'
+        cors='false'
+        showMenu='true'
+        tag={{tagHandler()}}>
+      <content></content>
+      </x-h264-video>
+    </template>    
+
+
   </template>
   <script>
     (function() {
       Polymer({
         is: "orov-video",
         properties: {
-          videoSource: {type:String},
+          videoSource: {type:Object},
           framesPerSecond: {type:Number},
-          canvas: {type:Object, observer: '_canvasChanged'}
+          canvas: {type:Object, observer: '_canvasChanged'},
+          videoMimeType: {type:String, default:"video/mp4"},
+          location: {type:String}
+        },
+        listeners: {
+          'dom-change':'handleMP4DomChange'
         },
         behaviors: [namespace('behaviors').oROVStandard],
         registerEmitterHanlders: function(emitter){
@@ -36,12 +60,38 @@
               callback({forwardCanvas:this.canvas});
             }
           });
+          
+          emitter.withHistory.on('CameraRegistration',function(data){
+            if (data.location!==self.location) return;
+            //      self.rov.emit('CameraRegistration',{cameraLocation:'front', videoMimeType:'video/mp4', resolution:'1920x1080', framerate:30, sourcePort:service.port, sourceAddress:service.address});
+            self.videoMimeType=data.videoMimeType;
+            self.framesPerSecond=data.framerate;
+            self.videoSource = data.sourceAddress;
+            //TODO: Remove hacking event registration
+            if (self.videoMimeType='video/mp4'){
+//              self.$.camera1.registerEmitterHanlders(self.videoSource);
+            }
+            
+          });
 
+        },
+        tagHandler: function(){
+          if (this.$$('#camera1') !== null){
+           this.$$('#camera1').registerEmitterHanlders(this.videoSource);
+          }
+        },
+        handleMP4DomChange: function(){
+          if (this.$$('#camera1') !== null){
+            this.$$('#camera1').registerEmitterHanlders(this.videoSource);
+          }          
         },
         _canvasChanged: function(){
           if (this.eventEmitter!==undefined){
             this.eventEmitter.emit('video.forward.canvas-changed',this.canvas);
           }
+        },
+        displayPlayer(mimeType,playerType){
+          return mimeType==playerType;
         }
       })
     })();

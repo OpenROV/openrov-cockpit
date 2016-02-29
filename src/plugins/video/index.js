@@ -27,7 +27,7 @@ video.prototype.getSettingSchema = function getSettingSchema(){
 	"properties": {
 		"forward_camera_url": {
 			"type": "string",
-      "default" : "/rov/forward-camera" //Added default
+      "default" : "rov/camera1" //Added default
 		},
 		"framerate": {
 			"type": "number",

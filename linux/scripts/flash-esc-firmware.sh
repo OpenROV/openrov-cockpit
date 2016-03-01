@@ -2,7 +2,7 @@
 set -e
 
 # Load the config variables for the attached board
-source /opt/openrov/cockpit/linux/scripts/get-board-config.sh
+. /opt/openrov/cockpit/linux/scripts/get-board-config.sh
 
 # Run the ESC flash script provided
 if [ ! -z "$ESC_SCRIPT" ] ; then

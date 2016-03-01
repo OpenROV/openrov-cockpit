@@ -41,4 +41,4 @@ if [ ! -f /var/swapfile ]; then
   bash /opt/openrov/cockpit/linux/scripts/add-swap-file.sh
 fi
 
-exit 0
+return 0

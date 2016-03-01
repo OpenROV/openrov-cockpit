@@ -8,7 +8,7 @@
 
         exclusive-use =
                 /* Pins used by this overlay */
-                "P9.11",                /* ATMEGA RESET */
+                /* "P9.11", */               /* ATMEGA RESET */
                 "P9.24",                /* UART1 TXD */
                 "P9.26",                /* UART1 RXD */
                 "P9.17",                /* spi0_cs0 */
@@ -17,7 +17,7 @@
                 "P9.22",                /* spi0_sclk */
 
                 /* Hardware IP used */
-                "gpio0_30",
+                /* "gpio0_30", */
                 "spi0",
                 "uart1";
 
@@ -95,7 +95,8 @@
                         };
                 };
         };
-
+	
+	/*
         fragment@3 {
                 target = <&ocp>;
                 __overlay__ {
@@ -114,4 +115,5 @@
                         };
                 };
         };
+*/
 };

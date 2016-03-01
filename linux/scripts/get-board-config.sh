@@ -2,7 +2,7 @@
 
 # Check to see if board detection was already done, if not run the detection script
 if [ ! -f /var/run/rov_board ]; then
-    sudo /opt/openrov/cockpit/linux/scripts/detect-board.sh
+    /opt/openrov/cockpit/linux/scripts/detect-board.sh
 fi
 
 # Get board name
@@ -19,7 +19,7 @@ then
 	export MCU_PROG_PIN=60
 	export UPLOAD_REQUIRES_RESET=true
 	export UPLOAD_REQUIRES_PROG_PIN=true
-	exit 0
+	return 0
 fi
 
 # CB25
@@ -32,7 +32,7 @@ then
 	export MCU_RESET_PIN=30
         export UPLOAD_REQUIRES_RESET=false
         export UPLOAD_REQUIRES_PROG_PIN=false 
-        exit 0
+        return 0
 fi
 
 # Cape
@@ -43,7 +43,7 @@ then
         export MCU_RESET_PIN=32
         export UPLOAD_REQUIRES_RESET=true   
         export UPLOAD_REQUIRES_PROG_PIN=false 
-        exit 0
+        return 0
 fi
 
 exit 1

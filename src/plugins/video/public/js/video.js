@@ -41,6 +41,14 @@
     
     //CameraRegistration
     this.rov.withHistory.on('CameraRegistration',function(data){
+      var http = location.protocol;
+      var slashes = http.concat("//");
+      var host = slashes.concat(window.location.hostname);
+      if (data.relativeServiceUrl !== null){
+        data.sourceAddress = host + data.relativeServiceUrl;
+      } else {
+        data.sourceAddress = host + ":" + data.sourcePort;
+      }
       if (data.videoMimeType=='video/mp4'){
         var http = location.protocol;
         var slashes = http.concat("//");

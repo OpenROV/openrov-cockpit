@@ -58,7 +58,7 @@ mkdirp(CONFIG.preferences.get('photoDirectory'));
 process.env.NODE_ENV = true;
 var globalEventLoop = new EventEmitter();
 var DELAY = Math.round(1000 / CONFIG.video_frame_rate);
-var camera = new OpenROVCamera({ delay: DELAY, app: app });
+//var camera = new OpenROVCamera({ delay: DELAY, app: app });
 io= require('./static/js/socketIOStoreAndForward.js')(io);
 var client = new CockpitMessaging(io);
 client = require('./static/js/eventEmitterStoreAndForward.js')(client);
@@ -69,7 +69,7 @@ var deps = {
   server: server,
   app: app,
   rov: controller,
-  camera: camera,
+//  camera: camera,
   cockpit: client,
   config: CONFIG,
   globalEventLoop: globalEventLoop,
@@ -106,16 +106,18 @@ connections += 1;
 if (connections == 1)
   controller.start();
 // opens socket with client
-if (camera.IsCapturing) {
+if (true) {
   deps.cockpit.emit('videoStarted');
   console.log('Send videoStarted to client 2');
 } else {
+  
   console.log('Trying to restart mjpeg streamer');
-  camera.capture();
+//  camera.capture();
   deps.cockpit.emit('videoStarted');
 }
 deps.cockpit.on('videoStatus', function(clk) {
-  clk(camera.IsCapturing);
+  //clk(camera.IsCapturing);
+  clk(true);
 });
 
 deps.cockpit.emit('settings', CONFIG.preferences.get());
@@ -155,30 +157,30 @@ globalEventLoop.on('videoStopped', function () {
   deps.cockpit.emit('videoStopped');
 });
 
-camera.on('started', function () {
-  console.log('emitted \'videoStarted\'');
-  globalEventLoop.emit('videoStarted');
-});
-camera.capture(function (err) {
-  if (err) {
-    connections -= 1;
-    camera.close();
-    return console.error('couldn\'t initialize camera. got:', err);
-  }
-});
-camera.on('error.device', function (err) {
-  console.log('camera emitted an error:', err);
-  globalEventLoop.emit('videoStopped');
-});
+//camera.on('started', function () {
+//  console.log('emitted \'videoStarted\'');
+//  globalEventLoop.emit('videoStarted');
+//});
+//camera.capture(function (err) {
+//  if (err) {
+//    connections -= 1;
+  //  camera.close();
+//    return console.error('couldn\'t initialize camera. got:', err);
+//  }
+//});
+//camera.on('error.device', function (err) {
+//  console.log('camera emitted an error:', err);
+//  globalEventLoop.emit('videoStopped');
+//});
 if (process.platform === 'linux') {
   process.on('SIGTERM', function () {
     console.error('got SIGTERM, shutting down...');
-    camera.close();
+  //  camera.close();
     process.exit(0);
   });
   process.on('SIGINT', function () {
     console.error('got SIGINT, shutting down...');
-    camera.close();
+   // camera.close();
     process.exit(0);
   });
 }

@@ -41,7 +41,7 @@
           videoSource: {type:Object},
           framesPerSecond: {type:Number},
           canvas: {type:Object, observer: '_canvasChanged'},
-          videoMimeType: {type:String, default:"video/mp4"},
+          videoMimeType: {type:String},
           location: {type:String}
         },
         listeners: {
@@ -67,10 +67,7 @@
             self.videoMimeType=data.videoMimeType;
             self.framesPerSecond=data.framerate;
             self.videoSource = data.sourceAddress;
-            //TODO: Remove hacking event registration
-            if (self.videoMimeType='video/mp4'){
-//              self.$.camera1.registerEmitterHanlders(self.videoSource);
-            }
+
             
           });
 
@@ -80,6 +77,7 @@
            this.$$('#camera1').registerEmitterHanlders(this.videoSource);
           }
         },
+                    //TODO: Remove hacking event registration
         handleMP4DomChange: function(){
           if (this.$$('#camera1') !== null){
             this.$$('#camera1').registerEmitterHanlders(this.videoSource);

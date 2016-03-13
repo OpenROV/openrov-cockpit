@@ -44,7 +44,7 @@ geomux.prototype.startBrowser = function startBrowser(){
       console.log("geomux.prototype.startBrowser:serviceUp");
       self.services[service.fullname + ":" + service.port]=service;
       //TODO: Update the mDNS publish to include all the camera details
-      self.deps.rov.emit('CameraRegistration',{location:'front', videoMimeType:'video/mp4', resolution:'1920x1080', framerate:30, sourcePort:service.port, sourceAddress:service.addresses[0]});
+      self.deps.rov.emit('CameraRegistration',{location:service.txtRecord.cameraLocation, videoMimeType:service.txtRecord.videoMimeType, resolution:service.txtRecord.resolution, framerate:service.txtRecord.framerate, relativeServiceUrl:service.txtRecord.relativeServiceUrl, sourcePort:service.port, sourceAddress:service.addresses[0]});
       console.log("Sent Camera Registration");
     });
     mdnsBrowser.on('serviceDown', function(service) {

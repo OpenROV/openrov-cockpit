@@ -1,6 +1,7 @@
 const exec=require('child_process').exec;
 const mdns=require('mdns');
 const fs=require('fs');
+const respawn = require('respawn');
 var mjpegvideo = function mjpegvideo(name, deps) {
   console.log('The mjpeg-video plugin.');
 
@@ -39,8 +40,40 @@ mjpegvideo.prototype.startBrowser = function startBrowser(){
     console.dir(mdns.browseThemAll());
 };
 
+var launch_options = [require.resolve('mjpeg-video-server')];
+
+const infinite=-1;
+var monitor = respawn(launch_options,{
+    name: 'mjpegserver',
+    maxRestarts: infinite,
+    sleep: 1000
+})
+
+monitor.on('stderr', function(data){
+    console.log(data.toString('utf-8'));
+})
+
+monitor.on('stdout', function(data){
+    console.log(data.toString('utf-8'));
+})
+
+
+monitor.on('stop', function(){
+   console.log("mjpeg-video-server stop"); 
+});
+
+monitor.on('crash', function(){
+   console.log("mjpeg-video-server crash"); 
+});
+
+monitor.on('exit', function(){
+   console.log("mjpeg-video-server exit"); 
+});
+
+
 mjpegvideo.prototype.start = function start(){
     this.startBrowser();
+    monitor.start();
 };
 
 //Export provides the public interface

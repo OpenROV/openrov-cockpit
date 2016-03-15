@@ -38,7 +38,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/photos', serveIndex(CONFIG.preferences.get('photoDirectory')));
 app.use('/photos', express.static(CONFIG.preferences.get('photoDirectory')));
-app.set('port', ((process.env.LISTEN_FDS > 0) && (process.env.LISTEN_PID == process.PID)) ? 'systemd' : CONFIG.port);
+app.set('port', process.env.LISTEN_FDS > 0 ? 'systemd' : CONFIG.port);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs', { pretty: true });
 app.use(favicon(__dirname + '/static/favicon.ico'));

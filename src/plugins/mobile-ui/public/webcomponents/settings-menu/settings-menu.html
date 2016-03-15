@@ -1,0 +1,121 @@
+<link rel="import" href="../../polymer/polymer.html">
+
+<link rel="import" href="../grid-menu/grid-menu.html">
+<link rel="import" href="../grid-menu/grid-menu-button.html">
+
+<link rel="import" href="../../paper-dialog/paper-dialog.html">
+
+<dom-module id="settings-menu">
+	
+	<style type="text/css">
+		
+		paper-dialog
+		{
+			color: white;
+			position: fixed;
+			
+			top: 0px;
+			right: 0;
+			margin-top: 90px;
+			margin-right: 10px;
+			width: 20%;
+
+			overflow: auto;
+			border-radius: 5px;
+			background-color: rgba( 00, 00, 00, 0.7 );
+    	}
+		
+		modal ::content > *
+		{
+			margin: 0;
+		}
+		
+		grid-menu
+		{
+			--grid-menu-max-width: 135px;
+		}
+		
+		grid-menu-button[selected]
+		{
+			color: black;
+			background-color: white;
+			--grid-menu-button-fill-color: black;
+		}
+		
+	</style>
+	
+
+	<template strip-whitespace>
+		<grid-menu id="gridMenu" horizontal-align="right" trigger-icon="settings">			
+				
+				<grid-menu-button icon="image:palette" label="Theme"></grid-menu-button>
+				<grid-menu-button action="callback" target="toggleFullscreen" icon="icons:fullscreen" label="Fullscreen"></grid-menu-button>
+				<grid-menu-button icon="icons:build" label="Calibrate"></grid-menu-button>
+				<grid-menu-button target="modal" icon="hardware:toys" label="Motors"></grid-menu-button>
+				
+				<grid-menu-button icon="icons:lightbulb-outline" label="Lights"></grid-menu-button>
+				<grid-menu-button icon="image:flare" label="Lasers"></grid-menu-button>
+				<grid-menu-button icon="maps:navigation" label="Heading"></grid-menu-button>
+				<grid-menu-button icon="icons:swap-vert" label="Depth"></grid-menu-button>
+		</grid-menu>
+		
+	</template>
+	
+	
+	<script>
+		( function()
+		{
+			Polymer(
+			{
+				is: 'settings-menu',
+				
+				listeners:
+				{
+					'menuSelection': 'handleMenuSelection'
+				},
+				
+				handleMenuSelection: function(e)
+				{ 
+					if( e.detail.action == "callback" )
+					{
+						if( this[ e.detail.target ] !== undefined )
+						{
+							this[ e.detail.target ]();
+						}
+					}
+				},
+				
+				handleTap: function(e)
+				{
+				},
+				
+				toggleFullscreen: function()
+				{
+					if (!document.fullscreenElement &&    // alternative standard method
+				      !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {  // current working methods
+				    if (document.documentElement.requestFullscreen) {
+				      document.documentElement.requestFullscreen();
+				    } else if (document.documentElement.msRequestFullscreen) {
+				      document.documentElement.msRequestFullscreen();
+				    } else if (document.documentElement.mozRequestFullScreen) {
+				      document.documentElement.mozRequestFullScreen();
+				    } else if (document.documentElement.webkitRequestFullscreen) {
+				      document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+				    }
+				  } else {
+				    if (document.exitFullscreen) {
+				      document.exitFullscreen();
+				    } else if (document.msExitFullscreen) {
+				      document.msExitFullscreen();
+				    } else if (document.mozCancelFullScreen) {
+				      document.mozCancelFullScreen();
+				    } else if (document.webkitExitFullscreen) {
+				      document.webkitExitFullscreen();
+				    }
+				  }
+				}
+			} );
+		}() );
+		
+	</script>
+</dom-module>

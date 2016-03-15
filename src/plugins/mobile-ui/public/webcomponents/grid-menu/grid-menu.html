@@ -1,0 +1,258 @@
+<link rel="import" href="../../polymer/polymer.html">
+
+<link rel="import" href="./grid-menu-button.html">
+
+<link rel="import" href="../../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../iron-icons/iron-icons.html">
+<link rel="import" href="../../iron-icons/device-icons.html">
+<link rel="import" href="../../iron-icons/image-icons.html">
+<link rel="import" href="../../iron-icons/notification-icons.html">
+<link rel="import" href="../../iron-icons/social-icons.html">
+<link rel="import" href="../../iron-icons/maps-icons.html">
+<link rel="import" href="../../iron-icons/hardware-icons.html">
+
+<link rel="import" href="../../iron-dropdown/iron-dropdown.html">
+
+<link rel="import" href="../../neon-animation/animations/fade-in-animation.html">
+<link rel="import" href="../../neon-animation/animations/fade-out-animation.html">
+
+<dom-module id="grid-menu">
+	
+	<style type="text/css">
+		:host
+		{
+			display: block;
+		}
+		
+		#trigger
+		{
+			display: block;
+			color: white;
+			border-radius: 50%;
+			background-color: rgba( 00, 00, 00, 0.5 );
+			width: 60px;
+			height: 60px;
+		}
+		
+		#container
+		{
+
+			display: inline-block;
+			border-radius: 5px;
+			background-color: rgba( 00, 00, 00, 0.5 );
+			max-width: var( --grid-menu-max-width, 210px );
+		}
+			
+		
+		#dropdown ::content grid-menu-button
+		{
+			margin: 3px;
+			display: inline-block;
+			color: white;
+			border: 0px solid white;
+			border-radius: 5px;
+			width: 60px;
+			height: 60px;
+			text-align: center;
+		}
+		
+		#dropdown ::content grid-menu-button:hover 
+		{
+			color: lightslategray;
+		}
+	
+	</style>
+	
+	<template>
+		
+		<!--Trigger Button-->
+		<paper-icon-button id="trigger" icon="{{trigger-icon}}" on-tap="toggle"></paper-icon-button>
+
+		<iron-dropdown 
+			id="dropdown"
+			opened="{{opened}}"
+			horizontal-align="[[horizontalAlign]]"
+			vertical-align="[[verticalAlign]]"
+			horizontal-offset="[[horizontalOffset]]"
+			vertical-offset="[[verticalOffset]]"
+			open-animation-config="[[openAnimationConfig]]"
+			close-animation-config="[[closeAnimationConfig]]"
+			no-animations="[[noAnimations]]"
+			focus-target="[[_dropdownContent]]"
+			on-iron-overlay-canceled="__onIronOverlayCanceled">
+			<div id="container" class="dropdown-content">
+				<content></content>
+			</div>
+		</iron-dropdown>
+		
+	</template>
+	
+	
+	<script>
+		( function()
+		{
+			Polymer(
+			{
+				is: 'grid-menu',
+				
+				properties: 
+				{
+					triggerIcon: String,
+					
+					opened: {
+						type: Boolean,
+						value: false,
+						notify: true,
+						observer: '_openedChanged'
+					},
+
+					horizontalAlign: {
+						type: String,
+						value: 'left',
+						reflectToAttribute: true
+					},
+
+					verticalAlign: {
+						type: String,
+						value: 'top',
+						reflectToAttribute: true
+					},
+
+					horizontalOffset: {
+						type: Number,
+						value: 0,
+						notify: true
+					},
+	
+					verticalOffset: {
+						type: Number,
+						value: 80,
+						notify: true
+					},
+	
+					noAnimations: {
+						type: Boolean,
+						value: false
+					},
+
+					ignoreSelect: {
+						type: Boolean,
+						value: false
+					},
+
+					openAnimationConfig: {
+						type: Object,
+						value: function() {
+						return [{
+							name: 'fade-in-animation',
+							timing: {
+							delay: 0,
+							duration: 400
+							}
+						}];
+						}
+					},
+
+					closeAnimationConfig: {
+						type: Object,
+						value: function() {
+						return [{
+							name: 'fade-out-animation',
+							timing: {
+							duration: 400
+							}
+						}];
+						}
+					},
+
+					_dropdownContent: 
+					{
+						type: Object
+					}
+				},
+				
+				listeners: 
+				{
+					'cancel': 'cancel'
+				},
+				
+				behaviors:
+				[
+					Polymer.IronControlState
+				],
+				
+				toggle: function()
+				{					
+					if (this.opened) 
+					{
+						this.close();
+					} else {
+						this.open();
+					}
+				},
+				
+				open: function() 
+				{
+					if (this.disabled)
+					{
+						return;
+					}
+					this.$.dropdown.open();
+				},
+				
+				cancel: function()
+				{
+					this.$.dropdown.close();
+				},
+				
+				/**
+				* Hide the dropdown content.
+				*/
+				close: function() 
+				{
+					this.$.dropdown.close();
+				},
+				
+				_openedChanged: function(opened, oldOpened) {
+					if (opened) {
+						// TODO(cdata): Update this when we can measure changes in distributed
+						// children in an idiomatic way.
+						// We poke this property in case the element has changed. This will
+						// cause the focus target for the `iron-dropdown` to be updated as
+						// necessary:
+						this._dropdownContent = this.contentElement;
+						this.fire('paper-dropdown-open');
+					} else if (oldOpened != null) {
+						this.fire('paper-dropdown-close');
+					}
+					},
+				/**
+				* If the dropdown is open when disabled becomes true, close the
+				* dropdown.
+				*
+				* @param {boolean} disabled True if disabled, otherwise false.
+				*/
+				_disabledChanged: function(disabled) 
+				{
+					Polymer.IronControlState._disabledChanged.apply(this, arguments);
+					if (disabled && this.opened) {
+						this.close();
+					}
+				},
+				
+				__onIronOverlayCanceled: function(event) 
+				{
+					var uiEvent = event.detail;
+					var target = Polymer.dom(uiEvent).rootTarget;
+					var trigger = this.$.trigger;
+					var path = Polymer.dom(uiEvent).path;
+					if (path.indexOf(trigger) > -1) 
+					{
+						event.preventDefault();
+					}
+				}
+			} );
+		}() );
+		
+	</script>
+</dom-module>

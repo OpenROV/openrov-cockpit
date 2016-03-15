@@ -1,0 +1,48 @@
+<link rel="import" href="../../polymer/polymer.html">
+
+<link rel="import" href="../../iron-icons/iron-icons.html">
+<link rel="import" href="../../iron-icon/iron-icon.html">
+
+<dom-module id="orov-mobile-battery">
+	
+	<style>
+		
+	</style>
+	
+	<template strip-whitespace>
+	  <iron-icon icon="device:battery-charging-full"></iron-icon>
+		<span>[[battery]]V</span>
+	</template>
+
+	<script>
+		Polymer(
+		{
+			is: 'orov-mobile-battery',
+			
+			listeners:
+			{
+			},
+			
+			properties: 
+			{
+        battery: {
+          type: Number,
+          value: '9.0'
+        },
+			},
+			
+			behaviors: [namespace('behaviors').oROVStandard],
+			
+      registerEmitterHanlders: function(emitter) 
+      {
+        var self = this;
+        
+        emitter.on('plugin.controllerboard2x.systemPower.update', function(data) 
+        {
+          self.battery = parseFloat(data.board.voltage).toFixed(1);
+        });
+      }
+      
+		} );
+	</script>
+</dom-module>

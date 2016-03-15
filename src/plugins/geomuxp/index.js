@@ -1,6 +1,8 @@
 const exec=require('child_process').exec;
 const mdns=require('mdns');
 const fs=require('fs');
+const respawn = require('respawn');
+
 var geomux = function geomux(name, deps) {
   console.log('The geo-mux plugin.');
 
@@ -38,8 +40,11 @@ geomux.prototype.startBrowser = function startBrowser(){
         'DNSServiceGetAddrInfo' in mdns.dns_sd ? mdns.rst.DNSServiceGetAddrInfo() : mdns.rst.getaddrinfo({families:[4]}),
         mdns.rst.makeAddressesUnique()
     ];    
-    var mdnsBrowser = mdns.createBrowser((mdns.tcp('geomux')),{resolverSequence: sequence, networkInterface: 'dummy0'});
+    mdnsBrowser = mdns.createBrowser((mdns.tcp('geomux')),{resolverSequence: sequence, networkInterface: 'dummy0'});
+    //mdnsBrowser = mdns.createBrowser((mdns.tcp('geomux')),{networkInterface: 'dummy0'});
     
+    //TODO: Find way to uniquely identify service when it goes down so we can remove it from the list
+    //TODO: Why or why does the avahi service need to be restarted to work?    
     mdnsBrowser.on('serviceUp', function(service) {
       console.log("geomux.prototype.startBrowser:serviceUp");
       self.services[service.fullname + ":" + service.port]=service;
@@ -48,16 +53,51 @@ geomux.prototype.startBrowser = function startBrowser(){
       console.log("Sent Camera Registration");
     });
     mdnsBrowser.on('serviceDown', function(service) {
-      delete this.services[service.fullname + ":" + service.port];
+    // Breaks at the moment, fullname is not part of the serviceDown message
+        console.log("Serice down mDNS message recieved");
+        console.dir(service);
+    //  delete this.services[service.fullname + ":" + service.port];
     });
     
     mdnsBrowser.start();   
     console.dir(mdns.browseThemAll());
+ //   self.deps.rov.emit('CameraRegistration',{location:'forward', videoMimeType:'video/mp4', sourcePort:'8099',relativeServiceUrl:null});
     console.log("geomux.prototype.startBrowser COMPLETE")
 };
 
+var launch_options = [require.resolve('geo-video-server')];
+
+const infinite=-1;
+var monitor = respawn(launch_options,{
+    name: 'geomux',
+    maxRestarts: infinite,
+    sleep: 1000
+})
+
+monitor.on('stderr', function(data){
+    console.log(data.toString('utf-8'));
+})
+
+monitor.on('stdout', function(data){
+    console.log(data.toString('utf-8'));
+})
+
+
+monitor.on('stop', function(){
+   console.log("geo-vide-server stop"); 
+});
+
+monitor.on('crash', function(){
+   console.log("geo-vide-server crash"); 
+});
+
+monitor.on('exit', function(){
+   console.log("geo-vide-server exit"); 
+});
+
 geomux.prototype.start = function start(){
     this.startBrowser();
+    monitor.start();
 };
 
 //Export provides the public interface

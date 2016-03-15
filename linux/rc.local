@@ -57,4 +57,9 @@ echo OPENROV-RESET > $CAPEMGR/slots
 echo BB-SPI0DEV > $CAPEMGR/slots
 echo BB-UART1 > $CAPEMGR/slots
 
+#To deal with flaky avahi behavior
+#http://forums.fedoraforum.org/showthread.php?t=266511
+sleep 15
+systemctl restart avahi-daemon.service
+
 exit 0

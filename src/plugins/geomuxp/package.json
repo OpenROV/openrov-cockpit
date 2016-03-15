@@ -1,0 +1,15 @@
+{
+  "name": "geomux",
+  "version": "1.0.0",
+  "description": "This is the plugin wrapper for the geomux streaming application.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Brian Adams <brian@babastik.com>",
+  "license": "MIT",
+  "dependencies": {
+    "geo-video-server": "https://github.com/OpenROV-Dev/geo-video-server.git"
+  }  
+  
+}

@@ -5,7 +5,11 @@ function video(name, deps) {
   this.deps = deps; //hold a reference to the plugin dependencies if you are going to use them
   this.rov = deps.rov; //explicitlly calling out the rov eventemitter
   this.cockpit = deps.cockpit; //explicitly calling out cockpit eventemitter
-
+  var self=this;
+  this.deps.rov.on('CameraRegistration',function(data){
+    console.log("Re-emitting CameraRegistration");
+  	self.cockpit.emit('CameraRegistration',data);
+  });
 
 }
 
@@ -14,9 +18,10 @@ video.prototype.start = function start(){
   var self = this; //set closure state variable for use in functions
 //      self.rov.emit('CameraRegistration',{cameraLocation:'front', videoMimeType:'video/mp4', resolution:'1920x1080', framerate:30, sourcePort:service.port, sourceAddress:service.address});
 
-  this.deps.rov.on('CameraRegistration',function(data){
-  	self.cockpit.emit('CameraRegistration',data);
-  });
+//  this.deps.rov.on('CameraRegistration',function(data){
+//    console.log("Re-emitting CameraRegistration");
+//  	self.cockpit.emit('CameraRegistration',data);
+//  });
 }
 
 // This is all that is required to enable settings for a plugin. They are

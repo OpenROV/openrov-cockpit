@@ -55,19 +55,16 @@ var OpenROVController = function (eventLoop, client) {
     }
     if ('CAPA' in status) {
       var s = rovsys;
-//      console.log('RovSys: ' + status.CAPA);
       s.capabilities = parseInt(status.CAPA);
       controller.Capabilities = s.capabilities;
       controller.emit('rovsys', s);
     }
     if ('cmd' in status) {
       if (status.com != 'ping(0)'){
-        //console.log('cmd: ' + status.cmd);
         controller.emit('command', status.cmd);
       }
     }
     if ('log' in status) {
-//      console.log('log: ' + status.log);
     }
     if ('boot' in status){
       this.Capabilities = 0;
@@ -143,13 +140,11 @@ OpenROVController.prototype.send = function (cmd) {
     return;
 
   var command = cmd + ';';
-//  console.log('Sending command to arduino: ' + command);
 
   controller.hardware.write(command);
 };
 
 OpenROVController.prototype.requestCapabilities = function () {
-  //console.log('Sending rcap to arduino');
   var command = 'rcap();';
   this.hardware.write(command);
 };
@@ -163,10 +158,10 @@ OpenROVController.prototype.requestSettings = function () {
 };
 
 OpenROVController.prototype.updateSetting = function () {
-  var command = 'updateSetting(' 
-    + CONFIG.preferences.get('smoothingIncriment') + ',' 
-    + CONFIG.preferences.get('deadzone_neg') + ',' 
-    + CONFIG.preferences.get('deadzone_pos') + ',' 
+  var command = 'updateSetting('
+    + CONFIG.preferences.get('smoothingIncriment') + ','
+    + CONFIG.preferences.get('deadzone_neg') + ','
+    + CONFIG.preferences.get('deadzone_pos') + ','
     + CONFIG.preferences.get('water_type') + ');';
   this.hardware.write(command);
   //This is the multiplier used to make the motor act linear fashion.

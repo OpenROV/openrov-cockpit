@@ -18,6 +18,6 @@
   },
   "resolutions": {
     "webcomponentsjs": "^0.7.20",
-    "polymer": "~1.2.0"
+    "polymer": "^1.0.0"
   }
 }

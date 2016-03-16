@@ -104,19 +104,6 @@ connections += 1;
 if (connections == 1)
   controller.start();
 // opens socket with client
-if (true) {
-  deps.cockpit.emit('videoStarted');
-  console.log('Send videoStarted to client 2');
-} else {
-
-  console.log('Trying to restart mjpeg streamer');
-//  camera.capture();
-  deps.cockpit.emit('videoStarted');
-}
-deps.cockpit.on('videoStatus', function(clk) {
-  //clk(camera.IsCapturing);
-  clk(true);
-});
 
 deps.cockpit.emit('settings', CONFIG.preferences.get());
 
@@ -141,11 +128,9 @@ controller.on('rovsys', function (data) {
 });
 controller.on('Arduino-settings-reported', function (settings) {
   deps.cockpit.emit('settings', settings);
-//  console.log('sending arduino settings to web client');
 });
 controller.on('settings-updated', function (settings) {
   deps.cockpit.emit('settings', settings);
-//  console.log('sending settings to web client');
 });
 globalEventLoop.on('videoStarted', function () {
   deps.cockpit.emit('videoStarted');
@@ -158,12 +143,10 @@ globalEventLoop.on('videoStopped', function () {
 if (process.platform === 'linux') {
   process.on('SIGTERM', function () {
     console.error('got SIGTERM, shutting down...');
-  //  camera.close();
     process.exit(0);
   });
   process.on('SIGINT', function () {
     console.error('got SIGINT, shutting down...');
-   // camera.close();
     process.exit(0);
   });
 }

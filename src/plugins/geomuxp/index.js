@@ -10,7 +10,7 @@ var geomux = function geomux(name, deps) {
   this.deps = deps;
   var self=this;
   this.services={};
- 
+
 }
 
 geomux.prototype.geomuxInstalled = function geomuxInstalled(callback){
@@ -39,12 +39,12 @@ geomux.prototype.startBrowser = function startBrowser(){
         mdns.rst.DNSServiceResolve(),
         'DNSServiceGetAddrInfo' in mdns.dns_sd ? mdns.rst.DNSServiceGetAddrInfo() : mdns.rst.getaddrinfo({families:[4]}),
         mdns.rst.makeAddressesUnique()
-    ];    
+    ];
     mdnsBrowser = mdns.createBrowser((mdns.tcp('geomux')),{resolverSequence: sequence, networkInterface: 'dummy0'});
     //mdnsBrowser = mdns.createBrowser((mdns.tcp('geomux')),{networkInterface: 'dummy0'});
-    
+
     //TODO: Find way to uniquely identify service when it goes down so we can remove it from the list
-    //TODO: Why or why does the avahi service need to be restarted to work?    
+    //TODO: Why or why does the avahi service need to be restarted to work?
     mdnsBrowser.on('serviceUp', function(service) {
       console.log("geomux.prototype.startBrowser:serviceUp");
       self.services[service.fullname + ":" + service.port]=service;
@@ -58,8 +58,8 @@ geomux.prototype.startBrowser = function startBrowser(){
         console.dir(service);
     //  delete this.services[service.fullname + ":" + service.port];
     });
-    
-    mdnsBrowser.start();   
+
+    mdnsBrowser.start();
     console.dir(mdns.browseThemAll());
  //   self.deps.rov.emit('CameraRegistration',{location:'forward', videoMimeType:'video/mp4', sourcePort:'8099',relativeServiceUrl:null});
     console.log("geomux.prototype.startBrowser COMPLETE")
@@ -75,24 +75,24 @@ var monitor = respawn(launch_options,{
 })
 
 monitor.on('stderr', function(data){
-    console.log(data.toString('utf-8'));
+//    console.log(data.toString('utf-8'));
 })
 
 monitor.on('stdout', function(data){
-    console.log(data.toString('utf-8'));
+//    console.log(data.toString('utf-8'));
 })
 
 
 monitor.on('stop', function(){
-   console.log("geo-vide-server stop"); 
+//   console.log("geo-vide-server stop");
 });
 
 monitor.on('crash', function(){
-   console.log("geo-vide-server crash"); 
+//   console.log("geo-vide-server crash");
 });
 
 monitor.on('exit', function(){
-   console.log("geo-vide-server exit"); 
+//   console.log("geo-vide-server exit");
 });
 
 geomux.prototype.start = function start(){

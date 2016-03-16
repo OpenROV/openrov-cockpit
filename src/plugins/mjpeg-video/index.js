@@ -9,7 +9,7 @@ var mjpegvideo = function mjpegvideo(name, deps) {
   this.deps = deps;
   var self=this;
   this.services={};
- 
+
 }
 
 var mdnsBrowser;
@@ -19,9 +19,9 @@ mjpegvideo.prototype.startBrowser = function startBrowser(){
         mdns.rst.DNSServiceResolve(),
         'DNSServiceGetAddrInfo' in mdns.dns_sd ? mdns.rst.DNSServiceGetAddrInfo() : mdns.rst.getaddrinfo({families:[4]}),
         mdns.rst.makeAddressesUnique()
-    ];    
+    ];
     var mdnsBrowser = mdns.createBrowser((mdns.tcp('mjpeg-video')),{resolverSequence: sequence, networkInterface: 'dummy0'});
-    
+
     mdnsBrowser.on('serviceUp', function(service) {
       console.log("Serice UP MJPG");
       console.dir(service);
@@ -35,12 +35,18 @@ mjpegvideo.prototype.startBrowser = function startBrowser(){
       console.dir(service);
       //delete this.services[service.fullname + ":" + service.port];
     });
-    
-    mdnsBrowser.start();   
+
+    mdnsBrowser.start();
     console.dir(mdns.browseThemAll());
 };
 
-var launch_options = [require.resolve('mjpeg-video-server')];
+var launch_options;
+var mock=false;
+if (deps.config.preferences.get('USE_MOCK') === 'true'){
+  mock=true;
+}
+launch_options = [require.resolve('mjpeg-video-server'),'-m',mock];
+
 
 const infinite=-1;
 var monitor = respawn(launch_options,{
@@ -50,24 +56,24 @@ var monitor = respawn(launch_options,{
 })
 
 monitor.on('stderr', function(data){
-    console.log(data.toString('utf-8'));
+//    console.log(data.toString('utf-8'));
 })
 
 monitor.on('stdout', function(data){
-    console.log(data.toString('utf-8'));
+//    console.log(data.toString('utf-8'));
 })
 
 
 monitor.on('stop', function(){
-   console.log("mjpeg-video-server stop"); 
+//   console.log("mjpeg-video-server stop");
 });
 
 monitor.on('crash', function(){
-   console.log("mjpeg-video-server crash"); 
+//   console.log("mjpeg-video-server crash");
 });
 
 monitor.on('exit', function(){
-   console.log("mjpeg-video-server exit"); 
+//   console.log("mjpeg-video-server exit");
 });
 
 

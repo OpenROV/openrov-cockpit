@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "./node_modules/grunt-cli/bin/grunt test",
-    "install": "node install_lib/bower_install_all.js"
+    "install": "node install_lib/bower_install_all.js && node install_lib/npm_install_all.js"
   },
   "dependencies": {
     "body-parser": "^1.14.2",

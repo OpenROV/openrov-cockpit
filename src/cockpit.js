@@ -19,7 +19,17 @@ if (process.env['NODE_PATH']!==undefined){
   console.log("Set NODE_PATH to: "+process.env['NODE_PATH'] );
 
 
-var CONFIG = require('./lib/config'), fs = require('fs'), express = require('express'), app = express(), server = require('http').createServer(app), io = require('socket.io').listen(server, { log: false, origins: '*:*' }), EventEmitter = require('events').EventEmitter, OpenROVCamera = require(CONFIG.OpenROVCamera), OpenROVController = require(CONFIG.OpenROVController), logger = require('./lib/logger').create(CONFIG), mkdirp = require('mkdirp'), path = require('path');
+var CONFIG = require('./lib/config');
+var fs = require('fs');
+var express = require('express');
+var app = express();
+var server = require('http').createServer(app);
+var io = require('socket.io').listen(server, { log: false, origins: '*:*' });
+var EventEmitter = require('events').EventEmitter;
+var OpenROVController = require(CONFIG.OpenROVController);
+var logger = require('./lib/logger').create(CONFIG);
+var mkdirp = require('mkdirp');
+var path = require('path');
 var PluginLoader = require('./lib/PluginLoader');
 var CockpitMessaging = require('./lib/CockpitMessaging');
 var Q=require('q');
@@ -58,7 +68,6 @@ mkdirp(CONFIG.preferences.get('photoDirectory'));
 process.env.NODE_ENV = true;
 var globalEventLoop = new EventEmitter();
 var DELAY = Math.round(1000 / CONFIG.video_frame_rate);
-var camera = new OpenROVCamera({ delay: DELAY, app: app });
 io= require('./static/js/socketIOStoreAndForward.js')(io);
 var client = new CockpitMessaging(io);
 client = require('./static/js/eventEmitterStoreAndForward.js')(client);
@@ -69,7 +78,6 @@ var deps = {
   server: server,
   app: app,
   rov: controller,
-  camera: camera,
   cockpit: client,
   config: CONFIG,
   globalEventLoop: globalEventLoop,
@@ -106,17 +114,6 @@ connections += 1;
 if (connections == 1)
   controller.start();
 // opens socket with client
-if (camera.IsCapturing) {
-  deps.cockpit.emit('videoStarted');
-  console.log('Send videoStarted to client 2');
-} else {
-  console.log('Trying to restart mjpeg streamer');
-  camera.capture();
-  deps.cockpit.emit('videoStarted');
-}
-deps.cockpit.on('videoStatus', function(clk) {
-  clk(camera.IsCapturing);
-});
 
 deps.cockpit.emit('settings', CONFIG.preferences.get());
 
@@ -141,11 +138,9 @@ controller.on('rovsys', function (data) {
 });
 controller.on('Arduino-settings-reported', function (settings) {
   deps.cockpit.emit('settings', settings);
-//  console.log('sending arduino settings to web client');
 });
 controller.on('settings-updated', function (settings) {
   deps.cockpit.emit('settings', settings);
-//  console.log('sending settings to web client');
 });
 globalEventLoop.on('videoStarted', function () {
   deps.cockpit.emit('videoStarted');
@@ -155,30 +150,13 @@ globalEventLoop.on('videoStopped', function () {
   deps.cockpit.emit('videoStopped');
 });
 
-camera.on('started', function () {
-  console.log('emitted \'videoStarted\'');
-  globalEventLoop.emit('videoStarted');
-});
-camera.capture(function (err) {
-  if (err) {
-    connections -= 1;
-    camera.close();
-    return console.error('couldn\'t initialize camera. got:', err);
-  }
-});
-camera.on('error.device', function (err) {
-  console.log('camera emitted an error:', err);
-  globalEventLoop.emit('videoStopped');
-});
 if (process.platform === 'linux') {
   process.on('SIGTERM', function () {
     console.error('got SIGTERM, shutting down...');
-    camera.close();
     process.exit(0);
   });
   process.on('SIGINT', function () {
     console.error('got SIGINT, shutting down...');
-    camera.close();
     process.exit(0);
   });
 }
@@ -260,6 +238,7 @@ Q.allSettled(funcs).then(function(results){
       plugin.start();
     }
   });
+
 })
 .fail(function (error) {
     console.log("Executing Error");
@@ -268,6 +247,7 @@ Q.allSettled(funcs).then(function(results){
     }
     process.exit -1;
     throw new Error("Error in loading plugins");
+    console.assert(false);
 
 //    console.log(error);
 //    throw error;

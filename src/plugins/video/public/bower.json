@@ -1,6 +1,6 @@
 {
   "name": "orov-video",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "homepage": "https://github.com/BrianAdams/openrov-cockpit",
   "authors": [
     "BrianAdams <brian@babastik.com>"
@@ -14,7 +14,8 @@
     "tests"
   ],
   "dependencies": {
-    "mjpeg-video-webcomponents": "~2.0.1"
+    "mjpeg-video-webcomponents": "~2.0.1",
+    "socket-video-h264": "https://github.com/BrianAdams/socket-video-h264.git"
   },
   "resolutions": {
     "webcomponentsjs": "^0.7.20",

@@ -163,7 +163,7 @@ $(document).ready(function() {
 
      {
        "tag": "orov-video",
-       "settings": {
+       "settings": {location:'forward' 
        },
        "_linkhref": "video/orov-video.html",
        "content" : [

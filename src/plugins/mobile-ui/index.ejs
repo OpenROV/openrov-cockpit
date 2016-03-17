@@ -69,6 +69,7 @@
 	<link rel="import" href="components/mobile-ui/orov-mobile-compass/orov-mobile-compass.html">
 	<link rel="import" href="components/mobile-ui/orov-mobile-depth/orov-mobile-depth.html">
 	<link rel="import" href="components/mobile-ui/orov-mobile-battery/orov-mobile-battery.html">
+	<link rel="import" href="components/mobile-ui/orov-mobile-controls.html">
 	
 	<% for( var i = 0; i < scripts.length; i++ ) 
 	{
@@ -93,7 +94,7 @@
 			
 			<!-- Controls Layer -->
 			<div id="layer-ctrl" class="layer fill" style="z-index: 30">
-				<dual-thumbstick class="overlay"></dual-thumbstick>
+				<orov-mobile-controls class="overlay"></orov-mobile-controls>
 			</div>
 			
 			<!-- UI Layer -->

@@ -20,7 +20,11 @@ mjpegvideo.prototype.startBrowser = function startBrowser(){
         'DNSServiceGetAddrInfo' in mdns.dns_sd ? mdns.rst.DNSServiceGetAddrInfo() : mdns.rst.getaddrinfo({families:[4]}),
         mdns.rst.makeAddressesUnique()
     ];
-    var mdnsBrowser = mdns.createBrowser((mdns.tcp('mjpeg-video')),{resolverSequence: sequence, networkInterface: 'dummy0'});
+    var mdnsOptions = {resolverSequence: sequence};
+    if (this.deps.config.preferences.get('serviceDiscoveryNIC')){
+      mdnsOptions.networkInterface=this.deps.config.preferences.get('serviceDiscoveryNIC');
+    }
+    var mdnsBrowser = mdns.createBrowser((mdns.tcp('mjpeg-video')),mdnsOptions);
 
     mdnsBrowser.on('serviceUp', function(service) {
       console.log("Serice UP MJPG");
@@ -40,44 +44,38 @@ mjpegvideo.prototype.startBrowser = function startBrowser(){
     console.dir(mdns.browseThemAll());
 };
 
-var launch_options;
-var mock=false;
-if (deps.config.preferences.get('USE_MOCK') === 'true'){
-  mock=true;
-}
-launch_options = [require.resolve('mjpeg-video-server'),'-m',mock];
-
-
-const infinite=-1;
-var monitor = respawn(launch_options,{
-    name: 'mjpegserver',
-    maxRestarts: infinite,
-    sleep: 1000
-})
-
-monitor.on('stderr', function(data){
-//    console.log(data.toString('utf-8'));
-})
-
-monitor.on('stdout', function(data){
-//    console.log(data.toString('utf-8'));
-})
-
-
-monitor.on('stop', function(){
-//   console.log("mjpeg-video-server stop");
-});
-
-monitor.on('crash', function(){
-//   console.log("mjpeg-video-server crash");
-});
-
-monitor.on('exit', function(){
-//   console.log("mjpeg-video-server exit");
-});
-
-
 mjpegvideo.prototype.start = function start(){
+
+    var launch_options = ['node',require.resolve('mjpeg-video-server')];
+    var mock=false;
+    if (this.deps.config.preferences.get('USE_MOCK') === 'true'){
+      launch_options.push('-m');
+      launch_options.push('true');
+      launch_options.push('-u');
+      launch_options.push(':8090/?action=stream');
+    }
+
+
+
+    const infinite=-1;
+    var monitor = respawn(launch_options,{
+        name: 'mjpegserver',
+        maxRestarts: infinite,
+        sleep: 1000
+    })
+    monitor.on('stdout', function(data){
+        console.log('STDOUT:' + data.toString('utf-8'));
+    })
+    monitor.on('stderr', function(data){
+        console.log('STDERR:' + data.toString('utf-8'));
+    })
+    monitor.on('exit', function(){
+       console.log("mjpeg-video-server exit");
+    });
+    monitor.on('crash', function(){
+       console.log("mjpeg-video-server crash");
+    });
+
     this.startBrowser();
     monitor.start();
 };

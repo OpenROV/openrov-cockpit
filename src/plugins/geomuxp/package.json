@@ -8,8 +8,7 @@
   },
   "author": "Brian Adams <brian@babastik.com>",
   "license": "MIT",
-  "dependencies": {
+  "optionalDependencies": {
     "geo-video-server": "https://github.com/OpenROV-Dev/geo-video-server.git"
-  }  
-  
+  }
 }

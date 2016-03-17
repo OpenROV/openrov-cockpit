@@ -40,7 +40,11 @@ geomux.prototype.startBrowser = function startBrowser(){
         'DNSServiceGetAddrInfo' in mdns.dns_sd ? mdns.rst.DNSServiceGetAddrInfo() : mdns.rst.getaddrinfo({families:[4]}),
         mdns.rst.makeAddressesUnique()
     ];
-    mdnsBrowser = mdns.createBrowser((mdns.tcp('geomux')),{resolverSequence: sequence, networkInterface: 'dummy0'});
+    var mdnsOptions = {resolverSequence: sequence};
+    if (this.deps.config.preferences.get('serviceDiscoveryNIC')){
+      mdnsOptions.networkInterface=this.deps.config.preferences.get('serviceDiscoveryNIC');
+    }
+    mdnsBrowser = mdns.createBrowser((mdns.tcp('geomux')),mdnsOptions);
     //mdnsBrowser = mdns.createBrowser((mdns.tcp('geomux')),{networkInterface: 'dummy0'});
 
     //TODO: Find way to uniquely identify service when it goes down so we can remove it from the list
@@ -65,39 +69,26 @@ geomux.prototype.startBrowser = function startBrowser(){
     console.log("geomux.prototype.startBrowser COMPLETE")
 };
 
-var launch_options = [require.resolve('geo-video-server')];
-
-const infinite=-1;
-var monitor = respawn(launch_options,{
-    name: 'geomux',
-    maxRestarts: infinite,
-    sleep: 1000
-})
-
-monitor.on('stderr', function(data){
-//    console.log(data.toString('utf-8'));
-})
-
-monitor.on('stdout', function(data){
-//    console.log(data.toString('utf-8'));
-})
-
-
-monitor.on('stop', function(){
-//   console.log("geo-vide-server stop");
-});
-
-monitor.on('crash', function(){
-//   console.log("geo-vide-server crash");
-});
-
-monitor.on('exit', function(){
-//   console.log("geo-vide-server exit");
-});
-
 geomux.prototype.start = function start(){
-    this.startBrowser();
-    monitor.start();
+  try {
+    var test =require.resolve('geo-video-server')
+  } catch (er) {
+    console.log("geo-vide-server not installed")
+    return;
+  }
+
+  var launch_options = [require.resolve('geo-video-server')];
+
+  const infinite=-1;
+  var monitor = respawn(launch_options,{
+      name: 'geomux',
+      maxRestarts: infinite,
+      sleep: 1000
+  })
+
+  this.startBrowser();
+  monitor.start();
+
 };
 
 //Export provides the public interface

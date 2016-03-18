@@ -11,17 +11,14 @@ function mobileUi( name, deps )
 	deps.app.get('/mobile-ui', function(req, res) {
 		var view =  __filename.substring(0, __filename.lastIndexOf("/")) + '/' + req.query.page + '.ejs';
 		
-		console.log( "SOMETHING123");
-		console.log( view );
-		
-		var pageInfo = deps.pathInfo();
+		var pathInfo = deps.pathInfo();
 		
 		res.render( view, 
 		{
 	        title: 'OpenROV Cockpit',
-	    	scripts: pageInfo.scripts,
-	    	styles: pageInfo.styles,
-	    	sysscripts: pageInfo.sysscripts,
+	    	scripts: pathInfo.scripts,
+	    	styles: pathInfo.styles,
+	    	sysscripts: pathInfo.sysscripts,
 	    	config: deps.config
       	} );
   	});

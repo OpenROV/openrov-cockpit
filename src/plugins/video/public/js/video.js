@@ -27,17 +27,52 @@
 
   };
 
+  var ResloveURL = function(canidateURL){
+    var http = location.protocol;
+    var slashes = http.concat("//");
+    var host = slashes.concat(window.location.hostname);
+
+    if (canidateURL.startsWith(':')){
+      //append host to rest of url that includes a new port
+      return host.concat(canidateURL);
+    }
+
+    if (canidateURL.startsWith('http')){
+      //use the URL as is
+      return canidateURL;
+    }
+
+    //we have a relative or absolute URL to the existing host+port
+    return host.concat(canidateURL);
+  }
   //listen gets called by the plugin framework after all of the plugins
   //have loaded.
   Video.prototype.listen = function listen() {
     var self=this;
-
 
     this.cockpit.on("plugin.video.video-clicked",function(){
       alert('Video plugin.\nThere will be a message sent to the ROV in 5 seconds.');
       setTimeout(function() {
         cockpit.rov.emit('plugin.video.foo');
       }, 5000);
+    });
+
+    //CameraRegistration
+    this.rov.withHistory.on('CameraRegistration',function(data){
+
+      data.sourceAddress = ResloveURL(data.relativeServiceUrl);
+
+      if (data.videoMimeType=='video/mp4'){
+        var connection = window.io.connect(data.sourceAddress);
+        connection.on("connect",function(){
+          //TODO: Remove the histHistory use inside the polymer control
+          var videosocket=connection;
+          //videosocket.withHistory = connection;
+          data.sourceAddress = videosocket;
+        });
+      }
+      self.cockpit.emit('CameraRegistration',data);
+
     });
 
   };

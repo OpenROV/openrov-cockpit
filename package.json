@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "./node_modules/grunt-cli/bin/grunt test",
-    "install": "node install_lib/bower_install_all.js"
+    "install": "node install_lib/bower_install_all.js && node install_lib/npm_install_all.js"
   },
   "dependencies": {
     "body-parser": "^1.14.2",
@@ -25,6 +25,7 @@
     "jquery-file-upload-middleware": "",
     "json-schema-defaults": "^0.1.1",
     "lazy": ">= 1.0.11",
+    "mdns": "^2.3.0",
     "method-override": "^2.3.5",
     "mkdirp": "",
     "moment": "",
@@ -36,6 +37,7 @@
     "os-utils": "",
     "q": "^1.4.1",
     "request": "^2.69.0",
+    "respawn": "^2.3.0",
     "rimraf": "^2.5.1",
     "serialport": "^2.0.6",
     "serve-favicon": "^2.3.0",

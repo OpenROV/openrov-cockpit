@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta charset="utf-8">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui" />
+		<link rel="manifest" href="manifest.webmanifest">
+		
+		<script type='text/javascript' src="components/jquery/dist/jquery.js"></script>
+		
+		<title>VR</title>
+		
+		<!-- CSS -->
+		<link href="components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="plugin/mobile-ui/css/style.css">
+		
+		 
+	</head>
+
+	<script type='text/javascript' src="js/libs/eventemitter2.js"></script>
+	<script type='text/javascript' src="components/bootstrap/dist/js/bootstrap.js"></script>
+	<script type='text/javascript' src="js/libs/mousetrap.min.js"></script>
+	
+	<script type='text/javascript' src='js/libs/gamepad.js'></script>
+	<script type='text/javascript' src='js/utilities.js'></script>
+	
+	<script type='text/javascript' src="config.js"></script>
+	<script type='text/javascript' src="socket.io/socket.io.js"></script>
+	<script type='text/javascript' src="system-plugin/globalization/js/initGlobalization.js"></script>
+	<script type='text/javascript' src='js/message-manager.js'></script>
+	<script type='text/javascript' src='js/eventEmitterStoreAndForward.js'></script>
+	<script type='text/javascript' src='js/socketIOStoreAndForward.js'></script>
+	<script type='text/javascript' src="js/cockpit.js"></script>
+	<script type="text/javascript" src="js/app.js"></script>
+
+	<script type="text/javascript" src="components/webcomponentsjs/webcomponents-lite.js"></script>
+	
+	<script type="text/javascript" src="plugin/mobile-ui/js/lib/three.min.js"></script>
+	
+	<script type='text/javascript' src="plugin/mobile-ui/js/third-party/threejs/three.js"></script>
+	<script type='text/javascript' src="plugin/mobile-ui/js/third-party/threejs/StereoEffect.js"></script>
+	<script type='text/javascript' src="plugin/mobile-ui/js/third-party/threejs/DeviceOrientationControls.js"></script>
+	<script type='text/javascript' src="plugin/mobile-ui/js/third-party/threejs/OrbitControls.js"></script>
+  
+	<script>
+		// Use native shadowdom
+		window.Polymer = window.Polymer || {};
+		window.Polymer.dom = 'shadow';
+		window.openrovtheme = 'mobile-ui';
+		
+		// Prevent safari overscroll behaviour
+		document.ontouchmove = function(event)
+		{
+			event.preventDefault();
+		}
+		
+		// Prevent context menu
+		window.oncontextmenu = function(event) {
+			event.preventDefault();
+			event.stopPropagation();
+			return false;
+		};
+	</script>
+	
+	<link rel="import" href="components/polymer/polymer.html">
+
+	<!-- Web components -->
+	<link rel="import" href="components/orov-behavior.html">
+	
+	<% for( var i = 0; i < scripts.length; i++ ) 
+	{
+		%>  <script type="text/javascript" src="<%= scripts[i] %>"></script><% 
+	} 
+	%>
+	
+	<style>
+		      body {
+		        margin: 0px;
+		        overflow: hidden;
+		      }
+		      #example {
+		        position: absolute;
+		        top: 0;
+		        left: 0;
+		        right: 0;
+		        bottom: 0;
+		      }
+	    </style>
+
+	<body>
+		<template id="t" is="dom-bind" strip-whitespace>
+			<div id="example"></div>
+			
+			
+			
+			<script>
+			var camera, scene, renderer;
+			var effect, controls;
+			var element, container;
+			
+			var clock = new THREE.Clock();
+			
+			init();
+			animate();
+			
+			function init() {
+			  renderer = new THREE.WebGLRenderer();
+			  element = renderer.domElement;
+			  container = document.getElementById('example');
+			  container.appendChild(element);
+			
+			  effect = new THREE.StereoEffect(renderer);
+			
+			  scene = new THREE.Scene();
+			
+			  camera = new THREE.PerspectiveCamera(90, 1, 0.001, 700);
+			  camera.position.set(0, 10, 0);
+			  scene.add(camera);
+			
+			  controls = new THREE.OrbitControls(camera, element);
+			  controls.rotateUp(Math.PI / 4);
+			  controls.target.set(
+			    camera.position.x + 0.1,
+			    camera.position.y,
+			    camera.position.z
+			  );
+			  controls.noZoom = true;
+			  controls.noPan = true;
+			
+			  function setOrientationControls(e) {
+			    if (!e.alpha) {
+			      return;
+			    }
+			
+			    controls = new THREE.DeviceOrientationControls(camera, true);
+			    controls.connect();
+			    controls.update();
+			
+			    element.addEventListener('click', fullscreen, false);
+			
+			    window.removeEventListener('deviceorientation', setOrientationControls, true);
+			  }
+			  window.addEventListener('deviceorientation', setOrientationControls, true);
+			
+			
+			  var light = new THREE.HemisphereLight(0x777777, 0x000000, 0.6);
+			  scene.add(light);
+			
+			  var texture = THREE.ImageUtils.loadTexture(
+			    'plugin/mobile-ui/textures/patterns/checker.png'
+			  );
+			  texture.wrapS = THREE.RepeatWrapping;
+			  texture.wrapT = THREE.RepeatWrapping;
+			  texture.repeat = new THREE.Vector2(50, 50);
+			  texture.anisotropy = renderer.getMaxAnisotropy();
+			
+			  var material = new THREE.MeshPhongMaterial({
+			    color: 0xffffff,
+			    specular: 0xffffff,
+			    shininess: 20,
+			    shading: THREE.FlatShading,
+			    map: texture
+			  });
+			
+			  var geometry = new THREE.PlaneGeometry(1000, 1000);
+			
+			  var mesh = new THREE.Mesh(geometry, material);
+			  mesh.rotation.x = -Math.PI / 2;
+			  scene.add(mesh);
+			
+			  window.addEventListener('resize', resize, false);
+			  setTimeout(resize, 1);
+			}
+			
+			function resize() {
+			  var width = container.offsetWidth;
+			  var height = container.offsetHeight;
+			
+			  camera.aspect = width / height;
+			  camera.updateProjectionMatrix();
+			
+			  renderer.setSize(width, height);
+			  effect.setSize(width, height);
+			}
+			
+			function update(dt) {
+			  resize();
+			
+			  camera.updateProjectionMatrix();
+			
+			  controls.update(dt);
+			}
+			
+			function render(dt) {
+			  effect.render(scene, camera);
+			}
+			
+			function animate(t) {
+			  requestAnimationFrame(animate);
+			
+			  update(clock.getDelta());
+			  render(clock.getDelta());
+			}
+			
+			function fullscreen() {
+			  if (container.requestFullscreen) {
+			    container.requestFullscreen();
+			  } else if (container.msRequestFullscreen) {
+			    container.msRequestFullscreen();
+			  } else if (container.mozRequestFullScreen) {
+			    container.mozRequestFullScreen();
+			  } else if (container.webkitRequestFullscreen) {
+			    container.webkitRequestFullscreen();
+			  }
+			}
+			</script>
+			
+		</template>
+	</body>
+	
+</html>

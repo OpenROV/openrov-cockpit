@@ -45,11 +45,8 @@ function Hardware() {
     var commandBuffer = new Buffer(command,'utf8');
     var crcBuffer = new Buffer(1);
     crcBuffer[0]=crc8;
-    console.log(crcBuffer[0] + ":" + crc8.toString(16));
-    console.log(command);
 
     var messagebuffer = Buffer.concat([crcBuffer,commandBuffer]);
-    console.log(messagebuffer.toString('hex'));
     if (CONFIG.production && serialConnected) {
       var currenttime = new Date();
       var delay = 3-((currenttime.getTime() - timesent.getTime()));

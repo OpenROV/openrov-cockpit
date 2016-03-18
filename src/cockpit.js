@@ -63,6 +63,8 @@ app.use('/components/telemetry', serveIndex(path.join(__dirname,'plugins/telemet
 console.log("!!!"+ path.join(__dirname, 'src/static/bower_components'));
 // Keep track of plugins js and css to load them in the view
 var scripts = [], styles = [];
+var sysscripts = [];
+
 // setup required directories
 mkdirp(CONFIG.preferences.get('photoDirectory'));
 process.env.NODE_ENV = true;
@@ -73,6 +75,15 @@ var client = new CockpitMessaging(io);
 client = require('./static/js/eventEmitterStoreAndForward.js')(client);
 var controller = new OpenROVController(globalEventLoop, client);
 
+var pathInfo = function()
+{
+  return {
+      scripts: scripts,
+      styles: styles,
+      sysscripts: sysscripts
+  }
+}
+
 // Prepare dependency map for plugins
 var deps = {
   server: server,
@@ -81,7 +92,8 @@ var deps = {
   cockpit: client,
   config: CONFIG,
   globalEventLoop: globalEventLoop,
-  loadedPlugins: []
+  loadedPlugins: [],
+  pathInfo: pathInfo
 };
 
 app.get('/config.js', function (req, res) {
@@ -182,7 +194,6 @@ function addPluginAssets(result) {
 var loader = new PluginLoader();
 
 /*Order does matter in the script loading below*/
-var sysscripts = [];
 
 /*
 var sysscripts = ["bogus",

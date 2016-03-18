@@ -1,0 +1,93 @@
+<link rel="import" href="../../polymer/polymer.html">
+
+<link rel="import" href="../grid-menu/grid-menu.html">
+<link rel="import" href="../grid-menu/grid-menu-button.html">
+
+<dom-module id="app-menu">
+	
+	<style type="text/css">
+
+		grid-menu-button
+		{
+			color:white;
+		}
+		
+		grid-menu-button[selected]
+		{
+			color: black;
+			background-color: white;
+			--grid-menu-button-fill-color: black;
+		}
+	</style>
+	
+	<template>
+		
+		<grid-menu trigger-icon="apps">			
+			<grid-menu-button label="Map" 		action="page-change" target="map" icon="maps:place"></grid-menu-button>
+			<grid-menu-button label="Network" 	action="page-change" target="network" icon="notification:wifi"></grid-menu-button>
+			<grid-menu-button label="VR" 		action="page-change" target="vr" icon="icons:visibility"></grid-menu-button>
+			<grid-menu-button label="Update"	action="page-change" target="update" icon="notification:system-update"></grid-menu-button>
+			<grid-menu-button label="Social" 	action="page-change" target="social" icon="social:group"></grid-menu-button>
+			<grid-menu-button label="Gallery" 	action="page-change" target="gallery" icon="image:photo-library"></grid-menu-button>
+			<grid-menu-button label="Plugins" 	action="page-change" target="plugins" icon="icons:extension"></grid-menu-button>
+			<grid-menu-button label="Settings" 	action="page-change" target="settings" icon="icons:settings"></grid-menu-button>
+			<grid-menu-button label="Cockpit" 	action="page-change" target="index" icon="device:airplanemode-active"></grid-menu-button>
+		</grid-menu>
+		
+	</template>
+	
+	
+	<script>
+		( function()
+		{
+			Polymer(
+			{
+				is: 'app-menu',
+				
+				properties:
+				{
+					currentPage: 
+					{
+						type: String,
+						observer: [ 'updateSelectedPage' ]
+					},
+				},
+				
+				listeners:
+				{
+					'menuSelection': 'handleMenuSelection'
+				},
+				
+				attached: function()
+				{
+					this.currentPage = document.title;
+				},
+				
+				handleMenuSelection: function(e)
+				{ 
+					console.log( "Clicked App Menu Button: " + e.detail.label );
+					console.log( "Action: " + e.detail.action );
+					console.log( "Target: " + e.detail.target );
+					
+					document.location.href = "mobile-ui?page=" + e.detail.target;
+				},
+				
+				updateSelectedPage: function( pageName )
+				{
+					// Deactivate all buttons
+					var buttons = Polymer.dom(this.root).querySelectorAll( "grid-menu-button" );
+					buttons.forEach( function(button){ button.selected = false; });
+					
+					// Activate current page button
+					var newButton = Polymer.dom(this.root).querySelector( "grid-menu-button[label=" + pageName + "]" );
+					
+					console.log( buttons );
+					console.log( newButton );
+					
+					newButton.selected = true;
+				}
+			} );
+		}() );
+		
+	</script>
+</dom-module>

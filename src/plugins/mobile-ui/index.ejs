@@ -94,7 +94,7 @@
 			
 			<!-- Controls Layer -->
 			<div id="layer-ctrl" class="layer fill" style="z-index: 30">
-				<orov-mobile-controls class="overlay"></orov-mobile-controls>
+				<orov-mobile-controls class="overlay" event-emitter="{{cockpitEventEmitter}}"></orov-mobile-controls>
 			</div>
 			
 			<!-- UI Layer -->
@@ -103,7 +103,7 @@
 				<!--Top-->
 				<div id="ui-top" class="rel-layer" style="" style="z-index: 20">
 					<app-menu></app-menu>
-					<settings-menu></settings-menu>
+					<settings-menu event-emitter="{{cockpitEventEmitter}}"></settings-menu>
 				</div>
 				
 				<!--Bottom-->

@@ -60,7 +60,7 @@
 	
 	
 	<template strip-whitespace>
-		<iron-icon icon="[[icon]]"></iron-icon>
+		<iron-icon id="button" icon="[[icon]]" toggles="[[toggles]]"></iron-icon>
 		<span>[[label]]</span>
 	</template>
 	
@@ -85,7 +85,13 @@
 				inkColor: String,
 				target: String,
 				action: String,
+				icon: String,
 				selected: 
+				{
+					type: Boolean,
+					reflectToAttribute: true
+				},
+				toggles: 
 				{
 					type: Boolean,
 					reflectToAttribute: true
@@ -100,7 +106,8 @@
 					{
 						action: this.action,
 						target: this.target,
-						label: this.label
+						label: this.label,
+						active: this.active
 					}
 				);
 			}

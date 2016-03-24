@@ -1,5 +1,4 @@
 const exec=require('child_process').exec;
-const mdns=require('mdns');
 const fs=require('fs');
 const respawn = require('respawn');
 var mjpegvideo = function mjpegvideo(name, deps) {
@@ -12,37 +11,6 @@ var mjpegvideo = function mjpegvideo(name, deps) {
 
 }
 
-var mdnsBrowser;
-mjpegvideo.prototype.startBrowser = function startBrowser(){
-    var self = this;
-    var sequence = [
-        mdns.rst.DNSServiceResolve(),
-        'DNSServiceGetAddrInfo' in mdns.dns_sd ? mdns.rst.DNSServiceGetAddrInfo() : mdns.rst.getaddrinfo({families:[4]}),
-        mdns.rst.makeAddressesUnique()
-    ];
-    var mdnsOptions = {resolverSequence: sequence};
-    if (this.deps.config.preferences.get('serviceDiscoveryNIC')){
-      mdnsOptions.networkInterface=this.deps.config.preferences.get('serviceDiscoveryNIC');
-    }
-    var mdnsBrowser = mdns.createBrowser((mdns.tcp('mjpeg-video')),mdnsOptions);
-
-    mdnsBrowser.on('serviceUp', function(service) {
-      console.log("Serice UP MJPG");
-      console.dir(service);
-      self.services[service.fullname + ":" + service.port]=service;
-      //TODO: Update the mDNS publish to include all the camera details
-      self.deps.rov.emit('CameraRegistration',{location:service.txtRecord.cameraLocation, videoMimeType:service.txtRecord.videoMimeType, resolution:service.txtRecord.resolution, framerate:service.txtRecord.framerate, relativeServiceUrl:service.txtRecord.relativeServiceUrl, sourcePort:service.port, sourceAddress:service.addresses[0]});
-    });
-
-    mdnsBrowser.on('serviceDown', function(service) {
-      Console.log("Service Down");
-      console.dir(service);
-      //delete this.services[service.fullname + ":" + service.port];
-    });
-
-    mdnsBrowser.start();
-    console.dir(mdns.browseThemAll());
-};
 
 mjpegvideo.prototype.start = function start(){
 
@@ -66,8 +34,18 @@ mjpegvideo.prototype.start = function start(){
     monitor.on('stdout', function(data){
         console.log('STDOUT:' + data.toString('utf-8'));
     })
+    var self=this;
     monitor.on('stderr', function(data){
-        console.log('STDERR:' + data.toString('utf-8'));
+      var msg = data.toString('utf-8');
+      var service;
+      try {
+        service = JSON.parse(msg);
+      } catch (e) {
+        return; //abort, not a json message
+      }
+      if ('service' in service){
+        self.deps.rov.emit('CameraRegistration',{location:service.txtRecord.cameraLocation, videoMimeType:service.txtRecord.videoMimeType, resolution:service.txtRecord.resolution, framerate:service.txtRecord.framerate, relativeServiceUrl:service.txtRecord.relativeServiceUrl, sourcePort:service.port, sourceAddress:service.addresses[0]});
+      }
     })
     monitor.on('exit', function(){
        console.log("mjpeg-video-server exit");
@@ -76,7 +54,6 @@ mjpegvideo.prototype.start = function start(){
        console.log("mjpeg-video-server crash");
     });
 
-    this.startBrowser();
     monitor.start();
 };
 

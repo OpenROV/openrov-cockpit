@@ -66,12 +66,14 @@
         var connection = window.io.connect(data.sourceAddress);
         connection.on("connect",function(){
           //TODO: Remove the histHistory use inside the polymer control
-          var videosocket=connection;
+          var videosocket=new window.SocketIOStoreAndForward(connection);
           //videosocket.withHistory = connection;
           data.sourceAddress = videosocket;
+          self.cockpit.emit('CameraRegistration',data);
         });
+      } else {
+          self.cockpit.emit('CameraRegistration',data);
       }
-      self.cockpit.emit('CameraRegistration',data);
 
     });
 

@@ -58,7 +58,12 @@
     });
 
     //CameraRegistration
+    var lastCameraRegsitration = null;
     this.rov.withHistory.on('CameraRegistration',function(data){
+      if (data == lastCameraRegsitration){
+        return;
+      }
+      lastCameraRegsitration = data;
 
       data.sourceAddress = ResloveURL(data.relativeServiceUrl);
 

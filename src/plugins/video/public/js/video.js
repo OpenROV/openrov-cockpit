@@ -71,12 +71,21 @@
       data.sourceAddress = ResloveURL(data.relativeServiceUrl);
 
       if (data.videoMimeType=='video/mp4'){
+        //We expect the mp4 data stream to be sent via a dedicated socket.io stream
         var connection = window.io.connect(data.sourceAddress);
         connection.on("connect",function(){
-          //TODO: Remove the histHistory use inside the polymer control
-          var videosocket=new window.SocketIOStoreAndForward(connection);
-          //videosocket.withHistory = connection;
-          data.sourceAddress = videosocket;
+
+          //TODO: abstract the messages enough that we can have multiple cameras controls
+          self.cockpit.on('request_Init_Segment',function(fn){
+            connection.emit('request_Init_Segment',function(data){
+              fn(data);
+            });
+          });
+
+          connection.on('x-h264-video.data',function(data){
+            self.cockpit.emit('x-h264-video.data',data);
+          })
+
           self.cockpit.emit('CameraRegistration',data);
         });
       } else {

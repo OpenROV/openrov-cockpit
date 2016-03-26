@@ -46,14 +46,21 @@
       }
     };
 
-    var setLights = function (value) {
+    var setLights = function (value) 
+    {
       lights = value;
-      if (lights > 1)
+      
+      if (lights >= 1)
+      {
         lights = 1;
-      if (lights < 0)
+      }
+      
+      if (lights <= 0)
+      {
         lights = 0;
+      }
 
-      var command = 'ligt(' + ArduinoHelper.serial.packPercent(value) + ')';
+      var command = 'ligt(' + ArduinoHelper.serial.packPercent(lights) + ')';
       deps.rov.send(command);
 
     };

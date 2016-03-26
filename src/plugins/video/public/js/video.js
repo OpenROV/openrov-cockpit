@@ -60,7 +60,10 @@
     //CameraRegistration
     var lastCameraRegsitration = null;
     this.rov.withHistory.on('CameraRegistration',function(data){
-      if (data == lastCameraRegsitration){
+      //TODO: More robust handling of duplicat CameraRegistration messages.  If the Camera
+      //already is setup, we want to ignore.  But we also want to handle multiple Cameras
+      //and camera's that change settings.
+      if ((lastCameraRegsitration !== null) &&(data.relativeServiceUrl == lastCameraRegsitration.relativeServiceUrl)){
         return;
       }
       lastCameraRegsitration = data;

@@ -15,7 +15,7 @@
   ],
   "dependencies": {
     "mjpeg-video-webcomponents": "~2.0.1",
-    "socket-video-h264": "https://github.com/BrianAdams/socket-video-h264.git"
+    "packet-video": "https://github.com/OpenROV-atoms/packet-video.git"
   },
   "resolutions": {
     "webcomponentsjs": "^0.7.20",

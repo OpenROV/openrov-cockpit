@@ -77,7 +77,7 @@
 
           //TODO: abstract the messages enough that we can have multiple cameras controls
           self.cockpit.on('request_Init_Segment',function(fn){
-            connection.send('request_Init_Segment',function(data){
+            connection.emit('request_Init_Segment',function(data){
               fn(data);
             });
           });

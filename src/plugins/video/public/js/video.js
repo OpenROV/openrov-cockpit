@@ -58,7 +58,15 @@
     });
 
     //CameraRegistration
+    var lastCameraRegsitration = null;
     this.rov.withHistory.on('CameraRegistration',function(data){
+      //TODO: More robust handling of duplicat CameraRegistration messages.  If the Camera
+      //already is setup, we want to ignore.  But we also want to handle multiple Cameras
+      //and camera's that change settings.
+      if ((lastCameraRegsitration !== null) &&(data.relativeServiceUrl == lastCameraRegsitration.relativeServiceUrl)){
+        return;
+      }
+      lastCameraRegsitration = data;
 
       data.sourceAddress = ResloveURL(data.relativeServiceUrl);
 
@@ -66,12 +74,14 @@
         var connection = window.io.connect(data.sourceAddress);
         connection.on("connect",function(){
           //TODO: Remove the histHistory use inside the polymer control
-          var videosocket=connection;
+          var videosocket=new window.SocketIOStoreAndForward(connection);
           //videosocket.withHistory = connection;
           data.sourceAddress = videosocket;
+          self.cockpit.emit('CameraRegistration',data);
         });
+      } else {
+          self.cockpit.emit('CameraRegistration',data);
       }
-      self.cockpit.emit('CameraRegistration',data);
 
     });
 

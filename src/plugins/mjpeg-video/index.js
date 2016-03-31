@@ -16,7 +16,7 @@ mjpegvideo.prototype.start = function start(){
 
     var launch_options = ['node',require.resolve('mjpeg-video-server')];
     var mock=false;
-    if (this.deps.config.preferences.get('USE_MOCK') === 'true'){
+    if (process.env.MJPG_MOCK === 'true'){
       launch_options.push('-m');
       launch_options.push('true');
       launch_options.push('-u');

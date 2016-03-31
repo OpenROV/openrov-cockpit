@@ -57,7 +57,23 @@
       }, 5000);
     });
 
-    //CameraRegistration
+    //If the data comes down the pre-existing rov channel, we just need to forward
+    //the traffic
+    this.rov.withHistory.on('x-h264-video.data',function(data){
+      self.cockpit.emit('x-h264-video.data',data);
+    });
+
+    this.cockpit.on('request_Init_Segment',function(fn){
+      self.rov.emit('request_Init_Segment',function(data){
+        fn(data);
+      });
+    });
+
+    //If we get a CameraRegistration then we have to open a connection to the camera server
+    //so that we can forward traffic to the cockpit emitter.
+    //TODO: refactor like a crazy. This might only work with interent control because
+    //the code below will *never* connect and thus be idle.  We really need to make
+    //this more explicit behavior.
     var lastCameraRegsitration = null;
     this.rov.withHistory.on('CameraRegistration',function(data){
       //TODO: More robust handling of duplicat CameraRegistration messages.  If the Camera

@@ -127,6 +127,16 @@
                     _self.rov.emit(event, arguments);
                   }
                 });
+
+                //Since the video comes in via a different route...
+                _self.cockpit.on('x-h264-video.data',function(data){
+                  _self.internet.emit('x-h264-video.data',data);
+                });
+
+                _self.internet.on('request_Init_Segment',function(fn){
+                  _self.rov.emit('request_Init_Segment',fn);
+                });
+
               })
 
               p2p.on('peer-error', function(data) {

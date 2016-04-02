@@ -65,6 +65,54 @@
         myEl.eventEmitter.emit('test');
         assert.equal(i,1,'Event emitter function call verified')
       });
+      test('WithHistory registrations are relinked through withHistory of the new emitter',function(){
+        var i = 0;
+        var handler = function(){i++;};
+        var newEmitter = new EventEmitter2();
+        newEmitter._lvc = null
+        newEmitter.withHistory = {
+          on: function(event,fn){
+            if (newEmitter._lvc == event){
+              fn(newEmitter._lvc);
+            }
+            newEmitter.on(event,fn);
+          }
+        }
+        var originalEmit = newEmitter.emit;
+        newEmitter.emit=function(event){
+          if (event!=='newListener'){
+            this._lvc = event;
+          }
+          originalEmit(event);
+        }
+        newEmitter.emit('test');
+        myEl.eventEmitter=newEmitter;
+        myEl.eventEmitter.withHistory.on('test',handler);
+        assert.equal(newEmitter.listeners('test').length,1,'Adding listeners is registered correctly');
+        assert.equal(i,1,'Event emitter function call verified');
+        var newEmitter2 = new EventEmitter2();
+        newEmitter2._lvc = null
+        newEmitter2.withHistory = {
+          on: function(event,fn){
+            console.log('firing('+newEmitter2._lvc+'):'+event);
+            if (newEmitter2._lvc == event){
+              fn(newEmitter2._lvc);
+            }
+            newEmitter2.on(event,fn);
+          }
+        }
+        var originalEmit2 = newEmitter2.emit;
+        newEmitter2.emit=function(event){
+          if (event!=='newListener'){
+            this._lvc = event;
+          }
+          originalEmit2(event);
+        }
+        newEmitter2.emit('test'); //The history has been primed with another event.
+        myEl.eventEmitter=newEmitter2;
+        assert.equal(i,2,'Prior registered listener to history fires again when rewired and history exists');
+
+      })
 
     });
   </script>

@@ -53,6 +53,16 @@
         assert.equal(newEmitter.listeners('test')[0],handler,'The new emitter inherits the event handlers from the older emitter');
         assert.equal(newEmitter,myEl.eventEmitter,'The new emitter successfully replaced the old one');
       });
+      test('Unregistering events works',function(){
+        var i = 0;
+        var handler = function(){i++;};
+
+        var newEmitter = new EventEmitter2();
+        myEl.eventEmitter=newEmitter;
+        myEl.eventEmitter.on('test',handler);
+        myEl.eventEmitter.off('test',handler);
+        assert.equal(newEmitter.listeners('test').length,0,'Event should have been removed');
+      });
       test('Listening to events using a real eventEmitter works correctly',function(){
         var i = 0;
         var handler = function(){i++;};

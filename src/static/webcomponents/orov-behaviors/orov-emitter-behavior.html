@@ -66,10 +66,12 @@
       //we can handle auto-reregistering on event emitter changes
       var on = newvalue.on;
       newvalue.on = function (message, fn) {
-        self._emitterRegistrations.push({
-          message: message,
-          fn: fn
-        });
+        if (self._emitterRegistrations.indexOf({message:message,fn:fn,withHistory:true}) == -1){
+          self._emitterRegistrations.push({
+            message: message,
+            fn: fn
+          });
+        }
         on.apply(newvalue, [
           message,
           fn
@@ -93,13 +95,18 @@
       //And in the case that control removes a linstener we want to pull
       //if from our registery so that future emitter changes don't auto
       //restore the removed listener.
-      var off = newvalue.off;
+      var off = newvalue.off.bind(newvalue);
       newvalue.off = function (message, fn) {
-        self._emitterRegistrations.pop({
-          message: message,
-          fn: fn
-        });
-        off(message, fn);
+        var index = self._emitterRegistrations.findIndex(function(element,index,array){return (element.message==message && element.fn == fn)});
+        if (index!==-1){
+          self._emitterRegistrations.splice(index,1);
+        }
+        try{
+          off(message, fn);
+        }catch(err){
+          console.error(err);
+          //keep going for now. No way to recover.
+        }
       };
       newvalue.revertoff = function () {
         this.off = off;

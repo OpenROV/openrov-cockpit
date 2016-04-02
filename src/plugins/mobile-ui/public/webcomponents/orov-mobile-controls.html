@@ -1,28 +1,29 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
 <link rel="import" href="dual-thumbstick/dual-thumbstick.html">
 
 <dom-module id="orov-mobile-controls">
-	<style type="text/css">		
+	<style type="text/css">
 	</style>
 
 	<template>
 		<dual-thumbstick id="dualthumbstick" event-emitter="{{eventEmitter}}">
 		</dual-thumbstick>
 	</template>
-	
+
 	<script>
 		( function()
 		{
 			Polymer(
 			{
 				is: 'orov-mobile-controls',
-				
-				properties: 
+
+				properties:
 				{
 				},
-				
+
 				behaviors: [namespace('behaviors').oROVStandard],
-		
+
 				attached: function ()
 				{
 					var dualThumbstick = this.$.dualthumbstick;
@@ -31,11 +32,11 @@
 					dualThumbstick.addEventListener('leftTrackY', this.handleThrottle.bind( this ) );
 		            dualThumbstick.addEventListener('rightTrackY', this.handleVertical.bind( this ) );
 				},
-				
+
 				registerEmitterHanlders: function(emitter)
 				{
 				},
-				
+
 				handleThrottle: function(e)
 				{
 					if( this.eventEmitter !== undefined )
@@ -43,7 +44,7 @@
 						this.eventEmitter.emit( 'plugin.rovpilot.setThrottle', e.detail.val );
 					}
 				},
-				
+
 				handleYaw: function(e)
 				{
         			if( this.eventEmitter !== undefined )
@@ -51,7 +52,7 @@
 						this.eventEmitter.emit( 'plugin.rovpilot.setYaw', e.detail.val );
 					}
 				},
-				
+
 				handleVertical: function(e)
 				{
         			if( this.eventEmitter !== undefined )
@@ -61,6 +62,6 @@
 				}
 			} );
 		}() );
-		
+
 	</script>
 </dom-module>

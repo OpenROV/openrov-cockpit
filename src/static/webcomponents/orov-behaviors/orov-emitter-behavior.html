@@ -1,0 +1,87 @@
+<script src="utilities.js"></script>
+<script>
+(function (window) {
+  'use strict';
+  var behaviors = namespace('behaviors');
+  behaviors.oROVStandardImpl = {
+    properties: {
+      eventEmitter: {
+        type: Object,
+        value: function () {
+          return {
+            on: function (event, func) {
+            },
+            emit: function () {
+            },
+            off: function () {
+            }
+          };
+        },
+        observer: '_eventEmitterChanged'
+      },
+      _emitterRegistrations: {
+        type: Array,
+        value: function () {
+          return [];
+        }
+      }
+    },
+    created: function () {
+      console.log('oROV Emitter Behavior for ', this, 'enabled!');
+    },
+    attached: function () {
+      //Added a new lifecycle event for the control:
+      if (this.eventEmitter !== undefined && this.registerEmitterHanlders !== undefined) {
+        this.registerEmitterHanlders(this.eventEmitter);
+        console.log('OROV-BEHAVIOR: Registerd eventEmitter');
+      }
+    },
+    _eventEmitterChanged: function (newvalue, oldvalue) {
+      var self = this;
+      if (newvalue.on === undefined)
+        return;
+      if (oldvalue === newvalue)
+        return;
+      if (oldvalue) {
+        oldvalue.revertoff();
+      }
+      //Move any existing listeners across to the new
+      //eventEmitter
+      for (var i in this._emitterRegistrations) {
+        var e = this._emitterRegistrations[i];
+        if (oldvalue !== undefined) {
+          oldvalue.off(e.message, e.fn);
+        }
+        newvalue.on(e.message, e.fn);
+      }
+      //Inject a registration of each message listener so that
+      //we can handle auto-reregistering on event emitter changes
+      var on = newvalue.on;
+      newvalue.on = function (message, fn) {
+        self._emitterRegistrations.push({
+          message: message,
+          fn: fn
+        });
+        on.apply(newvalue, [
+          message,
+          fn
+        ]);
+      };
+      //And in the case that control removes a linstener we want to pull
+      //if from our registery so that future emitter changes don't auto
+      //restore the removed listener.
+      var off = newvalue.off;
+      newvalue.off = function (message, fn) {
+        self._emitterRegistrations.pop({
+          message: message,
+          fn: fn
+        });
+        off(message, fn);
+      };
+      newvalue.revertoff = function () {
+        this.off = off;
+      };
+    }
+  };
+}(window));
+</script>

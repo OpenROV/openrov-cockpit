@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="import" href="../polymer/polymer.html">
+  <link rel="import" href="orov-emitter-behavior.html">
+  <script src="utilities.js"></script>
+</head>
+<body>
+
+       <dom-module name="test-element">
+         <template>
+           <p>
+             Hi! I'm a Polymer element that was defined in the
+             main document!
+           </p>
+         </template>
+         <script>
+          console.log("outside test-element");
+           (function () {
+             console.log("in test-element");
+             Polymer({
+               is: 'test-element',
+               properties: {
+                 _registerEmitterHandlersCalled : {type: Boolean, value: false}
+               },
+               behaviors: [namespace('behaviors').oROVStandardImpl],
+               registerEmitterHanlders: function(emitter){
+                 this._registerEmitterHandlersCalled=true;
+                 console.log('handler called');
+                 console.dir(emitter);
+                 emitter.on('test-message-1',function(callback){
+                   return true;
+                 });
+               }
+             });
+           })();
+         </script>
+       </dom-module>
+</body>
+</html>

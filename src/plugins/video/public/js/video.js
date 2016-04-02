@@ -59,7 +59,7 @@
 
     //If the data comes down the pre-existing rov channel, we just need to forward
     //the traffic
-    this.rov.withHistory.on('x-h264-video.data',function(data){
+    this.rov.socket.on('x-h264-video.data',function(data){
       self.cockpit.emit('x-h264-video.data',data);
     });
 

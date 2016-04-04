@@ -27,8 +27,6 @@
                behaviors: [namespace('behaviors').oROVStandardImpl],
                registerEmitterHanlders: function(emitter){
                  this._registerEmitterHandlersCalled=true;
-                 console.log('handler called');
-                 console.dir(emitter);
                  emitter.on('test-message-1',function(callback){
                    return true;
                  });

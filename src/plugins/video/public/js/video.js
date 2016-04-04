@@ -59,7 +59,9 @@
 
     //If the data comes down the pre-existing rov channel, we just need to forward
     //the traffic
+    var dataflowing = false;
     this.rov.socket.on('x-h264-video.data',function(data){
+      dataflowing = true;
       self.cockpit.emit('x-h264-video.data',data);
     });
 
@@ -83,6 +85,9 @@
         return;
       }
       lastCameraRegsitration = data;
+      if (dataflowing){
+          self.cockpit.emit('CameraRegistration',data);
+      }
 
       data.sourceAddress = ResloveURL(data.relativeServiceUrl);
 

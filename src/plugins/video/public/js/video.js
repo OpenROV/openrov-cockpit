@@ -66,9 +66,12 @@
     });
 
     this.cockpit.on('request_Init_Segment',function(fn){
-      self.rov.emit('request_Init_Segment',function(data){
+      var handler = function(data){
         fn(data);
-      });
+        this.rov.off('x-h264-video.init',handler);
+      };
+      self.rov.on('x-h264-video.init',handler);
+      self.rov.emit('request_Init_Segment');
     });
 
     //If we get a CameraRegistration then we have to open a connection to the camera server

@@ -134,7 +134,13 @@
                 });
 
                 _self.internet.on('request_Init_Segment',function(fn){
-                  _self.rov.emit('request_Init_Segment',fn);
+                  _self.rov.emit('request_Init_Segment',function(init){
+                    if ((fn!==undefined) && (typeof(fn) === 'function')){
+                      fn(init);
+                    } else {
+                      _self.internet.emit('x-h264-video.init',init);
+                    }
+                  });
                 });
 
               })

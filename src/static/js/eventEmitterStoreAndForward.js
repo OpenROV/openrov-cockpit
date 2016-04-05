@@ -21,13 +21,13 @@
     coveredEventEmitter.withHistory.on = function(aType,aListener){
       if (self.eventCache[aType]!==undefined){
         var d = self.eventCache[aType];
-        aListener.call(d[0],d[1],d[2],d[3],d[4],d[5]);
+        aListener.apply(d.context,d.args);
       }
       original_on.call(coveredEventEmitter, aType, aListener);
     };
 
-    coveredEventEmitter.onAny(function(data1, data2, data3, data4, data5){
-      self.eventCache[this.event]=[this,data1,data2,data3,data4,data5];
+    coveredEventEmitter.onAny(function(){
+      self.eventCache[this.event]={context:this,args:arguments};
     });
 
     return coveredEventEmitter;

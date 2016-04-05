@@ -20,12 +20,6 @@
           };
         },
         observer: '_eventEmitterChanged'
-      },
-      _emitterRegistrations: {
-        type: Array,
-        value: function () {
-          return [];
-        }
       }
     },
     created: function () {
@@ -44,73 +38,9 @@
         return;
       if (oldvalue === newvalue)
         return;
-      if (oldvalue) {
-        oldvalue.revertoff();
+      if (this.eventEmitter !== undefined && this.registerEmitterHanlders !== undefined) {
+        this.registerEmitterHanlders(this.eventEmitter);
       }
-      //Move any existing listeners across to the new
-      //eventEmitter
-      for (var i in this._emitterRegistrations) {
-        var e = this._emitterRegistrations[i];
-        if (oldvalue !== undefined) {
-          oldvalue.off(e.message, e.fn);
-        }
-        if(newvalue.withHistory && e.withHistory){
-          newvalue.withHistory.on(e.message, e.fn);
-        } else {
-          newvalue.on(e.message, e.fn);
-        }
-      }
-
-
-      //Inject a registration of each message listener so that
-      //we can handle auto-reregistering on event emitter changes
-      var on = newvalue.on;
-      newvalue.on = function (message, fn) {
-        if (self._emitterRegistrations.indexOf({message:message,fn:fn,withHistory:true}) == -1){
-          self._emitterRegistrations.push({
-            message: message,
-            fn: fn
-          });
-        }
-        on.apply(newvalue, [
-          message,
-          fn
-        ]);
-      };
-
-      if (newvalue.withHistory){
-        var withHistory_on = newvalue.withHistory.on;
-        newvalue.withHistory.on = function(message,fn){
-          self._emitterRegistrations.push({
-            message: message,
-            fn: fn,
-            withHistory: true
-          });
-          withHistory_on.apply(newvalue, [
-            message,
-            fn
-          ]);
-        }
-      }
-      //And in the case that control removes a linstener we want to pull
-      //if from our registery so that future emitter changes don't auto
-      //restore the removed listener.
-      var off = newvalue.off.bind(newvalue);
-      newvalue.off = function (message, fn) {
-        var index = self._emitterRegistrations.findIndex(function(element,index,array){return (element.message==message && element.fn == fn)});
-        if (index!==-1){
-          self._emitterRegistrations.splice(index,1);
-        }
-        try{
-          off(message, fn);
-        }catch(err){
-          console.error(err);
-          //keep going for now. No way to recover.
-        }
-      };
-      newvalue.revertoff = function () {
-        this.off = off;
-      };
     }
   };
 }(window));

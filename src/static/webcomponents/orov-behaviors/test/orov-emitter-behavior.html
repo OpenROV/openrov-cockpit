@@ -14,6 +14,7 @@
   <test-fixture id="test-element-fixture">
      <template id='t'>
        <test-element id="test-element"></test-element>
+       <test-element id="test-element2"></test-element>
      </template>
    </test-fixture>
 
@@ -21,7 +22,9 @@
     suite('orov-emitter-behavior', function() {
       var myEl;
       setup(function() {
-        myEl = fixture('test-element-fixture');
+        var f = fixture('test-element-fixture');
+        myEl = f[0];
+        myEl2 = f[1];
       });
       test('can get handle to dynamic test element', function() {
         assert.isNotNull(myEl);
@@ -31,37 +34,11 @@
         var behaviors = namespace('behaviors');
         assert.isDefined(behaviors.oROVStandardImpl);
       });
-      test('build in test listener is registered in _emitterRegistrations',function(){
-        assert.isOk(myEl._emitterRegistrations.length,1);
-      });
       test('behavior calls registerEmitterHanlders on the element',function(){
         assert.isOk(myEl._registerEmitterHandlersCalled);
       });
       test('the event emitter can be accessed',function(){
         assert.isDefined(myEl.eventEmitter);
-      });
-      test('Events registered on one event handler automatically register on a new eventEmitter',function(){
-        var i = 0;
-        var handler = function(){i++;};
-
-        myEl.eventEmitter.on('test',handler);
-        //The test element internally registeres 1 event
-        //debugger;
-        assert.equal(myEl._emitterRegistrations.length,2,'Recorded the event listener');
-        var newEmitter = new EventEmitter2();
-        myEl.eventEmitter=newEmitter;
-        assert.equal(newEmitter.listeners('test')[0],handler,'The new emitter inherits the event handlers from the older emitter');
-        assert.equal(newEmitter,myEl.eventEmitter,'The new emitter successfully replaced the old one');
-      });
-      test('Unregistering events works',function(){
-        var i = 0;
-        var handler = function(){i++;};
-
-        var newEmitter = new EventEmitter2();
-        myEl.eventEmitter=newEmitter;
-        myEl.eventEmitter.on('test',handler);
-        myEl.eventEmitter.off('test',handler);
-        assert.equal(newEmitter.listeners('test').length,0,'Event should have been removed');
       });
       test('Listening to events using a real eventEmitter works correctly',function(){
         var i = 0;
@@ -119,11 +96,11 @@
           originalEmit2(event);
         }
         newEmitter2.emit('test'); //The history has been primed with another event.
+        debugger;
         myEl.eventEmitter=newEmitter2;
         assert.equal(i,2,'Prior registered listener to history fires again when rewired and history exists');
 
-      })
-
+      });
     });
   </script>
 </body>

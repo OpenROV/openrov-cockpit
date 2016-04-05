@@ -11,7 +11,12 @@
     //does magic.  Have to send only the right number of arguments.
     this.onAny(function() {
       if (this.event !== 'newListener') {
-        socket.emit.apply(socket,arguments);
+        var args = new Array(arguments.length);
+        for(var i = 0; i < args.length; ++i) {
+                    //i is always valid index in the arguments object
+            args[i] = arguments[i];
+        }
+        socket.emit.apply(socket,[this.event].concat(args));
       }
     });
 

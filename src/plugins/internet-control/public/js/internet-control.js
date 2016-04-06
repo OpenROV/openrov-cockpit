@@ -17,7 +17,6 @@
       this.cockpit = cockpit;
       this.rov = cockpit.rov;
       this.settings = {};
-      this.internet = null;
 
       // for plugin management:
       this.pluginDefaults = {
@@ -68,86 +67,133 @@
 
 
           //TODO: Move to a pattern that can retry the connection when the setting changes
-          $.getScript(self.settings.webRTCSignalServerURI + "/socketiop2p.min.js", function() {
+          //$.getScript(self.settings.webRTCSignalServerURI + "/simplepeer.min.js", function() {
+          $.getScript(self.settings.webRTCSignalServerURI + "/msgpack.min.js");
+          $.getScript(self.settings.webRTCSignalServerURI + "/simplepeer.js", function() {
               var _self = self
-              var P2P = window.P2P;
+              var Peer = window.SimplePeer;
               var io = window.io;
               var socket = io(self.settings.webRTCSignalServerURI);
 
               var opts = {
-                peerOpts: {
-                  channelConfig: {
-                    ordered: false,
-                    maxRetransmits: 0
-                  }
-                },
+//                peerOpts: {
+//                  channelConfig: {
+//                    ordered: false,
+//                    maxRetransmits: 0
+//                  }
+//                },
                 autoUpgrade: false
               }
-              var p2p = new P2P(socket, opts);
-              self.internet = p2p;
 
-              p2p.on('ready', function() {
-                p2p.usePeerConnection = true;
-                p2p.emit('peer-obj', {
-                  peerId: peerId
-                });
-              })
-
-              // this event will be triggered over the socket transport
-              // until `usePeerConnection` is set to `true`
-              p2p.on('peer-msg', function(data) {
-                console.log(data);
+              var heartbeatInterval = null;
+              socket.on('close',function(){
+                if (heartbeatInterval!==null){
+                  clearInterval(heartbeatInterval);
+                }
               });
 
-              p2p.on('upgrade', function(data) {
-                console.log("Connection upgraded to WebRTC")
-                p2p.useSockets = false
-                p2p.emit('peer-msg','ROV Cockpit plugin attached');
+              socket.on('heartbeat',function(data){
+                console.log('Heartbeat: ' + data);
+              });
 
-                var onevent = _self.rov.socket.onevent;
-                _self.rov.socket.onevent = function (packet) {
-                    var args = packet.data || [];
-                    onevent.call (this, packet);    // original call
-                  //  emit.apply   (this, ["*"].concat(args));      // additional call to catch-all
-                    args = args.filter(function(n){ return n != null });
-                    _self.internet.emit.apply(_self.internet,args);
-                };
+              socket.on('connect',function(){
+                //var msgpack = require("msgpack-lite");
 
-                _self.rov.onAny(function() {
-                  var event = this.event;
-                  if (event !== 'newListener') {
-                  //  console.log(event);
-                    _self.internet.emit(event, arguments);
-                  }
-                });
+                heartbeatInterval=setInterval(function(){
+                  socket.emit('heartbeat','server');
+                },1000);
 
-                _self.internet.on('*',function() {
-                  var event = this.event;
-                  if (event !== 'newListener') {
-                    _self.rov.emit(event, arguments);
-                  }
-                });
+                socket.on('peer-connect-offer',function(peer_id,callback){
+                  var p = new Peer();
 
-                //Since the video comes in via a different route...
-                _self.cockpit.on('x-h264-video.data',function(data){
-                  _self.internet.emit('x-h264-video.data',data);
-                });
-
-                _self.internet.on('request_Init_Segment',function(fn){
-                  _self.rov.emit('request_Init_Segment',function(init){
-                    if ((fn!==undefined) && (typeof(fn) === 'function')){
-                      fn(init);
-                    } else {
-                      _self.internet.emit('x-h264-video.init',init);
+                  p.withHistory = {
+                    on: function(event, fn) {
+                      p.on(event, fn);
                     }
+                  };
+
+                  p.on('error', function (err) { console.log('error', err) })
+
+                  p.on('signal', function (data) {
+                    socket.emit('signal',peer_id, data);
+                    console.log('SIGNAL SENT:', JSON.stringify(data))
+                  })
+
+                  socket.on('signal',function(data,sender_id){
+                    if (sender_id !== peer_id){
+                      console.error('Invalid sender_id');
+                      return;
+                    }
+                    p.signal(data);
                   });
-                });
 
-              })
+                  callback(true);
 
-              p2p.on('peer-error', function(data) {
-                console.log("Error during signaling:" + data);
-              })
+                  p.on('connect', function(){
+//                    var emitter = new EventEmitter2();
+                    p.sendemit = function sendemit(){
+                      var args = new Array(arguments.length);
+                      for(var i = 0; i < args.length; ++i) {
+                                  //i is always valid index in the arguments object
+                          args[i] = arguments[i];
+                      }
+                      p.send(msgpack.encode(args));
+                      //p.send("THIS IS A STRING!!!!");
+                    }
+
+                    //Test data payload sizes
+                    for (var i=1;i<=10;i++){
+                      var size = Math.pow(2,i);
+                      p.sendemit('data-msg',size,new ArrayBuffer(size),'ok');
+                    }
+
+                    var onevent = _self.rov.socket.onevent;
+                    _self.rov.socket.onevent = function (packet) {
+                        var args = packet.data || [];
+                        onevent.call (this, packet);    // original call
+                      //  emit.apply   (this, ["*"].concat(args));      // additional call to catch-all
+                        args = args.filter(function(n){ return n != null });
+                        p.sendemit.apply(this,args);
+                    };
+
+                    _self.rov.onAny(function() {
+                      var event = this.event;
+                      if (event !== 'newListener') {
+                      //  console.log(event);
+                        var args = new Array(arguments.length);
+                        for(var i = 0; i < args.length; ++i) {
+                                    //i is always valid index in the arguments object
+                            args[i] = arguments[i];
+                        }
+                        args.unshift(event);
+                        p.sendemit.apply(p,args);
+                      }
+                    });
+
+                    //Since the video comes in via a different route...
+                    _self.cockpit.on('x-h264-video.data',function(data){
+                      p.sendemit('x-h264-video.data',data);
+                    });
+
+                    p.on('data',function(data){
+                      var msg = msgpack.decode(data);
+                      switch(msg[0]){
+                        case 'request_Init_Segment':
+                          _self.cockpit.emit('request_Init_Segment',function(init){
+                              p.sendemit('x-h264-video.init',init);
+                          });
+                        break;
+                      }
+
+                    });
+
+
+                  })
+
+
+
+                })
+              });
 
           });
 

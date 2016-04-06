@@ -68,7 +68,7 @@
     this.cockpit.on('request_Init_Segment',function(fn){
       var handler = function(data){
         fn(data);
-        this.rov.off('x-h264-video.init',handler);
+        self.rov.off('x-h264-video.init',handler);
       };
       self.rov.on('x-h264-video.init',handler);
       self.rov.emit('request_Init_Segment');

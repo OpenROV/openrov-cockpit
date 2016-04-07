@@ -60,7 +60,7 @@
     //If the data comes down the pre-existing rov channel, we just need to forward
     //the traffic
     var dataflowing = false;
-    this.rov.socket.on('x-h264-video.data',function(data){
+    this.rov.on('x-h264-video.data',function(data){
       dataflowing = true;
       self.cockpit.emit('x-h264-video.data',data);
     });

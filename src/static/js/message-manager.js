@@ -4,7 +4,7 @@
   the messages between the emitter and the message transport.
 */
 (function() {
-  var MessageManager = function(socket) {
+  var SocketIOEmitter = function(socket) {
     this.socket = socket;
     var self = this;
     //Apparently socket checks the last variable for a function callback and
@@ -26,15 +26,28 @@
           }
     }
 
+    var listeningTo = {};
     this.on('newListener', function(aType, aListener) {
       if (aType!=='*'){
-        socket.on(aType, aListener);
+//        socket.on(aType, aListener);
+        if (listeningTo[aType]===undefined){
+          socket.on(aType,function(){
+            var args = new Array(arguments.length);
+            for(var i = 0; i < args.length; ++i) {
+                        //i is always valid index in the arguments object
+                args[i] = arguments[i];
+            }
+            args = args.filter(function(item){return item!==null});
+            self.emit.apply(self,[aType].concat(args));
+          })
+          listeningTo[aType]=true;
+        }
       }
     });
     return this;
   };
-  MessageManager.prototype = new EventEmitter2({ newListener: true, wildcard: true });
-  MessageManager.prototype.constructor = MessageManager;
+  SocketIOEmitter.prototype = new EventEmitter2({ newListener: true, wildcard: true });
+  SocketIOEmitter.prototype.constructor = SocketIOEmitter;
 
-  window.MessageManager = MessageManager;
+  window.SocketIOEmitter = SocketIOEmitter;
 })();

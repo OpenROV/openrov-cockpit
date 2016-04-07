@@ -1,4 +1,5 @@
 (function (window, $, undefined) {
+  return; //TODO: Remove disable
   'use strict';
   var capestatus = namespace('plugins.capestatus');
   capestatus.Capestatus = function Capestatus(cockpit) {

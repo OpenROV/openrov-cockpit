@@ -27,6 +27,7 @@ $(function () {
     var socket = window.io.connect(window.location.protocol + '//' +
                  window.location.hostname+ ':8080');
     socket=new window.SocketIOStoreAndForward(socket);
+    socket=new window.SocketIOEmitter(socket);
   }
 
 

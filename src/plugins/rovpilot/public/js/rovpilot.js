@@ -310,7 +310,7 @@
     if (this.sendUpdateEnabled && updateRequired || this.sendToROVEnabled === false) {
       if (this.sendToROVEnabled) {
         this.ack = performance.now();
-        this.rov.emit('plugin.rovpilot.desiredControlRates',controls,this.ack,function(ack){
+        this.cockpit.emit('plugin.rovpilot.desiredControlRates',controls,this.ack,function(ack){
           if (ack===self.ack) {self.ack = null;}
         });
       }

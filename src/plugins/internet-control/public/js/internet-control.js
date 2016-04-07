@@ -67,7 +67,6 @@
 
 
           //TODO: Move to a pattern that can retry the connection when the setting changes
-          //$.getScript(self.settings.webRTCSignalServerURI + "/simplepeer.min.js", function() {
           $.getScript(self.settings.webRTCSignalServerURI + "/msgpack.min.js");
           $.getScript(self.settings.webRTCSignalServerURI + "/simplepeer.js", function() {
               var _self = self
@@ -112,20 +111,24 @@
                     }
                   };
 
-                  p.on('error', function (err) { console.log('error', err) })
+                  p.on('error', function (err) {
+                    console.error('error', err)
+                  })
 
                   p.on('signal', function (data) {
                     socket.emit('signal',peer_id, data);
                     console.log('SIGNAL SENT:', JSON.stringify(data))
                   })
 
-                  socket.on('signal',function(data,sender_id){
+                  var onSignalHanlder = function(data,sender_id){
                     if (sender_id !== peer_id){
                       console.error('Invalid sender_id');
                       return;
                     }
                     p.signal(data);
-                  });
+                  };
+
+                  socket.on('signal',onSignalHanlder);
 
                   callback(true);
 
@@ -148,15 +151,17 @@
                     }
 
                     var onevent = _self.rov.socket.onevent;
+
                     _self.rov.socket.onevent = function (packet) {
                         var args = packet.data || [];
                         onevent.call (this, packet);    // original call
-                      //  emit.apply   (this, ["*"].concat(args));      // additional call to catch-all
+
+                        if (p==null) {return;}
                         args = args.filter(function(n){ return n != null });
                         p.sendemit.apply(this,args);
                     };
 
-                    _self.rov.onAny(function() {
+                    var onAnyHandler = function() {
                       var event = this.event;
                       if (event !== 'newListener') {
                       //  console.log(event);
@@ -168,12 +173,14 @@
                         args.unshift(event);
                         p.sendemit.apply(p,args);
                       }
-                    });
+                    }
+                    _self.rov.onAny(onAnyHandler);
 
                     //Since the video comes in via a different route...
-                    _self.cockpit.on('x-h264-video.data',function(data){
+                    var videodataHanlder = function(data){
                       p.sendemit('x-h264-video.data',data);
-                    });
+                    }
+                    _self.cockpit.on('x-h264-video.data',videodataHanlder);
 
                     p.on('data',function(data){
                       var msg = msgpack.decode(data);
@@ -187,8 +194,12 @@
 
                     });
 
-
-                  })
+                  p.on('close', function(){
+                    socket.off('signal',onSignalHanlder);
+                    _self.rov.offAny(onAnyHandler);
+                    _self.cockpit.off('x-h264-video.data',videodataHanlder);
+                    p = null;
+                  });
 
 
 
@@ -197,9 +208,9 @@
 
           });
 
-
       });
-    }
+    });
+  }
 
       IC.prototype.inputDefaults = function inputDefaults() {
         var self = this;

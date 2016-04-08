@@ -45,6 +45,7 @@
           location: {type:String}
         },
         behaviors: [namespace('behaviors').oROVStandard],
+        packetVideo_initializationInProgress: false,
         registerEmitterHanlders: function(emitter){
           var self = this;
 
@@ -69,7 +70,7 @@
           //If we have segmented mp4 data streaming for this camera,
           //we go ahead and request the initalization packet and
           //init the camera before appending the raw data.
-          var packetVideo_initializationInProgress = false;
+
           emitter.on('x-h264-video.data',function(data){
             if (self.$$('#camera1')===null){
               return;
@@ -77,8 +78,8 @@
             if(self.$$('#camera1').initialized){
               self.$$('#camera1').append(new Uint8Array(data));
             } else {
-              if(!packetVideo_initializationInProgress){
-                packetVideo_initializationInProgress = true;
+              if(!self.packetVideo_initializationInProgress){
+                self.packetVideo_initializationInProgress = true;
                 emitter.emit('request_Init_Segment',function(data){
                   self.$$('#camera1').init(new Uint8Array(data),function(){
                     packetVideo_initializationInProgress = false;
@@ -86,7 +87,7 @@
                 });
                 //timeout and try agian after 1 second
                 setTimeout(function(){
-                  packetVideo_initializationInProgress = false;
+                  self.packetVideo_initializationInProgress = false;
                 },1000);
               }
             }

@@ -26,6 +26,11 @@
         defaultEnabled: true
       };
 
+      this.connected = false;
+      this.connecting = false;
+      this.viewers = 0;
+      this.peers = [];
+
     };
 
     //private functions and variables (hidden within the function, available via the closure)
@@ -56,6 +61,40 @@
     IC.prototype.listen = function listen() {
       var self = this;
 
+      var statusUpdate=function(){
+        var status = {status:'off',stats:{viewers:0,pilots:0,connection:{}},pilots:{}};
+        if (self.connecting){
+          status.status='starting';
+        }
+        if (self.connected){
+          status.status='streaming';
+        }
+        status.stats.viewers = self.viewers;
+
+
+        //TODO: Figure out how to show stats
+        /*
+        status.stats.connection = self.peers.map(function(item){
+          item._pc.getStats(function(res){
+            return res.result();
+          });
+        }).reduce(function(previousValue,currentValue){
+          if (previousValue===null){
+            return currentValue;
+          }
+          for (var property in currentValue) {
+              if (object.hasOwnProperty(property)) {
+                  previousValue[property]=previousValue[property]+currentValue[property];
+              }
+          }
+          return previousValue;
+        },null);
+
+        */
+        self.cockpit.emit('plugin-internetControl-status',status);
+      }
+      setInterval(statusUpdate,1000);
+
       //Response from the getSettings call. Using the withHistory will call the
       //update function with the last copy of this message that had been sent.
       //The settings manager sends a change message for each section when
@@ -64,8 +103,6 @@
           console.log("Settings changed for IC");
           self.settings = settings.ic;
 
-
-
           //TODO: Move to a pattern that can retry the connection when the setting changes
           $.getScript(self.settings.webRTCSignalServerURI + "/msgpack.min.js");
           $.getScript(self.settings.webRTCSignalServerURI + "/simplepeer.js", function() {
@@ -73,7 +110,7 @@
               var Peer = window.SimplePeer;
               var io = window.io;
               var socket = io(self.settings.webRTCSignalServerURI);
-
+              self.connecting = true;
               var opts = {
 //                peerOpts: {
 //                  channelConfig: {
@@ -89,6 +126,7 @@
                 if (heartbeatInterval!==null){
                   clearInterval(heartbeatInterval);
                 }
+                self.connected=false;
               });
 
               socket.on('heartbeat',function(data){
@@ -96,12 +134,14 @@
               });
 
               socket.on('connect',function(){
+                self.connected = true;
+                self.connecting= false;
                 //var msgpack = require("msgpack-lite");
 
                 heartbeatInterval=setInterval(function(){
                   socket.emit('heartbeat','server');
                 },1000);
-
+                var pilot_sender_id = null;
                 socket.on('peer-connect-offer',function(peer_id,callback){
                   var p = new Peer();
 
@@ -133,6 +173,11 @@
                   callback(true);
 
                   p.on('connect', function(){
+                    _self.viewers++;
+                    _self.peers.push(p);
+                    //make last person to connect pilot by default
+                    pilot_sender_id = peer_id;
+                    _self.cockpit.emit('plugin.rovpilot.sendToROVEnabled',false);
 //                    var emitter = new EventEmitter2();
                     p.sendemit = function sendemit(){
                       var args = new Array(arguments.length);
@@ -192,12 +237,43 @@
                         break;
                       }
 
+                      if (peer_id == pilot_sender_id){
+                        switch(msg[0]){
+                          case 'throttle':
+                          case 'yaw':
+                          case 'list':
+                          case 'pitch':
+                          case 'roll':
+                          case 'strafe':
+                            _self.rov.emit(msg[0],msg[1]);
+                          break;
+                          case 'plugin.rovpilot.desiredControlRates':
+                          case 'plugin.externalLights.toggle':
+                          case 'plugin.externalLights.adjust':
+                          case 'plugin.externalLights.set':
+                          case 'plugin.laser.set':
+                          case 'plugin.lights.toggle':
+                          case 'plugin.lights.adjust':
+                          case 'plugin.lights.set':
+                          case 'plugin.rovpilot.depthHold.set':
+                          case 'plugin.rovpilot.headingHold.set':
+                            _self.rov.emit.apply(_self.rov,msg);
+                          break;
+                        }
+                      }
+
                     });
 
                   p.on('close', function(){
+                    _self.viewers--;
                     socket.off('signal',onSignalHanlder);
                     _self.rov.offAny(onAnyHandler);
                     _self.cockpit.off('x-h264-video.data',videodataHanlder);
+                    _self.cockpit.emit('plugin.rovpilot.sendToROVEnabled',true);
+                    var index = _self.peers.indexOf(p);
+                    if (index > -1) {
+                      _self.peers.splice(index, 1);
+                    }
                     p = null;
                   });
 

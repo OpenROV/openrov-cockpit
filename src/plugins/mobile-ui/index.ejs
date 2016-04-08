@@ -57,8 +57,9 @@
 
 	<link rel="import" href="components/polymer/polymer.html">
 
+	<!-- Web components -->
+	<link rel="import" href="components/video/orov-video.html">
 
-	
 	<link rel="import" href="components/mobile-ui/app-menu/app-menu.html">
 	<link rel="import" href="components/mobile-ui/settings-menu/settings-menu.html">
 	<link rel="import" href="components/mobile-ui/dual-thumbstick/dual-thumbstick.html">
@@ -67,6 +68,7 @@
 	<link rel="import" href="components/mobile-ui/orov-mobile-depth/orov-mobile-depth.html">
 	<link rel="import" href="components/mobile-ui/orov-mobile-battery/orov-mobile-battery.html">
 	<link rel="import" href="components/mobile-ui/orov-mobile-controls.html">
+	<link rel="import" href="components/internet-control/orov-internetControl-status.html">
 
 	<% for( var i = 0; i < scripts.length; i++ )
 	{
@@ -128,6 +130,10 @@
 
 							<div class="depth">
 								<orov-mobile-depth event-emitter="{{cockpitEventEmitter}}"></orov-mobile-depth>
+							</div>
+
+							<div class="rightend">
+								<orov-internetControl-status event-emitter="{{cockpitEventEmitter}}"><orov-internetControl-status>
 							</div>
 						</div>
 					</div>

@@ -61,18 +61,22 @@
     //the traffic
     var dataflowing = false;
     this.rov.on('x-h264-video.data',function(data){
-      dataflowing = true;
       self.cockpit.emit('x-h264-video.data',data);
+      if (!dataflowing){
+        self.cockpit.on('request_Init_Segment',function(fn){
+          var handler = function(data){
+            fn(data);
+            self.rov.off('x-h264-video.init',handler);
+          };
+          self.rov.on('x-h264-video.init',handler);
+          self.rov.emit('request_Init_Segment');
+        });
+        dataflowing = true;
+      }
+
     });
 
-    this.cockpit.on('request_Init_Segment',function(fn){
-      var handler = function(data){
-        fn(data);
-        self.rov.off('x-h264-video.init',handler);
-      };
-      self.rov.on('x-h264-video.init',handler);
-      self.rov.emit('request_Init_Segment');
-    });
+
 
     //If we get a CameraRegistration then we have to open a connection to the camera server
     //so that we can forward traffic to the cockpit emitter.

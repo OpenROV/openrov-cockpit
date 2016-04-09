@@ -130,7 +130,7 @@
               });
 
               socket.on('heartbeat',function(data){
-                console.log('Heartbeat: ' + data);
+                console.log('Heartbeat: ' + JSON.stringify(data));
               });
 
               socket.on('connect',function(){

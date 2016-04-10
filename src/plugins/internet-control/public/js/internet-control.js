@@ -148,12 +148,12 @@
                   socket.emit('twitchtv-stream-closed',function(){
                     _self.cockpit.off('x-h264-video.data',h264dataHandler);
                   });
-                  socket.emit('twitchtv-stream-on',function(sendToTwitch){
+                  socket.emit('twitchtv-stream-on',function(ok){
                     h264dataHandler = function(data){
-                      sendToTwitch(data);
+                      _self.socket.emit('twitchtv-stream-data',data);
                     };
                     _self.cockpit.emit('request_Init_Segment',function(init){
-                        sendToTwitch(init);
+                        _self.socket.emit('twitchtv-stream-data',init);
                         _self.cockpit.on('x-h264-video.data',h264dataHandler);
                     });
                   });

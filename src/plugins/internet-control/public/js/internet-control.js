@@ -150,10 +150,10 @@
                   });
                   socket.emit('twitchtv-stream-on',function(ok){
                     h264dataHandler = function(data){
-                      _self.socket.emit('twitchtv-stream-data',data);
+                      socket.emit('twitchtv-stream-data',data);
                     };
                     _self.cockpit.emit('request_Init_Segment',function(init){
-                        _self.socket.emit('twitchtv-stream-data',init);
+                        socket.emit('twitchtv-stream-data',init);
                         _self.cockpit.on('x-h264-video.data',h264dataHandler);
                     });
                   });

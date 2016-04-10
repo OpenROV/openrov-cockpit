@@ -142,6 +142,23 @@
                   socket.emit('heartbeat','server');
                 },1000);
                 var pilot_sender_id = null;
+
+                socket.on('twitchtv-available',function(){
+                  var h264dataHandler;
+                  socket.emit('twitchtv-stream-closed',function(){
+                    _self.cockpit.off('x-h264-video.data',h264dataHandler);
+                  });
+                  socket.emit('twitchtv-stream-on',function(sendToTwitch){
+                    h264dataHandler = function(data){
+                      sendToTwitch(data);
+                    };
+                    _self.cockpit.emit('request_Init_Segment',function(init){
+                        sendToTwitch(init);
+                        _self.cockpit.on('x-h264-video.data',h264dataHandler);
+                    });
+                  });
+                })
+
                 socket.on('peer-connect-offer',function(peer_id,callback){
                   var p = new Peer();
 

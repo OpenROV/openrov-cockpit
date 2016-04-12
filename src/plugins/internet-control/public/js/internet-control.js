@@ -1,7 +1,5 @@
 (function(window, document, $) { //The function wrapper prevents leaking variables to global space
     'use strict';
-
-
     var IC;
 
     //These lines register the Example object in a plugin namespace that makes
@@ -11,7 +9,7 @@
 
     IC = function IC(cockpit) {
 
-      console.log('Loading example plugin in the browser.');
+      console.log('Loading internet-control plugin in the browser.');
 
       //instance variables
       this.cockpit = cockpit;
@@ -23,7 +21,7 @@
         name: 'Internet Control', // for the settings
         viewName: 'Internet Control plugin', // for the UI
         canBeDisabled: true, //allow enable/disable
-        defaultEnabled: true
+        defaultEnabled: false
       };
 
       this.connected = false;
@@ -35,12 +33,6 @@
 
     //private functions and variables (hidden within the function, available via the closure)
 
-    var _name = '';
-    var getAttributes = function getAttributes() {
-      return {
-        name: _name
-      }
-    }
 
     //Adding the public methods using prototype simply groups those methods
     //together outside the parent function definition for easier readability.
@@ -48,17 +40,20 @@
     //Called by the plugin-manager to enable a plugin
     IC.prototype.enable = function enable() {
       alert('Internet-control enabled');
+      this.listen();
     };
 
     //Called by the plugin-manager to disable a plugin
     IC.prototype.disable = function disable() {
       alert('Internet-control disabled');
+      //TODO: Impliment and unlisten
     };
 
 
     //listen gets called by the plugin framework after all of the plugins
     //have loaded.
     IC.prototype.listen = function listen() {
+      if (!this.enabled){return;}
       var self = this;
 
       var statusUpdate=function(){
@@ -129,6 +124,17 @@
                 self.connected=false;
               });
 
+              var connectionTimeOutTimer=null;
+              socket.on('disconnect',function(){
+                console.log("disconneted");
+                self.connected = false;
+              })
+
+              socket.on('reconnect',function(){
+                console.log("disconneted");
+                self.connected = true;
+              })
+
               socket.on('heartbeat',function(data){
                 console.log('Heartbeat: ' + JSON.stringify(data));
               });
@@ -136,28 +142,15 @@
               socket.on('connect',function(){
                 self.connected = true;
                 self.connecting= false;
+
+
                 //var msgpack = require("msgpack-lite");
 
                 heartbeatInterval=setInterval(function(){
+                  if (!self.connected){return;}
                   socket.emit('heartbeat','server');
                 },1000);
                 var pilot_sender_id = null;
-
-                socket.on('twitchtv-available',function(){
-                  var h264dataHandler;
-                  socket.emit('twitchtv-stream-closed',function(){
-                    _self.cockpit.off('x-h264-video.data',h264dataHandler);
-                  });
-                  socket.emit('twitchtv-stream-on',function(ok){
-                    h264dataHandler = function(data){
-                      socket.emit('twitchtv-stream-data',data);
-                    };
-                    _self.cockpit.emit('request_Init_Segment',function(init){
-                        socket.emit('twitchtv-stream-data',init);
-                        _self.cockpit.on('x-h264-video.data',h264dataHandler);
-                    });
-                  });
-                })
 
                 socket.on('peer-connect-offer',function(peer_id,callback){
                   var p = new Peer();

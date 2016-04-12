@@ -8,3 +8,5 @@ This setup allows for conflicting commands to be sent from the cockpit and the i
 
 Pre-req
 ----
+TODO:
+- [ ] Add audio between host and pilot

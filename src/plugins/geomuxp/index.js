@@ -14,14 +14,21 @@ var geomux = function geomux(name, deps) {
 
 
 geomux.prototype.start = function start(){
-  try {
-    var test =require.resolve('geo-video-server')
-  } catch (er) {
-    console.log("geo-vide-server not installed")
-    return;
+  var geoprogram = '';
+  if (process.env.GEO_MOCK == 'true'){
+    geoprogram = require.resolve('geo-video-simulator');
+  }
+  else {
+    try {
+      geoprogram =require.resolve('geo-video-server')
+    } catch (er) {
+      console.log(process.env.GEO_MOCK);
+      console.log("geo-video-server not installed")
+      return;
+    }
   }
 
-  var launch_options = [require.resolve('geo-video-server')];
+  var launch_options = [geoprogram];
 
   const infinite=-1;
   var monitor = respawn(launch_options,{

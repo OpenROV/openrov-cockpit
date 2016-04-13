@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../../polymer/polymer.html">
+  <script src="../../web-component-tester/browser.js"></script>
+  <link rel="import" href="../orov-emitter-behavior.html">
+  <link rel="import" href="../testelement.html">
+  <script src="../../eventemitter2/lib/eventemitter2.js"></script>
+  <script src="../utilities.js"></script>
+</head>
+<body>
+  <test-fixture id="test-element-fixture">
+     <template id='t'>
+       <test-element id="test-element"></test-element>
+       <test-element id="test-element2"></test-element>
+     </template>
+   </test-fixture>
+
+  <script>
+    suite('orov-emitter-behavior', function() {
+      var myEl;
+      setup(function() {
+        var f = fixture('test-element-fixture');
+        myEl = f[0];
+        myEl2 = f[1];
+      });
+      test('can get handle to dynamic test element', function() {
+        assert.isNotNull(myEl);
+        assert.equal(document.getElementById('test-element'),myEl);
+      });
+      test('behavior is in scope',function(){
+        var behaviors = namespace('behaviors');
+        assert.isDefined(behaviors.oROVStandardImpl);
+      });
+      test('behavior calls registerEmitterHanlders on the element',function(){
+        assert.isOk(myEl._registerEmitterHandlersCalled);
+      });
+      test('the event emitter can be accessed',function(){
+        assert.isDefined(myEl.eventEmitter);
+      });
+      test('Listening to events using a real eventEmitter works correctly',function(){
+        var i = 0;
+        var handler = function(){i++;};
+        var newEmitter = new EventEmitter2();
+        myEl.eventEmitter=newEmitter;
+        assert.equal(newEmitter.listeners.length,1,'Adding emitter to new control will only inherit built in listeners');
+        myEl.eventEmitter.on('test',handler);
+        assert.equal(newEmitter.listeners('test').length,1,'Adding listeners is registered correctly');
+        assert.equal(newEmitter.listeners('test-message-1').length,1,'Prior listeners is registered correctly');
+        myEl.eventEmitter.emit('test');
+        assert.equal(i,1,'Event emitter function call verified')
+      });
+      test('WithHistory registrations are relinked through withHistory of the new emitter',function(){
+        var i = 0;
+        var handler = function(){i++;};
+        var newEmitter = new EventEmitter2();
+        newEmitter._lvc = null
+        newEmitter.withHistory = {
+          on: function(event,fn){
+            if (newEmitter._lvc == event){
+              fn(newEmitter._lvc);
+            }
+            newEmitter.on(event,fn);
+          }
+        }
+        var originalEmit = newEmitter.emit;
+        newEmitter.emit=function(event){
+          if (event!=='newListener'){
+            this._lvc = event;
+          }
+          originalEmit(event);
+        }
+        newEmitter.emit('test');
+        myEl.eventEmitter=newEmitter;
+        myEl.eventEmitter.withHistory.on('test',handler);
+        assert.equal(newEmitter.listeners('test').length,1,'Adding listeners is registered correctly');
+        assert.equal(i,1,'Event emitter function call verified');
+        var newEmitter2 = new EventEmitter2();
+        newEmitter2._lvc = null
+        newEmitter2.withHistory = {
+          on: function(event,fn){
+            console.log('firing('+newEmitter2._lvc+'):'+event);
+            if (newEmitter2._lvc == event){
+              fn(newEmitter2._lvc);
+            }
+            newEmitter2.on(event,fn);
+          }
+        }
+        var originalEmit2 = newEmitter2.emit;
+        newEmitter2.emit=function(event){
+          if (event!=='newListener'){
+            this._lvc = event;
+          }
+          originalEmit2(event);
+        }
+        newEmitter2.emit('test'); //The history has been primed with another event.
+        debugger;
+        myEl.eventEmitter=newEmitter2;
+        assert.equal(i,2,'Prior registered listener to history fires again when rewired and history exists');
+
+      });
+    });
+  </script>
+</body>
+</html>

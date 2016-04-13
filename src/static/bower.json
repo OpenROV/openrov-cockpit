@@ -1,5 +1,5 @@
 {
-  "name": "static openrov",
+  "name": "static_openrov",
   "dependencies": {
     "fpsmeter": "~0.3.1",
     "i18next": "~1.11.0",

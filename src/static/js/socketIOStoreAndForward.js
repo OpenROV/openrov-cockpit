@@ -25,20 +25,20 @@
           aType = aType.slice(12);
           if (self.eventCache[aType]!==undefined){
             var d = self.eventCache[aType];
-            aListener.call(d[0],d[1],d[2],d[3],d[4],d[5]);
+            aListener.apply(d.context,d.args);
           }
         }
         original_on.call(socket, aType, aListener);
       };
 
       socket.emit = function(aType,data1, data2, data3, data4, data5){
-        self.eventCache[this.event]=[this,data1,data2,data3,data4,data5];
-        orignal_emit.call(socket,aType,data1, data2, data3, data4, data5);
+        self.eventCache[this.event]={context:this,args:arguments};
+        orignal_emit.apply(socket,arguments);
       };
 
       socket.volatile.emit = function(aType,data1, data2, data3, data4, data5){
-        self.eventCache[this.event]=[this,data1,data2,data3,data4,data5];
-        orignal_v_emit.call(socket,aType,data1, data2, data3, data4, data5);
+        self.eventCache[this.event]={context:this,args:arguments};
+        orignal_v_emit.apply(socket,arguments);
       };
 
     }
@@ -50,7 +50,7 @@
       socket.on('withHistory',function(aType,aListener){
         if (that.eventCache[aType]!==undefined){
           var d = that.eventCache[aType];
-          aListener.call(d[0],d[1],d[2],d[3],d[4],d[5]);
+          aListener.apply(d.context,d.args);
         } else {
           aListener();
         }
@@ -78,9 +78,9 @@
     withHistory.prototype = {
       on: function on(aType, aListener){
         var socket = this.element;
-        this.element.emit('withHistory',aType,function(v1,v2,v3,v4,v5){
-          if (v1 !== undefined){
-            aListener(v1,v2,v3,v4,v5);
+        this.element.emit('withHistory',aType,function(){
+          if (arguments.length>0){
+            aListener.apply(this,arguments);
           }
           socket.on(aType,aListener);  //delay until the callback takes place to keep order
         })
@@ -98,18 +98,6 @@
     	configurable: true,
     	writeable: false
     });
-/*
-    window.io.Socket.prototype.withHistory_on = function withHistory_on(aType, aListener){
-      this.emit('withHistory',aType,function(v1,v2,v3,v4,v5){
-        if (v1 !== undefined){
-          aListener(v1,v2,v3,v4,v5);
-        }
-        this.on(aType,aListener);  //delay until the callback takes place to keep order
-      });
-
-    };
-*/
-
 
   }
 

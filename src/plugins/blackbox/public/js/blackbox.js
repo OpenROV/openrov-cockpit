@@ -282,14 +282,38 @@
 
 
     this.idb[options.collection].toArray(function(name,dump){
+      var sizeofData = 0
+      var arrayOfData = dump.map(function(item){
+        var converted = new Uint8Array(item.data);
+        sizeofData+=converted.length;
+        return converted;
+      });
+      var result = new Uint8Array(sizeofData);
+      var tail = 0;
+      arrayOfData.forEach(function(item){
+        result.set(item,tail);
+        tail+=item.length;
+      });
+
+
+//      var result = Uint8Array.of.apply(this,arrayOfData);
+/*
+
+
+      var bufferlength=0;
       var dataArray = dump.reduce(function(previous,current,index,array){
         var b = new Uint8Array(current.data);
-        var c = new Uint8Array(previous.length + b.length);
-        c.set(previous);
-        c.set(b, previous.length);        
+        //var c = new Uint8Array(previous.length + b.length);
+        //c.set(previous);
+        if (bufferlength+b.length>previous.length){
+          var c =
+        }
+        previous.set(b, bufferlength);
+        bufferlength+=b.length
         return c;
-      },new Uint8Array());
-      downloadInBrowser(dataArray,name+'.'+'mp4');
+      },new Uint8Array(2000000));
+*/
+      downloadInBrowser(result,name+'.'+'mp4');
     }.bind(null,options.collection));
 
   };

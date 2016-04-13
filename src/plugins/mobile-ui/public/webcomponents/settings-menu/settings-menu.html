@@ -1,4 +1,5 @@
 <link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../orov-behaviors/orov-behavior.html">
 
 <link rel="import" href="../grid-menu/grid-menu.html">
 <link rel="import" href="../grid-menu/grid-menu-button.html">
@@ -6,14 +7,14 @@
 <link rel="import" href="../../paper-dialog/paper-dialog.html">
 
 <dom-module id="settings-menu">
-	
+
 	<style type="text/css">
-		
+
 		paper-dialog
 		{
 			color: white;
 			position: fixed;
-			
+
 			top: 0px;
 			right: 0;
 			margin-top: 90px;
@@ -24,65 +25,65 @@
 			border-radius: 5px;
 			background-color: rgba( 00, 00, 00, 0.7 );
     	}
-		
+
 		modal ::content > *
 		{
 			margin: 0;
 		}
-		
+
 		grid-menu
 		{
 			--grid-menu-max-width: 135px;
 		}
-		
+
 		grid-menu-button
 		{
 			color:white;
 		}
-		
+
 		grid-menu-button[active]
 		{
 			color: black;
 			background-color: white;
 			--grid-menu-button-fill-color: black;
 		}
-		
+
 	</style>
-	
+
 
 	<template strip-whitespace>
-		<grid-menu id="gridMenu" horizontal-align="right" trigger-icon="settings">			
-				
+		<grid-menu id="gridMenu" horizontal-align="right" trigger-icon="settings">
+
 				<grid-menu-button action="callback" target="changeToDesktopUI" icon="image:palette" label="Theme"></grid-menu-button>
 				<grid-menu-button action="callback" target="toggleFullscreen" icon="icons:fullscreen" label="Fullscreen"></grid-menu-button>
 				<grid-menu-button icon="icons:build" label="Calibrate"></grid-menu-button>
 				<grid-menu-button target="modal" icon="hardware:toys" label="Motors"></grid-menu-button>
-				
+
 				<grid-menu-button toggles action="callback" target="toggleLights" icon="icons:lightbulb-outline" label="Lights"></grid-menu-button>
 				<grid-menu-button toggles action="callback" target="toggleLasers" icon="image:flare" label="Lasers"></grid-menu-button>
 				<grid-menu-button toggles action="callback" target="toggleHeading" icon="maps:navigation" label="Heading"></grid-menu-button>
 				<grid-menu-button toggles action="callback" target="toggleDepth" icon="icons:swap-vert" label="Depth"></grid-menu-button>
 		</grid-menu>
-		
+
 	</template>
-	
-	
+
+
 	<script>
 		( function()
 		{
 			Polymer(
 			{
 				is: 'settings-menu',
-				
+
 				listeners:
 				{
 					'menuSelection': 'handleMenuSelection'
 				},
-				
+
 				behaviors: [namespace('behaviors').oROVStandard],
-				
+
 				handleMenuSelection: function(e)
-				{ 
+				{
 					if( e.detail.action == "callback" )
 					{
 						if( this[ e.detail.target ] !== undefined )
@@ -91,11 +92,11 @@
 						}
 					}
 				},
-				
+
 				handleTap: function(e)
 				{
 				},
-				
+
 				toggleFullscreen: function(e)
 				{
 					if (!document.fullscreenElement &&    // alternative standard method
@@ -121,7 +122,7 @@
 				    }
 				  }
 				},
-				
+
 				toggleLights: function( e )
 				{
 					if( e.detail.active )
@@ -135,7 +136,7 @@
 						this.eventEmitter.emit( 'plugin.lights.set', 0 );
 					}
 				},
-				
+
 				toggleLasers: function( e )
 				{
 					if( e.detail.active )
@@ -147,7 +148,7 @@
 						this.eventEmitter.emit( 'plugin.laser.set', 0 );
 					}
 				},
-				
+
 				toggleDepth: function( e )
 				{
 					if( e.detail.active  )
@@ -159,7 +160,7 @@
 						this.eventEmitter.emit( 'plugin.rovpilot.depthHold.set', { enabled: false } );
 					}
 				},
-				
+
 				toggleHeading: function( e )
 				{
 					if( e.detail.active  )
@@ -171,13 +172,13 @@
 						this.eventEmitter.emit( 'plugin.rovpilot.headingHold.set', { enabled: false } );
 					}
 				},
-				
+
 				changeToDesktopUI: function( e )
 				{
 					this.eventEmitter.emit( "plugin.settings-manager.persist-data", { "ui-manager": { "selectedUI": "new-ui" } }, function(){ location.reload(); } );
 				}
 			} );
 		}() );
-		
+
 	</script>
 </dom-module>

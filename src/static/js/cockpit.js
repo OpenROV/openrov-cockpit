@@ -13,8 +13,8 @@
   var Cockpit = function Cockpit(csocket) {
     var self = this;
 //    this.uiLoader = new window.UiLoader();
-    csocket = new window.SocketIOStoreAndForward(csocket);
-    this.rov = new window.MessageManager(csocket);
+
+    this.rov = csocket;
     this.storeAndForward = new window.EventEmiiterStoreAndForward(this);
 /*    var onevent = csocket.onevent;
     csocket.onevent = function (packet) {

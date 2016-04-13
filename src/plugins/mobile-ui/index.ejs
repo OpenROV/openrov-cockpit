@@ -7,11 +7,11 @@
 		<meta name="mobile-web-app-capable" content="yes">
 		<meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui" />
 		<link rel="manifest" href="manifest.webmanifest">
-		
+
 		<script type='text/javascript' src="components/jquery/dist/jquery.js"></script>
-		
+
 		<title>Cockpit</title>
-		
+
 		<!-- CSS -->
 		<link href="components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 		<link rel="stylesheet" href="plugin/mobile-ui/css/style.css">
@@ -20,10 +20,10 @@
 	<script type='text/javascript' src="js/libs/eventemitter2.js"></script>
 	<script type='text/javascript' src="components/bootstrap/dist/js/bootstrap.js"></script>
 	<script type='text/javascript' src="js/libs/mousetrap.min.js"></script>
-	
+
 	<script type='text/javascript' src='js/libs/gamepad.js'></script>
 	<script type='text/javascript' src='js/utilities.js'></script>
-	
+
 	<script type='text/javascript' src="config.js"></script>
 	<script type='text/javascript' src="socket.io/socket.io.js"></script>
 	<script type='text/javascript' src="system-plugin/globalization/js/initGlobalization.js"></script>
@@ -34,19 +34,19 @@
 	<script type="text/javascript" src="js/app.js"></script>
 
 	<script type="text/javascript" src="components/webcomponentsjs/webcomponents-lite.js"></script>
-  
+
 	<script>
 		// Use native shadowdom
 		window.Polymer = window.Polymer || {};
 		window.Polymer.dom = 'shadow';
 		window.openrovtheme = 'mobile-ui';
-		
+
 		// Prevent safari overscroll behaviour
 		document.ontouchmove = function(event)
 		{
 			event.preventDefault();
 		}
-		
+
 		// Prevent context menu
 		window.oncontextmenu = function(event) {
 			event.preventDefault();
@@ -54,14 +54,12 @@
 			return false;
 		};
 	</script>
-	
+
 	<link rel="import" href="components/polymer/polymer.html">
 
 	<!-- Web components -->
-	<link rel="import" href="components/orov-behavior.html">
-	
 	<link rel="import" href="components/video/orov-video.html">
-	
+
 	<link rel="import" href="components/mobile-ui/app-menu/app-menu.html">
 	<link rel="import" href="components/mobile-ui/settings-menu/settings-menu.html">
 	<link rel="import" href="components/mobile-ui/dual-thumbstick/dual-thumbstick.html">
@@ -70,82 +68,87 @@
 	<link rel="import" href="components/mobile-ui/orov-mobile-depth/orov-mobile-depth.html">
 	<link rel="import" href="components/mobile-ui/orov-mobile-battery/orov-mobile-battery.html">
 	<link rel="import" href="components/mobile-ui/orov-mobile-controls.html">
-	
-	<% for( var i = 0; i < scripts.length; i++ ) 
+	<link rel="import" href="components/internet-control/orov-internetControl-status.html">
+
+	<% for( var i = 0; i < scripts.length; i++ )
 	{
-		%>  <script type="text/javascript" src="<%= scripts[i] %>"></script><% 
-	} 
+		%>  <script type="text/javascript" src="<%= scripts[i] %>"></script><%
+	}
 	%>
 
 	<body>
 		<template id="t" is="dom-bind" strip-whitespace>
-			
+
 			<!-- Video Layer -->
 			<div id="layer-vid" class="layer-no-input fill" style="z-index: 10">
 				<!-- Video -->
 				<orov-video class="video" location="forward" event-emitter="{{cockpitEventEmitter}}"></orov-video>
 			</div>
-			
+
 			<!-- HUD Layer -->
 			<div id="layer-hud" class="layer-no-input fill" style="z-index: 20">
 				<!--Horizon Display-->
 				<!--Depth Display-->
 			</div>
-			
+
 			<!-- Controls Layer -->
 			<div id="layer-ctrl" class="layer fill" style="z-index: 30">
 				<orov-mobile-controls class="overlay" event-emitter="{{cockpitEventEmitter}}"></orov-mobile-controls>
 			</div>
-			
+
 			<!-- UI Layer -->
 			<div id="layer-ui" class="layer fill" style="z-index: 40">
-			
+
 				<!--Top-->
 				<div id="ui-top" class="rel-layer" style="" style="z-index: 20">
 					<app-menu></app-menu>
 					<settings-menu event-emitter="{{cockpitEventEmitter}}"></settings-menu>
 				</div>
-				
+
 				<!--Bottom-->
 				<div id="ui-bot" class="rel-layer fill" style="z-index: 10">
 					<div id="layer-widgets" class="layer" style="z-index: 0">
 					</div>
-					
+
 					<div id="layer-win" class="layer fill" style="z-index: 10">
 						<orov-window id="ui-win">
 							yo
 						</orov-window>
 					</div>
 				</div>
-				
+
 				<!--Absolute widget layer-->
 				<div id="layer-ui-absolute" class="layer fill" style="z-index: 0">
-					
+
 					<div class="action-bar">
 						<div class="action-bar-container">
 							<div class="battery">
 								<orov-mobile-battery event-emitter="{{cockpitEventEmitter}}"></orov-mobile-battery>
 							</div>
-							
+
 							 <orov-mobile-compass class="center" heading="0" event-emitter="{{cockpitEventEmitter}}"></orov-mobile-compass>
-							
+
 							<div class="depth">
 								<orov-mobile-depth event-emitter="{{cockpitEventEmitter}}"></orov-mobile-depth>
 							</div>
+
+							<div class="rightend">
+								<orov-internetControl-status event-emitter="{{cockpitEventEmitter}}"><orov-internetControl-status>
+							</div>
 						</div>
 					</div>
-					
+
 				</div>
 			</div>
-			
+
 			<!-- Modal Layer -->
 			<div id="layer-modal" class="layer fill" style="z-index: 50;">
 				<orov-window id="modal-win" modal>
 					I'm modal
 				</orov-window>
 			</div>
-			
+
 		</template>
 	</body>
-	
+
 </html>

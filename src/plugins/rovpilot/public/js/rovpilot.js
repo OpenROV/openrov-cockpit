@@ -193,7 +193,6 @@
 
   }
 
-
   ROVpilot.prototype.altMenuDefaults = function altMenuDefaults() {
     self=this;
     return [
@@ -285,6 +284,10 @@
     this.rovsendPilotingDataTimer = setInterval(function(){
       self.sendPilotingData();
     },100); //Todo: Make configurable
+
+    this.cockpit.on('plugin.rovpilot.sendToROVEnabled', function(value){
+      self.sendToROVEnabled=value;
+    });
 
   };
 

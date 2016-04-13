@@ -7,6 +7,7 @@
   var SocketIOEmitter = function(socket) {
     this.socket = socket;
     var self = this;
+    this.senderID = generateUUID();
     //Apparently socket checks the last variable for a function callback and
     //does magic.  Have to send only the right number of arguments.
     this.onAny(function() {
@@ -16,6 +17,8 @@
                     //i is always valid index in the arguments object
             args[i] = arguments[i];
         }
+        if (args[args.length-1]===self.senderID) {return;}
+//        args.push(self.senderID)
         socket.emit.apply(socket,[this.event].concat(args));
       }
     });
@@ -38,6 +41,8 @@
                 args[i] = arguments[i];
             }
             args = args.filter(function(item){return item!==null});
+            if (args[args.length-1]===self.senderID) {return;}
+            args.push(self.senderID)
             self.emit.apply(self,[aType].concat(args));
           })
           listeningTo[aType]=true;

@@ -50,14 +50,21 @@
     };
 
     var setLights = function setLights(value) {
-      console.log("setLights:" + value);
+      
       this.lights = value;
-      if (this.lights > 1)
+      
+      if (this.lights >= 1)
+      {
         this.lights = 1;
-      if (this.lights < 0)
+      }
+      
+      if (this.lights <= 0)
+      {
         this.lights = 0;
+      }
 
       var command = 'eligt(' + ArduinoHelper.serial.packPercent(this.lights) + ')';
+      
       deps.rov.send(command);
 
     };

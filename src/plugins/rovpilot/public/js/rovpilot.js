@@ -194,7 +194,7 @@
   }
 
   ROVpilot.prototype.altMenuDefaults = function altMenuDefaults() {
-    self=this;
+    var self=this;
     return [
       {
         label: 'Increment power level',

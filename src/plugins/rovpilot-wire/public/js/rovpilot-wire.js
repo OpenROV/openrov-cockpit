@@ -14,7 +14,7 @@
   };
 
   ROVpilotWire.prototype.inputDefaults = function inputDefaults() {
-    self = this;
+    var self = this;
     return [
       // Toggle heading hold
       {

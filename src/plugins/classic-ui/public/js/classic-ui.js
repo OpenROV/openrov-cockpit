@@ -21,7 +21,14 @@
   };
 
   plugins.classicUi.prototype.listen = function listen(){
-    $('#t')[0]['cockpit-event-emitter'] = this.cockpit;
+    if (!window.cockpit_int){
+      setTimeout(function(){
+        self.listen.call(self);
+      },100);
+      return;
+    }
+
+    $('#t')[0]['cockpitEventEmitter'] = this.cockpit;
 
     window.cockpit_int.i18n.loadNamespace('classic-ui', function() {  });
     var key_s = window.cockpit_int.i18n.options.keyseparator;

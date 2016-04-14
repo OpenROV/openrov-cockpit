@@ -44,7 +44,7 @@ USE_MOCK=true configfile='/tmp/rovconfig.json' pluginsDownloadDirectory='/tmp/pl
 The minimal command line will start the node process, allowing you to connect to `http://localhost:8080` which will bring up the cockpit.  The mock dependencies will be sending fake data over the message bus causing compass dials to rotate etc.  The minimal command line will not start any video.
 
 Some of the more common advanced command line options:
-* GEO_MOCK=true : Starts the simulated MP4 video stream (a test pattern)
+* GEO_MOCK=true : Starts the simulated MP4 video stream (a test pattern, requires FFMPEG to be installed on your computer)
 * MJPEG_MOCK=true: Starts the simulated MJPEG video stream (rotating set of underwater images)
 * env plugins__ui-manager__selectedUI='classic-ui': Override the default theme that is loaded  (the env command on linux is needed since the theme name contains a dash.
 

@@ -14,6 +14,7 @@
     this.cockpit = cockpit;
     this.recording = false;
     this.idb;
+    this.sessionID = this.newSession();
 
   };
 
@@ -73,14 +74,47 @@
       self.stopRecording();
     });
 
+    this.cockpit.on('plugin-blackbox-get-sessions', function(callback){
+      self.recordedSessions(callback);
+    });
+
     this.cockpit.on('plugin-blackbox-recording?', function(fn){
       if(typeof(fn) === 'function'){
         fn(self.recording);
       }
     });
 
+    this.recordedSessions(function(sessions){
+        self.cockpit.emit('plugin-blackbox-sessions',sessions)
+    });
 
   };
+
+  var sessionIDRecorded = false;
+  Blackbox.prototype.newSession = function newSession(){
+     return generateUUID();
+  }
+
+  //TODO: Add sessions collection that each unique session is placed
+  var _recordedSessions = function recordedSessions(idb,callback){
+    idb.sessions.toArray(function(data){
+      callback(data);
+    });
+  };
+
+  Blackbox.prototype.recordedSessions = function recordedSessions(callback){
+    if (!this.idb.isOpen()) {
+      this.idb.open()
+        .catch(function (error) {
+          console.error(error);
+        });
+      _recordedSessions(this.idb,callback);
+      this.idb.close();
+    } else {
+      _recordedSessions(this.idb,callback);
+    }
+
+  }
 
   Blackbox.prototype.toggleRecording = function toggleRecording() {
     if (this.recording){
@@ -92,9 +126,17 @@
 
   Blackbox.prototype.startRecording = function startRecording() {
     if (!this.recording) {
+      var self=this;
       console.log('Recording Telemetry');
       var blackbox = this;
       this.idb.open();
+      if(!sessionIDRecorded){
+        this.idb.sessions.add({sessionID:this.sessionID,timestamp:Date.now()});
+        this.recordedSessions(function(sessions){
+          self.cockpit.emit('plugin-blackbox-sessions',sessions)
+        });
+        sessionIDRecorded=true;
+      }
       this.recording = true;
       this.cockpit.emit('plugin-blackbox-recording-status',true);
     }
@@ -125,7 +167,7 @@
       });
     } else {
     //var myblob = new Blob([data]);
-    this.idb.mp4.add({timestamp: Date.now(),data:data})
+    this.idb.mp4.add({timestamp: Date.now(),sessionID:this.sessionID,data:data})
       .catch(function (error) {
         console.error(error);
       });
@@ -137,6 +179,7 @@
       return;
     }
     navdata.timestamp = Date.now();
+    navdata.sessionID= this.sessionID;
     this.idb.navdata.add(navdata)
       .catch(function (error) {
         console.error(error);
@@ -148,6 +191,7 @@
       return;
     }
     statusdata.timestamp = Date.now();
+    statusdata.sessionID= this.sessionID;
     this.idb.telemetry.add(statusdata)
       .catch(function (error) {
         console.error(error);
@@ -158,9 +202,10 @@
     //Instructions to upgrade: https://github.com/dfahlander/Dexie.js/wiki/Design
     var idb = new Dexie("openrov-blackbox2");
     idb.version(3).stores({
-        navdata: 'id++,timestamp',
-        telemetry: 'id++,timestamp',
-        mp4: 'id++,timestamp'
+        navdata: 'id++,timestamp,sessionID',
+        telemetry: 'id++,timestamp,sessionID',
+        mp4: 'id++,timestamp,sessionID',
+        sessions: 'timestamp,sessionID'
     });
     return idb;
   }
@@ -176,7 +221,7 @@
 
     for(var i in cols){
       options.collection = cols[i];
-      if (!this.recording) {
+      if ((!this.idb.isOpen())) {
         this.idb.open()
           .catch(function (error) {
             console.error(error);
@@ -201,7 +246,7 @@
 
     for(var i in cols){
       options.collection = cols[i];
-      if (!this.recording) {
+      if (!this.idb.isOpen()) {
         this.idb.open()
           .catch(function (error) {
             console.error(error);
@@ -240,7 +285,7 @@
       fakeClick(link);
     };
 
-    this.idb[options.collection].toArray(function(name,dump){
+    this.idb[options.collection].where("sessionID").equalsIgnoreCase(options.sessionID).toArray(function(name,dump){
       var serializedData;
       switch(options.format){
         case 'json': serializedData = JSON.stringify(dump);
@@ -250,7 +295,7 @@
         case 'csv':
         default: serializedData = new CSV(dump, {header: true}).encode(); //TODO:
       }
-      downloadInBrowser(serializedData,name+'.'+options.format);
+      downloadInBrowser(serializedData,name+'-'+options.sessionID+'.'+options.format);
     }.bind(null,options.collection));
 
   };
@@ -281,7 +326,7 @@
     };
 
 
-    this.idb[options.collection].toArray(function(name,dump){
+    this.idb[options.collection].where("sessionID").equalsIgnoreCase(options.sessionID).toArray(function(name,dump){
       var sizeofData = 0
       var arrayOfData = dump.map(function(item){
         var converted = new Uint8Array(item.data);
@@ -313,7 +358,7 @@
         return c;
       },new Uint8Array(2000000));
 */
-      downloadInBrowser(result,name+'.'+'mp4');
+      downloadInBrowser(result,name+'-'+options.sessionID+'.'+'mp4');
     }.bind(null,options.collection));
 
   };

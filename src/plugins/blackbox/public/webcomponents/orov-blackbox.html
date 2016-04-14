@@ -15,6 +15,13 @@
         <paper-item>{{__('xml')}}</paper-item>
       </paper-menu>
     </paper-dropdown-menu>
+    <paper-dropdown-menu label="{{__('Choose Session:')}}">
+      <paper-menu class="dropdown-content" selected="{{sessionID}}">
+        <template is="dom-repeat" items="{{sessions}}">
+          <paper-item>{{item.sessionID}}</paper-item>
+        </template>
+      </paper-menu>
+    </paper-dropdown-menu>
     <button on-click='export'>{{__('Export')}}</button>
 
   </template>
@@ -23,10 +30,17 @@
       Polymer({
         is: "orov-blackbox",
         properties: {
-          format: {type: String, value: 'csv'}
+          format: {type: String, value: 'csv'},
+          sessions: {type: Array},
+          session: {type: String}
         },
         behaviors: [namespace('behaviors').oROVStandard],
         registerEmitterHanlders: function(emitter){
+          var self=this;
+          emitter.withHistory.on('plugin-blackbox-sessions',function(sessions){
+            self.sessions = sessions;
+            self.session = sessions.length>0?sessions[sessions.length-1].sessionID:'';
+          });
         },
         start: function(){
           if(this.eventEmitter !== undefined){
@@ -39,7 +53,7 @@
           }
         },
         export: function(){
-          var options = {collection: '*', format: this.format};
+          var options = {collection: '*', format: this.format, sessionID: this.session};
           if(this.eventEmitter !== undefined){
             this.eventEmitter.emit('plugin-blackbox-export',options);
           }

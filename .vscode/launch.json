@@ -15,10 +15,11 @@
 			],
 			"env": {
 				"NODE_ENV": "development",
-				"USE_MOCK": true,
-				"GEO_MOCK": true,
+				"USE_MOCK": "true",
+				"GEO_MOCK": "true",
 				"configfile": "/tmp/rovconfig.json",
-				"plugins__ui-manager__selectedUI": "new-ui"
+				"plugins__ui-manager__selectedUI": "new-ui",
+				"pluginsDownloadDirectory": "/tmp/plugins"
 			},
 			"externalConsole": false,
 			"sourceMaps": false,

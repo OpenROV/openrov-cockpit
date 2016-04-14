@@ -32,7 +32,7 @@ mjpegvideo.prototype.start = function start(){
         sleep: 1000
     })
     monitor.on('stdout', function(data){
-        console.log('STDOUT:' + data.toString('utf-8'));
+        // console.log('STDOUT:' + data.toString('utf-8'));
     })
     var self=this;
     monitor.on('stderr', function(data){
@@ -48,7 +48,7 @@ mjpegvideo.prototype.start = function start(){
       }
     })
     monitor.on('exit', function(){
-       console.log("mjpeg-video-server exit");
+    //    console.log("mjpeg-video-server exit");
     });
     monitor.on('crash', function(){
        console.log("mjpeg-video-server crash");

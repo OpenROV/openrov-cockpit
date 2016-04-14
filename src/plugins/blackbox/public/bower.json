@@ -17,7 +17,11 @@
   "dependencies": {
     "dexie": "~1.2.0",
     "comma-separated-values": "~3.6.4",
-    "fontawesome-iconset": "philya/font-awesome-polymer-icons#master"
+    "fontawesome-iconset": "philya/font-awesome-polymer-icons#master",
+    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^1.2.0",
+    "paper-menu": "PolymerElements/paper-menu#^1.2.2",
+    "paper-item": "PolymerElements/paper-item#^1.2.0",
+    "paper-listbox": "PolymerElements/paper-listbox#^1.1.2"
   },
   "resolutions": {
     "polymer": "^1.1.0",

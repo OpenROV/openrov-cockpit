@@ -1,3 +1,97 @@
+### How to develop without the embedded computer
+This section covers development on your laptop or desktop.  This approach passes flags to the cockpit process which replace actualy interfaces to the hardware with "mock" interfaces that act like the underlying hardware.
+
+Prerequsites:
+* You have done a git clone of the openrov-cockpit repository
+* Are *NOT* running as root (that requires additional flags when doing the install)
+* You are not running on ARM (there were some intel only developmen dependencies that will break the default install)
+
+Step 1: Installation
+You need to install all of the dependecies that are needed.  You do need an active internet connection when running this command.
+
+```
+npm install
+```
+
+This will go through all of the directories and look for bower.json files and package.json files and install them.  It will take a few minutes to run.  The goemux project will show some error messages when installing on Intel hardware.  Those can be ignored as the project is setup as an optional dependency and will just keep going.  The install should exit cleanly:
+
+```
+  │   ├── lodash@3.10.1
+  │   └── punycode@1.4.1
+  ├─┬ tap-parser@1.2.2
+  │ ├── events-to-array@1.0.2
+  │ └─┬ js-yaml@3.5.5
+  │   └── argparse@1.0.7
+  └── tmatch@2.0.1
+
+npm WARN OpenROV-Cockpit@30.1.0 No license field.
+[brian@Babs openrov-cockpit]$
+```
+
+The node process expects certian environment flags to be set to change its behavior.  You can override all of the setttings that are stored in the config files from the commandline.
+
+> Windows users: You have to setup the environment variables manually before executing the node command
+
+The minimal items that need to be specified to run in a mock mode are:
+* USE_MOCK=true : Cockpit will load mock dependencies in place of the real ones (which also generate fake runtime events)
+* configfile='<path'> : The location to read/write the rovconfig.json file.  Your account needs access to this location.
+
+```
+USE_MOCK=true configfile='/tmp/rovconfig.json' node src/cockpit.js
+```
+
+The minimal command line will start the node process, allowing you to connect to `http://localhost:8080` which will bring up the cockpit.  The mock dependencies will be sending fake data over the message bus causing compass dials to rotate etc.  The minimal command line will not start any video.
+
+Some of the more common advanced command line options:
+* GEO_MOCK=true : Starts the simulated MP4 video stream (a test pattern)
+* MJPEG_MOCK=true: Starts the simulated MJPEG video stream (rotating set of underwater images)
+* env plugins__ui-manager__selectedUI='classic-ui': Override the default theme that is loaded  (the env command on linux is needed since the theme name contains a dash.
+
+```
+USE_MOCK=true GEO_MOCK=true configfile='/tmp/rovconfig.json' env plugins__ui-manager__selectedUI='classic-ui'  node src/cockpit.js
+```
+
+### Debugging the node processes
+There are lots of tools for developing and debugging.  We include Cloud9 IDE on the ROV image that we distribute.  When developing locally pick your tool of choice.
+
+##### Using node inspector
+This NPM package will allow you to start a web server from the command-line that will allow debugging of a node process using a webkit based browser (Chrome, Firefox etc..). 
+
+To install: 
+```
+npm install -g node-inspector
+```
+
+To start node inspector:
+
+```
+node-inspector --web-port 3080
+```
+We need to specify a web-port option because node-inspector by default tries to listen for brower requests on port 8080 which happens to be what we use for cockpit.
+
+You then start the cockpit node process with the debug option (or --debug-brk if you want your process to pause until you connect your debugging session):
+
+```
+USE_MOCK=true configfile='/tmp/rovconfig.json' node src/cockpit.js --debug
+```
+
+You should now be able to open a browser window to `http://localhost:3080` and get a debugging session.  And then open another browser window to `http://localhost:8080` to start interacting with cockpit.
+
+##### Using node inspector with forever
+You can setup your debug session so that when you make code changes, the system magically and near instantly restarts and reloads cockpit in the background.
+
+You need to install forever
+```
+npm install -g forever
+```
+
+And you then change your command that start cockpit to let the forever program load it for you:
+
+```
+USE_MOCK=true configfile='/tmp/rovconfig.json' forever -w -c 'node --debug' src/cockpit.js
+```
+
+## Other developer tasks:
 ### Bulk upgrade node dependencies:
 https://docs.npmjs.com/cli/update
 

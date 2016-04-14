@@ -6,5 +6,6 @@
   "json": "json",
   "xml": "xml",
   "Choose format:": "Choose format:",
-  "Export": "Export"
+  "Export": "Export",
+  "Choose Session:": "Choose Session:"
 }

@@ -1,5 +1,7 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../paper-listbox/paper-listbox.html">
+<link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../orov-behaviors/orov-behavior.html">
 <dom-module name="orov-blackbox">
   <style>
@@ -8,25 +10,39 @@
     <lable>{{__('Black Box Controls')}}</label>
     <button on-click='start'>{{__('Start')}}</button>
     <button on-click='stop'>{{__('Stop')}}</button>
-    <paper-dropdown-menu label="{{__('Choose format:')}}">
-      <paper-menu class="dropdown-content" selected="{{format}}">
+    <paper-dropdown-menu id='cformat' label="{{__('Choose format:')}}">
+      <paper-listbox class="dropdown-content">
         <paper-item>{{__('csv')}}</paper-item>
         <paper-item>{{__('json')}}</paper-item>
         <paper-item>{{__('xml')}}</paper-item>
-      </paper-menu>
+      </paper-listbox>
+    </paper-dropdown-menu>
+    <paper-dropdown-menu id='csession' label="{{__('Choose Session:')}}">
+      <paper-listbox class="dropdown-content">
+        <template is="dom-repeat" items="{{sessions}}">
+          <paper-item>{{item.sessionID}}</paper-item>
+        </template>
+      </paper-listbox>
     </paper-dropdown-menu>
     <button on-click='export'>{{__('Export')}}</button>
-
   </template>
+
   <script>
     (function() {
       Polymer({
         is: "orov-blackbox",
         properties: {
-          format: {type: String, value: 'csv'}
+          format: {type: String, value: 'csv'},
+          sessions: {type: Array},
+          session: {type: String}
         },
         behaviors: [namespace('behaviors').oROVStandard],
         registerEmitterHanlders: function(emitter){
+          var self=this;
+          emitter.withHistory.on('plugin-blackbox-sessions',function(sessions){
+            self.sessions = sessions;
+            self.session = sessions.length>0?sessions[sessions.length-1].sessionID:'';
+          });
         },
         start: function(){
           if(this.eventEmitter !== undefined){
@@ -39,7 +55,7 @@
           }
         },
         export: function(){
-          var options = {collection: '*', format: this.format};
+          var options = {collection: '*', format: this.$.cformat.selectedItemLabel, sessionID: this.$.csession.selectedItemLabel};
           if(this.eventEmitter !== undefined){
             this.eventEmitter.emit('plugin-blackbox-export',options);
           }

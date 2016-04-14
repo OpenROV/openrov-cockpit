@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta charset="utf-8">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui" />
+		<link rel="manifest" href="manifest.webmanifest">
+
+		<script type='text/javascript' src="components/jquery/dist/jquery.js"></script>
+
+    <title><%= title %></title>
+
+		<!-- CSS -->
+		<link rel="stylesheet" href="plugin/data-viewer/css/style.css">
+	</head>
+
+	<script type='text/javascript' src="system-plugin/globalization/js/initGlobalization.js"></script>
+	<script type="text/javascript" src="components/webcomponentsjs/webcomponents-lite.js"></script>
+  <script type="text/javascript" src="js/libs/eventemitter2.js"></script>
+  <script type='text/javascript' src='js/eventEmitterStoreAndForward.js'></script>
+  <script type='text/javascript' src='js/utilities.js'></script>
+	<script>
+		// Use native shadowdom
+		window.Polymer = window.Polymer || {};
+		window.Polymer.dom = 'shadow';
+
+		// Prevent safari overscroll behaviour
+		document.ontouchmove = function(event)
+		{
+			event.preventDefault();
+		}
+
+		// Prevent context menu
+		window.oncontextmenu = function(event) {
+			event.preventDefault();
+			event.stopPropagation();
+			return false;
+		};
+	</script>
+<script>
+  window.Cockpit=new EventEmitter2();
+  window.Cockpit.plugins=[];
+</script>
+
+	<link rel="import" href="components/polymer/polymer.html">
+  <link rel="import" href="components/blackbox/orov-blackbox.html">
+  <link rel="import" href="components/video/orov-video.html">
+
+
+
+
+  <script type="text/javascript" src="system-plugin/globalization/js/globlization.js"></script>
+  <script type="text/javascript" src="plugin/blackbox/js/blackbox.js"></script>
+
+	<body>
+		<template id="t" is="dom-bind" strip-whitespace>
+      <orov-blackbox event-emitter="{{cockpitEventEmitter}}"/>
+		</template>
+	</body>
+
+  <script type="text/javascript" src="plugin/data-viewer/js/dataviewer.js"></script>
+
+</html>

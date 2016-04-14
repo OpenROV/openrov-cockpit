@@ -194,7 +194,7 @@
   }
 
   ROVpilot.prototype.altMenuDefaults = function altMenuDefaults() {
-    self=this;
+    var self=this;
     return [
       {
         label: 'Increment power level',
@@ -244,8 +244,8 @@
     });
 
 
-    this.rov.on('plugin.rovpilot.setPowerLevel', function(level){
-      self.cockpit.emit('plugin.rovpilot.setPowerLevel',level);
+    this.cockpit.on('plugin.rovpilot.setPowerLevel', function(level){
+      self.rov.emit('plugin.rovpilot.setPowerLevel',level);
     });
 
     this.cockpit.on('plugin.rovpilot.setThrottle',function(value){

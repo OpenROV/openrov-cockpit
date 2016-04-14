@@ -2,5 +2,6 @@
   "vout": "vout",
   "iout": "iout",
   "cpu": "cpu",
-  "cpuUsage": "cpuUsage"
+  "cpuUsage": "cpuUsage",
+  "deep": "deep"
 }

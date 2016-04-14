@@ -15,7 +15,9 @@ canTalkToATMEGAviaSPI(){
 
 export ROV_BOARD=custom
 
-if canTalkToATMEGAviaSPI
+
+canTalkToATMEGAviaSPI;
+if [ "$?" -eq 0 ];
 then
     export ROV_BOARD=board25
 else

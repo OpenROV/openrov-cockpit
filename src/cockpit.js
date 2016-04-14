@@ -43,18 +43,19 @@ var session = require('express-session');
 var bodyParser = require('body-parser');
 var multer = require('multer');
 var errorHandler = require('errorhandler');
+
+var pluginFolder = CONFIG.preferences.get('pluginsDownloadDirectory');
+
 app.use(express.static(__dirname + '/static/'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/photos', serveIndex(CONFIG.preferences.get('photoDirectory')));
-app.use('/photos', express.static(CONFIG.preferences.get('photoDirectory')));
 app.set('port', process.env.LISTEN_FDS > 0 ? 'systemd' : CONFIG.port);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs', { pretty: true });
 app.use(favicon(__dirname + '/static/favicon.ico'));
 app.use(logger('dev'));
 app.use('/components', express.static(path.join(__dirname, 'static/bower_components')));
-app.use('/components', express.static('/usr/share/cockpit/bower_components'));
+app.use('/components', express.static(pluginFolder));
 app.use('/components', express.static(path.join(__dirname, 'static/webcomponents')));
 
 app.use('/components', express.static(path.join(__dirname,'plugins/telemetry/public/bower_components')));
@@ -219,13 +220,15 @@ var sysscripts = ["bogus",
 */
 //
 //            "bower_components/webcomponentsjs/webcomponents.min.js",
-mkdirp.sync('/usr/share/cockpit/bower_components');
+
+
+mkdirp.sync(pluginFolder);
 
 var funcs = [
 //  loader.loadPlugins(path.join(__dirname, 'ui-plugins'), 'ui-plugin', deps),
   loader.loadPlugins(path.join(__dirname, 'system-plugins'), 'system-plugin', deps),
   loader.loadPlugins(path.join(__dirname, 'plugins'), 'plugin', deps),
-  loader.loadPlugins('/usr/share/cockpit/bower_components', 'community-plugin', deps, function (file) {
+  loader.loadPlugins(pluginFolder, 'community-plugin', deps, function (file) {
     return file.substring(0, 15) === 'openrov-plugin-';
   })
 ]

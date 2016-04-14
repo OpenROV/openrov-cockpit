@@ -35,9 +35,10 @@ The node process expects certian environment flags to be set to change its behav
 The minimal items that need to be specified to run in a mock mode are:
 * USE_MOCK=true : Cockpit will load mock dependencies in place of the real ones (which also generate fake runtime events)
 * configfile='<path'> : The location to read/write the rovconfig.json file.  Your account needs access to this location.
+* pluginsDownloadDirectory='/tmp/plugins' : Folder that will be created if missing, for downloading plugins
 
 ```
-USE_MOCK=true configfile='/tmp/rovconfig.json' node src/cockpit.js
+USE_MOCK=true configfile='/tmp/rovconfig.json' pluginsDownloadDirectory='/tmp/plugins' node src/cockpit.js
 ```
 
 The minimal command line will start the node process, allowing you to connect to `http://localhost:8080` which will bring up the cockpit.  The mock dependencies will be sending fake data over the message bus causing compass dials to rotate etc.  The minimal command line will not start any video.
@@ -48,16 +49,16 @@ Some of the more common advanced command line options:
 * env plugins__ui-manager__selectedUI='classic-ui': Override the default theme that is loaded  (the env command on linux is needed since the theme name contains a dash.
 
 ```
-USE_MOCK=true GEO_MOCK=true configfile='/tmp/rovconfig.json' env plugins__ui-manager__selectedUI='classic-ui'  node src/cockpit.js
+USE_MOCK=true GEO_MOCK=true configfile='/tmp/rovconfig.json' pluginsDownloadDirectory='/tmp/plugins' env plugins__ui-manager__selectedUI='classic-ui'  node src/cockpit.js
 ```
 
 ### Debugging the node processes
 There are lots of tools for developing and debugging.  We include Cloud9 IDE on the ROV image that we distribute.  When developing locally pick your tool of choice.
 
 ##### Using node inspector
-This NPM package will allow you to start a web server from the command-line that will allow debugging of a node process using a webkit based browser (Chrome, Firefox etc..). 
+This NPM package will allow you to start a web server from the command-line that will allow debugging of a node process using a webkit based browser (Chrome, Firefox etc..).
 
-To install: 
+To install:
 ```
 npm install -g node-inspector
 ```
@@ -72,7 +73,7 @@ We need to specify a web-port option because node-inspector by default tries to 
 You then start the cockpit node process with the debug option (or --debug-brk if you want your process to pause until you connect your debugging session):
 
 ```
-USE_MOCK=true configfile='/tmp/rovconfig.json' node src/cockpit.js --debug
+USE_MOCK=true configfile='/tmp/rovconfig.json' pluginsDownloadDirectory='/tmp/plugins' node src/cockpit.js --debug
 ```
 
 You should now be able to open a browser window to `http://localhost:3080` and get a debugging session.  And then open another browser window to `http://localhost:8080` to start interacting with cockpit.
@@ -88,7 +89,7 @@ npm install -g forever
 And you then change your command that start cockpit to let the forever program load it for you:
 
 ```
-USE_MOCK=true configfile='/tmp/rovconfig.json' forever -w -c 'node --debug' src/cockpit.js
+USE_MOCK=true configfile='/tmp/rovconfig.json' pluginsDownloadDirectory='/tmp/plugins' forever -w -c 'node --debug' src/cockpit.js
 ```
 
 ## Other developer tasks:

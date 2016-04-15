@@ -92,6 +92,17 @@ And you then change your command that start cockpit to let the forever program l
 USE_MOCK=true configfile='/tmp/rovconfig.json' pluginsDownloadDirectory='/tmp/plugins' forever -w -c 'node --debug' src/cockpit.js
 ```
 
+##### Using Visual Studio Code
+Visual Studio Code is a fairly decent Cross-Platform IDE that can be used for writing and debugging in a variety of languages, primarily Node.JS. The cockpit project contains a set of default configuration files for debugging in Mock mode. The steps to debug with VSC are:
+
+1. Install Visual Studio Code for your platform
+2. Open the openrov-cockpit project folder in VSC
+3. Hit F5 to start debugging
+4. The cockpit software can now be accessed as usual from http://localhost:8080
+5. Use VSC to place breakpoints, step through the code, inspect variables, and much more. See VSC docs for features.
+
+Additionally, there are plugins that allow debugging the code running in the browser in VSC as well, which we will provide instructions for in the future.
+
 ## Other developer tasks:
 ### Bulk upgrade node dependencies:
 https://docs.npmjs.com/cli/update

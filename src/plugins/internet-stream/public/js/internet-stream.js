@@ -24,7 +24,7 @@
       canBeDisabled: true, //allow enable/disable
       defaultEnabled: true
     };
-//    this.enabled = this.pluginDefaults.defaultEnabled;
+    this.enabled = false;
     this.connected = false;
     this.connecting = false;
     this.streaming = false;

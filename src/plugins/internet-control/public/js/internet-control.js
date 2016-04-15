@@ -23,7 +23,7 @@
         canBeDisabled: true, //allow enable/disable
         defaultEnabled: false
       };
-
+      this.enabled=false;
       this.connected = false;
       this.connecting = false;
       this.viewers = 0;
@@ -232,8 +232,18 @@
                     _self.rov.onAny(onAnyHandler);
 
                     //Since the video comes in via a different route...
+                    const webRTCDataChannelChunkLimit=16*1024; //16KB Chunk Recommendation
                     var videodataHanlder = function(data){
-                      p.sendemit('x-h264-video.data',data);
+                      var chunk_count = 1;
+                      var sliceend=0;
+                      var end = 0;
+                      while(end<data.byteLength){
+                        var sliceend = sliceend+webRTCDataChannelChunkLimit>data.byteLength?data.byteLength:sliceend+webRTCDataChannelChunkLimit
+                        var chunk = data.slice(end,sliceend);
+                        p.sendemit('x-h264-video.chunk',chunk_count,data.byteLength-sliceend,chunk);
+                        chunk_count++;
+                        end=sliceend;
+                      }
                     }
                     _self.cockpit.on('x-h264-video.data',videodataHanlder);
 

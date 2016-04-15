@@ -206,6 +206,15 @@
         telemetry: 'id++,timestamp,sessionID',
         mp4: 'id++,timestamp,sessionID',
         sessions: 'timestamp,sessionID'
+    }).upgrade(function(trans){
+      trans.navdata.each(function(data, cursor){
+        data.sessionID = 'pre-session'
+        cursor.update(data);
+      });
+      trans.telemetry.each(function(data, cursor){
+        data.sessionID = 'pre-session'
+        cursor.update(data);
+      });
     });
     return idb;
   }

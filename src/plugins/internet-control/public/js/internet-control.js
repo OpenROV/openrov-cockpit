@@ -106,15 +106,13 @@
               var io = window.io;
               var socket = io(self.settings.webRTCSignalServerURI);
               self.connecting = true;
-              var opts = {
-//                peerOpts: {
-//                  channelConfig: {
-//                    ordered: false,
-//                    maxRetransmits: 0
-//                  }
-//                },
-                autoUpgrade: false
-              }
+              var peerOpts= {
+                  channelConfig: {
+                    ordered: false,
+                    maxRetransmits: 0
+                  }
+                }
+
 
               var heartbeatInterval = null;
               socket.on('close',function(){
@@ -153,7 +151,7 @@
                 var pilot_sender_id = null;
 
                 socket.on('peer-connect-offer',function(peer_id,callback){
-                  var p = new Peer();
+                  var p = new Peer(peerOpts);
 
                   p.withHistory = {
                     on: function(event, fn) {

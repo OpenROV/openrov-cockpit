@@ -95,6 +95,7 @@ html, body
 	float: left;
 	position: relative;
 	left: 50%;
+	pointer-events: none;
 }
 
 .action-bar-container
@@ -103,6 +104,7 @@ html, body
 	position: relative;
 	left: -50%;
 	vertical-align: top;
+	
 }
 
 .action-bar-container div

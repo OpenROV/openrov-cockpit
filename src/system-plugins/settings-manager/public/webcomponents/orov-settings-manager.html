@@ -628,6 +628,7 @@
            fields.
         */
         _emitter.emit('plugin.settings-manager.getSettings',null,function(settings){
+          _self.$.form1.innerHTML='';
           _self.value = settings;
           _self.editorOptions['schema'] = schema;
           _self.editorOptions['theme'] = 'bootstrap3';

@@ -7,7 +7,7 @@ function video(name, deps) {
   this.cockpit = deps.cockpit; //explicitly calling out cockpit eventemitter
   var self=this;
   this.deps.rov.on('CameraRegistration',function(data){
-    console.log("Re-emitting CameraRegistration");
+    // console.log("Re-emitting CameraRegistration");
   	self.cockpit.emit('CameraRegistration',data);
   });
 

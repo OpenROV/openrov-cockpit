@@ -225,7 +225,7 @@
             fillColor = this.colors[this.colors.length - 1].color;
           }
           ;
-          if (!isNaN(indicatorWidth) && indicatorWidth >= 0) {
+          if (!isNaN(indicatorWidth) && isFinite( indicatorWidth ) && indicatorWidth >= 0) {
             $(this.$.indicator).css({ fill: fillColor });
             $(this.$.indicator).attr('width', indicatorWidth);
           }

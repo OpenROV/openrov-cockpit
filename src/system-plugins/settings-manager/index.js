@@ -12,6 +12,21 @@ var settingsManager = function settingsManager(name, deps) {
   this.preferences = getNameSpacedPreferences(deps.config);
 
   var self=this;
+
+  deps.app.get('/settings', function(req, res) {
+    var view =  __filename.substring(0, __filename.lastIndexOf("/")) + '/' + 'settings.ejs';
+
+    var pathInfo = deps.pathInfo();
+
+    res.render( view,
+    {
+        title: 'OpenROV ROV Settings',
+        scripts: pathInfo.scripts,
+        styles: pathInfo.styles,
+        sysscripts: pathInfo.sysscripts,
+        config: deps.config
+        } );
+    });
 }
 
 //Private functions

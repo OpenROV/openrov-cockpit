@@ -5,6 +5,7 @@ Prerequsites:
 * You have done a git clone of the openrov-cockpit repository
 * Are *NOT* running as root (that requires additional flags when doing the install)
 * You are not running on ARM (there were some intel only developmen dependencies that will break the default install)
+* If using the mock video options, FFMPEG needs to be installed on your machine.
 
 Step 1: Installation
 You need to install all of the dependecies that are needed.  You do need an active internet connection when running this command.

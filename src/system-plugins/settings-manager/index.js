@@ -160,7 +160,7 @@ settingsManager.prototype.listen = function listen(){
       self.loadSettings();
 //      self.deps.cockpit.emit('settings-change',self.settings);
 
-      if (fn!==undefined){
+      if (fn!==undefined && typeof(fn)=='function'){
         fn();
       }
     });

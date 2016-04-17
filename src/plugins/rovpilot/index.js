@@ -177,6 +177,29 @@
     }
   };
 
+  ROVPilot.prototype.getSettingSchema = function getSettingSchema(){
+    return [
+      {
+          "title": "ROV Pilot Settings",
+          "id" : "rovpilot",
+          "type": "object",
+          "properties": {
+              "exponentialSticks": {
+                  "type": "boolean",
+                  "title": "Use exponential gamepad sticks",
+                  "default": false
+              },
+              "exponentialRate": {
+                "type":"number",
+                "title":"The expontetial rate for mapping the stick",
+                "default":3
+              }
+          }
+      }
+    ]
+  };
+
+
   module.exports = function (name, deps) {
     return new ROVPilot(deps);
   };

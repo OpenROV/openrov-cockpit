@@ -19,5 +19,9 @@
   },
   "dependencies": {
     "polymer": "~1.4.0"
+  },
+  "resolutions": {
+    "polymer": "~1.4.0",
+    "webcomponentsjs": "^0.7.20"
   }
 }

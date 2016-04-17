@@ -28,6 +28,16 @@
   ROVpilot.prototype.inputDefaults = function inputDefaults() {
     var self = this;
     var rov = this;
+    function postProcessStickValues(input){
+      if (self.settings.exponentialSticks){
+        var s = Math.sign(input);
+        input=Math.pow(input,self.settings.exponentialRate);
+        if (Math.sign(input)!==s){
+          input = input * s;
+        }
+      }
+      return input;
+    }
     return [
       // Increment power level
       {
@@ -58,7 +68,7 @@
         description: 'Set throttle via axis input.',
         defaults: { gamepad: 'LEFT_STICK_Y' },
         axis: function (v) {
-          rov.cockpit.emit('plugin.rovpilot.setThrottle', -1 * v);
+          rov.cockpit.emit('plugin.rovpilot.setThrottle', -1 * postProcessStickValues(v));
         }
       },
 
@@ -81,7 +91,7 @@
         description: 'Turn the ROV via axis input.',
         defaults: { gamepad: 'LEFT_STICK_X' },
         axis: function (v) {
-          rov.cockpit.emit('plugin.rovpilot.setYaw', v);
+          rov.cockpit.emit('plugin.rovpilot.setYaw', postProcessStickValues(v));
         }
       },
 
@@ -117,7 +127,7 @@
         description: 'Bring the ROV shallower or deeper via axis input.',
         defaults: { gamepad: 'RIGHT_STICK_Y' },
         axis: function (v) {
-          rov.cockpit.emit('plugin.rovpilot.setLift', -1 * v);
+          rov.cockpit.emit('plugin.rovpilot.setLift', -1 * postProcessStickValues(v));
         }
       },
       // Lift up
@@ -225,6 +235,10 @@
 
     //We can also send our state updates with a timestamp if we figure out a way
     //to deal with the clocks not being in sync between the computer and the ROV.
+
+    this.cockpit.on('settings-change.rovpilot',function(settings){
+      self.settings=settings.rovpilot;
+    })
 
     //initial sync of state information
     this.rov.emit('plugin.rovpilot.getState', function(state){

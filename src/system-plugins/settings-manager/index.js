@@ -155,9 +155,10 @@ settingsManager.prototype.listen = function listen(){
         result[item]=settings[item];
         self.deps.config.preferences.set(PREFERENCES_NS+":"+item, settings[item]);
         self.deps.config.savePreferences();
-        self.deps.cockpit.emit('settings-change.'+item,result);
+//        self.deps.cockpit.emit('settings-change.'+item,result);
       };
-      self.deps.cockpit.emit('settings-change',self.settings);
+      self.loadSettings();
+//      self.deps.cockpit.emit('settings-change',self.settings);
 
       if (fn!==undefined){
         fn();

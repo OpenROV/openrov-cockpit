@@ -59,6 +59,10 @@ plugins.ExternalLights.prototype.inputDefaults = function (){
         self.cockpit.emit('plugin.externalLights.level',state.level);
       });
 
+      self.cockpit.on('plugin.externalLights.set',function(value){
+          cockpit.rov.emit('plugin.externalLights.set',value);
+      });
+
   };
 
   window.Cockpit.plugins.push(plugins.ExternalLights);

@@ -32,6 +32,10 @@ function Hardware() {
       hardware.emitStatus('LIGP:' + commandParts[1]/100);
       console.log('HARDWARE-MOCK return light status:'+  commandParts[1]/100);
     }
+    if (commandText === 'eligt') {
+      hardware.emitStatus('LIGPE:' + commandParts[1]/100);
+      console.log('HARDWARE-MOCK return elight status:'+  commandParts[1]/100);
+    }
     if (commandText === 'escp') {
       hardware.emitStatus('ESCP:' + commandParts[1]);
       console.log('HARDWARE-MOCK return ESC status:'+commandParts[1]);

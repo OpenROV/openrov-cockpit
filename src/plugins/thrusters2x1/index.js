@@ -44,7 +44,7 @@ thrusters2x1.prototype.getSettingSchema = function getSettingSchema(){
               "title:": "Port Motor",
               "type": "object",
               "properties": {
-                "reversed" : {"type": "boolean", "format": "checkbox"},
+                "reversed" : {"type":"boolean", "format": "checkbox","default":false},
                 "forward-modifier" : {"type":"number","default": 1},
                 "reverse-modifier" : {"type":"number","default": 2}
               }
@@ -53,7 +53,7 @@ thrusters2x1.prototype.getSettingSchema = function getSettingSchema(){
               "title:": "Port Motor",
               "type": "object",
               "properties": {
-                "reversed" : {"type": "boolean", "format": "checkbox"},
+                "reversed" : {"type":"boolean", "format": "checkbox","default":false},
                 "forward-modifier" : {"type":"number","default": 1},
                 "reverse-modifier" : {"type":"number","default": 2}
               }
@@ -62,7 +62,7 @@ thrusters2x1.prototype.getSettingSchema = function getSettingSchema(){
               "title:": "Port Motor",
               "type": "object",
               "properties": {
-                "reversed" : {"type": "boolean", "format": "checkbox"},
+                "reversed" : {"type":"boolean", "format": "checkbox","default":false},
                 "forward-modifier" : {"type":"number","default": 1},
                 "reverse-modifier" : {"type":"number","default": 2}
               }

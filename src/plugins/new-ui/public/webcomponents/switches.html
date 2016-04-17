@@ -150,6 +150,21 @@
                     }
                   }
                 },
+                XLE: {
+                  switchable: true,
+                  state: false,
+                  description: 'External LED lights on/off',
+                  events: [
+                    {message:'plugin.externalLights.level',fn: function(level){return level>0;}}
+                  ],
+                  switch: function (state) {
+                    if (self.eventEmitter !== undefined){
+                      var level = 1;
+                      if (state==true) level = 0;
+                      self.eventEmitter.emit('plugin.externalLights.set',level);
+                    }
+                  }
+                },
                 ESC: {
                   switchable: true,
                   state: false,
@@ -166,7 +181,24 @@
                       }
                     }
                   }
-                }
+                },
+                REC:{
+                  switchable: true,
+                  state: false,
+                  events: [
+                    {message:'plugin-blackbox-recording-status', fn: function(state){return state;}}
+                  ],
+                  description: 'ROV ESCs active/inactive',
+                  switch: function (state) {
+                    if (self.eventEmitter !== undefined){
+                      if (state) {
+                        self.eventEmitter.emit('plugin-blackbox-recording-stop');
+                      } else {
+                        self.eventEmitter.emit('plugin-blackbox-recording-start');
+                      }
+                    }
+                  }
+                },
               };
             }
           }

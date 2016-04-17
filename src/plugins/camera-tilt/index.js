@@ -23,7 +23,7 @@
     });
 
     var mapTiltServo = function (value) {
-      value = limit(value, -0.7, 0.7);
+      value = ArduinoHelper.limit(value, -0.7, 0.7);
       return ArduinoHelper.mapA(value, -1, 1, 1000, 2000);
     };
 
@@ -36,6 +36,8 @@
 
       var servoTilt = mapTiltServo(tilt);
       var command = 'tilt(' + servoTilt + ')';
+      
+      console.log( "tilt:" + servoTilt );
 
       deps.rov.send(command);
     };

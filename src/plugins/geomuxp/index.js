@@ -28,7 +28,7 @@ geomux.prototype.start = function start(){
     }
   }
 
-  var launch_options = [geoprogram];
+  var launch_options = ['nice','-1','node',geoprogram];
 
   const infinite=-1;
   var monitor = respawn(launch_options,{

@@ -6,7 +6,7 @@
   var head = document.getElementsByTagName("head")[0];
   var js = document.createElement("script");
   js.type = "text/javascript";
-  js.src = '/components/dexie/dist/latest/Dexie.js';
+  js.src = 'components/dexie/dist/latest/Dexie.js';
   head.appendChild(js);
 
   var Blackbox = function Blackbox(cockpit) {
@@ -309,6 +309,8 @@
 
   };
 
+  //TODO: Track this issue preventing easy download of large amounts of data.
+  //https://bugs.chromium.org/p/chromium/issues/detail?id=375297
   Blackbox.prototype._exportVideo = function _exportVideo(options,callback){
 
     var fakeClick = function fakeClick(anchorObj) {

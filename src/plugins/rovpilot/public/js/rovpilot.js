@@ -21,6 +21,10 @@
       roll: 0,
       strafe: 0
     };
+    var self=this;
+    this.cockpit.withHistory.on('settings-change.rovpilot',function(settings){
+      self.settings=settings.rovpilot;
+    })
 
   };
 
@@ -236,9 +240,10 @@
     //We can also send our state updates with a timestamp if we figure out a way
     //to deal with the clocks not being in sync between the computer and the ROV.
 
-    this.cockpit.on('settings-change.rovpilot',function(settings){
-      self.settings=settings.rovpilot;
-    })
+    if (this.setting === null){
+      setTimeout(this.listen.bind(this),1000);
+      return;
+    }
 
     //initial sync of state information
     this.rov.emit('plugin.rovpilot.getState', function(state){

@@ -4,6 +4,7 @@
   plugins.UIManager = function UIManager(cockpit) {
 
     this.cockpit = cockpit;
+    this.rov = cockpit.rov;
     this.name = 'ui-manager';   // for the settings
   };
 
@@ -22,6 +23,10 @@
       return item1==item2;
     }
     template.set('scriplet','cockpit');
+
+    this.rov.withHistory.on('ui-manager-applets',function(applets){
+      self.cockpit.emit('ui-manager-applets',applets);
+    });
 
   }
 

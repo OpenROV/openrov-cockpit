@@ -40,6 +40,11 @@ UIManager.prototype.start = function start(){
 
   this.deps.app.get('/', function (req, res) {
     var scriplets = self.getAppletsByTheme(self.getApplets(),theme);
+    //TODO: Add theme to the message so you can differentiate the applets by theme
+    //and ignore if it is not the theme you are using.
+    self.deps.cockpit.emit('ui-manager-applets',scriplets.filter(function(item){
+      return ['footer','header'].indexOf(item.name)==-1;
+    }));
 
     res.render(__dirname +'/base.ejs', {
       title: 'OpenROV ROV Cockpit',

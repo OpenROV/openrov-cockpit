@@ -36,8 +36,13 @@
 
   <script type="text/javascript" src="components/webcomponentsjs/webcomponents-lite.js"></script>
   <script>
-    window.Polymer = window.Polymer || {};
-    window.Polymer.dom = 'shadow';
+  //  window.Polymer = window.Polymer || {};
+  //  window.Polymer.dom = 'shadow';
+    //TODO: Do we need to look at https://github.com/Polymer/polymer/issues/1844
+    window.Polymer = {
+      dom: 'shadow',
+      lazyRegister: true
+    };
   </script>
   <script>window.openrovtheme='new-ui'</script>
   <link rel="import" href="components/polymer/polymer.html">
@@ -49,7 +54,21 @@
 <!--TODO: Add logic to support either popout or popin(swapping) of applets-->
 <div id='container'>
 <template id="t" is="dom-bind"  strip-whitespace>
-  <% for(var i=0; i<scriplets.length; i++) {%>
+  <%
+    var header = scriplets.find(function(item){return item.name=='header'});
+  %>
+  <%if (header !== undefined){ %>
+  <%- include(header.path,{
+    title: title,
+    scripts: scripts,
+    styles: styles,
+    sysscripts: sysscripts,
+    config: config
+  })%>
+  <%}%>
+
+  <% for(var i=0; i<scriplets.length; i++) {
+    if ((scriplets[i].name == 'header') || (scriplets[i].name == 'footer')){continue;}%>
   <template is="dom-if" restamp=true if="{{displaySection(scriplet,'<%= scriplets[i].name %>')}}">
 
   <%- include(scriplets[i].path,{
@@ -61,6 +80,19 @@
   }) %>
   </template>
   <% } %>
+
+  <%
+    var footer = scriplets.find(function(item){return item.name=='footer'});
+  %>
+  <%if (footer !== undefined){ %>
+  <%- include(footer.path,{
+    title: title,
+    scripts: scripts,
+    styles: styles,
+    sysscripts: sysscripts,
+    config: config
+  })%>
+  <%}%>
 </template>
 </div>
   </body>

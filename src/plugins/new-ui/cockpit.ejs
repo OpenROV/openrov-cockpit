@@ -14,25 +14,10 @@
 <link rel="import" href="components/settings-manager/orov-settings-manager.html">
 <link rel="import" href="components/thrusters2x1/orov-thrusters2x1-motortest.html">
 
-<link href="components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="themes/OpenROV/css/style.css">
-<!--link href="components/jquery/css/ui-lightness/jquery-ui-1.8.23.custom.css" rel="stylesheet" /-->
-<link rel="stylesheet" href="plugin/new-ui/css/style.css">
 
   <div id="UI" class="full-height">
         <div id="newuiBody" class="full-height">
           <div id="newuiContainer">
-            <div class="navbar navbar-inverse navbar-fixed-top navbar-collapse">
-              <div id="newuiTopbar" class="container"><div class="navbar-header"><a class="navbar-brand" href="#"><img src="themes/OpenROV/img/openrov.png" class="logo"><span class="navbar-titel">{{__('Cockpit')}}</span></a></div>
-
-                <div id="menu">
-                  <rov-menu id="menuitems" class="nav pull-right navbar-nav">
-                    <li><a href="#" id="show-settings" onclick="document.querySelector('#plugin-settings').open();">{{__('Settings')}}</a></li>
-                    <li><a href="#" id="show-diagnostic" onclick="document.querySelector('#diagnostic').open();">{{__('Diagnostic')}}</a></li>
-                  </rov-menu>
-                </div>
-              </div>
-            </div>
           </div>
           <div id="mainContent" class="full-height">
 

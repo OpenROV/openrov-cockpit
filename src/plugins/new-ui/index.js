@@ -3,7 +3,7 @@ function newUi(name, deps) {
 
   this.plugin={
     name: "new-ui",
-    type: "theme"
+    type: "theme",
   };
 
   deps.app.get('/new-ui/telemetry', function(req, res) {

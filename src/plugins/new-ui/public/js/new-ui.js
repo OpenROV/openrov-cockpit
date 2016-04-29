@@ -11,7 +11,7 @@
   };
 
   plugins.NewUI.prototype.listen = function listen(){
-    $('#t')[0]['cockpitEventEmitter'] = this.cockpit;
+//    $('#t')[0]['cockpitEventEmitter'] = this.cockpit;
 
     window.cockpit_int.i18n.loadNamespace('new-ui', function() {  });
     var key_s = window.cockpit_int.i18n.options.keyseparator;

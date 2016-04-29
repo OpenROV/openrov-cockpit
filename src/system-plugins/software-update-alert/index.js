@@ -34,4 +34,4 @@ function getPreferences(config) {
   console.log('Software Update plugin loaded preferences: ' + JSON.stringify(preferences));
   return preferences;
 }
-module.exports = softwareUpdate;
+module.exports = function(name,deps){return new softwareUpdate(name,deps)};

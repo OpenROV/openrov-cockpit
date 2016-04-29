@@ -63,7 +63,7 @@ app.use('/components/telemetry', express.static(path.join(__dirname,'plugins/tel
 app.use('/components/telemetry', serveIndex(path.join(__dirname,'plugins/telemetry/public/webcomponents')));
 console.log("!!!"+ path.join(__dirname, 'src/static/bower_components'));
 // Keep track of plugins js and css to load them in the view
-var scripts = [], styles = [];
+var scripts = [], styles = [], applets = [];
 var sysscripts = [];
 
 // setup required directories
@@ -81,7 +81,8 @@ var pathInfo = function()
   return {
       scripts: scripts,
       styles: styles,
-      sysscripts: sysscripts
+      sysscripts: sysscripts,
+      applets: applets
   }
 }
 
@@ -101,18 +102,7 @@ app.get('/config.js', function (req, res) {
   res.type('application/javascript');
   res.send('var CONFIG = ' + JSON.stringify(CONFIG));
 });
-app.get('/', function (req, res) {
-  var viewname = CONFIG.preferences.get("plugins:ui-manager").selectedUI;
-  viewname = viewname === undefined ? "new-ui" : viewname;
-  var view =  __dirname + '/plugins/'+viewname+'/index.ejs';
-  res.render(view, {
-    title: 'OpenROV Cockpit',
-    scripts: scripts,
-    styles: styles,
-    sysscripts: sysscripts,
-    config: CONFIG
-  });
-});
+
 //socket.io cross domain access
 app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
@@ -188,6 +178,7 @@ function addPluginAssets(result) {
     console.dir(asset);
     app.use('/' + asset.path, express.static(asset.assets));
   });
+  applets = applets.concat(result.applets)
   if (result.plugins !== undefined){
     deps.loadedPlugins=deps.loadedPlugins.concat(result.plugins);
   }

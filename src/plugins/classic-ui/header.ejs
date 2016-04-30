@@ -348,7 +348,7 @@ orov-thrustfactor{
   --thrustfactor-label-color: white;
 }
 </style>
-
+<link rel="import" href="components/ui-manager/orov-appletswitcher.html">
 
 <div id="header" class="navbar navbar-inverse navbar-fixed-top nav-collapse">
   <div class="navbar-inner">
@@ -366,6 +366,7 @@ orov-thrustfactor{
       <li><a href="#"><orov-blackbox-status class="pull-left" event-emitter="{{cockpitEventEmitter}}"></orov-blackbox-status></a></li>
     </ul>
     <rov-menu id="menuitems" class="nav pull-right">
+    <li><orov-appletswitcher event-emitter="{{cockpitEventEmitter}}" selection="{{routedata.page}}"></orov-appletswitcher></li>
     </rov-menu>
 
   </div>

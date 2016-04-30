@@ -36,15 +36,16 @@ UIManager.prototype.start = function start(){
 
   var pathInfo = this.deps.pathInfo();
 
-  var theme = this.deps.config.preferences.get("plugins:ui-manager").selectedUI;
-  theme = theme === undefined ? "new-ui" : viewname;
+
 
   this.deps.app.get('/', function (req, res) {
+    var theme = self.deps.config.preferences.get("plugins:ui-manager").selectedUI;
+    theme = theme === undefined ? "new-ui" : theme;
     var scriplets = self.getAppletsByTheme(self.getApplets(),theme);
     //TODO: Add theme to the message so you can differentiate the applets by theme
     //and ignore if it is not the theme you are using.
     self.deps.cockpit.emit('ui-manager-applets',scriplets.filter(function(item){
-      return ['footer','header'].indexOf(item.name)==-1;
+      return ['footer','header','head'].indexOf(item.name)==-1;
     }));
 
     res.render(__dirname +'/base.ejs', {

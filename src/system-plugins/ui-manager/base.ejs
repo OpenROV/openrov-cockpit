@@ -9,7 +9,18 @@
     <script type='text/javascript' src="components/jquery/dist/jquery.js"></script>
     <!--script type='text/javascript' src="components/jquery-ui/jquery-ui.min.js"></script-->
     <title><%= title %></title>
-
+    <%
+      var head = scriplets.find(function(item){return item.name=='head'});
+    %>
+    <%if (header !== undefined){ %>
+    <%- include(head.path,{
+      title: title,
+      scripts: scripts,
+      styles: styles,
+      sysscripts: sysscripts,
+      config: config
+    })%>
+    <%}%>
   </head>
 
   <script type='text/javascript' src="js/libs/eventemitter2.js"></script>
@@ -56,8 +67,6 @@
 <link rel="import" href="components/carbon-route/carbon-location.html">
 <carbon-location use-hash-as-path route={{route}}></carbon-location>
 <carbon-route route="{{route}}" pattern="/:page" data={{routedata}} active="{{homeActive}}"></carbon-route>
-
-<span>{{routedata.page}}</span>
   <%
     var header = scriplets.find(function(item){return item.name=='header'});
   %>
@@ -72,7 +81,7 @@
   <%}%>
 
   <% for(var i=0; i<scriplets.length; i++) {
-    if ((scriplets[i].name == 'header') || (scriplets[i].name == 'footer')){continue;}%>
+    if ((scriplets[i].name == 'header') || (scriplets[i].name == 'footer')|| (scriplets[i].name == 'head')){continue;}%>
   <template is="dom-if" restamp=true if="{{displaySection(routedata.page,'<%= scriplets[i].name %>')}}">
 
   <%- include(scriplets[i].path,{

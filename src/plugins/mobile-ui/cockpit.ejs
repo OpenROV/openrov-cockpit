@@ -1,4 +1,4 @@
-	<link rel="stylesheet" href="plugin/mobile-ui/css/style.css">
+
 		<script>
 		window.openrovtheme = 'mobile-ui';
 
@@ -18,7 +18,6 @@
 
 	<!-- Web components -->
 	<link rel="import" href="components/video/orov-video.html">
-	<link rel="import" href="components/mobile-ui/settings-menu/settings-menu.html">
 	<link rel="import" href="components/mobile-ui/dual-thumbstick/dual-thumbstick.html">
 	<link rel="import" href="components/mobile-ui/orov-window/orov-window.html">
 	<link rel="import" href="components/mobile-ui/orov-mobile-compass/orov-mobile-compass.html">
@@ -26,7 +25,7 @@
 	<link rel="import" href="components/mobile-ui/orov-mobile-battery/orov-mobile-battery.html">
 	<link rel="import" href="components/mobile-ui/orov-mobile-controls.html">
 	<link rel="import" href="components/internet-control/orov-internetControl-status.html">
-	<link rel="import" href="components/ui-manager/orov-appletswitcher.html">
+
 
 			<!-- Video Layer -->
 			<div id="layer-vid" class="layer-no-input fill" style="z-index: 10">
@@ -47,12 +46,6 @@
 
 			<!-- UI Layer -->
 			<div id="layer-ui" class="layer fill" style="z-index: 40">
-
-				<!--Top-->
-				<div id="ui-top" class="rel-layer" style="" style="z-index: 20">
-					<orov-appletswitcher event-emitter="{{cockpitEventEmitter}}" selection="{{routedata.page}}"></orov-appletswitcher>
-					<settings-menu event-emitter="{{cockpitEventEmitter}}"></settings-menu>
-				</div>
 
 				<!--Bottom-->
 				<div id="ui-bot" class="rel-layer fill" style="z-index: 10">

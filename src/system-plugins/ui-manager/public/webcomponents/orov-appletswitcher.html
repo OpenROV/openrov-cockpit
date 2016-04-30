@@ -20,7 +20,7 @@
 <template>
     <grid-menu trigger-icon="apps">
       <template is="dom-repeat" items="{{applets}}">
-			<grid-menu-button label="{{__(item.name)}}" action="page-change" target="{{item.name}}" icon="maps:place"></grid-menu-button>
+			<grid-menu-button label="{{__(item.name)}}" action="page-change" target="{{item.name}}" icon="{{item.iconMeta}}"></grid-menu-button>
       </template>
 		</grid-menu>
 </template>

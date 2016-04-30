@@ -4,12 +4,24 @@
 <link rel="stylesheet" href="plugin/new-ui/css/style.css">
 
 <link rel="import" href="components/ui-manager/orov-appletswitcher.html">
+
+<!--This example shows how to selectivly apply settings per applet that override the overall style sheet-->
+<template is="dom-if" restamp=true if="{{displaySection(routedata.page,'settings')}}">
+<style>
+body {
+    position: relative;
+    margin: 20px;
+}
+</style>
+</template>
+
+
 <div class="navbar navbar-inverse navbar-fixed-top navbar-collapse">
   <div id="newuiTopbar" class="container"><div class="navbar-header"><a class="navbar-brand" href="#"><img src="themes/OpenROV/img/openrov.png" class="logo"><span class="navbar-titel">{{__('Cockpit')}}</span></a></div>
 
     <div id="menu">
       <div id="menuitems" class="nav pull-right navbar-nav">
-        <li><orov-appletswitcher event-emitter="{{cockpitEventEmitter}}" selection="{{scriplet}}"></orov-appletswitcher></li>
+        <li><orov-appletswitcher event-emitter="{{cockpitEventEmitter}}" selection="{{routedata.page}}"></orov-appletswitcher></li>
       </div>
     </div>
   </div>

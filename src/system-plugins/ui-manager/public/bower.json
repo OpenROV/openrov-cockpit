@@ -17,7 +17,8 @@
   "dependencies": {
     "paper-item": "PolymerElements/paper-item#^1.2.1",
     "iron-icon": "PolymerElements/iron-icon#^1.0.8",
-    "polymer-font-awesome-icons": "philya/font-awesome-polymer-icons#^4.2.0-b2"
+    "polymer-font-awesome-icons": "philya/font-awesome-polymer-icons#^4.2.0-b2",
+    "carbon-route": "PolymerElements/carbon-route#^0.8.4"
   },
   "resolutions": {
     "polymer": "1.4.0",

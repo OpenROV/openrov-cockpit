@@ -22,7 +22,7 @@
     template.displaySection= function displaySection(item1,item2){
       return item1==item2;
     }
-    template.set('scriplet','cockpit');
+    template.set('routedata.page','cockpit');
 
     this.rov.withHistory.on('ui-manager-applets',function(applets){
       self.cockpit.emit('ui-manager-applets',applets);

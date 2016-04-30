@@ -1,5 +1,6 @@
 var PREFERENCES = 'plugins:ui-manager';
 const path = require('path');
+const fs = require('fs');
 function UIManager(name, deps) {
   console.log('UI Manager plugin started.');
   var preferences = getPreferences(deps.config);
@@ -63,15 +64,15 @@ UIManager.prototype.getAppletsByTheme = function getAppletsByTheme(applets,theme
   //This overrides any applet with those in the theme folder
   var result = {};
   applets.base.forEach(function(item){
-    result[item.name] = item.path
+    result[item.name] = item;
   });
   if (applets[theme] !== undefined){
     applets[theme].forEach(function(item){
-      result[item.name] = item.path
+      result[item.name] = item;
     });
   }
 
-  return Object.keys(result).map(function (key) {return {name:key, path: result[key]}});
+  return Object.keys(result).map(function (key) {return result[key]});
 }
 
 UIManager.prototype.getApplets = function getApplets(){
@@ -90,8 +91,9 @@ UIManager.prototype.getApplets = function getApplets(){
     result[rpath] = result[rpath].concat(plugin._raw.applets.map(function(item){
       console.log('adding: ' + rpath + ': ' +item);
       return {
-        name: path.basename(item,'.ejs'),
-        path: item
+        name: path.basename(item.path,'.ejs'),
+        path: item.path,
+        iconMeta: item.icon === undefined? null : fs.readFileSync(item.icon,'utf8').replace(/(\r\n|\n|\r)/gm,"")
       };
     })
     );

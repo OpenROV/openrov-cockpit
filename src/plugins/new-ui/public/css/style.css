@@ -6,6 +6,11 @@
     color: white;
 }
 
+
+#newuiTopbar {
+  width:100%;
+}
+
 .navbar-fixed-top .navbar-inner {
     height: 30px;
 }

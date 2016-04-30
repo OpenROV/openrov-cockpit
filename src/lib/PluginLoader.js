@@ -54,7 +54,12 @@ var PluginLoader = function() {
 
             fs.readdirSync(path.join(dir, plugin)).filter(getFilter('ejs')).forEach(function (ejs) {
               result.applets.push(dir + '/' + plugin + '/' + ejs);
-              pluginInstance._raw.applets.push(dir + '/' + plugin + '/' + ejs);
+              if (fs.existsSync(ejsicon = path.join(dir, plugin, ejs + '.icon'))) {
+                pluginInstance._raw.applets.push({path: dir + '/' + plugin + '/' + ejs, icon:ejsicon});
+              } else {
+                pluginInstance._raw.applets.push({path: dir + '/' + plugin + '/' + ejs});
+              }
+
             });
 
             //Note the asset is set in the if check and used by the css and js search

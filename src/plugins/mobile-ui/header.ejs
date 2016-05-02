@@ -2,7 +2,7 @@
 <link rel="import" href="components/ui-manager/orov-appletswitcher.html">
 <link rel="import" href="components/mobile-ui/settings-menu/settings-menu.html">
 
-<div id="ui-top-holder">
+<div id="ui-top-holder" style="display: flex">
 <div id="ui-top" class="rel-layer" style="z-index: 20">
   <orov-appletswitcher event-emitter="{{cockpitEventEmitter}}" selection="{{routedata.page}}"></orov-appletswitcher>
   <settings-menu event-emitter="{{cockpitEventEmitter}}"></settings-menu>
@@ -17,4 +17,14 @@
   display: flex;
 }
 </style>
+</template>
+
+<!--This example shows how to selectivly apply settings per applet that override the overall style sheet-->
+<template is="dom-if" restamp=true if="{{displaySection(routedata.page,'settings')}}">
+<style>
+body {
+    overflow: scroll;
+}
+</style>
+
 </template>

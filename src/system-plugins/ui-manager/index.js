@@ -42,6 +42,7 @@ UIManager.prototype.start = function start(){
     var scriplets = self.getAppletsByTheme(self.getApplets(),theme);
     //TODO: Add theme to the message so you can differentiate the applets by theme
     //and ignore if it is not the theme you are using.
+    //TODO: Look for applet.ejs.disable in a theme to remove the applet option.
     self.deps.cockpit.emit('ui-manager-applets',scriplets.filter(function(item){
       return ['footer','header','head'].indexOf(item.name)==-1;
     }));

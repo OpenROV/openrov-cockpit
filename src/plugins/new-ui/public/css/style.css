@@ -90,6 +90,11 @@ a .navbar-titel {
     margin-top: 8px;
 }
 
+orov-newui-switches {
+  margin-top: 10px;
+  display: flex;
+}
+
 #newui-time {
     top: -35px;
     margin-bottom: -30px;

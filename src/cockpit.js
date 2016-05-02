@@ -1,4 +1,4 @@
-/*
+ /*
  *
  * Description:
  * This script is the Node.js server for OpenROV.  It creates a server and instantiates an OpenROV
@@ -118,18 +118,7 @@ if (connections == 1)
   controller.start();
 // opens socket with client
 
-deps.cockpit.emit('settings', CONFIG.preferences.get());
 
-deps.cockpit.on('update_settings', function (value) {
-  for (var property in value)
-    if (value.hasOwnProperty(property))
-      CONFIG.preferences.set(property, value[property]);
-  CONFIG.savePreferences();
-  controller.updateSetting();
-  setTimeout(function () {
-    controller.requestSettings();
-  }, 1000);
-});
 deps.cockpit.on('disconnect', function () {
   connections -= 1;
   console.log('disconnect detected');
@@ -138,19 +127,6 @@ deps.cockpit.on('disconnect', function () {
 });
 controller.on('rovsys', function (data) {
   deps.cockpit.emit('rovsys', data);
-});
-controller.on('Arduino-settings-reported', function (settings) {
-  deps.cockpit.emit('settings', settings);
-});
-controller.on('settings-updated', function (settings) {
-  deps.cockpit.emit('settings', settings);
-});
-globalEventLoop.on('videoStarted', function () {
-  deps.cockpit.emit('videoStarted');
-  console.log('sent videoStarted to client');
-});
-globalEventLoop.on('videoStopped', function () {
-  deps.cockpit.emit('videoStopped');
 });
 
 if (process.platform === 'linux') {
@@ -184,33 +160,6 @@ function addPluginAssets(result) {
   }
 }
 var loader = new PluginLoader();
-
-/*Order does matter in the script loading below*/
-
-/*
-var sysscripts = ["bogus",
-          "js/libs/eventemitter2.js",
-           "bower_components/jquery/dist/jquery.min.js",
-           "bower_components/jquery-ui//jquery-ui.min.js",
-           "js/libs/bootstrap.min.js",
-           "js/libs/mousetrap.min.js",
-           'bower_components/knockoutjs/dist/knockout.js',
-           "bower_components/knockout.validation/Dist/knockout.validation.js",
-           'js/knockout-extentions.js',
-           'js/libs/db.js',
-           "js/libs/IndexedDBShim.min.js",
-           "config.js",
-           "socket.io/socket.io.js",
-           'js/libs/gamepad.js',
-           'js/utilities.js',
-           'js/message-manager.js',
-    //       'js/ui-loader.js',
-           "js/cockpit.js",
-           'js/app.js'
-         ];
-*/
-//
-//            "bower_components/webcomponentsjs/webcomponents.min.js",
 
 
 mkdirp.sync(pluginFolder);

@@ -77,25 +77,6 @@
             </div>
           </div>
 
-          <rov-diagnostics id="diagnostic">
-            <div class="settings-block">
-              <h4>{{__('Pre-Flight Check')}}</h4>
-            </div>
-            <div>
-              <orov-thrusters2x1-motortest event-emitter="{{cockpitEventEmitter}}"></orov-thrusters2x1-motortest>
-            </div>
-            <div class="settings-block">
-              <h4>{{__('Callibration')}}</h4>
-              <a href="#" class="btn btn-default" id="callibrate_compass">{{__('Callibrate Compass')}}</a>
-              <a href="#" class="btn btn-default" id="zero_depth">{{__('Zero Depth')}}</a>
-            </div>
-          </rov-diagnostics>
-
-          <drop-in-dialog id="plugin-settings" header="Settings">
-            <div>
-            <orov-settings-manager event-emitter="{{cockpitEventEmitter}}"></orov-settings-manager>
-          </div>
-          </drop-in-dialog>
         </div>
 
       </div> <!--Placeholder for the UI plugin-->

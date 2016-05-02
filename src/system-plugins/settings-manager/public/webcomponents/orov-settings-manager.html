@@ -5,18 +5,20 @@
 <link rel="import" href="../paper-toast/paper-toast.html">
 <link rel="import" href="foundationcss.html">
 <link rel="import" href="normalizecss.html">
+<script src="../json-editor/dist/jsoneditor.js"></script>
 <!-- Foundation CSS framework (Bootstrap and jQueryUI also supported) -->
 
 <dom-module name="orov-settings-manager">
 <template>
 <style include="foundation5-styles"></style>
 <style include="normalized-styles"></style>
-<script src="../json-editor/dist/jsoneditor.js"></script>
 
 
+  <paper-toast id="toast"></paper-toast>
   <div id='form1'>
+
   </div>
-  <paper-toast id="toast" text="Settings saved"></paper-toast>
+
 </template>
 <script>
 (function() {
@@ -80,7 +82,7 @@
       if (this.eventEmitter !== undefined){
         this.eventEmitter.emit('plugin.settings-manager.persist-data',data);
       }
-      this.$.toast.open();
+      this.$.toast.show('Settings Saved');
     },
     attached: function(){
       var self = this;

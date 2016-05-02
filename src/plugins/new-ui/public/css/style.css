@@ -61,7 +61,7 @@ a .navbar-titel {
     text-align: center;
     font-size: 1.2vw;
     color: white;
-    top: -2.9vh;
+    top: -2.1vh;
 
     background-color: black;
     padding: 5px 10px;
@@ -90,4 +90,8 @@ a .navbar-titel {
 #newui-time {
     top: -35px;
     margin-bottom: -30px;
+}
+
+iron-a11y-announcer {
+  display: none
 }

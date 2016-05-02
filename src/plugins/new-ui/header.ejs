@@ -1,18 +1,21 @@
 <link href="components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="themes/OpenROV/css/style.css">
+
+<link rel="stylesheet" href="plugin/new-ui/css/classicstyle.css">
 <!--link href="components/jquery/css/ui-lightness/jquery-ui-1.8.23.custom.css" rel="stylesheet" /-->
 <link rel="stylesheet" href="plugin/new-ui/css/style.css">
 
 <link rel="import" href="components/ui-manager/orov-appletswitcher.html">
 
 <!--This example shows how to selectivly apply settings per applet that override the overall style sheet-->
-<template is="dom-if" restamp=true if="{{displaySection(routedata.page,'settings')}}">
+<template is="dom-if" restamp=true if="{{!displaySection(routedata.page,'cockpit')}}">
 <style>
 body {
     position: relative;
     margin: 20px;
+    background-color: white;
 }
 </style>
+
 </template>
 
 

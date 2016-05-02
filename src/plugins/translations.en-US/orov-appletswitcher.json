@@ -8,5 +8,6 @@
   "network": "network",
   "social": "social",
   "update": "update",
-  "vr": "vr"
+  "vr": "vr",
+  "diagnostics": "diagnostics"
 }

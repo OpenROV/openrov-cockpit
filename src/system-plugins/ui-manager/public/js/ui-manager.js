@@ -23,6 +23,10 @@
       return item1==item2;
     }
     template.set('routedata.page','cockpit');
+    if (window.location.path="/"){
+      window.location.replace ('#/cockpit');
+    }
+
 
     this.rov.withHistory.on('ui-manager-applets',function(applets){
       self.cockpit.emit('ui-manager-applets',applets);

@@ -28,13 +28,16 @@
     },
     attached: function () {
       //Added a new lifecycle event for the control:
-//      if (this.eventEmitter !== undefined && this.registerEmitterHanlders !== undefined) {
-//        this.registerEmitterHanlders(this.eventEmitter);
-        console.log('OROV-BEHAVIOR: Registerd eventEmitter');
-//        }
+      if (this.eventEmitter !== undefined && this.registerEmitterHanlders !== undefined) {
+        this.registerEmitterHanlders(this.eventEmitter);
+      }
+      console.log('OROV-BEHAVIOR: Registerd eventEmitter');
+      this.processedAttached=true;
     },
     _eventEmitterChanged: function (newvalue, oldvalue) {
       var self = this;
+      if(this.processedAttached!==true)
+        return;
       if (newvalue.on === undefined)
         return;
       if (oldvalue === newvalue)

@@ -51,6 +51,7 @@ a .navbar-titel {
 .newui-item {
     border: 1px solid white;
     margin: 15px;
+    text-align: center;
 }
 
 #newui-depth {
@@ -58,15 +59,13 @@ a .navbar-titel {
 }
 
 .newui-item h4 {
-    text-align: center;
-    font-size: 1.2vw;
+    font-size: 1.1vw;
     color: white;
-    top: -2.1vh;
+    top: -2.9vh;
 
     background-color: black;
     padding: 5px 10px;
     display: inline-block;
-    left: 1vw;
     /*width: 33%;*/
     margin-right: auto;
     margin-left: auto;
@@ -85,6 +84,10 @@ a .navbar-titel {
 
 #newui-compass {
     margin-bottom: -45px;
+}
+
+#newui-power {
+    margin-top: 8px;
 }
 
 #newui-time {

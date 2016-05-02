@@ -22,7 +22,7 @@
     template.displaySection= function displaySection(item1,item2){
       return item1==item2;
     }
-    template.set('routedata.page','cockpit');
+//    template.set('routedata.page','cockpit');
     if (window.location.path="/"){
       window.location.replace ('#/cockpit');
     }

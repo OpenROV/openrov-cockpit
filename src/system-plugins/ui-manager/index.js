@@ -36,8 +36,6 @@ UIManager.prototype.start = function start(){
 
   var pathInfo = this.deps.pathInfo();
 
-
-
   this.deps.app.get('/', function (req, res) {
     var theme = self.deps.config.preferences.get("plugins:ui-manager").selectedUI;
     theme = theme === undefined ? "new-ui" : theme;

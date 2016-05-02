@@ -18,7 +18,7 @@
   }
 </style>
 <template>
-    <grid-menu trigger-icon="apps">
+    <grid-menu trigger-icon="apps" horizontal-offset=[[horizontalOffset]]>
       <template is="dom-repeat" items="{{applets}}">
 			<grid-menu-button label="{{__(item.name)}}" action="page-change" target="{{item.name}}" icon="{{item.iconMeta}}"></grid-menu-button>
       </template>
@@ -33,7 +33,8 @@
     properties: {
       applets: {type: Array, value: []},
       showSelection: {type: Boolean, value: true},
-      selection: {type: String, value: '', notify: true}
+      selection: {type: String, value: '', notify: true},
+      horizontalOffset: {type: Number}
     },
     listeners:
     {

@@ -104,7 +104,8 @@ html, body
 	position: relative;
 	left: -50%;
 	vertical-align: top;
-	
+  display: inline-table;
+
 }
 
 .action-bar-container div

@@ -348,6 +348,14 @@ orov-thrustfactor{
   --thrustfactor-label-color: white;
 }
 </style>
+
+<template is="dom-if" restamp=true if="{{displaySection(routedata.page,'settings')}}">
+<style>
+body {
+    overflow: scroll;
+}
+</style>
+</template>
 <link rel="import" href="components/ui-manager/orov-appletswitcher.html">
 
 <div id="header" class="navbar navbar-inverse navbar-fixed-top nav-collapse">

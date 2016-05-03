@@ -62,10 +62,11 @@
   <body>
 <!--TODO: Add logic to support either popout or popin(swapping) of applets-->
 <template id="t" is="dom-bind"  strip-whitespace>
-<link rel="import" href="components/carbon-route/carbon-route.html">
+<!-- Temporarily disabled pending solution for relative pathing -->
+<!--link rel="import" href="components/carbon-route/carbon-route.html">
 <link rel="import" href="components/carbon-route/carbon-location.html">
 <carbon-location use-hash-as-path url-space-regex="^/#/" route={{route}}></carbon-location>
-<carbon-route route="{{route}}" pattern="/:page" data={{routedata}} active="{{homeActive}}"></carbon-route>
+<carbon-route route="{{route}}" pattern="/:page" data={{routedata}} active="{{homeActive}}"></carbon-route-->
   <%
     var header = scriplets.find(function(item){return item.name=='header'});
   %>

@@ -22,10 +22,10 @@
     template.displaySection= function displaySection(item1,item2){
       return item1==item2;
     }
-//    template.set('routedata.page','cockpit');
-    if ((window.location.pathname=="/") && (window.location.hash=='')){
-      window.location.replace ('#/cockpit');
-    }
+    template.set('routedata.page','cockpit');
+//    if ((window.location.pathname=="/") && (window.location.hash=='')){
+//      window.location.replace ('#/cockpit');
+//    }
 
 
     this.rov.withHistory.on('ui-manager-applets',function(applets){

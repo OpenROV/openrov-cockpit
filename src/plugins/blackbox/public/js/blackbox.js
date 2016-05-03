@@ -9,6 +9,11 @@
   js.src = 'components/dexie/dist/latest/Dexie.js';
   head.appendChild(js);
 
+  var js = document.createElement("script");
+  js.type = "text/javascript";
+  js.src = 'components/comma-separated-values/csv.min.js';
+  head.appendChild(js);
+
   var Blackbox = function Blackbox(cockpit) {
     console.log('Loading Blackbox plugin.');
     this.cockpit = cockpit;
@@ -35,7 +40,7 @@
   Blackbox.prototype.listen = function listen() {
     var self = this;
 
-    if (window.Dexie===undefined){
+    if ((window.Dexie===undefined) || (window.CSV===undefined)){
 //      $.getScript('/components/dexie/dist/latest/Dexie.js',function(){
 //        self.listen();
 //      });
@@ -288,6 +293,7 @@
       var link = document.createElement("A");
       link.setAttribute('href', window.URL.createObjectURL(blob));
       link.setAttribute('download',name);
+      link.setAttribute('target','_blank');
       //download="data.json"
       //link.attr('href', window.URL.createObjectURL(blob));
       document.body.appendChild(link);

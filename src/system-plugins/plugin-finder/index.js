@@ -110,4 +110,6 @@ function getPreferences(config) {
   console.log('Plugin Finder loaded preferences: ' + JSON.stringify(preferences));
   return preferences;
 }
-module.exports = pluginFinder;
+module.exports = function(name,deps){
+  return new pluginFinder(name,deps);
+}

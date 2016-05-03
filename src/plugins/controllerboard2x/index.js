@@ -12,6 +12,7 @@
       //time
     });
 
+
   };
 
   var SystemPower = function SystemPower(name,deps){
@@ -48,7 +49,8 @@
     //types and inject them in to the schema.  TODO: signal an update
     //to the schema that is caches in several spots when a Battery
     //is changed.
-    BatteryOptions = [];
+
+    BatteryOptions = ['TrustFire','LiFePO4'];
     var b = this.config.preferences.get(PREFERENCES_NS);
     if ('batteryDefintions' in b){
       b.batteryDefintions.batteries.forEach(function(bat){
@@ -87,12 +89,26 @@
           },
           "required": [
             "0"
+          ],
+          "default": [
+            {
+              "name": "TrustFire",
+              "minVoltage": 8,
+              "maxVoltage": 13
+            },
+            {
+              "name": "LiFePO4",
+              "minVoltage": 7,
+              "maxVoltage": 10
+            }
           ]
+
         },
         "selectedBattery" : {
           "id" : "selectedBattery",
           "type" : "string",
-          "enum" : BatteryOptions
+          "enum" : BatteryOptions,
+          "default" : "LiFePO4"
         }
       },
       "required": [

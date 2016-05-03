@@ -1,0 +1,120 @@
+
+    <link rel="import" href="components/video/orov-video.html">
+    <link rel="import" href="components/navigation-data/orov-horizon.html">
+    <link rel="import" href="components/drop-in-dialog/drop-in-dialog.html">
+    <link rel="import" href="components/menu/menu.html">
+    <link rel="import" href="components/navigation-data/topdowncompass.html">
+    <link rel="import" href="components/connection-health/orov-ping-graph.html">
+    <link rel="import" href="components/serial-monitor/orov-serial-monitor.html">
+    <link rel="import" href="components/telemetry/orov-telemetry-monitor.html">
+    <link rel="import" href="components/telemetry/telemetry-item.html">
+    <link rel="import" href="components/controllerboard2x/orov-time.html">
+    <link rel="import" href="components/controllerboard2x/orov-battery-status.html">
+    <link rel="import" href="components/connection-health/orov-connection-health.html">
+    <link rel="import" href="components/camera-tilt/orov-servo-tilt.html">
+    <link rel="import" href="components/externallights/orov-external-brightness-indicator.html">
+    <link rel="import" href="components/lasers/orov-lasers.html">
+    <link rel="import" href="components/classic-ui/gamepad.html">
+    <link rel="import" href="components/classic-ui/holds.html">
+    <link rel="import" href="components/rovpilot/orov-thrustfactor.html">
+    <link rel="import" href="components/rovpilot-wire/orov-depthHold.html">
+    <link rel="import" href="components/rovpilot-wire/orov-headingHold.html">
+    <link rel="import" href="components/blackbox/orov-blackbox-status.html">
+    <link rel="import" href="components/input-controller/orov-inputs-list.html">
+    <link rel="import" href="components/settings-manager/orov-settings-manager.html">
+    <link rel="import" href="components/thrusters2x1/orov-thrusters2x1-motortest.html">
+
+        <!-- Main ROW -->
+        <div id="main-row" class="container-fluid full-height">
+          <div class="row-fluid full-height">
+            <div class="span9 border full-height" id="outter-videocontainer">
+              <div id="video-container1" class="full-height center pagination-centered" border='1'>
+        <!--        <rov-video>
+                </rov-video>
+        -->
+                <orov-video id="camera1" border='1' location='forward' style='position:relative; width: 100%; height:100%' event-emitter="{{cockpitEventEmitter}}">
+                  <orov-horizon id="horizon" style='position:absolute; top:0px; left:0px; z-index:33; width:100%; height:100%' event-emitter="{{cockpitEventEmitter}}"></orov-horizon>
+                </orov-video>
+
+
+              </div>
+            </div>
+            <div id="rov_status_panel" class="span3 pull-right visible-desktop" style="overflow: auto; height: 100%">
+              <orov-serial-monitor class="hidden" style=""  event-emitter="{{cockpitEventEmitter}}"></orov-serial-monitor>
+              <orov-telemetry-monitor id="telemetry" class=""  event-emitter="{{cockpitEventEmitter}}" ></orov-telemetry-monitor>
+            </div>
+          </div>
+        </div>
+        </div>
+        <div id="footer" class="navbar navbar-inverse navbar-fixed-bottom nav-collapse collapse visible-desktop">
+          <div class="navbar-inner">
+            <div id="footercontent" class="container-fluid" style="height: 100%">
+              <div class="pull-left text-center">
+                <label for='orov-thrustfactor'>{{__('ThrustFactor')}}</label>
+                <orov-thrustfactor event-emitter="{{cockpitEventEmitter}}"></orov-thrustfactor>
+              </div>
+              <div class="pull-left text-center">
+                <label>{{__('Connection')}}</label>
+                <orov-connection-health event-emitter="{{cockpitEventEmitter}}"></orov-connection-health>
+              </div>
+              <div class="pull-left text-center">
+                <orov-topdowncompass event-emitter="{{cockpitEventEmitter}}"></orov-topdowncompass>
+              </div>
+              <div class="pull-left text-center">
+                <label>{{__('Latency')}}</label>
+                <orov-ping-graph event-emitter="{{cockpitEventEmitter}}"></orov-ping-graph>
+              </div>
+              <div class="pull-right text-center">
+                <orov-time event-emitter="{{cockpitEventEmitter}}"></orov-time>
+              </div>
+              <div class="pull-right text-center">
+                <label>{{__('CPU %')}}</label>
+                <orov-telemetry-item  telemetry-item="cpuUsage" event-emitter="{{cockpitEventEmitter}}"></orov-telemetry-item>
+              </div>
+              <div class="pull-right text-center">
+                <label>{{__('Battery')}}</label>
+                <orov-battery-status event-emitter="{{cockpitEventEmitter}}"></orov-battery-status>
+              </div>
+              <div class="pull-right text-center">
+                <label>{{__('Board Current')}}</label>
+                <orov-telemetry-item telemetry-item="iout" event-emitter="{{cockpitEventEmitter}}"></orov-telemetry-item>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hidden" id="keyboardInstructions">
+          <p>
+            Use the <i>Up</i>, <i>Down</i>, <i>Left</i>, <i>Right</i>, <i>Shift</i> and <i>Ctrl</i> keys to maneuver.
+            Use <i>1</i>-<i>5</i> to set power. <i>7</i>,<i>8</i> (lift) and <i>9</i>,<i>0</i> (thrust) trim. Space for all stop.
+          </p>
+          <p>Use <i>Q</i>, <i>A</i>, <i>Z</i> to tilt servo.</p>
+          <p>Use <i>o</i>, <i>p</i> to increase brightness of lights.</p>
+          <p>Use <i>l</i> to toggle callibration lasers.</p>
+        </div>
+
+        <drop-in-dialog id="plugin-settings" header="Settings">
+          <div>
+          <orov-settings-manager event-emitter="{{cockpitEventEmitter}}"></orov-settings-manager>
+        </div>
+        </drop-in-dialog>
+
+        <drop-in-dialog id="keyboard-listing" header="Key Mappings">
+          <div>
+            <orov-inputs-list id="keyboardInstructions" event-emitter="{{cockpitEventEmitter}}"></orov-inputs-list>
+          </div>
+        </drop-in-dialog>
+
+        <drop-in-dialog id="diagnostic" header="Diagnostics">
+          <div class="settings-block">
+            <h4>{{__('Pre-Flight Check')}}</h4>
+          </div>
+          <div>
+            <orov-thrusters2x1-motortest event-emitter="{{cockpitEventEmitter}}"></orov-thrusters2x1-motortest>
+          </div>
+          <div class="settings-block">
+            <h4>{{__('Callibration')}}</h4>
+            <a href="#" class="btn btn-default" id="callibrate_compass">{{__('Callibrate Compass')}}</a>
+            <a href="#" class="btn btn-default" id="zero_depth">{{__('Zero Depth')}}</a>
+          </div>
+        </drop-in-dialog>

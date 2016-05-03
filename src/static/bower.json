@@ -3,17 +3,14 @@
   "dependencies": {
     "fpsmeter": "~0.3.1",
     "i18next": "~1.11.0",
-    "iron-ajax": "PolymerElements/iron-ajax#~1.0.4",
     "jquery": "2.1",
     "jquery-ui": "1.11",
     "mousetrap": "~1.5.3",
-    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#~1.1.3",
-    "paper-slider": "PolymerElements/paper-slider#^1.0.4",
-    "paper-tooltip": "PolymerElements/paper-tooltip#~1.1.1",
-    "polymer": "~1.2.0"
+    "polymer": "^1.4.0",
+    "webcomponentsjs": "^0.7.22"
   },
   "resolutions": {
-    "polymer": "^1.2.1",
-    "webcomponentsjs": "0.7.22"
+    "webcomponentsjs": "0.7.22",
+    "polymer": "^1.4.0"
   }
 }

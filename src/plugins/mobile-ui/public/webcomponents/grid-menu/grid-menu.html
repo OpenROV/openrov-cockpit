@@ -5,11 +5,13 @@
 <link rel="import" href="../../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../iron-icons/iron-icons.html">
 <link rel="import" href="../../iron-icons/device-icons.html">
+<link rel="import" href="../../iron-icons/places-icons.html">
 <link rel="import" href="../../iron-icons/image-icons.html">
 <link rel="import" href="../../iron-icons/notification-icons.html">
 <link rel="import" href="../../iron-icons/social-icons.html">
 <link rel="import" href="../../iron-icons/maps-icons.html">
 <link rel="import" href="../../iron-icons/hardware-icons.html">
+<link rel="import" href="../../iron-icons/av-icons.html">
 
 <link rel="import" href="../../iron-dropdown/iron-dropdown.html">
 
@@ -17,13 +19,13 @@
 <link rel="import" href="../../neon-animation/animations/fade-out-animation.html">
 
 <dom-module id="grid-menu">
-	
+
 	<style type="text/css">
 		:host
 		{
 			display: block;
 		}
-		
+
 		#trigger
 		{
 			display: block;
@@ -33,7 +35,7 @@
 			width: 60px;
 			height: 60px;
 		}
-		
+
 		#container
 		{
 
@@ -42,8 +44,8 @@
 			background-color: rgba( 00, 00, 00, 0.5 );
 			max-width: var( --grid-menu-max-width, 210px );
 		}
-			
-		
+
+
 		#dropdown ::content grid-menu-button
 		{
 			margin: 3px;
@@ -54,20 +56,20 @@
 			height: 60px;
 			text-align: center;
 		}
-		
-		#dropdown ::content grid-menu-button:hover 
+
+		#dropdown ::content grid-menu-button:hover
 		{
 			color: lightslategray;
 		}
-	
+
 	</style>
-	
+
 	<template>
-		
+
 		<!--Trigger Button-->
 		<paper-icon-button id="trigger" icon="{{trigger-icon}}" on-tap="toggle"></paper-icon-button>
 
-		<iron-dropdown 
+		<iron-dropdown
 			id="dropdown"
 			opened="{{opened}}"
 			horizontal-align="[[horizontalAlign]]"
@@ -83,21 +85,21 @@
 				<content></content>
 			</div>
 		</iron-dropdown>
-		
+
 	</template>
-	
-	
+
+
 	<script>
 		( function()
 		{
 			Polymer(
 			{
 				is: 'grid-menu',
-				
-				properties: 
+
+				properties:
 				{
 					triggerIcon: String,
-					
+
 					opened: {
 						type: Boolean,
 						value: false,
@@ -122,13 +124,13 @@
 						value: 0,
 						notify: true
 					},
-	
+
 					verticalOffset: {
 						type: Number,
 						value: 80,
 						notify: true
 					},
-	
+
 					noAnimations: {
 						type: Boolean,
 						value: false
@@ -164,33 +166,33 @@
 						}
 					},
 
-					_dropdownContent: 
+					_dropdownContent:
 					{
 						type: Object
 					}
 				},
-				
-				listeners: 
+
+				listeners:
 				{
 					'cancel': 'cancel'
 				},
-				
+
 				behaviors:
 				[
 					Polymer.IronControlState
 				],
-				
+
 				toggle: function()
-				{					
-					if (this.opened) 
+				{
+					if (this.opened)
 					{
 						this.close();
 					} else {
 						this.open();
 					}
 				},
-				
-				open: function() 
+
+				open: function()
 				{
 					if (this.disabled)
 					{
@@ -198,20 +200,20 @@
 					}
 					this.$.dropdown.open();
 				},
-				
+
 				cancel: function()
 				{
 					this.$.dropdown.close();
 				},
-				
+
 				/**
 				* Hide the dropdown content.
 				*/
-				close: function() 
+				close: function()
 				{
 					this.$.dropdown.close();
 				},
-				
+
 				_openedChanged: function(opened, oldOpened) {
 					if (opened) {
 						// TODO(cdata): Update this when we can measure changes in distributed
@@ -231,27 +233,27 @@
 				*
 				* @param {boolean} disabled True if disabled, otherwise false.
 				*/
-				_disabledChanged: function(disabled) 
+				_disabledChanged: function(disabled)
 				{
 					Polymer.IronControlState._disabledChanged.apply(this, arguments);
 					if (disabled && this.opened) {
 						this.close();
 					}
 				},
-				
-				__onIronOverlayCanceled: function(event) 
+
+				__onIronOverlayCanceled: function(event)
 				{
 					var uiEvent = event.detail;
 					var target = Polymer.dom(uiEvent).rootTarget;
 					var trigger = this.$.trigger;
 					var path = Polymer.dom(uiEvent).path;
-					if (path.indexOf(trigger) > -1) 
+					if (path.indexOf(trigger) > -1)
 					{
 						event.preventDefault();
 					}
 				}
 			} );
 		}() );
-		
+
 	</script>
 </dom-module>

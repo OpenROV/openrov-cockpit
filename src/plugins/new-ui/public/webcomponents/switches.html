@@ -11,7 +11,7 @@
       }
       .switches-row {
         display: table-row;
-        font-size: 1em;
+        font-size: 1.1vw;
         line-height: 1em;
       }
       .switches-switch-on,
@@ -207,6 +207,7 @@
         registerEmitterHanlders: function(emitter) {
           var self = this;
           var container = $(this.$.switchesContainer);
+          this.$.switchesContainer.innerHTML='';
           for (var aSwitch in self.switches) {
             container.append('<div class="switches-row ' + (self.switches[aSwitch].switchable ? 'switchable' : '') + '" id="' + aSwitch + '" title="' + self.switches[aSwitch].description + '">' + '<div class="switches-switch-on">' + aSwitch + '</div>' + '<div class="switches-switch-off">' + aSwitch + '</div>' + '</div>');
             if (self.switches[aSwitch].switchable) {

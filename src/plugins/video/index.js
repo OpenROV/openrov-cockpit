@@ -16,31 +16,50 @@ function video(name, deps) {
 // Start is executed after all plugins have loaded. Activate listeners here.
 video.prototype.start = function start(){
   var self = this; //set closure state variable for use in functions
+
+  //enumerate video devices
+
 }
 
 // This is all that is required to enable settings for a plugin. They are
 // automatically made editable, saved, etc from this definition.
 video.prototype.getSettingSchema = function getSettingSchema(){
 //from http://json-schema.org/videos.html
+
+  var cameraIDs = [];
+
+  //This should keep the CamerIDs list up to date in the schema
+  //TODO: Test, we are probabaly caching all of this so that we
+  //may need to support syncronous timing of some sort here.
+  this.deps.rov.on('video-deviceRegistration',function(data){
+    if (typeof(data) == 'array'){
+      cameraIDs=cameraIDs.concat(data);
+    }else{
+      cameraIDs.push(data.deviceid);
+    }
+  });
+
   return [{
 	"title": "Video Settings",
-	"type": "object",
-  "id": "video", //Added to support namespacing configurations
-	"properties": {
-		"forward_camera_url": {
-			"type": "string",
-      "default" : "rov/camera1" //Added default
-		},
-		"framerate": {
-			"type": "number",
-      "default" : "30" //Added default
-		},
-		"resolution": {
-			"type": "string",
-			"default": "1280x720",
-      "enum": ["1920x1080","1600x900","1360x768","1280x720","1024x768","800x600"]
-		}
-	}
+  "cameras": {
+    "id": "cameras",
+    "type": "array",
+    "items": {
+      "id": "0",
+    	"type": "object",
+      "id": "video", //Added to support namespacing configurations
+    	"properties": {
+    		"cameraID": {
+    			"type": "string",
+          "enum" : cameraIDs,
+    		},
+    		"location": {
+    			"type": "string",
+          "default" : "forward" //Added default
+    		}
+    	}
+    }
+  }
 }];
 };
 

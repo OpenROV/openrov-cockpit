@@ -12,8 +12,45 @@ var geomux = function geomux(name, deps) {
 
 }
 
-
+geomux.prototype.enumerateDevices = function enumerateDevices(callback){
+  var results=[];
+  var i=0;
+  fs.readdir('/dev', function (err, files) {
+    if (err) {
+      reject(err);
+    }
+    files.filter(function(file){
+        return file.indexOf('video') == 0;
+    }).forEach(function(file){
+      //udevadm info --query=all --name=/dev/' + file
+      //
+      i++;
+      exec('udevadm info --query=all --name=/dev/' + file + ' | grep "S: v4l/by-id/"', function(error, stdout, stderr){
+        if ((error == null) && (stdout.indexOf('GEO_Semi_Condor')>0)){
+          var result = {device: file, format:'MP4'}
+          result.deviceid = stdout.slice("S: v4l/by-id/".length);
+          results.push(result);
+        }
+        i--;
+        if(i==0){callback(results)};
+      });
+    });
+  });
+}
 geomux.prototype.start = function start(){
+  var self=this;
+  if (process.env.GEO_MOCK == 'true'){
+    this.startCamera('/dev/video0');
+  } else {
+    this.enumerateDevices(function(results){
+      if (results.length==0) return;
+      self.deps.rov.emit('video-deviceRegistration',results);
+      self.startCamera('/dev/' + results[0].device);
+    })
+  }
+}
+
+geomux.prototype.startCamera = function startCamera(device){
   var geoprogram = '';
   if (process.env.GEO_MOCK == 'true'){
     geoprogram = require.resolve('geo-video-simulator');
@@ -28,7 +65,7 @@ geomux.prototype.start = function start(){
     }
   }
 
-  var launch_options = ['nice','-1','node',geoprogram];
+  var launch_options = ['nice','-1','node',geoprogram,device];
 
   const infinite=-1;
   var monitor = respawn(launch_options,{

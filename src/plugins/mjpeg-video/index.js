@@ -37,6 +37,9 @@ mjpegvideo.prototype.enumerateDevices = function enumerateDevices(callback){
             if(i==0){callback(results)};
           });
 
+        } else {
+          i--;
+          if(i==0){callback(results)};
         }
       });
     });
@@ -46,11 +49,15 @@ mjpegvideo.prototype.enumerateDevices = function enumerateDevices(callback){
 mjpegvideo.prototype.start = function start(){
   var self = this;
   //if (config.preferences.video)
-  this.enumerateDevices(function(results){
-    if (results.length==0) return;
-    self.deps.rov.emit('video-deviceRegistration',results);
-    self.startCamera('/dev/' + results[0].device);
-  })
+  if (process.env.MJPG_MOCK === 'true'){
+      self.startCamera('/dev/video0');
+  } else {
+    this.enumerateDevices(function(results){
+      if (results.length==0) return;
+      self.deps.rov.emit('video-deviceRegistration',results);
+      self.startCamera('/dev/' + results[0].device);
+    })
+  }
 
 
 };

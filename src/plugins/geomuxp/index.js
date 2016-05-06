@@ -45,7 +45,8 @@ geomux.prototype.start = function start(){
     this.enumerateDevices(function(results){
       if (results.length==0) return;
       self.deps.globalEventLoop.emit('video-deviceRegistration',results);
-      self.startCamera('/dev/' + results[0].device);
+      sortedResult=results.sort(function(a,b){return a.device.localeCompare(b.device)});
+      self.startCamera('/dev/' + sortedResult[0].device); //start first camera
     })
   }
 }
@@ -65,7 +66,8 @@ geomux.prototype.startCamera = function startCamera(device){
     }
   }
 
-  var launch_options = ['nice','-1','node',geoprogram,device];
+  var launch_options = ['nice','-1','node',geoprogram];
+  //TODO: Add device to the parameters once it is supported in geomux
 
   const infinite=-1;
   var monitor = respawn(launch_options,{
@@ -85,7 +87,7 @@ geomux.prototype.startCamera = function startCamera(device){
       return; //abort, not a json message
     }
     if ('service' in service){
-      self.deps.rov.emit('CameraRegistration',{location:service.txtRecord.cameraLocation, videoMimeType:service.txtRecord.videoMimeType, resolution:service.txtRecord.resolution, framerate:service.txtRecord.framerate, relativeServiceUrl:service.txtRecord.relativeServiceUrl, sourcePort:service.port, sourceAddress:service.addresses[0]});
+      self.deps.globalEventLoop.emit('CameraRegistration',{location:service.txtRecord.cameraLocation, videoMimeType:service.txtRecord.videoMimeType, resolution:service.txtRecord.resolution, framerate:service.txtRecord.framerate, relativeServiceUrl:service.txtRecord.relativeServiceUrl, sourcePort:service.port, sourceAddress:service.addresses[0]});
     }
 
   });

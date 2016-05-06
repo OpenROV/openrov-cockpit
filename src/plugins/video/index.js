@@ -6,17 +6,17 @@ function video(name, deps) {
   this.rov = deps.rov; //explicitlly calling out the rov eventemitter
   this.cockpit = deps.cockpit; //explicitly calling out cockpit eventemitter
   var self=this;
-  this.deps.rov.on('CameraRegistration',function(data){
+  this.deps.globalEventLoop.on('CameraRegistration',function(data){
     // console.log("Re-emitting CameraRegistration");
   	self.cockpit.emit('CameraRegistration',data);
   });
   this.cameras={};
 
-  var function AddCamera(camera){
+  function AddCamera(camera){
     if (self.cameras[camera.path] == undefined){
-      sself.cameras[camera.path]=[];
+      self.cameras[camera.path]=[];
     }
-    self.cameras[data.path].push(data);
+    self.cameras[camera.path].push(camera);
   }
 
   this.deps.globalEventLoop.on('video-deviceRegistration',function(data){
@@ -25,7 +25,7 @@ function video(name, deps) {
         AddCamera(camera);
       })
     }else{
-      AddCamera(camera);
+      AddCamera(data);
     }
   });
 

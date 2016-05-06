@@ -10,6 +10,24 @@ function video(name, deps) {
     // console.log("Re-emitting CameraRegistration");
   	self.cockpit.emit('CameraRegistration',data);
   });
+  this.cameras={};
+
+  var function AddCamera(camera){
+    if (self.cameras[camera.path] == undefined){
+      sself.cameras[camera.path]=[];
+    }
+    self.cameras[data.path].push(data);
+  }
+
+  this.deps.globalEventLoop.on('video-deviceRegistration',function(data){
+    if (typeof(data) == 'array'){
+      data.forEach(function(camera){
+        AddCamera(camera);
+      })
+    }else{
+      AddCamera(camera);
+    }
+  });
 
 }
 
@@ -18,6 +36,7 @@ video.prototype.start = function start(){
   var self = this; //set closure state variable for use in functions
 
   //enumerate video devices
+
 
 }
 
@@ -31,7 +50,7 @@ video.prototype.getSettingSchema = function getSettingSchema(){
   //This should keep the CamerIDs list up to date in the schema
   //TODO: Test, we are probabaly caching all of this so that we
   //may need to support syncronous timing of some sort here.
-  this.deps.rov.on('video-deviceRegistration',function(data){
+  this.deps.globalEventLoop.on('video-deviceRegistration',function(data){
     if (typeof(data) == 'array'){
       cameraIDs=cameraIDs.concat(data);
     }else{
@@ -41,24 +60,27 @@ video.prototype.getSettingSchema = function getSettingSchema(){
 
   return [{
 	"title": "Video Settings",
-  "cameras": {
+	"id" :"videosettings",
+  "type" : "object",
+  "properties": {
+    "cameras":{
     "id": "cameras",
     "type": "array",
     "items": {
       "id": "0",
     	"type": "object",
-      "id": "video", //Added to support namespacing configurations
     	"properties": {
     		"cameraID": {
     			"type": "string",
-          "enum" : cameraIDs,
+          "enum" : ['TBD']
     		},
     		"location": {
     			"type": "string",
-          "default" : "forward" //Added default
+          "default" : "forward"
     		}
     	}
     }
+   }
   }
 }];
 };

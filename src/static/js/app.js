@@ -25,7 +25,7 @@ $(function () {
     CONFIG.sample_freq = 20;
   } else {
     var socket = window.io.connect(window.location.protocol + '//' +
-                 window.location.hostname+ ':8080');
+                 window.location.hostname+ ':' +  window.location.port,{path:'/cockpitsocket'});
     socket=new window.SocketIOStoreAndForward(socket);
     socket=new window.SocketIOEmitter(socket);
   }

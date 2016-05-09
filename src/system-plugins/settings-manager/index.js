@@ -73,6 +73,7 @@ settingsManager.prototype.loadSettings = function loadSettings(callback){
       var result = {}
       result[key]=this.settings[key];
       this.deps.cockpit.emit('settings-change.'+key,result);
+      this.deps.globalEventLoop.emit('settings-change.'+key,result);
     }
   }
   this.deps.cockpit.emit('settings-change',this.settings);

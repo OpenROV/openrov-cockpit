@@ -4,6 +4,14 @@
     console.log('Camera tilt plugin loaded');
     var tilt = 0;
     var physics = ArduinoHelper.physics;
+    this.positiveRangeLimit = .7;
+    this.negativeRangeLimit = -.7;
+    var self=this;
+
+    deps.globalEventLoop.withHistory.on('settings-change.cameratilt', function(value){
+        self.positiveRangeLimit=value.cameratilt.positiveRange;
+        self.negativeRangeLimit=value.cameratilt.negativeRange;
+    });
 
     // Cockpit
     deps.cockpit.on('plugin.cameraTilt.set', function (angle) {
@@ -23,7 +31,7 @@
     });
 
     var mapTiltServo = function (value) {
-      value = ArduinoHelper.limit(value, -0.7, 0.7);
+      value = ArduinoHelper.limit(value, self.negativeRangeLimit, self.positiveRangeLimit);
       return ArduinoHelper.mapA(value, -1, 1, 1000, 2000);
     };
 
@@ -36,7 +44,7 @@
 
       var servoTilt = mapTiltServo(tilt);
       var command = 'tilt(' + servoTilt + ')';
-      
+
       console.log( "tilt:" + servoTilt );
 
       deps.rov.send(command);
@@ -47,6 +55,26 @@
       setCameraTilt(tilt);
     };
   }
+
+  CameraTilt.prototype.getSettingSchema = function getSettingSchema(){
+  //from http://json-schema.org/examples.html
+    return [{
+  	"title": "Camera Tilt",
+  	"type": "object",
+    "id": "cameratilt", //Added to support namespacing configurations
+  	"properties": {
+  		"positiveRange": {
+  			"type": "number",
+        "default" : ".7" //Added default
+  		},
+  		"negativeRange": {
+  			"type": "number",
+        "default" : "-.7" //Added default
+  		}
+  	},
+  	"required": ["positiveRange", "negativeRange"]
+  }];
+  };
 
   module.exports = function (name, deps) {
     return new CameraTilt(name,deps);

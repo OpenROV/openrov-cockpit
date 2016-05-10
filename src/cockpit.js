@@ -26,6 +26,7 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io').listen(server, { log: false, origins: '*:*', path:'/cockpitsocket' });
 var EventEmitter = require('events').EventEmitter;
+var EventEmitter2 = require('eventemitter2').EventEmitter2;
 var OpenROVController = require(CONFIG.OpenROVController);
 var logger = require('./lib/logger').create(CONFIG);
 var mkdirp = require('mkdirp');
@@ -69,7 +70,7 @@ var sysscripts = [];
 // setup required directories
 mkdirp(CONFIG.preferences.get('photoDirectory'));
 process.env.NODE_ENV = true;
-var globalEventLoop = new EventEmitter();
+var globalEventLoop = require('./static/js/eventEmitterStoreAndForward.js')(new EventEmitter2());
 var DELAY = Math.round(1000 / CONFIG.video_frame_rate);
 io= require('./static/js/socketIOStoreAndForward.js')(io);
 var client = new CockpitMessaging(io);

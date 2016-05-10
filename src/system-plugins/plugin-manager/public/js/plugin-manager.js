@@ -40,6 +40,27 @@
       });
     });
 
+    this.startPlugins();
+
+  };
+
+  PluginManager.prototype.startPlugins = function startPlugins(fn){
+    this.EnumerateControllablePlugins(function(items){
+      items.forEach(function(p){
+        if(p.isEnabled === true){
+          p.rawPlugin.enable();
+          p.isEnabled = true;
+          p.rawPlugin.isEnabled = true;
+        } else {
+          p.rawPlugin.disable();
+          p.isEnabled = false;
+          p.rawPlugin.isEnabled = false;
+        }
+      });
+      if (typeof(fn) === 'function'){
+        fn();
+      }
+    });
 
   };
 
@@ -50,6 +71,7 @@
           if(p.isEnabled === false){
             p.rawPlugin.enable();
             p.isEnabled = true;
+            p.rawPlugin.isEnabled = true;
             if (typeof(fn) === 'function'){
               fn();
             }
@@ -68,6 +90,7 @@
           if(p.isEnabled === true){
             p.rawPlugin.disable();
             p.isEnabled=false;
+            p.rawPlugin.isEnabled = false;
             if (typeof(fn) === 'function'){
               fn();
             }

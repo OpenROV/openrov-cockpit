@@ -43,8 +43,7 @@
       return;
     }
     this.enabled = true;
-    this.listen();
-    alert('Internet-streaming enabled');
+    this.startlisten();
   };
 
   //Called by the plugin-manager to disable a plugin
@@ -56,7 +55,6 @@
     if (this.streaming) {
       this.stop();
     }
-    alert('Internet-streaming disabled');
   };
 
   InternetStream.prototype.stop = function stop() {
@@ -110,8 +108,8 @@
   //have loaded.
   var socket = null;
 
-  InternetStream.prototype.listen = function listen() {
-    if (!this.enabled) {
+  InternetStream.prototype.startlisten = function startlisten() {
+    if (!this.isEnabled) {
       return;
     }
     var closeHandler = function() {

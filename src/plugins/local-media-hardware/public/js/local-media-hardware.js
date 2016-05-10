@@ -61,17 +61,17 @@
 
   //Called by the plugin-manager to enable a plugin
   LocalMedia.prototype.enable = function enable() {
-    alert('LocalMedia enabled');
+    this.startlisten();
   };
 
   //Called by the plugin-manager to disable a plugin
   LocalMedia.prototype.disable = function disable() {
-    alert('LocalMedia disabled');
+    console.error('need to impliment disable in local-media-hardware');
   };
 
   //listen gets called by the plugin framework after all of the plugins
   //have loaded.
-  LocalMedia.prototype.listen = function listen() {
+  LocalMedia.prototype.startlisten = function startlisten() {
     var self = this;
 
     if (this.cockpit.listeners('local-media-data').length>0) {

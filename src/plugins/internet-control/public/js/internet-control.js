@@ -39,21 +39,19 @@
 
     //Called by the plugin-manager to enable a plugin
     IC.prototype.enable = function enable() {
-      alert('Internet-control enabled');
-      this.listen();
+      this.startlisten();
     };
 
     //Called by the plugin-manager to disable a plugin
     IC.prototype.disable = function disable() {
-      alert('Internet-control disabled');
       //TODO: Impliment and unlisten
     };
 
 
     //listen gets called by the plugin framework after all of the plugins
     //have loaded.
-    IC.prototype.listen = function listen() {
-      if (!this.enabled){return;}
+    IC.prototype.startlisten = function startlisten() {
+      if (!this.isEnabled){return;}
       var self = this;
 
       var statusUpdate=function(){

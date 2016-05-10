@@ -175,11 +175,13 @@
     this.idb.mp4.add({timestamp: Date.now(),sessionID:this.sessionID,data:data})
       .catch(function (error) {
         console.error(error);
+        self.stopRecording();
       });
     }
   };
 
   Blackbox.prototype.logNavData = function logNavData(navdata) {
+    var self=this;
     if (!this.recording) {
       return;
     }
@@ -188,10 +190,12 @@
     this.idb.navdata.add(navdata)
       .catch(function (error) {
         console.error(error);
+        self.stopRecording();
       });
   };
 
   Blackbox.prototype.logStatusData = function logStatusData(statusdata) {
+    var self=this;
     if (!this.recording) {
       return;
     }
@@ -200,6 +204,7 @@
     this.idb.telemetry.add(statusdata)
       .catch(function (error) {
         console.error(error);
+        self.stopRecording();
       });
   };
 

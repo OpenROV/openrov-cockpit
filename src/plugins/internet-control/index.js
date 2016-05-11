@@ -26,7 +26,7 @@ ic.prototype.getSettingSchema = function getSettingSchema(){
 	"properties": {
 		"webRTCSignalServerURI": {
 			"type": "string",
-      "default" : "http://192.168.99.100:3030" //Added default
+      "default" : "http://192.168.99.100:8080" //Added default
 		},
 		"secretKey": {
 			"type": "string",

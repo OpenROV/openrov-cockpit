@@ -98,11 +98,11 @@
 
           //TODO: Move to a pattern that can retry the connection when the setting changes
           $.getScript(self.settings.webRTCSignalServerURI + "/msgpack.min.js");
-          $.getScript(self.settings.webRTCSignalServerURI + "/simplepeer.js", function() {
+          $.getScript(self.settings.webRTCSignalServerURI + "/components/simple-peer/simplepeer.min.js", function() {
               var _self = self
               var Peer = window.SimplePeer;
               var io = window.io;
-              var socket = io(self.settings.webRTCSignalServerURI);
+              var socket = io(self.settings.webRTCSignalServerURI,{path:'/netcockpit-signal'});
               self.connecting = true;
               var peerOpts= {
                   channelConfig: {

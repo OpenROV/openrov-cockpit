@@ -1,6 +1,8 @@
 (function (window, document, jQuery) {
   'use strict';
   var plugins = namespace('plugins');
+  const maxVideoSegmentSize = 200000000;
+
   //jQuery.getScript('/components/dexie/dist/latest/Dexie.js');
 
   var head = document.getElementsByTagName("head")[0];
@@ -50,7 +52,8 @@
     this.idb = this.defineDB(); //Readies the DB, ensures schema is consistent
     this.idb.on('error', function (err) {
         // Catch all uncatched DB-related errors and exceptions
-        console.error(err);
+        console.error(err.message);
+        console.dir(err);
     });
 
     this.cockpit.rov.on('plugin.navigationData.data', function (data) {
@@ -103,7 +106,21 @@
   //TODO: Add sessions collection that each unique session is placed
   var _recordedSessions = function recordedSessions(idb,callback){
     idb.sessions.toArray(function(data){
-      callback(data);
+      for(var i=0;i<=data.length;i++){
+        idb.mp4.where("sessionID").equalsIgnoreCase(data[i].sessionID).toArray(function(j,dump){
+          var sizeofData = 0
+          var arrayOfData = dump.map(function(item){
+            var converted = new Uint8Array(item.data);
+            sizeofData+=converted.length;
+            return converted;
+          });
+          var segments = Math.ceil(sizeofData/maxVideoSegmentSize);
+          data[j].VideoSegments = new Array(segments);
+          if (j==data.length-1){
+            callback(data);
+          }
+        }.bind(this,i));
+      }
     });
   };
 
@@ -175,11 +192,13 @@
     this.idb.mp4.add({timestamp: Date.now(),sessionID:this.sessionID,data:data})
       .catch(function (error) {
         console.error(error);
+        self.stopRecording();
       });
     }
   };
 
   Blackbox.prototype.logNavData = function logNavData(navdata) {
+    var self=this;
     if (!this.recording) {
       return;
     }
@@ -188,10 +207,12 @@
     this.idb.navdata.add(navdata)
       .catch(function (error) {
         console.error(error);
+        self.stopRecording();
       });
   };
 
   Blackbox.prototype.logStatusData = function logStatusData(statusdata) {
+    var self=this;
     if (!this.recording) {
       return;
     }
@@ -200,6 +221,7 @@
     this.idb.telemetry.add(statusdata)
       .catch(function (error) {
         console.error(error);
+        self.stopRecording();
       });
   };
 
@@ -249,32 +271,11 @@
 
   };
 
-  Blackbox.prototype.exportVideo = function exportVideo(options){
-    var cols;
-
-//    if(options.collection === "*"){
-      cols = ['mp4'];
-//    } else {
-//      cols = [options.collection];
-//    }
-
-    for(var i in cols){
-      options.collection = cols[i];
-      if (!this.idb.isOpen()) {
-        this.idb.open()
-          .catch(function (error) {
-            console.error(error);
-          });
-        this._exportVideo(options);
-        this.idb.close();
-      } else {
-        this._exportVideo(options);
-      }
-    }
-
-  };
-
   Blackbox.prototype._exportData = function _exportData(options,callback){
+    if (options.collection=='mp4'){
+       this._exportVideo(options,callback);
+       return;
+    }
 
     var fakeClick = function fakeClick(anchorObj) {
       if (anchorObj.click) {
@@ -351,31 +352,19 @@
         return converted;
       });
       var result = new Uint8Array(sizeofData);
-      var tail = 0;
+      var initFrame=arrayOfData.shift();
+      result.set(initFrame,0);
+      var tail=initFrame.length;
+      var track = 0;
       arrayOfData.forEach(function(item){
-        result.set(item,tail);
-        tail+=item.length;
+        track+=item.length;
+        if (Math.ceil(track/maxVideoSegmentSize)==options.segment){
+          result.set(item,tail);
+          tail+=item.length;
+        }
       });
 
-
-//      var result = Uint8Array.of.apply(this,arrayOfData);
-/*
-
-
-      var bufferlength=0;
-      var dataArray = dump.reduce(function(previous,current,index,array){
-        var b = new Uint8Array(current.data);
-        //var c = new Uint8Array(previous.length + b.length);
-        //c.set(previous);
-        if (bufferlength+b.length>previous.length){
-          var c =
-        }
-        previous.set(b, bufferlength);
-        bufferlength+=b.length
-        return c;
-      },new Uint8Array(2000000));
-*/
-      downloadInBrowser(result,name+'-'+options.sessionID+'.'+'mp4');
+      downloadInBrowser(result,name+'-'+options.sessionID+'-'+options.segment+'.'+'mp4');
     }.bind(null,options.collection));
 
   };

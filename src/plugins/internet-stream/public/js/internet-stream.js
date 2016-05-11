@@ -43,8 +43,7 @@
       return;
     }
     this.enabled = true;
-    this.listen();
-    alert('Internet-streaming enabled');
+    this.startlisten();
   };
 
   //Called by the plugin-manager to disable a plugin
@@ -56,7 +55,6 @@
     if (this.streaming) {
       this.stop();
     }
-    alert('Internet-streaming disabled');
   };
 
   InternetStream.prototype.stop = function stop() {
@@ -72,7 +70,7 @@
   InternetStream.prototype.stream = function stream() {
     var self=this;
     if (this.streaming) {
-      return;
+      this.stop();
     }
     h264dataHandler = function(data) {
       if (!self.connected) {
@@ -95,12 +93,13 @@
     }
 
     self.cockpit.emit('request_Init_Segment', function(init) {
-      h264dataHandler(init);
+      socket.compress(false).emit('broadcast-stream-init', init, function(){
+        self.cockpit.on('local-media-data', audiodataHandler);
+        self.cockpit.on('x-h264-video.data', h264dataHandler);
+        self.streaming = true;
+      });
       //TODO: Verify this works, could end up with audio blocked because
       //user does not grant access to the mike.
-      self.cockpit.on('local-media-data', audiodataHandler);
-      self.cockpit.on('x-h264-video.data', h264dataHandler)
-      self.streaming = true;
     });
 
   }
@@ -109,26 +108,32 @@
   //listen gets called by the plugin framework after all of the plugins
   //have loaded.
   var socket = null;
-
-  InternetStream.prototype.listen = function listen() {
-    if (!this.enabled) {
+  var closeHandler = null;
+  var connectHandler = null;
+  InternetStream.prototype.startlisten = function startlisten() {
+    if (!this.isEnabled) {
       return;
     }
-    var closeHandler = function() {
+    closeHandler = function() {
       self.connected = false;
     }
 
-    var connectHandler = function() {
+    connectHandler = function() {
+      console.log("connected to streaming server");
+      if (self.connected){
+        //Okay, a new connection, need to restart data
+        self.stop();
+      }
       self.connected = true;
       self.connecting = false;
       //TODO: Add logic to restart an existing streaming session if one existed prior
     }
 
     var self = this;
-    this.rov.withHistory.on('settings-change.ic', function(settings) {
+    this.rov.withHistory.on('settings-change.internetstreaming', function(settings) {
       //sharing the internet server settings
-      self.settings = settings.ic;
-      socket = io(self.settings.webRTCSignalServerURI);
+      self.settings = settings.internetstreaming;
+      socket = io(self.settings.streamingServerURI,{path:'/internetcomms'});
       self.connecting = true;
       socket.on('close', closeHandler);
       socket.on('connect', connectHandler);
@@ -142,6 +147,9 @@
       });
       socket.on('reconnect', connectHandler);
       socket.on('broadcast-available', function(){
+        if(self.streaming){
+          self.stop();
+        }
         socket.emit('broadcast-stream-on', function(ok) {
           self.stream();
         });

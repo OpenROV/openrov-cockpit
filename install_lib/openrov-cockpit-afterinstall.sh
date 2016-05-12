@@ -12,6 +12,7 @@ chmod +x /opt/openrov/cockpit/linux/rc.local
 chown -R rov /opt/openrov/cockpit
 chgrp -R admin /opt/openrov/cockpit
 
+
 # setup reset and uart for non black BB
 cp /etc/rc.local /etc/rc.local_orig
 cat > /etc/rc.local << __EOF__

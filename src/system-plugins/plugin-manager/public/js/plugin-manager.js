@@ -116,7 +116,7 @@
   }
 
   PluginManager.prototype.EnumerateControllablePlugins = function EnumerateControllablePlugins(callback){
-    self = this;
+    var self = this;
     if (_plugins !== null) {
         callback(_plugins);
         return;

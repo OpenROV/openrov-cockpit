@@ -28,10 +28,9 @@ cat > /etc/rc.local << __EOF__
 #
 
 /opt/openrov/cockpit/linux/rc.local
-
-mkdir -p /etc/nginx/locations-enabled
-ln -s /opt/openrov/cockpit/linux/nginx.location /etc/nginx/locations-enabled/cockpit.conf
-
 exit 0
 
 __EOF__
+
+mkdir -p /etc/nginx/locations-enabled
+ln -s /opt/openrov/cockpit/linux/nginx.location /etc/nginx/locations-enabled/cockpit.conf

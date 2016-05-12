@@ -4,12 +4,42 @@ function thrusters2x1(name, deps) {
   //instance variables
   this.rov = deps.rov;
   this.cockpit = deps.cockpit;
+  this.global = deps.globalEventLoop;
 
 
 }
 
 thrusters2x1.prototype.start = function start(){
   var self=this;
+
+  self.global.withHistory.on('settings-change.thrusters2x1',function(data){
+    var settings = data.thrusters2x1;
+    var port = settings.port['forward-modifier'];
+    var vertical = settings.vertical['forward-modifier'];
+    var starbord = settings.starboard['forward-modifier'];
+    var nport = settings.port['reverse-modifier'];
+    var nvertical = settings.vertical['reverse-modifier'];
+    var nstarbord =settings.starboard['reverse-modifier'];
+    if (settings.port.reversed) {
+      port = port * -1;
+      nport = nport * -1;
+    }
+    if (settings.vertical.reversed) {
+      vertical = vertical * -1;
+      nvertical = nvertical * -1;
+    }
+    if (settings.starboard.reversed) {
+      starbord = starbord * -1;
+      nstarbord = nstarbord * -1;
+    }
+    //todo: Move to motor-diag plugin
+    //API to Arduino to pass a percent in 2 decimal accuracy requires multipling by 100 before sending.
+    command = 'mtrmod1(' + port * 100 + ',' + vertical * 100 + ',' + starbord * 100 + ');';
+    self.rov.hardware.write(command);
+    command = 'mtrmod2(' + nport * 100 + ',' + nvertical * 100 + ',' + nstarbord * 100 + ');';
+    self.rov.hardware.write(command);
+
+  })
 
   self.rov.on('status', function (status) {
     if ('mtrmod' in status) {

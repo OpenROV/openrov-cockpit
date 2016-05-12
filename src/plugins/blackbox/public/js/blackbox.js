@@ -71,7 +71,6 @@
     });
     this.cockpit.on('plugin-blackbox-export', function(options){
       self.exportData(options);
-      self.exportVideo(options);
     });
 
     this.cockpit.on('plugin-blackbox-recording-start', function(){
@@ -316,6 +315,7 @@
 
   };
 
+  var lastURL = null;
   //TODO: Track this issue preventing easy download of large amounts of data.
   //https://bugs.chromium.org/p/chromium/issues/detail?id=375297
   Blackbox.prototype._exportVideo = function _exportVideo(options,callback){
@@ -333,9 +333,14 @@
     };
 
     var downloadInBrowser = function downloadInBrowser(data,name){
+      if (lastURL!=null){
+        URL.revokeObjectURL(lastURL);
+        lastURL = null;
+      }
       var blob = new Blob([data], { 'type': 'video/mp4' });
       var link = document.createElement("A");
-      link.setAttribute('href', window.URL.createObjectURL(blob));
+      lastURL = window.URL.createObjectURL(blob);
+      link.setAttribute('href', lastURL);
       link.setAttribute('download',name);
       //download="data.json"
       //link.attr('href', window.URL.createObjectURL(blob));

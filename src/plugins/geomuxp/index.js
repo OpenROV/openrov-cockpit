@@ -1,5 +1,6 @@
 const exec=require('child_process').exec;
 const fs=require('fs');
+const path=require('path');
 const respawn = require('respawn');
 
 var geomux = function geomux(name, deps) {
@@ -37,17 +38,32 @@ geomux.prototype.enumerateDevices = function enumerateDevices(callback){
     });
   });
 }
+
+geomux.prototype.startDevices = function startDevices(callback){
+    exec('mxcam list | grep "Core: Condor"', function(error, stdout, stderr){
+      if (error == null){
+        exec(path.dirname(require.resolve('geo-video-server'))+'/platform/linux/bootcamera.sh', function(error, stdout, stderr){
+          callback();
+        });
+      }
+    });
+
+
+}
+
 geomux.prototype.start = function start(){
   var self=this;
   if (process.env.GEO_MOCK == 'true'){
     this.startCamera('/dev/video0');
   } else {
-    this.enumerateDevices(function(results){
-      if (results.length==0) return;
-      self.deps.globalEventLoop.emit('video-deviceRegistration',results);
-      sortedResult=results.sort(function(a,b){return a.device.localeCompare(b.device)});
-      self.startCamera('/dev/' + sortedResult[0].device); //start first camera
-    })
+    this.startDevices(function(){
+      self.enumerateDevices(function(results){
+        if (results.length==0) return;
+        self.deps.globalEventLoop.emit('video-deviceRegistration',results);
+        sortedResult=results.sort(function(a,b){return a.device.localeCompare(b.device)});
+        self.startCamera('/dev/' + sortedResult[0].device); //start first camera
+      })
+    });
   }
 }
 

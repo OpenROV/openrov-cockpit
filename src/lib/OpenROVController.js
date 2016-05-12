@@ -157,41 +157,23 @@ OpenROVController.prototype.requestSettings = function () {
   this.hardware.write(command);
 };
 
+//TODO: Move the water setting to diveprofile
 OpenROVController.prototype.updateSetting = function () {
+  function watertypeToflag(type){
+    if(type=='fresh'){return 0;}
+    return 1;
+  }
+
   var command = 'updateSetting('
     + CONFIG.preferences.get('smoothingIncriment') + ','
     + CONFIG.preferences.get('deadzone_neg') + ','
     + CONFIG.preferences.get('deadzone_pos') + ','
-    + CONFIG.preferences.get('water_type') + ');';
+    + watertypeToflag(CONFIG.preferences.get('plugin:diveprofile:water-type')) + ');';
   this.hardware.write(command);
   //This is the multiplier used to make the motor act linear fashion.
   //for example: the props generate twice the thrust in the positive direction
   //than the negative direction.  To make it linear we have to multiply the
   //negative direction * 2.
-  var port = CONFIG.preferences.get('thrust_modifier_port');
-  var vertical = CONFIG.preferences.get('thrust_modifier_vertical');
-  var starbord = CONFIG.preferences.get('thrust_modifier_starbord');
-  var nport = CONFIG.preferences.get('thrust_modifier_nport');
-  var nvertical = CONFIG.preferences.get('thrust_modifier_nvertical');
-  var nstarbord = CONFIG.preferences.get('thrust_modifier_nstarbord');
-  if (CONFIG.preferences.get('reverse_port_thruster')) {
-    port = port * -1;
-    nport = nport * -1;
-  }
-  if (CONFIG.preferences.get('reverse_lift_thruster')) {
-    vertical = vertical * -1;
-    nvertical = nvertical * -1;
-  }
-  if (CONFIG.preferences.get('reverse_starbord_thruster')) {
-    starbord = starbord * -1;
-    nstarbord = nstarbord * -1;
-  }
-  //todo: Move to motor-diag plugin
-  //API to Arduino to pass a percent in 2 decimal accuracy requires multipling by 100 before sending.
-  command = 'mtrmod1(' + port * 100 + ',' + vertical * 100 + ',' + starbord * 100 + ');';
-  this.hardware.write(command);
-  command = 'mtrmod2(' + nport * 100 + ',' + nvertical * 100 + ',' + nstarbord * 100 + ');';
-  this.hardware.write(command);
 };
 
 OpenROVController.prototype.sendMotorTest = function (port, starbord, vertical) {

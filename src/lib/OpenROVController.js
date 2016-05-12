@@ -157,12 +157,18 @@ OpenROVController.prototype.requestSettings = function () {
   this.hardware.write(command);
 };
 
+//TODO: Move the water setting to diveprofile
 OpenROVController.prototype.updateSetting = function () {
+  function watertypeToflag(type){
+    if(type=='fresh'){return 0;}
+    return 1;
+  }
+
   var command = 'updateSetting('
     + CONFIG.preferences.get('smoothingIncriment') + ','
     + CONFIG.preferences.get('deadzone_neg') + ','
     + CONFIG.preferences.get('deadzone_pos') + ','
-    + CONFIG.preferences.get('water_type') + ');';
+    + watertypeToflag(CONFIG.preferences.get('plugin:diveprofile:water-type')) + ');';
   this.hardware.write(command);
   //This is the multiplier used to make the motor act linear fashion.
   //for example: the props generate twice the thrust in the positive direction

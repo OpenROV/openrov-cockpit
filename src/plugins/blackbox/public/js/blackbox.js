@@ -146,6 +146,14 @@
   };
 
 
+  function formatBytes(bytes,decimals) {
+     if(bytes == 0) return '0 Byte';
+     var k = 1000; // or 1024 for binary
+     var dm = decimals + 1 || 3;
+     var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+     var i = Math.floor(Math.log(bytes) / Math.log(k));
+     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  }
 
   Blackbox.prototype.startRecording = function startRecording() {
     if (this.recording) {
@@ -189,7 +197,12 @@
         });
       if ((self.recording)|| (self.mp4Buffer.length>0 || self.navBuffer.length>0 || self.statusBuffer.length>0) ){
         setTimeout(commitBuffers.bind(self),1000);
-        console.log('NavBuffer Length:',self.navBuffer.length)
+        navigator.webkitTemporaryStorage.queryUsageAndQuota (
+            function(usedBytes, grantedBytes) {
+                console.log('we are using ', formatBytes(usedBytes,2), ' of ', formatBytes(grantedBytes,2), ' ', formatBytes(grantedBytes-usedBytes,2),' remaining.');
+            },
+            function(e) { console.log('Error', e);  }
+        );
       }
     }
     commitBuffers.call(self);
@@ -392,27 +405,28 @@
 
 
     this.idb[options.collection].where("sessionID").equalsIgnoreCase(options.sessionID).toArray(function(name,dump){
-      var sizeofData = 0
-      var arrayOfData = dump.map(function(item){
-        var converted = new Uint8Array(item.data);
-        sizeofData+=converted.length;
-        return converted;
-      });
-      var result = new Uint8Array(sizeofData);
-      var initFrame=arrayOfData.shift();
-      result.set(initFrame,0);
-      var tail=initFrame.length;
-      var track = 0;
-      arrayOfData.forEach(function(item){
-        track+=item.length;
-        if (Math.ceil(track/maxVideoSegmentSize)==options.segment){
-          result.set(item,tail);
-          tail+=item.length;
-        }
-      });
+        var sizeofData = 0
+        var arrayOfData = dump.map(function(item){
+          var converted = new Uint8Array(item.data);
+          sizeofData+=converted.length;
+          return converted;
+        });
+        var result = new Uint8Array(maxVideoSegmentSize*200000);
+        var initFrame=arrayOfData.shift();
+        result.set(initFrame,0);
+        var tail=initFrame.length;
+        var track = 0;
+        arrayOfData.forEach(function(item){
+          track+=item.length;
+          if (Math.ceil(track/maxVideoSegmentSize)==options.segment){
+            console.log(tail+item.length);
+            result.set(item,tail);
+            tail+=item.length;
+          }
+        });
 
-      downloadInBrowser(result,name+'-'+options.sessionID+'-'+options.segment+'.'+'mp4');
-    }.bind(null,options.collection));
+        downloadInBrowser(result.subarray(0,tail),name+'-'+options.sessionID+'-'+options.segment+'.'+'mp4');
+      }.bind(null,options.collection));
 
   };
 

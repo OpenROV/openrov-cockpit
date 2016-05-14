@@ -82,7 +82,7 @@ geomux.prototype.startCamera = function startCamera(device){
     }
   }
 
-  var launch_options = ['nice','-1','node',geoprogram];
+  var launch_options = ['nice','-1','node',geoprogram,'--wspath=/geovideo1','--port=8099'];
   //TODO: Add device to the parameters once it is supported in geomux
 
   const infinite=-1;
@@ -94,6 +94,11 @@ geomux.prototype.startCamera = function startCamera(device){
 
   var self = this;
 
+  monitor.on('stdout',function(data){
+//      var msg = data.toString('utf-8');
+//      console.log(msg);
+  });
+
   monitor.on('stderr',function(data){
     var msg = data.toString('utf-8');
     var service;
@@ -103,7 +108,7 @@ geomux.prototype.startCamera = function startCamera(device){
       return; //abort, not a json message
     }
     if ('service' in service){
-      self.deps.globalEventLoop.emit('CameraRegistration',{location:service.txtRecord.cameraLocation, videoMimeType:service.txtRecord.videoMimeType, resolution:service.txtRecord.resolution, framerate:service.txtRecord.framerate, relativeServiceUrl:service.txtRecord.relativeServiceUrl, sourcePort:service.port, sourceAddress:service.addresses[0]});
+      self.deps.globalEventLoop.emit('CameraRegistration',{location:service.txtRecord.cameraLocation, videoMimeType:service.txtRecord.videoMimeType, resolution:service.txtRecord.resolution, framerate:service.txtRecord.framerate, relativeServiceUrl:process.env.GEO_MOCK==true?':8099':'', wspath:'/geovideo1', connectionType:'socket.io', sourcePort:service.port, sourceAddress:service.addresses[0]});
     }
 
   });

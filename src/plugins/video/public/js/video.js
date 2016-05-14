@@ -43,6 +43,9 @@
     }
 
     //we have a relative or absolute URL to the existing host+port
+    if ((window.location.port!='80') && (window.location.port!='443') && (window.location.port!='')){
+      host.concat(":"+window.location.port);
+    }
     return host.concat(canidateURL);
   }
   //listen gets called by the plugin framework after all of the plugins
@@ -100,7 +103,7 @@
 
       if (data.videoMimeType=='video/mp4'){
         //We expect the mp4 data stream to be sent via a dedicated socket.io stream
-        var connection = window.io.connect(data.sourceAddress);
+        var connection = window.io.connect(data.sourceAddress,{path:data.wspath});
         connection.on("connect",function(){
 
           //TODO: abstract the messages enough that we can have multiple cameras controls

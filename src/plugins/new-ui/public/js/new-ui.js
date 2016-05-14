@@ -12,6 +12,10 @@
 
   plugins.NewUI.prototype.listen = function listen(){
 //    $('#t')[0]['cockpitEventEmitter'] = this.cockpit;
+    if (window.cockpit_int.i18n === undefined){
+      setTimeout(this.listen.bind(this),250);
+      return;
+    }
 
     window.cockpit_int.i18n.loadNamespace('new-ui', function() {  });
     var key_s = window.cockpit_int.i18n.options.keyseparator;

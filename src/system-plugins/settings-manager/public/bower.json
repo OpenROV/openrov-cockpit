@@ -19,6 +19,7 @@
     "paper-toast": "PolymerElements/paper-toast#^1.2.2"
   },
   "resolutions": {
-    "webcomponentsjs": "^0.6.0"
+    "webcomponentsjs": "^0.7.20",
+    "polymer": "^1.1.0"
   }
 }

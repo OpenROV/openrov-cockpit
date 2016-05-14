@@ -14,5 +14,8 @@
   ],
   "dependencies": {
     "three.js": "threejs#*"
+  },
+  "resolutions": {
+    "webcomponentsjs": "^0.6.0"
   }
 }

@@ -182,9 +182,8 @@
                     _self.viewers++;
                     _self.peers.push(p);
                     //make last person to connect pilot by default
-                    pilot_sender_id = peer_id;
-                    _self.cockpit.emit('plugin.rovpilot.sendToROVEnabled',false);
-//                    var emitter = new EventEmitter2();
+//                    pilot_sender_id = peer_id;
+//                    _self.cockpit.emit('plugin.rovpilot.sendToROVEnabled',false);
                     p.sendemit = function sendemit(){
                       var args = new Array(arguments.length);
                       for(var i = 0; i < args.length; ++i) {
@@ -192,7 +191,6 @@
                           args[i] = arguments[i];
                       }
                       p.send(msgpack.encode(args));
-                      //p.send("THIS IS A STRING!!!!");
                     }
 
                     //Test data payload sizes

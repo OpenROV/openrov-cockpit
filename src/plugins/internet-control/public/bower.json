@@ -16,5 +16,9 @@
   ],
   "dependencies": {
     "paper-tooltip": "PolymerElements/paper-tooltip#^1.1.2"
+  },
+  "resolutions": {
+    "polymer": "^1.2.0",
+    "webcomponentsjs": "^0.7.20"
   }
 }

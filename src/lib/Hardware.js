@@ -1,15 +1,23 @@
-var crc = require('crc'); var serialPort = require('serialport'), EventEmitter = require('events').EventEmitter,
-StatusReader = require('./StatusReader'), CONFIG = require('./config'), logger = require('./logger').create(CONFIG);
+var crc             = require('crc');
+var serialPort      = require('serialport');
+var EventEmitter    = require('events').EventEmitter;
+var StatusReader    = require('./StatusReader');
+var CONFIG          = require('./config');
+var logger          = require('./logger').create(CONFIG);
+
 function Hardware() {
-  var hardware = new EventEmitter();
-  var reader = new StatusReader();
-  var serialConnected = false;
+  var self              = this;
+  var hardware          = new EventEmitter();
+  var reader            = new StatusReader();
+  var serialConnected   = false;
   var emitRawSerialData = false;
+  
   hardware.serial = {};
-  var self = this;
+  
   reader.on('Arduino-settings-reported', function (settings) {
     hardware.emit('Arduino-settings-reported', settings);
   });
+  
   hardware.connect = function () {
 
     hardware.serial = new serialPort.SerialPort(CONFIG.serial, {

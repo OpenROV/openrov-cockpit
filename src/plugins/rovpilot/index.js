@@ -9,7 +9,6 @@
     this.physics = new ArduinoHelper().physics;
 
     self.cockpit = deps.cockpit;
-    self.rov = deps.rov;
     self.sendToROVEnabled = true;
     self.sendUpdateEnabled = true;
     self.priorControls = {};
@@ -165,7 +164,7 @@
         for(var control in controls){
           if(controls[control] != this.priorControls[control]){
             var command = control + '(' + controls[control] * 100+ ')';
-            this.rov.send(command);
+            deps.globalEventLoop.emit( 'physicalInterface.send', command);
           //  console.log(command);
           }
         }

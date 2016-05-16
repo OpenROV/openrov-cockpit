@@ -2,7 +2,6 @@ function diveprofile(name, deps) {
   console.log('This is where DiveProfile plugin.');
 
   //instance variables
-  this.rov = deps.rov;
   this.cockpit = deps.cockpit;
   this.global = deps.globalEventLoop;
   this.deps = deps;
@@ -13,7 +12,7 @@ function diveprofile(name, deps) {
 diveprofile.prototype.start = function start(){
   var self=this;
 
-  this.deps.rov.on('status', function(data) {
+  this.deps.globalEventLoop.on( 'physicalInterface.status', function(data) {
     var watertype = undefined;
     if ('dtwa' in data) {
       watertype = {raw: data.dtwa, watertype: data.dtwa.toString() == '1' ? 'salt' : 'fresh' };
@@ -30,7 +29,7 @@ diveprofile.prototype.start = function start(){
   });
 
   this.deps.cockpit.on('plugin.diveprofile.watertype.toggle', function () {
-    self.deps.rov.send('dtwa()');
+    self.deps.globalEventLoop.emit( 'physicalInterface.send', 'dtwa()');
   });
 
   self.global.withHistory.on('settings-change.diveprofile',function(data){

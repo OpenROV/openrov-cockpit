@@ -20,7 +20,7 @@ SerialMonitor.prototype.listen = function listen(deps) {
   });
 
   deps.cockpit.on('plugin.serial-monitor.serial-sent', function (data) {
-    deps.rov.send(data);
+    deps.globalEventLoop.emit('physicalInterface.send', data );
   });
 
 };

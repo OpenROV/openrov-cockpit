@@ -114,7 +114,7 @@ settingsManager.prototype.listen = function listen(){
 
   var self=this;
   //Wireup event listeners
-  this.deps.rov.on('status', function (status) {
+  this.deps.globalEventLoop.on('physicalInterface.status', function (status) {
   });
 
   this.deps.cockpit.on('callibrate_escs', function () {

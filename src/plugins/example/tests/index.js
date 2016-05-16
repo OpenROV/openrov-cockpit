@@ -4,7 +4,6 @@ var testee = require('../');
 
 var deps = {
   cockpit: { on: function() {} },
-  rov: { registerPassthrough: function() {} }
 };
 
 describe('unit',function(){
@@ -12,13 +11,11 @@ describe('unit',function(){
     beforeEach(function () {
       sinon.spy(console, 'log');
       sinon.spy(deps.cockpit, 'on');
-      sinon.spy(deps.rov, 'registerPassthrough');
     });
 
     afterEach(function () {
       console.log.restore();
       deps.cockpit.on.restore();
-      deps.rov.registerPassthrough.restore();
     });
 
     it('the example calls console.log', function () {
@@ -36,11 +33,6 @@ describe('unit',function(){
     it('registers on events from cockpit', function() {
       new testee('', deps).start();
       deps.cockpit.on.calledTwice.should.be.true; /* jshint ignore:line */
-    });
-
-    it('registers passthrough commands', function() {
-      new testee('', deps).start();
-      deps.rov.registerPassthrough.calledOnce.should.be.true; /* jshint ignore:line */
     });
   });
 });

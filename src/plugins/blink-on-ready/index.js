@@ -3,8 +3,10 @@ function readyAyeReady(name, deps) {
   var lastLightCmd = '';
 
   //rovsys comes up when arduino starts
-  deps.rov.on('rovsys', function(s){
-    if (! done) {
+  deps.globalEventLoop.on('physicalInterface.rovsys', function(s)
+  {
+    if (! done) 
+    {
       console.log('The ROV is ready!.');
       setLight('12.5');
       done = true;

@@ -52,6 +52,7 @@ thrusters2x1.prototype.start = function start(){
   });
 
   self.cockpit.on('plugin.thrusters2x1.motorTest', function(positions){
+    // TODO: Change to global emit
      deps.rov.sendMotorTest(positions.port, positions.starboard, positions.vertical);
   });
 }

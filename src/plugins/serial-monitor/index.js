@@ -6,7 +6,7 @@ SerialMonitor = function SerialMonitor(name, deps) {
   this.listen(deps);
 };
 SerialMonitor.prototype.listen = function listen(deps) {
-  deps.globalEventLoop.on('serial-recieved', function (data) {
+  deps.globalEventLoop.on('physicalInterface.serialRecieved', function (data) {
     deps.cockpit.emit('plugin.serial-monitor.serial-received', data);
   });
   //Would prefer to put this on the global eventloop so that Hardware picks it up, but have

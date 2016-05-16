@@ -56,7 +56,7 @@ var physicalInterface = function physicalInterface( name, deps )
     
     this.hardware.on( 'serial-recieved', function (data) 
     {
-        self.globalEventLoop.emit( 'physicalInterface.serial-recieved', data);
+        self.globalEventLoop.emit( 'physicalInterface.serialRecieved', data);
     });
 
     this.hardware.on( 'status', function (status) 
@@ -89,7 +89,7 @@ var physicalInterface = function physicalInterface( name, deps )
             self.settingsCollection.deadZone_max          = setparts[2];
             self.settingsCollection.water_type            = setparts[3];
             
-            self.globalEventLoop.emit( 'physicalInterface.Arduino-settings-reported', self.settingsCollection );
+            self.globalEventLoop.emit( 'physicalInterface.firmwareSettingsReported', self.settingsCollection );
         }
 
         // Capability report
@@ -126,9 +126,25 @@ var physicalInterface = function physicalInterface( name, deps )
             self.requestCapabilities();
         }
     });
+    
     // ----------------------------------------------------------------------
-  
     // Register global event handlers
+    
+    this.globalEventLoop.on('physicalInterface.send', function( cmd ) 
+    {
+        self.send( cmd );
+    });
+    
+    this.globalEventLoop.on('physicalInterface.sendMotorTest', function( port, starbord, vertical )
+    {
+        self.sendMotorTest( port, starbord, vertical );
+    });
+    
+    this.globalEventLoop.on('physicalInterface.registerPassthrough', function ( config ) 
+    {
+        self.registerPassthrough( config );
+    });
+       
     this.globalEventLoop.on('physicalInterface.startRawSerial', function () 
     {
         self.hardware.startRawSerialData();
@@ -138,6 +154,7 @@ var physicalInterface = function physicalInterface( name, deps )
     {
         self.hardware.stopRawSerialData();
     });
+    
     // ----------------------------------------------------------------------
     
     // Connect to the hardware
@@ -145,7 +162,7 @@ var physicalInterface = function physicalInterface( name, deps )
 
     // Every few seconds we check to see if capabilities or settings changes on the arduino.
     // This handles the cases where we have garbled communication or a firmware update of the arduino.
-    setInterval(function () 
+    setInterval( function () 
     {
         if( self.notSafeToControl() === false ) 
         {
@@ -158,7 +175,7 @@ var physicalInterface = function physicalInterface( name, deps )
     }, 1000);
 };
 
-physicalInterface.prototype.notSafeToControl = function () 
+physicalInterface.notSafeToControl = function () 
 {
     // Arduino is OK to accept commands. After the Capabilities was added, all future updates require
     // being backward safe compatible (meaning you cannot send a command that does something unexpected but
@@ -171,37 +188,23 @@ physicalInterface.prototype.notSafeToControl = function ()
     return true;
 };
 
-
-physicalInterface.prototype.send = function( cmd ) 
-{
-    var self = this;
-    
-    if( self.notSafeToControl() )
-    {
-        return;
-    }
-
-    var command = cmd + ';';
-    self.hardware.write( command );
-};
-
 physicalInterface.prototype.requestCapabilities = function () 
 {
     var command = 'rcap();';
-    this.hardware.write(command);
+    this.hardware.write( command );
 };
 
 physicalInterface.prototype.requestSettings = function () 
 {
     //todo: Move to a settings manager
     var command = 'reportSetting();';
-    this.hardware.write(command);
+    this.hardware.write( command );
     
     command = 'rmtrmod();';
-    this.hardware.write(command);
+    this.hardware.write( command );
 };
 
-//TODO: Move the water setting to diveprofile
+// TODO: Move the water setting to diveprofile
 physicalInterface.prototype.updateSetting = function () 
 {
     function watertypeToflag(type)
@@ -226,6 +229,26 @@ physicalInterface.prototype.updateSetting = function ()
     this.hardware.write(command);
 };
 
+
+// --------------------------------
+// Public interfaces
+// -------------------------------
+
+// TODO: Needs global listener
+physicalInterface.prototype.send = function( cmd ) 
+{
+    var self = this;
+    
+    if( self.notSafeToControl() )
+    {
+        return;
+    }
+
+    var command = cmd + ';';
+    self.hardware.write( command );
+};
+
+// TODO: Needs global listener
 physicalInterface.prototype.sendMotorTest = function (port, starbord, vertical) 
 {
     // The 1 bypasses motor smoothing
@@ -236,30 +259,8 @@ physicalInterface.prototype.sendMotorTest = function (port, starbord, vertical)
     this.send(command);
 };
 
-physicalInterface.prototype.sendCommand = function (throttle, yaw, vertical) 
-{
-    var motorCommands = this.physics.mapMotors(throttle, yaw, vertical);
-    
-    var command = 'go(' + motorCommands.port + ',' +
-        motorCommands.vertical + ',' +
-        motorCommands.starbord + ')';
-        
-    this.send(command);
-};
-
-physicalInterface.prototype.stop = function (value) 
-{
-    var command = 'stop()';
-    this.send(command);
-};
-
-physicalInterface.prototype.start = function (value) 
-{
-    var command = 'start()';
-    this.send(command);
-};
-
-physicalInterface.prototype.registerPassthrough = function(config) 
+// TODO: Needs global listener
+physicalInterface.prototype.registerPassthrough = function( config ) 
 {
     if(config) 
     {
@@ -270,17 +271,18 @@ physicalInterface.prototype.registerPassthrough = function(config)
 
         var messagePrefix = config.messagePrefix;
 
+        // Route specific status messages from the firmware to plugins interested in them
         if(config.fromROV) 
         {
             if(Array.isArray(config.fromROV)) 
             {
                 config.fromROV.forEach(function(item) 
                 {
-                    self.on('status', function (data) 
+                    self.globalEventLoop.on( 'physicalInterface.status', function (data) 
                     {
                         if(item in data) 
                         {
-                            self.cockpit.emit(messagePrefix+'.'+item, data[item]);
+                            self.cockpit.emit( messagePrefix + '.' + item, data[item] );
                         }
                     });
                 });
@@ -291,17 +293,18 @@ physicalInterface.prototype.registerPassthrough = function(config)
             }
         }
 
-        if(config.toROV) 
+        // Route commands to the hardware
+        if( config.toROV ) 
         {
-            if(Array.isArray(config.toROV)) 
+            if( Array.isArray( config.toROV ) ) 
             {
-                config.toROV.forEach(function(item) 
+                config.toROV.forEach( function(item) 
                 {
-                    self.cockpit.on(messagePrefix+'.'+item, function(data) 
+                    self.cockpit.on( messagePrefix + '.' + item, function(data) 
                     {
                         var args = Array.isArray(data) ? data.join() : data;
                         var command = item + '(' + args + ')';
-                        self.send(command);
+                        self.send( command );
                     });
                 });
             }

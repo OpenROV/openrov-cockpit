@@ -137,7 +137,7 @@ var deps = {
 
 var numConnections = 0;
 
-// Handle connection events
+// Handle socket.io events
 deps.cockpit.on('connect', function () 
 {
     numConnections++;
@@ -151,6 +151,13 @@ deps.cockpit.on('disconnect', function ()
     console.log('Disconnect detected');
     console.log('Current connections: ' + numConnections );
 });
+
+// Handle global events
+deps.globalEventLoop.on( 'physicalInterface.rovsys', function( data ) 
+{
+    deps.cockpit.emit( 'physicalInterface.rovsys', data );
+} );
+
 
 // -----------------------------------------------------------------------
 // Load Plugins

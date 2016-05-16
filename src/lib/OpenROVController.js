@@ -4,15 +4,15 @@
  * This file holds the controller logic.  It manages the connection to the Atmega328.
  *
  */
-var path = require('path'), spawn = require('child_process').spawn, CONFIG = require('./config'), StatusReader = require('./StatusReader'), ArduinoHelper = require('./ArduinoHelper'), logger = require('./logger').create(CONFIG), EventEmitter = require('events').EventEmitter, Hardware = require('../' + CONFIG.Hardware);
-var setup_serial = function () {
-  var location = path.join(__dirname, '..', './linux');
-  logger.log('Starting the script from ' + location + ' to setup UART1...');
-  var setuart_process = spawn('sudo', [path.join(location, 'setuart.sh')]);
-  setuart_process.on('error', function (err) {
-    logger.log('Error while starting the UART1 setup scipt!\nThe error was: ' + err);
-  });
-};
+var path            = require('path');
+var spawn           = require('child_process').spawn;
+var CONFIG          = require('./config');
+var StatusReader    = require('./StatusReader');
+var ArduinoHelper   = require('./ArduinoHelper');
+var logger          = require('./logger').create(CONFIG);
+var EventEmitter    = require('events').EventEmitter;
+var Hardware        = require('../' + CONFIG.Hardware);
+
 var statusdata = {};
 var settingsCollection = {
     smoothingIncriment: 0,
@@ -24,12 +24,12 @@ var settingsCollection = {
 var rovsys = { capabilities: 0 };
 
 var OpenROVController = function (eventLoop, client) {
-  var controller = this;
-  var serial;
-  var globalEventLoop = eventLoop;
-  this.physics = new ArduinoHelper().physics;
+  var controller        = this;
+  var globalEventLoop   = eventLoop;
+  
+  this.physics  = new ArduinoHelper().physics;
   this.hardware = new Hardware();
-  this.cockpit = client;
+  this.cockpit  = client;
 
   this.hardware.on('serial-recieved', function (data) {
     globalEventLoop.emit('serial-recieved', data);
@@ -41,11 +41,16 @@ var OpenROVController = function (eventLoop, client) {
     for (var i in status) {
       statusdata[i] = status[i];
     }
+    
     controller.emit('status', statusdata);
-    if ('ver' in status) {
+    
+    if ('ver' in status) 
+    {
       controller.ArduinoFirmwareVersion = status.ver;
     }
-    if ('TSET' in status) {
+    
+    if ('TSET' in status) 
+    {
       var setparts = status.settings.split(',');
       settingsCollection.smoothingIncriment = setparts[0];
       settingsCollection.deadZone_min = setparts[1];
@@ -53,27 +58,35 @@ var OpenROVController = function (eventLoop, client) {
       settingsCollection.water_type = setparts[3];
       controller.emit('Arduino-settings-reported', settingsCollection);
     }
-    if ('CAPA' in status) {
+    
+    if ('CAPA' in status) 
+    {
       var s = rovsys;
       s.capabilities = parseInt(status.CAPA);
       controller.Capabilities = s.capabilities;
       controller.emit('rovsys', s);
     }
-    if ('cmd' in status) {
+    
+    if ('cmd' in status) 
+    {
       if (status.com != 'ping(0)'){
         controller.emit('command', status.cmd);
       }
     }
-    if ('log' in status) {
+    
+    if ('log' in status)
+    {
     }
-    if ('boot' in status){
+    
+    if ('boot' in status)
+    {
       this.Capabilities = 0;
       controller.updateSetting();
       controller.requestSettings();
       controller.requestCapabilities();
     }
   });
-  setup_serial();
+  
   this.hardware.connect();
   controller.ArduinoFirmwareVersion = 0;
   controller.Capabilities = 0;
@@ -103,7 +116,6 @@ var OpenROVController = function (eventLoop, client) {
     controller.updateSetting();
     controller.requestSettings();
     controller.requestCapabilities();
-//    logger.log('Opened serial connection after firmware upload');
   });
 
   //Every few seconds we check to see if capabilities or settings changes on the arduino.
@@ -117,19 +129,19 @@ var OpenROVController = function (eventLoop, client) {
 
   return controller;
 };
+
 OpenROVController.prototype = new EventEmitter();
 OpenROVController.prototype.constructor = OpenROVController;
 
 OpenROVController.prototype.notSafeToControl = function () {
-  //Arduino is OK to accept commands. After the Capabilities was added, all future updates require
-  //being backward safe compatible (meaning you cannot send a command that does something unexpected but
-  //instead it should do nothing).
+  // Arduino is OK to accept commands. After the Capabilities was added, all future updates require
+  // being backward safe compatible (meaning you cannot send a command that does something unexpected but
+  // instead it should do nothing).
   if (this.Capabilities !== 0)
+  {
     return false;
-  //This feature added after the swap to ms on the Arduino
-//  console.log('Waiting for the capability response from Arduino before sending command.');
-//  console.log('Arduno Version: ' + this.ArduinoFirmwareVersion);
-//  console.log('Capability bitmap: ' + this.Capabilities);
+  }
+  
   return true;
 };
 
@@ -137,7 +149,9 @@ OpenROVController.prototype.notSafeToControl = function () {
 OpenROVController.prototype.send = function (cmd) {
   var controller = this;
   if (controller.notSafeToControl())
+  {
     return;
+  }
 
   var command = cmd + ';';
 
@@ -169,6 +183,7 @@ OpenROVController.prototype.updateSetting = function () {
     + CONFIG.preferences.get('deadzone_neg') + ','
     + CONFIG.preferences.get('deadzone_pos') + ','
     + watertypeToflag(CONFIG.preferences.get('plugin:diveprofile:water-type')) + ');';
+    
   this.hardware.write(command);
   //This is the multiplier used to make the motor act linear fashion.
   //for example: the props generate twice the thrust in the positive direction

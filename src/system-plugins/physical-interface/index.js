@@ -1,14 +1,44 @@
-var ArduinoHelper   = require('./ArduinoHelper');
+// To eliminate hard coding paths for require, we are modifying the NODE_PATH to include our lib folder
+var oldpath = '';
+if(process.env['NODE_PATH']!==undefined)
+{
+    oldpath = process.env['NODE_PATH'];
+}
+
+// Just in case already been set, leave it alone
+process.env['NODE_PATH'] = ( __dirname + '/modules:' + oldpath );
+require('module').Module._initPaths();
+console.log( "Set NODE_PATH to: " + process.env['NODE_PATH'] );
+
+var ArduinoHelper   = require('ArduinoHelper.js');
+
+// Load appropriate hardware constructor
+var Hardware;
+
+if( process.env.HARDWARE_MOCK == 'true' )
+{
+    Hardware = require( 'Hardware-mock.js' );
+} 
+else 
+{
+    Hardware = require( 'Hardware.js' );
+}
 
 var physicalInterface = function physicalInterface( name, deps ) 
 {
-    var controller          = this;
-    var globalEventLoop     = deps.globalEventLoop;
-    var cockpit             = deps.cockpit;
-    var Hardware            = require('../' + deps.config.Hardware);
+    var self                = this;
     
-    var statusdata = {};
-    var settingsCollection = 
+    this.globalEventLoop    = deps.globalEventLoop;
+    this.cockpit            = deps.cockpit;
+    this.physics            = new ArduinoHelper().physics;
+    this.hardware           = new Hardware();
+   
+       
+    this.firmwareVersion    = 0;
+    this.Capabilities       = 0;
+    this.statusdata         = {};
+    
+    this.settingsCollection = 
     {
         smoothingIncriment: 0,
         deadZone_min: 0,
@@ -16,135 +46,116 @@ var physicalInterface = function physicalInterface( name, deps )
         water_type: 0 // FreshWater
     };
 
-    var rovsys = 
+    this.rovsys = 
     { 
         capabilities: 0 
     };
-    
-    this.physics            = new ArduinoHelper().physics;
-    this.hardware           = new Hardware();
     
     // ----------------------------------------------------------------------
     // Register Hardware Event Handlers
     
     this.hardware.on( 'serial-recieved', function (data) 
     {
-        globalEventLoop.emit( 'sys.physicalInterface.serial-recieved', data);
+        self.globalEventLoop.emit( 'physicalInterface.serial-recieved', data);
     });
 
-    this.hardware.on('status', function (status) 
+    this.hardware.on( 'status', function (status) 
     {
-        statusdata = {};
+        // Clear old status data
+        self.statusdata = {};
 
-        for (var i in status) 
+        // Copy new status data 
+        for( var i in status ) 
         {
-            statusdata[i] = status[i];
+            self.statusdata[i] = status[i];
         }
 
-        globalEventLoop.emit('sys.physicalInterface.status', statusdata);
+        // Re-emit status data for other subsystems
+        self.globalEventLoop.emit('physicalInterface.status', statusdata);
 
-        if ('ver' in status) 
+        // Firmware version
+        if( 'ver' in status ) 
         {
-            controller.ArduinoFirmwareVersion = status.ver;
+            self.firmwareVersion = status.ver;
         }
-
-        if ('TSET' in status) 
+         
+        // Settings update   
+        if( 'TSET' in status ) 
         {
-            var setparts                            = status.settings.split(',');
-            settingsCollection.smoothingIncriment   = setparts[0];
-            settingsCollection.deadZone_min         = setparts[1];
-            settingsCollection.deadZone_max         = setparts[2];
-            settingsCollection.water_type           = setparts[3];
+            var setparts = status.settings.split(',');
             
-            globalEventLoop.emit('sys.physicalInterface.Arduino-settings-reported', settingsCollection);
+            self.settingsCollection.smoothingIncriment    = setparts[0];
+            self.settingsCollection.deadZone_min          = setparts[1];
+            self.settingsCollection.deadZone_max          = setparts[2];
+            self.settingsCollection.water_type            = setparts[3];
+            
+            self.globalEventLoop.emit( 'physicalInterface.Arduino-settings-reported', self.settingsCollection );
         }
 
-        if ('CAPA' in status) 
+        // Capability report
+        if( 'CAPA' in status ) 
         {
-            var s                   = rovsys;
+            var s                   = self.rovsys;
             s.capabilities          = parseInt(status.CAPA);
-            controller.Capabilities = s.capabilities;
-            globalEventLoop.emit('sys.physicalInterface.rovsys', s);
+            
+            self.Capabilities = s.capabilities;
+            self.globalEventLoop.emit( 'physicalInterface.rovsys', s );
         }
 
-        if ('cmd' in status) 
+        // Command request
+        if( 'cmd' in status ) 
         {
-            if (status.com != 'ping(0)')
+            // Re-emit all commands except ping
+            if( status.com != 'ping(0)' )
             {
-                globalEventLoop.emit('sys.physicalInterface.command', status.cmd);
+                self.globalEventLoop.emit( 'physicalInterface.command', status.cmd );
             }
         }
 
-        if ('log' in status)
+        // Log entry
+        if( 'log' in status )
         {
         }
 
-        if ('boot' in status)
+        // Initial boot notification
+        if( 'boot' in status )
         {
-            this.Capabilities = 0;
-            controller.updateSetting();
-            controller.requestSettings();
-            controller.requestCapabilities();
+            self.Capabilities = 0;
+            self.updateSetting();
+            self.requestSettings();
+            self.requestCapabilities();
         }
     });
     // ----------------------------------------------------------------------
   
-    
-
-    globalEventLoop.on('register-ArdunoFirmwareVersion', function (val) 
+    // Register global event handlers
+    this.globalEventLoop.on('physicalInterface.startRawSerial', function () 
     {
-        controller.ArduinoFirmwareVersion = val;
-    });
-    
-    globalEventLoop.on('register-ArduinoCapabilities', function (val) 
-    {
-        controller.Capabilities = val;
+        self.hardware.startRawSerialData();
     });
 
-    globalEventLoop.on('SerialMonitor_start_rawSerial', function () 
+    this.globalEventLoop.on('physicalInterface.stopRawSerial', function () 
     {
-        controller.hardware.startRawSerialData();
+        self.hardware.stopRawSerialData();
     });
-
-    globalEventLoop.on('SerialMonitor_stop_rawSerial', function () 
-    {
-        controller.hardware.stopRawSerialData();
-    });
-
-    globalEventLoop.on('serial-stop', function () 
-    {
-        logger.log('Closing serial connection for firmware upload');
-        controller.hardware.close();
-    });
-
-    globalEventLoop.on('serial-start', function () 
-    {
-        controller.hardware.connect();
-        controller.updateSetting();
-        controller.requestSettings();
-        controller.requestCapabilities();
-    });
+    // ----------------------------------------------------------------------
     
     // Connect to the hardware
     this.hardware.connect();
-    controller.ArduinoFirmwareVersion   = 0;
-    controller.Capabilities             = 0;
 
-    //Every few seconds we check to see if capabilities or settings changes on the arduino.
-    //This handles the cases where we have garbled communication or a firmware update of the arduino.
+    // Every few seconds we check to see if capabilities or settings changes on the arduino.
+    // This handles the cases where we have garbled communication or a firmware update of the arduino.
     setInterval(function () 
     {
-        if (controller.notSafeToControl() === false) 
+        if( self.notSafeToControl() === false ) 
         {
             return;
         }
         
-        controller.updateSetting();
-        controller.requestSettings();
-        controller.requestCapabilities();
+        self.updateSetting();
+        self.requestSettings();
+        self.requestCapabilities();
     }, 1000);
-
-    return controller;
 };
 
 physicalInterface.prototype.notSafeToControl = function () 
@@ -152,7 +163,7 @@ physicalInterface.prototype.notSafeToControl = function ()
     // Arduino is OK to accept commands. After the Capabilities was added, all future updates require
     // being backward safe compatible (meaning you cannot send a command that does something unexpected but
     // instead it should do nothing).
-    if (this.Capabilities !== 0)
+    if( this.Capabilities !== 0 )
     {
         return false;
     }
@@ -161,16 +172,17 @@ physicalInterface.prototype.notSafeToControl = function ()
 };
 
 
-physicalInterface.prototype.send = function (cmd) 
+physicalInterface.prototype.send = function( cmd ) 
 {
-    var controller = this;
-    if (controller.notSafeToControl())
+    var self = this;
+    
+    if( self.notSafeToControl() )
     {
         return;
     }
 
     var command = cmd + ';';
-    controller.hardware.write(command);
+    self.hardware.write( command );
 };
 
 physicalInterface.prototype.requestCapabilities = function () 
@@ -184,6 +196,7 @@ physicalInterface.prototype.requestSettings = function ()
     //todo: Move to a settings manager
     var command = 'reportSetting();';
     this.hardware.write(command);
+    
     command = 'rmtrmod();';
     this.hardware.write(command);
 };
@@ -248,24 +261,24 @@ physicalInterface.prototype.start = function (value)
 
 physicalInterface.prototype.registerPassthrough = function(config) 
 {
-    if (config) 
+    if(config) 
     {
-        if (!config.messagePrefix) 
+        if(!config.messagePrefix) 
         {
             throw new Error('You need to specify a messagePrefix that is used to emit and receive message.');
         }
 
         var messagePrefix = config.messagePrefix;
 
-        if (config.fromROV) 
+        if(config.fromROV) 
         {
-            if (Array.isArray(config.fromROV)) 
+            if(Array.isArray(config.fromROV)) 
             {
                 config.fromROV.forEach(function(item) 
                 {
                     self.on('status', function (data) 
                     {
-                        if (item in data) 
+                        if(item in data) 
                         {
                             self.cockpit.emit(messagePrefix+'.'+item, data[item]);
                         }
@@ -278,9 +291,9 @@ physicalInterface.prototype.registerPassthrough = function(config)
             }
         }
 
-        if (config.toROV) 
+        if(config.toROV) 
         {
-            if (Array.isArray(config.toROV)) 
+            if(Array.isArray(config.toROV)) 
             {
                 config.toROV.forEach(function(item) 
                 {
@@ -302,5 +315,5 @@ physicalInterface.prototype.registerPassthrough = function(config)
 
 module.exports = function( name, deps )
 {   
-    return new controllerboardInterface( name, deps )
+    return new physicalInterface( name, deps )
 };

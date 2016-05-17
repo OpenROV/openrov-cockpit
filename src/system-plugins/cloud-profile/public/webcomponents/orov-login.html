@@ -6,17 +6,22 @@
 <link rel="import" href="../paper-menu-button/paper-menu-button.html">
 <dom-module name="orov-login">
   <style>
+  paper-button {
+    background: white;
+    color:black;
+  }
   </style>
   <template>
-    <div>
-      <paper-menu-button hidden="{{displayLoggedIn(loggedIn)}}">
+      <span hidden="{{displayLoggedIn(loggedIn)}}">
+      <paper-menu-button>
         <paper-icon-button src='[[profilePictureURL]]' class="dropdown-trigger"></paper-icon-button>
         <paper-menu class="dropdown-content">
-          <paper-item>Logout</paper-item>
+          <paper-item on-tap="logout">Logout</paper-item>
         </paper-menu>
-      </paper-menu-button>
-      <paper-button raised on-tap="handleLoginTap" hidden="{{!displayLoggedIn(loggedIn)}}"">Login</paper-button>
-    </div>
+      </paper-menu-button></span>
+      <span hidden="{{!displayLoggedIn(loggedIn)}}">
+      <paper-button raised on-tap="handleLoginTap">Login</paper-button>
+     </span>
   </template>
   <script>
     (function() {

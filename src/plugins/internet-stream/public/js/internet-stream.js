@@ -34,11 +34,11 @@
       canBeDisabled: true, //allow enable/disable
       defaultEnabled: true
     };
-    this.enabled = false;
     this.connected = false;
     this.connecting = false;
     this.streaming = false;
     this.loggedIn = false;
+    this.enabled = false;
     var self=this;
     this.cockpit.on('cloudprofile-status',function(status){
       self.loggedIn=status.loggedIn;
@@ -67,10 +67,29 @@
       return;
     }
     this.stoplistening();
+  };
+
+  InternetStream.prototype.startlisten = function startlisten(){
+    var self = this;
+    this.cockpit.on('internet-stream-start',function(){
+      if (!self.enabled){return;}
+      self.startService();
+
+    });
+
+    this.cockpit.on('internet-stream-stop',function(){
+      if (!self.enabled){return;}
+      self.stopService();
+      self.stop();
+    });
+  }
+
+  InternetStream.prototype.stoplisten = function stoplisten(){
     if (this.streaming) {
       this.stop();
     }
-  };
+  }
+
 
   InternetStream.prototype.stop = function stop() {
     log_trace('InternetStream:Stop');
@@ -82,6 +101,8 @@
     this.cockpit.off('x-h264-video.data', h264dataHandler);
     this.cockpit.emit('local-media-audio-stop');
     this.streaming = false;
+    this.cockpit.emit('internet-stream-status',{isStreaming:false});
+
   }
 
   InternetStream.prototype.stream = function stream() {
@@ -124,6 +145,8 @@
       self.cockpit.emit('local-media-audio-start');
     });
 
+    self.cockpit.emit('internet-stream-status',{isStreaming:true});
+
   }
 
 
@@ -132,7 +155,7 @@
   var socket = null;
   var closeHandler = null;
   var connectHandler = null;
-  InternetStream.prototype.startlisten = function startlisten() {
+  InternetStream.prototype.startService = function startService() {
     if (!this.isEnabled) {
       return;
     }
@@ -212,7 +235,7 @@
 
   }
 
-  InternetStream.prototype.stoplistening = function stoplistening() {
+  InternetStream.prototype.stopService = function stopService() {
     socket.close();
     socket.off('close', closeHandler);
     socket.off('connect', connectHandler);

@@ -199,6 +199,23 @@
                     }
                   }
                 },
+                STR:{
+                  switchable: true,
+                  state: false,
+                  events: [
+                    {message:'internet-stream-status', fn: function(state){return state.isStreaming;}}
+                  ],
+                  description: 'Internet stream video',
+                  switch: function (state) {
+                    if (self.eventEmitter !== undefined){
+                      if (state) {
+                        self.eventEmitter.emit('internet-stream-stop');
+                      } else {
+                        self.eventEmitter.emit('internet-stream-start');
+                      }
+                    }
+                  }
+                }
               };
             }
           }

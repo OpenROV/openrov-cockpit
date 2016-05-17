@@ -141,7 +141,7 @@
     }
 
     if (localStorage.getItem('id_token')==null){
-      lock.show({ authParams: { scope: 'openid profile' } },function (err, profile, token) {
+      lock.show({ authParams: { scope: 'openid profile' },icon:'https://s3.amazonaws.com/openrov-com-assets/openrov_community_banner_690x138.png',socialBigButtons: true },function (err, profile, token) {
         if (err){
           console.alert('Error logging in:', JSON.stringify(err));
           return; //TODO: Better handling of canceling

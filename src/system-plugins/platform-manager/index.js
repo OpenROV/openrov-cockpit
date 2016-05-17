@@ -1,11 +1,13 @@
 var oldpath = '';
-if (process.env['NODE_PATH']!==undefined){
-  oldpath = process.env['NODE_PATH'];
+if( process.env['NODE_PATH'] !== undefined )
+{
+	oldpath = process.env['NODE_PATH'];
 }
- //just in case already been set leave it alone
-  process.env['NODE_PATH']=__dirname+':'+oldpath;
-  require('module').Module._initPaths();
-  console.log("Set NODE_PATH to: "+process.env['NODE_PATH'] );
+
+// Append this directory to the node path
+process.env['NODE_PATH']=__dirname+':'+oldpath;
+require('module').Module._initPaths();
+console.log("Set NODE_PATH to: "+process.env['NODE_PATH'] );
 
 var fs 		= require( "fs" );
 var path 	= require( "path" );
@@ -15,7 +17,7 @@ var PlatformManager = function( name, deps )
 {
 	var globalEmitter 	= deps.globalEventLoop;
 	var cockpitEmitter 	= deps.cockpit;
-	var platformNames = getDirectories( path.join( __dirname, "platforms" ) );
+	var platformNames 	= getDirectories( path.join( __dirname, "platforms" ) );
 	
 	var manager = {};
 	
@@ -35,6 +37,9 @@ var PlatformManager = function( name, deps )
 		function( platform ) 
 		{
 			console.log( "Successfully loaded configuration for a supported platform." );
+			console.log( "CPU Revision: " + platform.cpu.info.revision );
+			console.log( "CPU Serial: " + platform.cpu.info.serial );
+			console.log( "Board ID: " + platform.board.info.productId )
 			
 			// Set interface properties
 			manager.cpu 	= platform.cpu;
@@ -44,34 +49,34 @@ var PlatformManager = function( name, deps )
 			manager.cpu.initialize();
 			manager.board.initialize();
 			
-			// Cockpit events - CPU
-			cockpitEmitter.on( "platform.cpu.setGovernor", function( governorName )
+			// Global events - CPU
+			globalEmitter.on( "platformManager.cpu.setGovernor", function( governorName )
 			{
 				manager.cpu.setGovernor( governorName );
 			} );
 			
-			// Cockpit events - Board
-			cockpitEmitter.on( "platform.board.buildFirmware", function()
+			// Global events - Board
+			globalEmitter.on( "platform.board.buildFirmware", function()
 			{
 				manager.board.buildSketch( "OpenROV" );
 			} );
 			
-			cockpitEmitter.on( "platform.board.uploadFirmware", function()
+			globalEmitter.on( "platform.board.uploadFirmware", function()
 			{
 				manager.board.buildSketch( "OpenROV" );
 			} );
 			
-			cockpitEmitter.on( "platform.board.buildSketch", function( sketchName )
+			globalEmitter.on( "platform.board.buildSketch", function( sketchName )
 			{
 				manager.board.buildSketch( sketchName );
 			} );
 			
-			cockpitEmitter.on( "platform.board.uploadSketch", function( sketchName )
+			globalEmitter.on( "platform.board.uploadSketch", function( sketchName )
 			{
 				manager.board.uploadSketch( sketchName );
 			} );
 			
-			cockpitEmitter.on( "platform.board.resetMCU", function()
+			globalEmitter.on( "platform.board.resetMCU", function()
 			{
 				manager.board.resetMCU();
 			} );

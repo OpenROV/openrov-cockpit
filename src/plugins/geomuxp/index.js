@@ -108,7 +108,8 @@ geomux.prototype.startCamera = function startCamera(device){
       return; //abort, not a json message
     }
     if ('service' in service){
-      self.deps.globalEventLoop.emit('CameraRegistration',{location:service.txtRecord.cameraLocation, videoMimeType:service.txtRecord.videoMimeType, resolution:service.txtRecord.resolution, framerate:service.txtRecord.framerate, relativeServiceUrl:process.env.GEO_MOCK==true?':8099':'', wspath:'/geovideo1', connectionType:'socket.io', sourcePort:service.port, sourceAddress:service.addresses[0]});
+      self.deps.globalEventLoop.emit('CameraRegistration',{location:service.txtRecord.cameraLocation, videoMimeType:service.txtRecord.videoMimeType, resolution:service.txtRecord.resolution, framerate:service.txtRecord.framerate, relativeServiceUrl:process.env.GEO_MOCK=='true'?':8099':'', wspath:'/geovideo1', connectionType:'socket.io', sourcePort:service.port, sourceAddress:service.addresses[0]});
+      console.log('sending CameraRegistration');
     }
 
   });

@@ -9,6 +9,7 @@
     this.physics = new ArduinoHelper().physics;
 
     self.cockpit = deps.cockpit;
+    self.globalEventLoop = deps.globalEventLoop;
     self.sendToROVEnabled = true;
     self.sendUpdateEnabled = true;
     self.priorControls = {};
@@ -97,6 +98,8 @@
 
     return this;
   };
+  
+  // --------------------
 
   ROVPilot.prototype.adjustForPowerLimit = function adjustForPowerLimit(value){
     return value * this.power;
@@ -143,6 +146,7 @@
 
 
   ROVPilot.prototype.sendPilotingData = function() {
+    var self = this;
     var positions = this.positions;
     var updateRequired = false;
     //Only send if there is a change
@@ -164,7 +168,7 @@
         for(var control in controls){
           if(controls[control] != this.priorControls[control]){
             var command = control + '(' + controls[control] * 100+ ')';
-            deps.globalEventLoop.emit( 'physicalInterface.send', command);
+            self.globalEventLoop.emit( 'physicalInterface.send', command);
           //  console.log(command);
           }
         }

@@ -114,13 +114,13 @@ settingsManager.prototype.listen = function listen(){
 
   var self=this;
   //Wireup event listeners
-  this.deps.globalEventLoop.on('physicalInterface.status', function (status) {
+  self.deps.globalEventLoop.on('physicalInterface.status', function (status) {
   });
 
-  this.deps.cockpit.on('callibrate_escs', function () {
+  self.deps.cockpit.on('callibrate_escs', function () {
   });
 
-  this.deps.cockpit.on('plugin.settings-manager.getSchemas',function(fn){
+  self.deps.cockpit.on('plugin.settings-manager.getSchemas',function(fn){
 
     var s = {
       "title": "OpenROV Settings",
@@ -133,7 +133,7 @@ settingsManager.prototype.listen = function listen(){
     fn(s);
   });
 
-  this.deps.cockpit.on('plugin.settings-manager.getSettings',function(modulename,fn){
+  self.deps.cockpit.on('plugin.settings-manager.getSettings',function(modulename,fn){
     if ((modulename !== undefined) && (modulename !== null)){
       var result = {};
       result[modulename]=self.settings[modulename];
@@ -148,7 +148,7 @@ settingsManager.prototype.listen = function listen(){
     }
   })
 
-  this.deps.cockpit.on('plugin.settings-manager.saveSettings',function(settings,fn){
+  self.deps.cockpit.on('plugin.settings-manager.saveSettings',function(settings,fn){
 //    self.deps.config.preferences.set(PREFERENCES_NS, settings);
     self.loadSettings(function(){
       for(var item in settings){

@@ -9,7 +9,7 @@ if(process.env['NODE_PATH']!==undefined)
 process.env['NODE_PATH'] = ( __dirname + '/modules:' + oldpath );
 require('module').Module._initPaths();
 
-var ArduinoHelper   = require('ArduinoHelper.js');
+var ArduinoHelper   = require('../../lib/ArduinoHelper.js');
 
 // Load appropriate hardware constructor
 var Hardware;
@@ -30,10 +30,10 @@ var physicalInterface = function physicalInterface( name, deps )
     this.debug              = require('debug')( name );
     this.globalEventLoop    = deps.globalEventLoop;
     this.cockpit            = deps.cockpit;
+    this.CONFIG             = deps.config;
     this.physics            = new ArduinoHelper().physics;
     this.hardware           = new Hardware( deps );
-   
-       
+     
     this.firmwareVersion    = 0;
     this.Capabilities       = 0;
     this.statusdata         = {};
@@ -71,7 +71,7 @@ var physicalInterface = function physicalInterface( name, deps )
         }
 
         // Re-emit status data for other subsystems
-        self.globalEventLoop.emit('physicalInterface.status', statusdata);
+        self.globalEventLoop.emit('physicalInterface.status', self.statusdata);
 
         // Firmware version
         if( 'ver' in status ) 
@@ -175,7 +175,7 @@ var physicalInterface = function physicalInterface( name, deps )
     }, 1000);
 };
 
-physicalInterface.notSafeToControl = function () 
+physicalInterface.prototype.notSafeToControl = function () 
 {
     // Arduino is OK to accept commands. After the Capabilities was added, all future updates require
     // being backward safe compatible (meaning you cannot send a command that does something unexpected but
@@ -221,10 +221,10 @@ physicalInterface.prototype.updateSetting = function ()
     // For example: the props generate twice the thrust in the positive direction than the negative direction.
     // To make it linear we have to multiply the negative direction * 2.
     var command = 'updateSetting('
-        + CONFIG.preferences.get('smoothingIncriment') + ','
-        + CONFIG.preferences.get('deadzone_neg') + ','
-        + CONFIG.preferences.get('deadzone_pos') + ','
-        + watertypeToflag(CONFIG.preferences.get('plugin:diveprofile:water-type')) + ');';
+        + this.CONFIG.preferences.get('smoothingIncriment') + ','
+        + this.CONFIG.preferences.get('deadzone_neg') + ','
+        + this.CONFIG.preferences.get('deadzone_pos') + ','
+        + watertypeToflag( this.CONFIG.preferences.get('plugin:diveprofile:water-type')) + ');';
     
     this.hardware.write(command);
 };
@@ -262,6 +262,7 @@ physicalInterface.prototype.sendMotorTest = function (port, starbord, vertical)
 // TODO: Needs global listener
 physicalInterface.prototype.registerPassthrough = function( config ) 
 {
+    var self = this;
     if(config) 
     {
         if(!config.messagePrefix) 

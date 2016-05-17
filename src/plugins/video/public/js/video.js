@@ -27,24 +27,26 @@
 
   };
 
-  var ResloveURL = function(canidateURL){
+  var ResolveURL = function(canidateURL){
     var http = location.protocol;
     var slashes = http.concat("//");
     var host = slashes.concat(window.location.hostname);
 
+    //just return fully qualifed addresses
+    if (canidateURL.startsWith('http')){
+        //use the URL as is
+        return canidateURL;
+    }
+
+    //if a port is defined, use it
     if (canidateURL.startsWith(':')){
       //append host to rest of url that includes a new port
       return host.concat(canidateURL);
-    }
-
-    if (canidateURL.startsWith('http')){
-      //use the URL as is
-      return canidateURL;
-    }
-
-    //we have a relative or absolute URL to the existing host+port
-    if ((window.location.port!='80') && (window.location.port!='443') && (window.location.port!='')){
-      host.concat(":"+window.location.port);
+    } else {
+      //we have a relative or absolute URL to the existing host+port
+      if ((window.location.port!='') && (window.location.port!='443') && (window.location.port!='80')){
+        host.concat(":"+window.location.port);
+      }
     }
     return host.concat(canidateURL);
   }
@@ -99,29 +101,36 @@
           self.cockpit.emit('CameraRegistration',data);
       }
 
-      data.sourceAddress = ResloveURL(data.relativeServiceUrl);
-
-      if (data.videoMimeType=='video/mp4'){
-        //We expect the mp4 data stream to be sent via a dedicated socket.io stream
-        var connection = window.io.connect(data.sourceAddress,{path:data.wspath});
-        connection.on("connect",function(){
-
-          //TODO: abstract the messages enough that we can have multiple cameras controls
-          self.cockpit.on('request_Init_Segment',function(fn){
-            connection.emit('request_Init_Segment',function(data){
-              fn(data);
-            });
-          });
-
-          connection.on('x-h264-video.data',function(data){
-            self.cockpit.emit('x-h264-video.data',data);
-          })
-
-          self.cockpit.emit('CameraRegistration',data);
-        });
-      } else {
-          self.cockpit.emit('CameraRegistration',data);
+      if(data.connectionType=='http'){
+        data.sourceAddress = ResolveURL(data.relativeServiceUrl);
       }
+
+      var connection;
+      if(data.connectionType=='socket.io'){
+        data.sourceAddress = ResolveURL(data.relativeServiceUrl);
+        connection = window.io.connect(data.sourceAddress,{path:data.wspath});
+
+        if (data.videoMimeType=='video/mp4'){
+            //We expect the mp4 data stream to be sent via a dedicated socket.io stream
+            connection.on("connect",function(){
+
+              //TODO: abstract the messages enough that we can have multiple cameras controls
+              self.cockpit.on('request_Init_Segment',function(fn){
+                connection.emit('request_Init_Segment',function(data){
+                  fn(data);
+                });
+              });
+
+              connection.on('x-h264-video.data',function(data){
+                self.cockpit.emit('x-h264-video.data',data);
+              })
+
+            });
+
+        }
+      }
+
+      self.cockpit.emit('CameraRegistration',data);
 
     });
 

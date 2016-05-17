@@ -1,5 +1,8 @@
-var EventEmitter = require('events').EventEmitter, StatusReader = require('./StatusReader'), CONFIG = require('./config');
-function Hardware() {
+var EventEmitter = require('events').EventEmitter;
+var StatusReader = require('StatusReader');
+var debug           = require('debug')( 'hardware' );
+
+function Hardware( deps ) {
   var DISABLED = 'DISABLED';
   var hardware = new EventEmitter();
   var reader = new StatusReader();
@@ -12,7 +15,7 @@ function Hardware() {
     hardware.emit('Arduino-settings-reported', settings);
   });
   hardware.connect = function () {
-    console.log('!Serial port opened');
+    debug('!Serial port opened');
   };
   hardware.startRawSerialData = function startRawSerialData() {
     emitRawSerial = true;
@@ -21,8 +24,8 @@ function Hardware() {
     emitRawSerial = false;;
   };
 
-  hardware.write = function (command) {
-    //console.log('HARDWARE-MOCK:' + command);
+  hardware.write = function (command) 
+  {
     var commandParts = command.split(/\(|\)/);
     var commandText = commandParts[0];
     if (commandText === 'rcap') {
@@ -30,19 +33,18 @@ function Hardware() {
     }
     if (commandText === 'ligt') {
       hardware.emitStatus('LIGP:' + commandParts[1]/100);
-      console.log('HARDWARE-MOCK return light status:'+  commandParts[1]/100);
+      debug('HARDWARE-MOCK return light status:'+  commandParts[1]/100);
     }
     if (commandText === 'eligt') {
       hardware.emitStatus('LIGPE:' + commandParts[1]/100);
-      console.log('HARDWARE-MOCK return elight status:'+  commandParts[1]/100);
+      debug('HARDWARE-MOCK return elight status:'+  commandParts[1]/100);
     }
     if (commandText === 'escp') {
       hardware.emitStatus('ESCP:' + commandParts[1]);
-      console.log('HARDWARE-MOCK return ESC status:'+commandParts[1]);
+      debug('HARDWARE-MOCK return ESC status:'+commandParts[1]);
     }
     if (commandText === 'tilt') {
       hardware.emitStatus('servo:' + commandParts[1]);
-  //    console.log('HARDWARE-MOCK return servo status');
     }
     if (commandText === 'claser') {
         if (hardware.laserEnabled) {
@@ -53,7 +55,7 @@ function Hardware() {
           hardware.laserEnabled = true;
           hardware.emitStatus('claser:255');
         }
-      console.log('HARDWARE-MOCK return laser status');
+      debug('HARDWARE-MOCK return laser status');
     }
 
     // Depth hold
@@ -62,7 +64,7 @@ function Hardware() {
         if (!hardware.depthHoldEnabled) {
             targetDepth = currentDepth;
             hardware.depthHoldEnabled = true;
-            console.log('HARDWARE-MOCK depth hold enabled');
+            debug('HARDWARE-MOCK depth hold enabled');
         }
         hardware.emitStatus(
           'targetDepth:' +
@@ -73,7 +75,7 @@ function Hardware() {
       if (commandText === 'holdDepth_off') {
             targetDepth = -500;
             hardware.depthHoldEnabled = false;
-            console.log('HARDWARE-MOCK depth hold DISABLED');
+            debug('HARDWARE-MOCK depth hold DISABLED');
 
         hardware.emitStatus(
           'targetDepth:' +
@@ -86,7 +88,7 @@ function Hardware() {
         var targetHeading = 0;
         targetHeading = currentHeading;
         hardware.targetHoldEnabled= true
-        console.log('HARDWARE-MOCK heading hold enabled');
+        debug('HARDWARE-MOCK heading hold enabled');
 
         hardware.emitStatus(
           'targetHeading:' + (hardware.targetHoldEnabled ? targetHeading.toString() : DISABLED)
@@ -98,7 +100,7 @@ function Hardware() {
         var targetHeading = 0;
             targetHeading = -500;
             hardware.targetHoldEnabled = false;
-            console.log('HARDWARE-MOCK heading hold DISABLED');
+            debug('HARDWARE-MOCK heading hold DISABLED');
         hardware.emitStatus(
           'targetHeading:' + (hardware.targetHoldEnabled ? targetHeading.toString() : DISABLED)
         );
@@ -122,7 +124,7 @@ function Hardware() {
 
   };
   hardware.close = function () {
-    console.log('!Serial port closed');
+    debug('!Serial port closed');
   };
   var time = 1000;
   setInterval(function () {

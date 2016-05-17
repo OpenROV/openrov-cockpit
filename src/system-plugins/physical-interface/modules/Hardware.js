@@ -1,9 +1,8 @@
 var crc             = require('crc');
 var serialPort      = require('serialport');
 var EventEmitter    = require('events').EventEmitter;
-var StatusReader    = require('./StatusReader');
-var CONFIG          = require('./config');
-var logger          = require('./logger').create(CONFIG);
+var StatusReader    = require('StatusReader');
+var debug           = require('debug')( 'hardware' );
 
 function Hardware() {
   var self              = this;
@@ -27,11 +26,11 @@ function Hardware() {
 
     hardware.serial.on('open', function () {
       serialConnected = true;
-      logger.log('Serial port open');
+      debug('Serial port open');
     });
 
     hardware.serial.on('close', function (data) {
-      logger.log('!Serial port closed');
+      debug('!Serial port closed');
       serialConnected = false;
     });
 
@@ -48,7 +47,7 @@ function Hardware() {
   // This code intentionally spaces out the serial commands so that the buffer does not overflow
   var timesent = new Date();
   hardware.write = function (command) {
-    logger.log(command);
+    debug( command );
     var crc8 = crc.crc81wire(command);
     var commandBuffer = new Buffer(command,'utf8');
     var crcBuffer = new Buffer(1);
@@ -66,7 +65,7 @@ function Hardware() {
         if (emitRawSerialData)  hardware.emit('serial-sent', command);
       }, delay);
     } else {
-      logger.log('DID NOT SEND');
+      debug('DID NOT SEND');
     }
   };
   hardware.startRawSerialData = function startRawSerialData() {

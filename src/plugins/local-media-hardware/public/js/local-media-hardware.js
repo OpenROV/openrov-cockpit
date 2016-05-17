@@ -51,8 +51,9 @@
     this.audioCapture = false;
     this.mediaRecorder = null;
     this.mediaStream = null;
+    this.state = {capturing:false,muted:false};
 
-    cockpit.emit('local-media-status',{capturing:false})
+    cockpit.emit('local-media-status',this.state);
 
   };
 
@@ -74,24 +75,32 @@
   LocalMedia.prototype.startlisten = function startlisten() {
     var self = this;
 
-    if (this.cockpit.listeners('local-media-data').length>0) {
+    this.cockpit.on('local-media-audio-start',function(){
       self.capture({audio: true});
-    }
-
-    //We want to explicitly release the mediea resources if nothign is listening to twitchtv-stream-data
-    this.cockpit.on('newListener',function(event){
-      if (event == 'local-media-data'){
-        self.capture({audio: true});
-      }
     });
 
-    this.cockpit.on('removeListener',function(event){
-      if (event == 'local-media-data'){
-        if (self.cockpit.listeners('local-media-data').length==0){
-          self.stop();
-        }
-      }
+    this.cockpit.on('local-media-audio-stop',function(){
+      self.stop();
     });
+
+    this.cockpit.on('local-media-audio-mute',function(){
+      var audioTracks = self.mediaStream.getAudioTracks();
+      for (var i = 0, l = audioTracks.length; i < l; i++) {
+        audioTracks[i].enabled = false;
+      }
+      self.state.muted=true;
+      cockpit.emit('local-media-status',self.state);
+    });
+
+    this.cockpit.on('local-media-audio-unmute',function(){
+      var audioTracks = self.mediaStream.getAudioTracks();
+      for (var i = 0, l = audioTracks.length; i < l; i++) {
+        audioTracks[i].enabled = true;
+      }
+      self.state.muted=false;
+      cockpit.emit('local-media-status',self.state);
+    });
+
 
   };
 
@@ -99,7 +108,7 @@
     if (!this.mediaStream) {
       return;
     } //not capturing
-    this.mediaRecorder.stop();
+    //this.mediaRecorder.stop();
     this.mediaStream.stop();
     this.mediaRecorder = null;
     this.mediaStream = null;
@@ -110,7 +119,7 @@
       return;
     }
     var self = this;
-
+    var audioInitFrame = null;
 
     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
     navigator.getUserMedia(UserMediaOptions,
@@ -124,18 +133,32 @@
         var mediaRecorder = new MediaRecorder(stream, options);
         self.mediaRecorder = MediaRecorder;
         mediaRecorder.ondataavailable = function(e) {
-          cockpit.emit('local-media-data', e);
+          if ((audioInitFrame == null)||(audioInitFrame.size<1500)){
+            if (audioInitFrame==null){
+              audioInitFrame = e.data;
+            }else {
+              audioInitFrame=new Blob([audioInitFrame,e.data]);
+            }
+            console.log(audioInitFrame.size);
+            if (audioInitFrame.size > 1500){
+              cockpit.emit('local-media-init', audioInitFrame);
+            }
+          } else {
+            cockpit.emit('local-media-data', e);
+          }
         }
         mediaRecorder.onerror = function(err) {
           console.error('Errror in mediaRecording: ', err);
         }
         mediaRecorder.start(1000 / 30); //attempt on data events for each frame
         console.log("Recording as ", mediaRecorder.mimeType);
-        cockpit.emit('local-media-status',{capturing:true})
+        self.state.capturing=true;
+        cockpit.emit('local-media-status',self.state);
       }, //initializeRecorder,
       function(err) {
         console.error(err);
-        cockpit.emit('local-media-status',{capturing:false})
+        self.state.capturing=false;
+        cockpit.emit('local-media-status',self.state);
       });
 
 

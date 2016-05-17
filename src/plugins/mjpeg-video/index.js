@@ -46,6 +46,7 @@ mjpegvideo.prototype.enumerateDevices = function enumerateDevices(callback){
   });
 }
 
+
 mjpegvideo.prototype.start = function start(){
   var self = this;
   //if (config.preferences.video)
@@ -54,7 +55,7 @@ mjpegvideo.prototype.start = function start(){
   } else {
     this.enumerateDevices(function(results){
       if (results.length==0) return;
-      self.deps.rov.emit('video-deviceRegistration',results);
+      self.deps.globalEventLoop.emit('video-deviceRegistration',results);
       self.startCamera('/dev/' + results[0].device);
     })
   }

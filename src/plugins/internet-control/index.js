@@ -3,10 +3,7 @@ function ic(name, deps) {
 
   //instance variables
   this.deps = deps; //hold a reference to the plugin dependencies if you are going to use them
-  this.rov = deps.rov; //explicitlly calling out the rov eventemitter
   this.cockpit = deps.cockpit; //explicitly calling out cockpit eventemitter
-
-
 }
 
 // Start is executed after all plugins have loaded. Activate listeners here.

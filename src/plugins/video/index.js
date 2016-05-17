@@ -3,7 +3,6 @@ function video(name, deps) {
 
   //instance variables
   this.deps = deps; //hold a reference to the plugin dependencies if you are going to use them
-  this.rov = deps.rov; //explicitlly calling out the rov eventemitter
   this.cockpit = deps.cockpit; //explicitly calling out cockpit eventemitter
   var self=this;
   this.deps.globalEventLoop.on('CameraRegistration',function(data){

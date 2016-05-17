@@ -5,10 +5,10 @@
 			"name": "Launch",
 			"type": "node",
 			"request": "launch",
-			"program": "src/cockpit.js",
+			"program": "${workspaceRoot}/src/cockpit.js",
 			"stopOnEntry": false,
 			"args": [],
-			"cwd": ".",
+			"cwd": "${workspaceRoot}",
 			"runtimeExecutable": null,
 			"runtimeArgs": [
 				"--nolazy"
@@ -16,7 +16,9 @@
 			"env": {
 				"NODE_ENV": "development",
 				"USE_MOCK": "true",
+				"HARDWARE_MOCK": "true",
 				"GEO_MOCK": "true",
+				"DEBUG": "hardware, physical-interface",
 				"configfile": "/tmp/rovconfig.json",
 				"plugins__ui-manager__selectedUI": "new-ui",
 				"pluginsDownloadDirectory": "/tmp/plugins"
@@ -27,9 +29,16 @@
 		},
 		{
 			"name": "Attach",
-			"type": "node",
-			"request": "attach",
-			"port": 5858
+            "type": "node",
+            "request": "attach",
+            "port": 5858,
+            "address": "localhost",
+            "restart": false,
+            "sourceMaps": false,
+            "outDir": null,
+            "localRoot": "${workspaceRoot}",
+            "remoteRoot": null
+        
 		}
 	]
 }

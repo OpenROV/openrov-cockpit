@@ -19,7 +19,7 @@
       setLights(value);
     });
     // Arduino
-    deps.rov.on('status', function (data) {
+    deps.globalEventLoop.on( 'physicalInterface.status', function (data) {
       if ('LIGPE' in data) {
         //value of 0-1.0 representing percent
         var level = data.LIGPE;
@@ -65,7 +65,7 @@
 
       var command = 'eligt(' + ArduinoHelper.serial.packPercent(this.lights) + ')';
       
-      deps.rov.send(command);
+      deps.globalEventLoop.emit( 'physicalInterface.send', command);
 
     };
 

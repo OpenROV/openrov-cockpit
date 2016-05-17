@@ -9,8 +9,7 @@ SerialMonitor.prototype.listen = function listen(deps) {
   deps.globalEventLoop.on('physicalInterface.serialRecieved', function (data) {
     deps.cockpit.emit('plugin.serial-monitor.serial-received', data);
   });
-  //Would prefer to put this on the global eventloop so that Hardware picks it up, but have
-  //to refactor hardware to listen to the global loop first
+  
   deps.cockpit.on('plugin.serial-monitor.start', function () {
     deps.globalEventLoop.emit('physicalInterface.startRawSerial');
   });

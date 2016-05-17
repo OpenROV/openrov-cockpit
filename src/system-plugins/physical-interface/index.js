@@ -8,7 +8,6 @@ if(process.env['NODE_PATH']!==undefined)
 // Just in case already been set, leave it alone
 process.env['NODE_PATH'] = ( __dirname + '/modules:' + oldpath );
 require('module').Module._initPaths();
-console.log( "Set NODE_PATH to: " + process.env['NODE_PATH'] );
 
 var ArduinoHelper   = require('ArduinoHelper.js');
 
@@ -27,7 +26,8 @@ else
 var physicalInterface = function physicalInterface( name, deps ) 
 {
     var self                = this;
-    
+  
+    this.debug              = require('debug')( name );
     this.globalEventLoop    = deps.globalEventLoop;
     this.cockpit            = deps.cockpit;
     this.physics            = new ArduinoHelper().physics;

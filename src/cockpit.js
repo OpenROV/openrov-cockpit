@@ -189,7 +189,6 @@ Q.allSettled(funcs).then(function(results)
         {
             var reason = result.reason;
             console.error(reason);
-            debugger;
         }
     });
 

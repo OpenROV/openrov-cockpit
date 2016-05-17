@@ -4,12 +4,14 @@ var EventEmitter    = require('events').EventEmitter;
 var StatusReader    = require('StatusReader');
 var debug           = require('debug')( 'hardware' );
 
-function Hardware() {
+function Hardware( deps ) {
   var self              = this;
+  var CONFIG            = deps.config;
   var hardware          = new EventEmitter();
   var reader            = new StatusReader();
   var serialConnected   = false;
   var emitRawSerialData = false;
+  
   
   hardware.serial = {};
   

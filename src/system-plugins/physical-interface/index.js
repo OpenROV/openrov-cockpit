@@ -31,7 +31,7 @@ var physicalInterface = function physicalInterface( name, deps )
     this.globalEventLoop    = deps.globalEventLoop;
     this.cockpit            = deps.cockpit;
     this.physics            = new ArduinoHelper().physics;
-    this.hardware           = new Hardware();
+    this.hardware           = new Hardware( deps );
    
        
     this.firmwareVersion    = 0;

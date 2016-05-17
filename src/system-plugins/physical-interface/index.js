@@ -52,127 +52,136 @@ var physicalInterface = function physicalInterface( name, deps )
     };
     
     // ----------------------------------------------------------------------
-    // Register Hardware Event Handlers
+    // Wait for platform configuration info so we can know how to interact with the CPU and MCU
     
-    this.hardware.on( 'serial-recieved', function (data) 
-    {
-        self.globalEventLoop.emit( 'physicalInterface.serialRecieved', data);
-    });
-
-    this.hardware.on( 'status', function (status) 
-    {
-        // Clear old status data
-        self.statusdata = {};
-
-        // Copy new status data 
-        for( var i in status ) 
+    this.globalEventLoop.withHistory.on('physicalInterface.platform', function( platform ) 
+    {  
+        self.platform = platform;
+        
+        console.log( "CPU Revision: " + platform.cpu.info.revision );
+        console.log( "CPU Serial: " + platform.cpu.info.serial );
+        console.log( "Board ID: " + platform.board.info.productId );
+        
+        // Now that we have a platform configuration, we can start the MCU and CPU interfaces
+        
+        // Register Hardware Event Handlers
+        
+        self.hardware.on( 'serial-recieved', function (data) 
         {
-            self.statusdata[i] = status[i];
-        }
+            self.globalEventLoop.emit( 'physicalInterface.serialRecieved', data);
+        });
 
-        // Re-emit status data for other subsystems
-        self.globalEventLoop.emit('physicalInterface.status', self.statusdata);
+        self.hardware.on( 'status', function (status) 
+        {
+            // Clear old status data
+            self.statusdata = {};
 
-        // Firmware version
-        if( 'ver' in status ) 
-        {
-            self.firmwareVersion = status.ver;
-        }
-         
-        // Settings update   
-        if( 'TSET' in status ) 
-        {
-            var setparts = status.settings.split(',');
-            
-            self.settingsCollection.smoothingIncriment    = setparts[0];
-            self.settingsCollection.deadZone_min          = setparts[1];
-            self.settingsCollection.deadZone_max          = setparts[2];
-            self.settingsCollection.water_type            = setparts[3];
-            
-            self.globalEventLoop.emit( 'physicalInterface.firmwareSettingsReported', self.settingsCollection );
-        }
-
-        // Capability report
-        if( 'CAPA' in status ) 
-        {
-            var s                   = self.rovsys;
-            s.capabilities          = parseInt(status.CAPA);
-            
-            self.Capabilities = s.capabilities;
-            self.globalEventLoop.emit( 'physicalInterface.rovsys', s );
-        }
-
-        // Command request
-        if( 'cmd' in status ) 
-        {
-            // Re-emit all commands except ping
-            if( status.com != 'ping(0)' )
+            // Copy new status data 
+            for( var i in status ) 
             {
-                self.globalEventLoop.emit( 'physicalInterface.command', status.cmd );
+                self.statusdata[i] = status[i];
             }
-        }
 
-        // Log entry
-        if( 'log' in status )
-        {
-        }
+            // Re-emit status data for other subsystems
+            self.globalEventLoop.emit('physicalInterface.status', self.statusdata);
 
-        // Initial boot notification
-        if( 'boot' in status )
+            // Firmware version
+            if( 'ver' in status ) 
+            {
+                self.firmwareVersion = status.ver;
+            }
+            
+            // Settings update   
+            if( 'TSET' in status ) 
+            {
+                var setparts = status.settings.split(',');
+                
+                self.settingsCollection.smoothingIncriment    = setparts[0];
+                self.settingsCollection.deadZone_min          = setparts[1];
+                self.settingsCollection.deadZone_max          = setparts[2];
+                self.settingsCollection.water_type            = setparts[3];
+                
+                self.globalEventLoop.emit( 'physicalInterface.firmwareSettingsReported', self.settingsCollection );
+            }
+
+            // Capability report
+            if( 'CAPA' in status ) 
+            {
+                var s                   = self.rovsys;
+                s.capabilities          = parseInt(status.CAPA);
+                
+                self.Capabilities = s.capabilities;
+                self.globalEventLoop.emit( 'physicalInterface.rovsys', s );
+            }
+
+            // Command request
+            if( 'cmd' in status ) 
+            {
+                // Re-emit all commands except ping
+                if( status.com != 'ping(0)' )
+                {
+                    self.globalEventLoop.emit( 'physicalInterface.command', status.cmd );
+                }
+            }
+
+            // Log entry
+            if( 'log' in status )
+            {
+            }
+
+            // Initial boot notification
+            if( 'boot' in status )
+            {
+                self.Capabilities = 0;
+                self.updateSetting();
+                self.requestSettings();
+                self.requestCapabilities();
+            }
+        });    
+        
+        // Register global event handlers
+        self.globalEventLoop.on('physicalInterface.send', function( cmd ) 
         {
-            self.Capabilities = 0;
+            self.send( cmd );
+        });
+        
+        self.globalEventLoop.on('physicalInterface.sendMotorTest', function( port, starbord, vertical )
+        {
+            self.sendMotorTest( port, starbord, vertical );
+        });
+        
+        self.globalEventLoop.on('physicalInterface.registerPassthrough', function ( config ) 
+        {
+            self.registerPassthrough( config );
+        });
+        
+        self.globalEventLoop.on('physicalInterface.startRawSerial', function () 
+        {
+            self.hardware.startRawSerialData();
+        });
+
+        self.globalEventLoop.on('physicalInterface.stopRawSerial', function () 
+        {
+            self.hardware.stopRawSerialData();
+        });
+        
+        // Connect to the hardware
+        self.hardware.connect();
+
+        // Every few seconds we check to see if capabilities or settings changes on the arduino.
+        // This handles the cases where we have garbled communication or a firmware update of the arduino.
+        setInterval( function () 
+        {
+            if( self.notSafeToControl() === false ) 
+            {
+                return;
+            }
+            
             self.updateSetting();
             self.requestSettings();
             self.requestCapabilities();
-        }
+        }, 1000);
     });
-    
-    // ----------------------------------------------------------------------
-    // Register global event handlers
-    
-    this.globalEventLoop.on('physicalInterface.send', function( cmd ) 
-    {
-        self.send( cmd );
-    });
-    
-    this.globalEventLoop.on('physicalInterface.sendMotorTest', function( port, starbord, vertical )
-    {
-        self.sendMotorTest( port, starbord, vertical );
-    });
-    
-    this.globalEventLoop.on('physicalInterface.registerPassthrough', function ( config ) 
-    {
-        self.registerPassthrough( config );
-    });
-       
-    this.globalEventLoop.on('physicalInterface.startRawSerial', function () 
-    {
-        self.hardware.startRawSerialData();
-    });
-
-    this.globalEventLoop.on('physicalInterface.stopRawSerial', function () 
-    {
-        self.hardware.stopRawSerialData();
-    });
-    
-    // ----------------------------------------------------------------------
-    
-    // Connect to the hardware
-    this.hardware.connect();
-
-    // Every few seconds we check to see if capabilities or settings changes on the arduino.
-    // This handles the cases where we have garbled communication or a firmware update of the arduino.
-    setInterval( function () 
-    {
-        if( self.notSafeToControl() === false ) 
-        {
-            return;
-        }
-        
-        self.updateSetting();
-        self.requestSettings();
-        self.requestCapabilities();
-    }, 1000);
 };
 
 physicalInterface.prototype.notSafeToControl = function () 

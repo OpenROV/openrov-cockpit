@@ -37,80 +37,14 @@ var PlatformManager = function( name, deps )
 		function( platform ) 
 		{
 			console.log( "Successfully loaded configuration for a supported platform." );
-			console.log( "CPU Revision: " + platform.cpu.info.revision );
-			console.log( "CPU Serial: " + platform.cpu.info.serial );
-			console.log( "Board ID: " + platform.board.info.productId )
-			
-			// Set interface properties
-			manager.cpu 	= platform.cpu;
-			manager.board 	= platform.board;
-			
-			// Call initialization routines for each interface
-			manager.cpu.initialize();
-			manager.board.initialize();
-			
-			// Global events - CPU
-			globalEmitter.on( "platformManager.cpu.setGovernor", function( governorName )
-			{
-				manager.cpu.setGovernor( governorName );
-			} );
-			
-			// Global events - Board
-			globalEmitter.on( "platform.board.buildFirmware", function()
-			{
-				manager.board.buildSketch( "OpenROV" );
-			} );
-			
-			globalEmitter.on( "platform.board.uploadFirmware", function()
-			{
-				manager.board.buildSketch( "OpenROV" );
-			} );
-			
-			globalEmitter.on( "platform.board.buildSketch", function( sketchName )
-			{
-				manager.board.buildSketch( sketchName );
-			} );
-			
-			globalEmitter.on( "platform.board.uploadSketch", function( sketchName )
-			{
-				manager.board.uploadSketch( sketchName );
-			} );
-			
-			globalEmitter.on( "platform.board.resetMCU", function()
-			{
-				manager.board.resetMCU();
-			} );
-			
-			// CPU Interface events
-			manager.cpuInterface.on( "setGovernor.result", function( data )
-			{
-				cockpitEmitter.emit( "platform.cpu.setGovernor.result", data );
-			});
-			
-			// Board Interface events
-			manager.boardInterface.on( "buildSketch.status", function( data )
-			{
-				cockpitEmitter.emit( "platform.board.buildSketch.status", data );
-			});
-			
-			manager.boardInterface.on( "buildSketch.output", function( data )
-			{
-				cockpitEmitter.emit( "platform.board.buildSketch.output", data );
-			});
-			
-			manager.boardInterface.on( "buildSketch.result", function( data )
-			{
-				cockpitEmitter.emit( "platform.board.buildSketch.result", data );
-			});
-			
-			manager.boardInterface.on( "uploadSketch.result", function( data )
-			{
-				cockpitEmitter.emit( "platform.board.uploadSketch.result", data );
-			});
 		
+			// Send the platform object to the hardware interface
+			globalEmitter.emit( "physicalInterface.platform", platform );
 		},
 		function ( error ) 
 		{	
+			console.error( "Failed to verify that the platform is supported." );
+			
 			throw new Error( "Failed to load platform details for this system: " + error );
 		}
 	);

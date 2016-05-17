@@ -22,7 +22,7 @@ var functions = function( board )
 	
 	board.resetMCU = function()
 	{
-		
+		console.log( "Reset MCU!" );
 	};
 }
 

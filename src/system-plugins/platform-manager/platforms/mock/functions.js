@@ -8,6 +8,7 @@ var registerFunctions = function( cpu )
 	cpu.setGovernor = function( governorName )
 	{ 
 		// Set the governor here
+		console.log( "Set Governor to: " + governorName );
 	};
 }
 

@@ -11,10 +11,7 @@
     log_trace = debug('internet-stream:trace');
   });
 
-  //<!-- Auth0Lock script -->
-  $.getScript("//cdn.auth0.com/js/lock-9.1.min.js",function(){
-    lock = new Auth0Lock('VeVsaT3dNLVt1Kv5xIx8GgW69mommmvQ', 'openrov.auth0.com');
-  });
+
 
   //These lines register the Example object in a plugin namespace that makes
   //referencing the plugin easier when debugging.
@@ -41,6 +38,11 @@
     this.connected = false;
     this.connecting = false;
     this.streaming = false;
+    this.loggedIn = false;
+    var self=this;
+    this.cockpit.on('cloudprofile-status',function(status){
+      self.loggedIn=status.loggedIn;
+    });
 
   };
   //Private variables
@@ -135,23 +137,11 @@
       return;
     }
 
-    if (lock==null){
-      setTimeout(this.startlisten.bind(this),500);
+    //TODO: Move the stream setup to a function based on a switch
+    if (!this.loggedIn){
+      setTimeout(this.startlisten.bind(this),5000);
       return;
-    }
-
-    if (localStorage.getItem('id_token')==null){
-      lock.show({ authParams: { scope: 'openid profile' },icon:'https://s3.amazonaws.com/openrov-com-assets/openrov_community_banner_690x138.png',socialBigButtons: true },function (err, profile, token) {
-        if (err){
-          console.alert('Error logging in:', JSON.stringify(err));
-          return; //TODO: Better handling of canceling
-        }
-        localStorage.setItem('id_token', token);
-        console.log(JSON.stringify(profile));
-        this.startlisten.bind(this);
-      });
-      return;
-    }
+    };
 
     closeHandler = function() {
       log_trace("socket.io connection closed");

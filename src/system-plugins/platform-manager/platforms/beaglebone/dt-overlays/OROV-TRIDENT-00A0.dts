@@ -1,0 +1,98 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+        compatible      = "ti,beaglebone", "ti,beaglebone-black";
+        part-number     = "OROV-TRIDENT";
+        version         = "00A0";
+
+        exclusive-use =
+                /* Pins used by this overlay */
+                "P9.14",        /* SAMD21 Reset:                gpio1_18 */
+                "P9.12",        /* SAMD21 Enable Programming:   gpio1_28 */
+                "P9.11",                /* UART4 RXD */
+                "P9.13",                /* UART4 TXD */
+                "P9.24",                /* UART1 TXD */
+        "P9.26",                /* UART1 RXD */
+
+                /* Hardware IP used */
+                "gpio1_18",
+                "gpio1_28",
+                "uart4",
+                "uart1";
+
+        fragment@0 {
+                target = <&am33xx_pinmux>;
+                __overlay__ {
+                        /* Configure UART1 */
+                        uart1_pins: pinmux_uart1_pins {
+                                pinctrl-single,pins = <
+                                        0x184 0x00              /* P9_24 = uart1_txd.uart1_txd, OUTPUT Mode0 */
+                                        0x180 0x20              /* P9_26 = uart1_rxd.uart1_rxd, INPUT  Mode0 */
+                                >;
+                        };
+
+                        /* Configure UART4 */
+                        uart4_pins: pinmux_uart4_pins {
+                                pinctrl-single,pins = <
+                                        0x074 0x06              /* P9_13 = gpmc_wpn.uart4_txd_mux2,   OUTPUT Mode6 */
+                                        0x070 0x26              /* P9_11 = gpmc_wait0.uart4_rxd_mux2, INPUT  Mode6 */
+                                >;
+                        };
+
+                        gpio_pins: pinmux_gpio_pins {
+                                pinctrl-single,pins = <
+                                        0x048 0x0f              /* P9 14 GPIO1_18 | OUTPUT | PULL DISABLED */
+                                        0x078 0x0f              /* P9_12 GPIO1_28 | OUTPUT | PULL DISABLED */
+                                >;
+                        };
+                };
+        };
+
+        /*Turn on UART1*/
+        fragment@1 {
+                target =    <&uart1>; /* really uart1 */
+                __overlay__ {
+                        status = "okay";
+                        pinctrl-names = "default";
+                        pinctrl-0 =    <&uart1_pins>;
+                };
+        };
+
+        /*Turn on UART4*/
+        fragment@2 {
+                target =    <&uart4>; /* really uart4 */
+                __overlay__ {
+                        status = "okay";
+                        pinctrl-names = "default";
+                        pinctrl-0 =    <&uart4_pins>;
+                };
+        };
+
+        fragment@3 {
+                target = <&ocp>;
+                __overlay__ {
+                        Trident_GPIO {
+                                compatible = "gpio-of-helper";
+                                status = "okay";
+                                pinctrl-names = "default";
+                                pinctrl-0 = <&gpio_pins>;
+
+                                /* NOTE: &gpioX numbers are off by one here. i.e. gpio1_18 is written as &gpio2 18 here */
+                                P9_14 {
+                                        gpio-name = "SAMD21_RESET";
+                                        gpio = <&gpio1 18 0x00>;
+                                        output;
+                                        init-high;
+                                };
+
+                                P9_12 {
+                                        gpio-name = "SAMD21_ENPROG";
+                                        gpio = <&gpio1 28 0x00>;        
+                                        output;
+                                        init-high;
+                                };
+                        };
+                };
+        };
+};

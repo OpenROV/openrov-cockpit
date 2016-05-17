@@ -1,0 +1,21 @@
+{
+	"0002"		:{ "model": "B", 				"pcbRev": "1.0", "ram": 256 },
+	"0003"		:{ "model": "B(ECN0001)", 		"pcbRev": "1.0", "ram": 256 },
+	"0004"		:{ "model": "B", 				"pcbRev": "2.0", "ram": 256 },
+	"0006"		:{ "model": "B", 				"pcbRev": "2.0", "ram": 256 },
+	"0005"		:{ "model": "B", 				"pcbRev": "2.0", "ram": 256 },
+	"0007"		:{ "model": "A", 				"pcbRev": "2.0", "ram": 256 },
+	"0008"		:{ "model": "A", 				"pcbRev": "2.0", "ram": 256 },
+	"0009"		:{ "model": "A", 				"pcbRev": "2.0", "ram": 256 },
+	"000e"		:{ "model": "B", 				"pcbRev": "2.0", "ram": 512 },
+	"000d"		:{ "model": "B", 				"pcbRev": "2.0", "ram": 512 },
+	"000f"		:{ "model": "B", 				"pcbRev": "2.0", "ram": 512 },
+	"0010"		:{ "model": "B+", 				"pcbRev": "1.0", "ram": 512 },
+	"0011"		:{ "model": "ComputeModule",	"pcbRev": "1.0", "ram": 512 },
+	"0012"		:{ "model": "A+", 				"pcbRev": "1.0", "ram": 256 },
+	"0013"		:{ "model": "B+", 				"pcbRev": "1.2", "ram": 512 },
+	"a01041"	:{ "model": "2ModelB", 			"pcbRev": "1.1", "ram": 1024 },
+	"a21041"	:{ "model": "2ModelB", 			"pcbRev": "1.1", "ram": 1024 },
+	"900092"	:{ "model": "Zero", 			"pcbRev": "1.2", "ram": 512 },
+	"a02082"	:{ "model": "3ModelB", 			"pcbRev": "1.2", "ram": 1024 }
+}

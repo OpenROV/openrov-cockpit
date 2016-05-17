@@ -1,0 +1,12 @@
+{
+	"0001": 
+	{
+		"UC_RESETN": 	{ "pin": 12, "gpio": 18 },
+		"SWDIO": 		{ "pin": 18, "gpio": 24 },
+		"SWCLK": 		{ "pin": 22, "gpio": 25 },
+		"STATUS_LED0":	{ "pin": 31, "gpio": 6 },
+		"STATUS_LED1":	{ "pin": 33, "gpio": 13 },
+		"STATUS_LED2":	{ "pin": 35, "gpio": 19 },
+		"STATUS_LED3":	{ "pin": 37, "gpio": 26 }
+	}
+}

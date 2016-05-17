@@ -1,0 +1,51 @@
+{
+	"productId": "3000",
+	"rev": "0001",
+	"vendor": "OpenROV",
+	
+	"pinmap":
+	{
+		"P1": "CPU_3V3/3.5E",
+		"P3": "CPU_I2C_SDA",
+		"P5": "CPU_I2C_SCL",
+		"P7": "NC",
+		"P9": "GND",
+		"P11": "CPU_UART_RTSN",
+		"P13": "NC",
+		"P15": "NC",
+		"P17": "NC",
+		"P19": "NC",
+		"P21": "NC",
+		"P23": "NC",
+		"P25": "GND",
+		"P27": "NC",
+		"P29": "NC",
+		"P31": "STATUS_LED0",
+		"P33": "STATUS_LED1",
+		"P35": "STATUS_LED2",
+		"P37": "STATUS_LED3",
+		"P39": "GND",
+		
+		"P2": "5V",
+		"P4": "5V",
+		"P6": "GND",
+		"P8": "CPU_UART_TX",
+		"P10": "CPU_UART_RX",
+		"P12": "UC_RESETN",
+		"P14": "GND",
+		"P16": "NC",
+		"P18": "SWDIO",
+		"P20": "GND",
+		"P22": "SWCLK",
+		"P24": "NC",
+		"P26": "NC",
+		"P28": "NC",
+		"P30": "GND",
+		"P32": "NC",
+		"P34": "GND",
+		"P36": "CPU_UART_CTSN",
+		"P38": "NC",
+		"P40": "PWR_FAIL"
+	}
+	
+}

@@ -1,34 +1,42 @@
+// To eliminate hard coding paths for require, we are modifying the NODE_PATH to include our lib folder
 var oldpath = '';
-if( process.env['NODE_PATH'] !== undefined )
+if(process.env['NODE_PATH']!==undefined)
 {
-	oldpath = process.env['NODE_PATH'];
+    oldpath = process.env['NODE_PATH'];
 }
 
-// Append this directory to the node path
-process.env['NODE_PATH']=__dirname+':'+oldpath;
+// Just in case already been set, leave it alone
+process.env['NODE_PATH'] = ( __dirname + '/modules:' + __dirname + '/platforms:' + oldpath );
 require('module').Module._initPaths();
-console.log("Set NODE_PATH to: "+process.env['NODE_PATH'] );
 
 var fs 		= require( "fs" );
 var path 	= require( "path" );
 var Q 		= require( "q" );
 
+var MCUInterface = require( "MCUInterface.js" );
+var CPUInterface = require( "CPUInterface.js" );
+
 var PlatformManager = function( name, deps )
-{
-	var globalEmitter 	= deps.globalEventLoop;
-	var cockpitEmitter 	= deps.cockpit;
-	var platformNames 	= getDirectories( path.join( __dirname, "platforms" ) );
+{	
+	var self = this;
+	this.platform = {};
 	
-	var manager = {};
+	this.platform.mcuInterface = new MCUInterface( deps );
+	this.platform.cpuInterface = new CPUInterface( deps );
 	
+	// Get a list of all supported platforms
+	var platformNames = getDirectories( path.join( __dirname, "platforms" ) );
+	
+	// Function for loading a platform based on its name
 	var loadPlatform = function ( platformName )
 	{ 
 		var platformPath = "./platforms/" + platformName;
 		
-		return require( platformPath + "/platform.js" )( globalEmitter );
+		// Attempt to create platform, passing it the deps object
+		return require( platformPath + "/platform.js" )( self.platform );
 	};
 	
-	// Attempt to load the platform configuration for each supported CPU.
+	// Attempt to load the platform configuration for each supported CPU
 	var promises = platformNames.map( loadPlatform );
 	
 	// If a supported platform was detected and its configuration loaded, we are now ready to create it's interface in the system
@@ -37,24 +45,26 @@ var PlatformManager = function( name, deps )
 		function( platform ) 
 		{
 			console.log( "Successfully loaded configuration for a supported platform." );
-		
-			// Send the platform object to the hardware interface
-			globalEmitter.emit( "physicalInterface.platform", platform );
+			
+			console.log( self.platform.mcuInterface.SerializeAPI() );
+			console.log( self.platform.cpuInterface.SerializeAPI() );
 		},
 		function ( error ) 
 		{	
-			console.error( "Failed to verify that the platform is supported." );
-			
 			throw new Error( "Failed to load platform details for this system: " + error );
 		}
-	);
+	)
+	.catch( function( error )
+	{
+		console.log( error );
+	} );
 }
 
 function getDirectories( srcpath ) 
 {
-  return fs.readdirSync( srcpath ).filter( function( file ) {
-    return fs.statSync( path.join( srcpath, file ) ).isDirectory();
-  });
+	return fs.readdirSync( srcpath ).filter( function( file ) {
+		return fs.statSync( path.join( srcpath, file ) ).isDirectory();
+	});
 };
 
 

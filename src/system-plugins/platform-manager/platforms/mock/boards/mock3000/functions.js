@@ -1,29 +1,23 @@
-var EventEmitter = require('events').EventEmitter;
 var fs = require('fs');
 var path = require('path');
 var spawn = require('child_process').spawn;
 
-var functions = function( board )
+var RegisterFunctions = function( board )
 {
-	board.initialize = function()
+	board.AddMethod( "Initialize", function()
 	{
-		
-	};
+		console.log( "Board initialized!" );
+	}, false );
 	
-	board.buildSketch = function( sketchName )
-	{		
-
-	};
-	
-	board.uploadSketch = function( sketchName )
+	board.AddMethod( "SendCommand", function( command )
 	{
-		
-	};
+		console.log( "Board command: " + command );
+	}, false );
 	
-	board.resetMCU = function()
+	board.AddMethod( "SendMotorTest", function( port, vertical, starboard )
 	{
-		console.log( "Reset MCU!" );
-	};
+		console.log( "Board motor test: " + port + ", " + vertical + ", " + starboard );
+	}, false );
 }
 
-module.exports = functions;
+module.exports = RegisterFunctions;

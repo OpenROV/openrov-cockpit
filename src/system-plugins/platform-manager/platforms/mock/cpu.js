@@ -10,7 +10,7 @@ var readFile = Q.denodeify( fs.readFile );
 var loadCpuConfig = function( platform )
 {
 	// Create the CPU object
-	var cpu = new EventEmitter();
+	var cpu = platform.cpuInterface;
 	cpu.info = {};
 	
 	// Compose the CPU interface object
@@ -51,6 +51,10 @@ var lookupCpuDetails = function( cpu )
 				
 				return cpu;
 			} )
+			.catch( function( error )
+			{
+				console.log( error );
+			} );
 }
 
 var checkSupport = function( cpu )

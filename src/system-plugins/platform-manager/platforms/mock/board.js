@@ -22,27 +22,21 @@ var eepromParser = Parser.start()
 var loadBoardConfig = function( platform )
 {
 	// Create the CPU object
-	var board = new EventEmitter();
+	var board = platform.mcuInterface;
 	
 	return getBoardInfo( board )
 			.then( loadPinMap )
 			.then( loadBoardFunctions )
 			.then( function( cpu )
 			{
-				// All steps were successful, so we can add the board interface to the platform
-				board.supported	= true;
-				platform.board 	= board;
-				
+				// All steps were successful
 				return platform;
 			} )	
 			.catch( function( err )
 			{
 				console.log( "Err loading board info: " + err );
 				
-				// Still add the board interface, but mark it as unsupported. Cockpit can still function in other ways without board support.
-				board.supported	= false;
-				platform.board 	= board;
-				
+				// Return the platform anyway.
 				return platform;
 			} );
 };

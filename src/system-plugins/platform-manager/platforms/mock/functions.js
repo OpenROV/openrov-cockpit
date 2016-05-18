@@ -1,15 +1,14 @@
-var registerFunctions = function( cpu )
+var RegisterFunctions = function( cpu )
 {
-	cpu.initialize = function()
+	cpu.AddMethod( "Initialize", function()
 	{
-		// Do any initialization routines here
-	};
+		console.log( "Initializing cpu!" );
+	}, false );
 	
-	cpu.setGovernor = function( governorName )
-	{ 
-		// Set the governor here
-		console.log( "Set Governor to: " + governorName );
-	};
+	cpu.AddMethod( "SetGovernor", function( governorName )
+	{
+		console.log( "Setting governor!" );
+	}, false );
 }
 
-module.exports = registerFunctions;
+module.exports = RegisterFunctions;

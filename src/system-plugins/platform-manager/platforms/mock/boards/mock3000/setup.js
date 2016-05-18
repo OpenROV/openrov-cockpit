@@ -2,7 +2,7 @@ var fs 				= require('fs');
 var path 			= require('path');
 var spawn 			= require('child_process').spawn;
 var ArduinoHelper	= require('ArduinoHelper');
-var Hardware		= require('./hardware.js');
+var Hardware		= require('./bridge.js');
 
 var SetupBoardInterface = function( board )
 {
@@ -10,7 +10,7 @@ var SetupBoardInterface = function( board )
 	
 	// Decorate the MCU interface with board specific properties
 	board.physics            = new ArduinoHelper().physics;
-    board.hardware           = new Hardware();
+    board.bridge           = new Hardware();
      
     board.firmwareVersion    = 0;
     board.Capabilities       = 0;
@@ -48,17 +48,17 @@ var SetupBoardInterface = function( board )
 	board.requestCapabilities = function () 
 	{
 		var command = 'rcap();';
-		board.hardware.write( command );
+		board.bridge.write( command );
 	};
 
 	board.requestSettings = function () 
 	{
 		//todo: Move to a settings manager
 		var command = 'reportSetting();';
-		board.hardware.write( command );
+		board.bridge.write( command );
 		
 		command = 'rmtrmod();';
-		board.hardware.write( command );
+		board.bridge.write( command );
 	};
 
 	// TODO: Move the water setting to diveprofile
@@ -83,18 +83,18 @@ var SetupBoardInterface = function( board )
 			+ board.vehicleConfig.preferences.get('deadzone_pos') + ','
 			+ watertypeToflag( board.vehicleConfig.preferences.get('plugin:diveprofile:water-type')) + ');';
 		
-		board.hardware.write(command);
+		board.bridge.write(command);
 	};
 
 	// ------------------------------------------------
-	// Setup hardware interface event handlers
+	// Setup bridge interface event handlers
 	
-	board.hardware.on( 'serial-recieved', function( data ) 
+	board.bridge.on( 'serial-recieved', function( data ) 
 	{
 		board.global.emit( board.interface + '.serialRecieved', data );
 	});
 
-	board.hardware.on( 'status', function (status) 
+	board.bridge.on( 'status', function (status) 
 	{
 		// Clear old status data
 		board.statusdata = {};
@@ -210,7 +210,7 @@ var RegisterFunctions = function( board )
 			return;
 		}
 
-		board.hardware.write( command + ";" );
+		board.bridge.write( command + ";" );
 		
 	}, false );
 	
@@ -221,7 +221,7 @@ var RegisterFunctions = function( board )
 			board.physics.mapRawMotor(vertical) + ',' +
 			board.physics.mapRawMotor(starboard) + ',1)';
 		
-		board.hardware.write( command + ";" );
+		board.bridge.write( command + ";" );
 		
 	}, false );
 	
@@ -258,7 +258,7 @@ var RegisterFunctions = function( board )
 				}
 			}
 
-			// Route commands to the hardware
+			// Route commands to the bridge
 			if( config.toROV ) 
 			{
 				if( Array.isArray( config.toROV ) ) 
@@ -284,8 +284,8 @@ var RegisterFunctions = function( board )
 	
 	board.AddMethod( "StartSerial", function()
 	{
-		// Connect to the hardware
-        board.hardware.connect();
+		// Connect to the MCU
+        board.bridge.connect();
 
         // Every few seconds we check to see if capabilities or settings changes on the arduino.
         // This handles the cases where we have garbled communication or a firmware update of the arduino.
@@ -305,8 +305,8 @@ var RegisterFunctions = function( board )
 	
 	board.AddMethod( "StopSerial", function()
 	{
-		// Close the hardware connection
-        board.hardware.close();
+		// Close the bridge connection
+        board.bridge.close();
 		
 		// Remove the safeCheck interval
 		board.safeCheck = {};
@@ -315,12 +315,12 @@ var RegisterFunctions = function( board )
 	
 	board.AddMethod( "StartRawSerial", function()
 	{
-		board.hardware.startRawSerialData();
+		board.bridge.startRawSerialData();
 	}, false );
 	
 	board.AddMethod( "StopRawSerial", function()
 	{
-		board.hardware.stopRawSerialData();
+		board.bridge.stopRawSerialData();
 	}, false );
 }
 

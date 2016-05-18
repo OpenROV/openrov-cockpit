@@ -1,10 +1,10 @@
 var EventEmitter = require('events').EventEmitter;
-var debug        = require('debug')( 'hardware' );
+var debug        = require('debug')( 'bridge' );
 
-function Hardware() 
+function Bridge() 
 {
   var DISABLED      = 'DISABLED';
-  var hardware      = new EventEmitter();
+  var bridge      = new EventEmitter();
   var reader        = new StatusReader();
   var emitRawSerial = false;
 
@@ -15,14 +15,14 @@ function Hardware()
   var currentServo    = 1500;
   var current         = 2;
 
-  hardware.depthHoldEnabled   = false;
-  hardware.targetHoldEnabled  = false;
-  hardware.laserEnabled       = false;
+  bridge.depthHoldEnabled   = false;
+  bridge.targetHoldEnabled  = false;
+  bridge.laserEnabled       = false;
   
   // -----------------------------------------
   // Methods
  
-  hardware.write = function( command ) 
+  bridge.write = function( command ) 
   {
     var commandParts = command.split(/\(|\)/);
     var commandText = commandParts[0];
@@ -31,51 +31,51 @@ function Hardware()
     {
       case "rcap":
       {
-        hardware.emitStatus('CAPA:255');
+        bridge.emitStatus('CAPA:255');
         debug( "CAPA:255")
         break;
       }
         
       case "ligt":
       {
-        hardware.emitStatus('LIGP:' + commandParts[1]/100);
+        bridge.emitStatus('LIGP:' + commandParts[1]/100);
         debug('Light status: '+  commandParts[1]/100);
         break;
       }
       
       case "eligt":
       {
-        hardware.emitStatus('LIGPE:' + commandParts[1]/100);
+        bridge.emitStatus('LIGPE:' + commandParts[1]/100);
         debug('External light status: '+  commandParts[1]/100);
         break;
       }
       
       case "escp":
       {
-        hardware.emitStatus('ESCP:' + commandParts[1]);
+        bridge.emitStatus('ESCP:' + commandParts[1]);
         debug('ESC status: ' + commandParts[1]);
         break;
       }
       
       case "tilt":
       {
-        hardware.emitStatus('servo:' + commandParts[1]);
+        bridge.emitStatus('servo:' + commandParts[1]);
         debug('Tilt status: ' + commandParts[1]/100);
         break;
       }
       
       case "claser":
       {
-        if (hardware.laserEnabled) 
+        if (bridge.laserEnabled) 
         {
-          hardware.laserEnabled = false;
-          hardware.emitStatus('claser:0');
+          bridge.laserEnabled = false;
+          bridge.emitStatus('claser:0');
           debug('Laser status: 0');
         }
         else 
         {
-          hardware.laserEnabled = true;
-          hardware.emitStatus('claser:255');
+          bridge.laserEnabled = true;
+          bridge.emitStatus('claser:255');
           debug('Laser status: 255');
         }
         
@@ -86,13 +86,13 @@ function Hardware()
       {
         var targetDepth = 0;
         
-        if (!hardware.depthHoldEnabled) 
+        if (!bridge.depthHoldEnabled) 
         {
             targetDepth = currentDepth;
-            hardware.depthHoldEnabled = true;
+            bridge.depthHoldEnabled = true;
         }
         
-        hardware.emitStatus('targetDepth:' + (hardware.depthHoldEnabled ? targetDepth.toString() : DISABLED) );
+        bridge.emitStatus('targetDepth:' + (bridge.depthHoldEnabled ? targetDepth.toString() : DISABLED) );
         
         debug('Depth hold enabled');
         
@@ -102,9 +102,9 @@ function Hardware()
       case "holdDepth_off":
       {
         targetDepth = -500;
-        hardware.depthHoldEnabled = false;
+        bridge.depthHoldEnabled = false;
 
-        hardware.emitStatus( 'targetDepth:' + (hardware.depthHoldEnabled ? targetDepth.toString() : DISABLED) );
+        bridge.emitStatus( 'targetDepth:' + (bridge.depthHoldEnabled ? targetDepth.toString() : DISABLED) );
         debug('Depth hold disabled');
         
         break;
@@ -114,9 +114,9 @@ function Hardware()
       {
         var targetHeading = 0;
         targetHeading = currentHeading;
-        hardware.targetHoldEnabled= true;
+        bridge.targetHoldEnabled= true;
 
-        hardware.emitStatus( 'targetHeading:' + (hardware.targetHoldEnabled ? targetHeading.toString() : DISABLED) );
+        bridge.emitStatus( 'targetHeading:' + (bridge.targetHoldEnabled ? targetHeading.toString() : DISABLED) );
         debug('Heading hold enabled');
         
         break;
@@ -126,9 +126,9 @@ function Hardware()
       {
         var targetHeading = 0;
             targetHeading = -500;
-            hardware.targetHoldEnabled = false;
+            bridge.targetHoldEnabled = false;
             
-        hardware.emitStatus( 'targetHeading:' + (hardware.targetHoldEnabled ? targetHeading.toString() : DISABLED) );
+        bridge.emitStatus( 'targetHeading:' + (bridge.targetHoldEnabled ? targetHeading.toString() : DISABLED) );
         debug('Heading hold disabled');
         
         break;
@@ -137,13 +137,13 @@ function Hardware()
       // Passthrough tests
       case "example_to_foo":
       {
-        hardware.emitStatus('example_foo:' + commandParts[1]);
+        bridge.emitStatus('example_foo:' + commandParts[1]);
         break;
       }
       
       case "example_to_bar":
       {
-        hardware.emitStatus('example_bar:' + commandParts[1]);
+        bridge.emitStatus('example_bar:' + commandParts[1]);
         break;
       }
       
@@ -154,69 +154,69 @@ function Hardware()
     }
     
     // Echo this command back to the MCU
-    hardware.emitStatus('cmd:' + command);
+    bridge.emitStatus('cmd:' + command);
   };
   
-  hardware.emitStatus = function(status) 
+  bridge.emitStatus = function(status) 
   {
     var txtStatus = reader.parseStatus(status);
-    hardware.emit('status', txtStatus);
+    bridge.emit('status', txtStatus);
     
     if (emitRawSerial) 
     {
-      hardware.emit('serial-recieved', status);
+      bridge.emit('serial-recieved', status);
     }
   };
   
-  hardware.connect = function () 
+  bridge.connect = function () 
   {
     debug('!Serial port opened');
     
     // Add status interval functions
-    hardware.timeInterval    = setInterval( hardware.emitTime, 1000 );
-    hardware.statsInterval   = setInterval( hardware.emitStats, 3000 );
-    hardware.navDataInterval = setInterval( hardware.emitNavData, 2000 );
+    bridge.timeInterval    = setInterval( bridge.emitTime, 1000 );
+    bridge.statsInterval   = setInterval( bridge.emitStats, 3000 );
+    bridge.navDataInterval = setInterval( bridge.emitNavData, 2000 );
     
     // Emit serial port opened event
   };
   
-  hardware.close = function () 
+  bridge.close = function () 
   {
     debug('!Serial port closed');
     
     // Remove status interval functions
-    clearInterval( hardware.timeInterval );
-    clearInterval( hardware.statsInterval );
-    clearInterval( hardware.navDataInterval );
+    clearInterval( bridge.timeInterval );
+    clearInterval( bridge.statsInterval );
+    clearInterval( bridge.navDataInterval );
     
     // Emit serial port closed event
   };
   
-  hardware.startRawSerialData = function startRawSerialData() 
+  bridge.startRawSerialData = function startRawSerialData() 
   {
     emitRawSerial = true;
   };
   
-  hardware.stopRawSerialData = function stopRawSerialData() 
+  bridge.stopRawSerialData = function stopRawSerialData() 
   {
     emitRawSerial = false;
   };
   
   // Set up intervals to emit mocked 
-  hardware.emitTime = function () 
+  bridge.emitTime = function () 
   {
-    hardware.emit('status', reader.parseStatus('time:' + time));
+    bridge.emit('status', reader.parseStatus('time:' + time));
     time += 1000;
   };
   
-  hardware.emitStats = function() 
+  bridge.emitStats = function() 
   {
     var data = 'vout:9.9;iout:0.2;BT.1.I:0.3;BT.2.I:0.5;BNO055.enabled:true;BNO055.test1.pid:passed;BNO055.test2.zzz:passed;';
     var status = reader.parseStatus(data);
-    hardware.emit('status', status);
+    bridge.emit('status', status);
   };
 
-  hardware.emitNavData = function() 
+  bridge.emitNavData = function() 
   {
     var result = "";
     
@@ -254,17 +254,17 @@ function Hardware()
     }
 
     // Emit status update
-    hardware.emit('status', reader.parseStatus(result));
+    bridge.emit('status', reader.parseStatus(result));
   };
   
   // Listen for firmware settings updates
   // TODO: Has this been deprecated for TSET?
   reader.on('firmwareSettingsReported', function (settings) 
   {
-    hardware.emit('firmwareSettingsReported', settings);
+    bridge.emit('firmwareSettingsReported', settings);
   });
   
-  return hardware;
+  return bridge;
 }
 
 // Helper class for parsing status messages
@@ -334,4 +334,4 @@ var StatusReader = function ()
   return reader;
 };
 
-module.exports = Hardware;
+module.exports = Bridge;

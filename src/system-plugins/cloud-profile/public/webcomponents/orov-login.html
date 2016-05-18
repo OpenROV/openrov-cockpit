@@ -1,0 +1,41 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../cloud-profile/orov-login-behavior.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../paper-menu/paper-menu.html">
+<link rel="import" href="../paper-menu-button/paper-menu-button.html">
+<dom-module name="orov-login">
+  <style>
+  paper-button {
+    background: white;
+    color:black;
+  }
+  </style>
+  <template>
+      <span hidden="{{displayLoggedIn(loggedIn)}}">
+      <paper-menu-button>
+        <paper-icon-button src='[[profilePictureURL]]' class="dropdown-trigger"></paper-icon-button>
+        <paper-menu class="dropdown-content">
+          <paper-item on-tap="logout">Logout</paper-item>
+        </paper-menu>
+      </paper-menu-button></span>
+      <span hidden="{{!displayLoggedIn(loggedIn)}}">
+      <paper-button raised on-tap="handleLoginTap">Login</paper-button>
+     </span>
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        is: "orov-login",
+        behaviors: [namespace('behaviors').oROVLogin],
+        handleLoginTap: function(){
+          this.showLogin();
+        },
+        displayLoggedIn: function(){
+          return !this.loggedIn;
+        }
+      })
+    })();
+  </script>
+
+</dom-module>

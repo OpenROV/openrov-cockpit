@@ -18,11 +18,16 @@ geomux.prototype.enumerateDevices = function enumerateDevices(callback){
   var i=0;
   fs.readdir('/dev', function (err, files) {
     if (err) {
-      reject(err);
+      callback(results);
     }
-    files.filter(function(file){
+    var f = files.filter(function(file){
         return file.indexOf('video') == 0;
-    }).forEach(function(file){
+    });
+    if (f.length==0){
+      callback(result);
+      return;
+    }
+    f.forEach(function(file){
       //udevadm info --query=all --name=/dev/' + file
       //
       i++;
@@ -43,22 +48,34 @@ geomux.prototype.startDevices = function startDevices(callback){
     exec('mxcam list | grep "Core: Condor"', function(error, stdout, stderr){
       if (error == null){
         exec(path.dirname(require.resolve('geo-video-server'))+'/platform/linux/bootcamera.sh', function(error, stdout, stderr){
-          callback();
+          setTimeout(function(){
+            callback();
+          },1000);  //give the system a moment to stabalize after the bootcamera script
         });
+      } else {
+        console.error('Error staring devices geo: ',JSON.stringify(error));
+        callback();
       }
     });
 
 
 }
-
+var timeoutscale = .1;
 geomux.prototype.start = function start(){
+  console.log('geo:start');
   var self=this;
   if (process.env.GEO_MOCK == 'true'){
     this.startCamera('/dev/video0');
   } else {
     this.startDevices(function(){
       self.enumerateDevices(function(results){
-        if (results.length==0) return;
+        if (results.length==0){
+          setTimeout(self.start.bind(this),1000*120*timeoutscale);
+          if (timeoutscale<1){
+            timoutscale+=.1;
+          }
+          return;
+        }
         self.deps.globalEventLoop.emit('video-deviceRegistration',results);
         sortedResult=results.sort(function(a,b){return a.device.localeCompare(b.device)});
         self.startCamera('/dev/' + sortedResult[0].device); //start first camera
@@ -108,7 +125,8 @@ geomux.prototype.startCamera = function startCamera(device){
       return; //abort, not a json message
     }
     if ('service' in service){
-      self.deps.globalEventLoop.emit('CameraRegistration',{location:service.txtRecord.cameraLocation, videoMimeType:service.txtRecord.videoMimeType, resolution:service.txtRecord.resolution, framerate:service.txtRecord.framerate, relativeServiceUrl:process.env.GEO_MOCK==true?':8099':'', wspath:'/geovideo1', connectionType:'socket.io', sourcePort:service.port, sourceAddress:service.addresses[0]});
+      self.deps.globalEventLoop.emit('CameraRegistration',{location:service.txtRecord.cameraLocation, videoMimeType:service.txtRecord.videoMimeType, resolution:service.txtRecord.resolution, framerate:service.txtRecord.framerate, relativeServiceUrl:process.env.GEO_MOCK=='true'?':8099':'', wspath:'/geovideo1', connectionType:'socket.io', sourcePort:service.port, sourceAddress:service.addresses[0]});
+      console.log('sending CameraRegistration');
     }
 
   });

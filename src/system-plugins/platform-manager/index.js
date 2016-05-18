@@ -45,12 +45,6 @@ var PlatformManager = function( name, deps )
 		function( platform ) 
 		{
 			console.log( "Successfully loaded configuration for a supported platform." );
-			
-			console.log( self.platform.mcuInterface.SerializeAPI() );
-			console.log( self.platform.cpuInterface.SerializeAPI() );
-			
-			deps.globalEventLoop.emit( "mcu.SendCommand", "yooooboy" );
-			deps.globalEventLoop.emit( "mcu.SendMotorTest", 1, 2, 3 );
 		},
 		function ( error ) 
 		{	

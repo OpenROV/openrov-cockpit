@@ -183,6 +183,26 @@ var RegisterFunctions = function( board )
 		board.global.emit( "mcu.StartSerial" );
 	}, false );
 	
+	board.AddMethod( "FlashFirmware", function( file )
+	{
+		console.log( "Flashing firmware: " + file );
+	}, false );
+	
+	board.AddMethod( "DumpFirmware", function( path )
+	{
+		console.log( "Dumping firmware to: " + path );
+	}, false );
+	
+	board.AddMethod( "ResetMCU", function( path )
+	{
+		console.log( "Dumping firmware to: " + path );
+	}, false );
+	
+	board.AddMethod( "FlashESC", function()
+	{
+		console.log( "Flashing ESCs" );
+	}, false );
+	
 	board.AddMethod( "SendCommand", function( command )
 	{
 		if( board.notSafeToControl() )

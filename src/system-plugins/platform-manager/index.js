@@ -24,6 +24,8 @@ var PlatformManager = function( name, deps )
 	this.platform.mcuInterface = new MCUInterface( deps );
 	this.platform.cpuInterface = new CPUInterface( deps );
 	
+	// TODO: Wait for settings manager to emit settings for the MCU and CPU interface before creating platforms
+	
 	// Get a list of all supported platforms
 	var platformNames = getDirectories( path.join( __dirname, "platforms" ) );
 	
@@ -45,6 +47,8 @@ var PlatformManager = function( name, deps )
 		function( platform ) 
 		{
 			console.log( "Successfully loaded configuration for a supported platform." );
+			
+			deps.globalEventLoop.emit( "platform.supported" );
 		},
 		function ( error ) 
 		{	
@@ -53,7 +57,7 @@ var PlatformManager = function( name, deps )
 	)
 	.catch( function( error )
 	{
-		console.log( error );
+		deps.globalEventLoop.emit( "platform.unsupported", error );
 	} );
 }
 

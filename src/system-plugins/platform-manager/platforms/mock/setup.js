@@ -53,6 +53,12 @@ var RegisterFunctions = function( cpu )
 	{
 		console.log( "Setting governor!" );
 	}, false );
+	
+	cpu.AddMethod( "BuildFirmware", function( firmwarePath, buildConfig )
+	{
+		console.log( "Building firmware: " + firmwarePath );
+		console.log( "Build config: " + buildConfig );
+	}, false );
 }
 
 module.exports = SetupCPUInterface;

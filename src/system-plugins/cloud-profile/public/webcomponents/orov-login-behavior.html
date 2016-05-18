@@ -26,6 +26,9 @@
         if (localStorage.getItem('id_token')!=null){
           this.set('loggedIn',true);
           var profile = localStorage.getItem('id_profile');
+          if (profile !== null){
+            profile=JSON.parse(profile);
+          }
           if ((profile!==null)&&(profile.picture!==undefined)){
             this.profilePictureURL=profile.picture;
           }
@@ -47,7 +50,7 @@
               return; //TODO: Better handling of canceling
             }
             localStorage.setItem('id_token', token);
-            localStorage.setItem('id_profile', profile);
+            localStorage.setItem('id_profile', JSON.stringify(profile));
             self.loggedIn=true;
             self.profilePictureURL=profile.picture;
             console.log(JSON.stringify(profile));

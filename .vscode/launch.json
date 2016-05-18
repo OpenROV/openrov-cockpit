@@ -16,7 +16,6 @@
 			"env": {
 				"NODE_ENV": "development",
 				"USE_MOCK": "true",
-				"HARDWARE_MOCK": "true",
 				"CPU_MOCK": "123MOCK",
 				"GEO_MOCK": "true",
 				"DEBUG": "hardware, physical-interface",

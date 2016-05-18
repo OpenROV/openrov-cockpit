@@ -8,146 +8,152 @@ function Hardware()
   var reader        = new StatusReader();
   var emitRawSerial = false;
 
+  // Initial values
+  var time            = 1000;
+  var currentDepth    = 1;
+  var currentHeading  = 0;
+  var currentServo    = 1500;
+  var current         = 2;
+
   hardware.depthHoldEnabled   = false;
   hardware.targetHoldEnabled  = false;
   hardware.laserEnabled       = false;
-
-  reader.on('Arduino-settings-reported', function (settings) 
-  {
-    hardware.emit('Arduino-settings-reported', settings);
-  });
   
-  hardware.connect = function () 
-  {
-    debug('!Serial port opened');
-  };
-  
-  hardware.startRawSerialData = function startRawSerialData() 
-  {
-    emitRawSerial = true;
-  };
-  
-  hardware.stopRawSerialData = function stopRawSerialData() 
-  {
-    emitRawSerial = false;;
-  };
-
-  hardware.write = function (command) 
+  // -----------------------------------------
+  // Methods
+ 
+  hardware.write = function( command ) 
   {
     var commandParts = command.split(/\(|\)/);
     var commandText = commandParts[0];
     
-    if (commandText === 'rcap') 
+    switch( commandText ) 
     {
-      hardware.emitStatus('CAPA:255');
-    }
-    
-    if (commandText === 'ligt') 
-    {
-      hardware.emitStatus('LIGP:' + commandParts[1]/100);
-      debug('HARDWARE-MOCK return light status:'+  commandParts[1]/100);
-    }
-    
-    if (commandText === 'eligt') 
-    {
-      hardware.emitStatus('LIGPE:' + commandParts[1]/100);
-      debug('HARDWARE-MOCK return elight status:'+  commandParts[1]/100);
-    }
-    
-    if (commandText === 'escp') 
-    {
-      hardware.emitStatus('ESCP:' + commandParts[1]);
-      debug('HARDWARE-MOCK return ESC status:'+commandParts[1]);
-    }
-    
-    if (commandText === 'tilt') 
-    {
-      hardware.emitStatus('servo:' + commandParts[1]);
-    }
-    
-    if (commandText === 'claser') 
-    {
+      case "rcap":
+      {
+        hardware.emitStatus('CAPA:255');
+        debug( "CAPA:255")
+        break;
+      }
+        
+      case "ligt":
+      {
+        hardware.emitStatus('LIGP:' + commandParts[1]/100);
+        debug('Light status: '+  commandParts[1]/100);
+        break;
+      }
+      
+      case "eligt":
+      {
+        hardware.emitStatus('LIGPE:' + commandParts[1]/100);
+        debug('External light status: '+  commandParts[1]/100);
+        break;
+      }
+      
+      case "escp":
+      {
+        hardware.emitStatus('ESCP:' + commandParts[1]);
+        debug('ESC status: ' + commandParts[1]);
+        break;
+      }
+      
+      case "tilt":
+      {
+        hardware.emitStatus('servo:' + commandParts[1]);
+        debug('Tilt status: ' + commandParts[1]/100);
+        break;
+      }
+      
+      case "claser":
+      {
         if (hardware.laserEnabled) 
         {
           hardware.laserEnabled = false;
           hardware.emitStatus('claser:0');
+          debug('Laser status: 0');
         }
         else 
         {
           hardware.laserEnabled = true;
           hardware.emitStatus('claser:255');
+          debug('Laser status: 255');
         }
         
-        debug('HARDWARE-MOCK return laser status');
-    }
-
-    // Depth hold
-    if (commandText === 'holdDepth_on') 
-    {
+        break;
+      }
+      
+      case "holdDepth_on":
+      {
         var targetDepth = 0;
         
         if (!hardware.depthHoldEnabled) 
         {
             targetDepth = currentDepth;
             hardware.depthHoldEnabled = true;
-            debug('HARDWARE-MOCK depth hold enabled');
         }
         
-        hardware.emitStatus(
-          'targetDepth:' +
-          (hardware.depthHoldEnabled ? targetDepth.toString() : DISABLED)
-        );
-    }
-
-    if (commandText === 'holdDepth_off') 
-    {
+        hardware.emitStatus('targetDepth:' + (hardware.depthHoldEnabled ? targetDepth.toString() : DISABLED) );
+        
+        debug('Depth hold enabled');
+        
+        break;
+      }
+      
+      case "holdDepth_off":
+      {
         targetDepth = -500;
         hardware.depthHoldEnabled = false;
-        debug('HARDWARE-MOCK depth hold DISABLED');
 
-        hardware.emitStatus(
-          'targetDepth:' +
-          (hardware.depthHoldEnabled ? targetDepth.toString() : DISABLED)
-        );
-    }
-
-    // Heading hold
-    if (commandText === 'holdHeading_on') 
-    {
+        hardware.emitStatus( 'targetDepth:' + (hardware.depthHoldEnabled ? targetDepth.toString() : DISABLED) );
+        debug('Depth hold disabled');
+        
+        break;
+      }
+      
+      case "holdHeading_on":
+      {
         var targetHeading = 0;
         targetHeading = currentHeading;
-        hardware.targetHoldEnabled= true
-        debug('HARDWARE-MOCK heading hold enabled');
+        hardware.targetHoldEnabled= true;
 
-        hardware.emitStatus(
-          'targetHeading:' + (hardware.targetHoldEnabled ? targetHeading.toString() : DISABLED)
-        );
-    }
-
-    // Heading hold
-    if (commandText === 'holdHeading_off') 
-    {
+        hardware.emitStatus( 'targetHeading:' + (hardware.targetHoldEnabled ? targetHeading.toString() : DISABLED) );
+        debug('Heading hold enabled');
+        
+        break;
+      }
+      
+      case "holdHeading_off":
+      {
         var targetHeading = 0;
             targetHeading = -500;
             hardware.targetHoldEnabled = false;
-            debug('HARDWARE-MOCK heading hold DISABLED');
             
-        hardware.emitStatus(
-          'targetHeading:' + (hardware.targetHoldEnabled ? targetHeading.toString() : DISABLED)
-        );
-    }
-
-    // example tests for passthrough
-    if (commandText === 'example_to_foo') 
-    {
-      hardware.emitStatus('example_foo:' + commandParts[1]);
+        hardware.emitStatus( 'targetHeading:' + (hardware.targetHoldEnabled ? targetHeading.toString() : DISABLED) );
+        debug('Heading hold disabled');
+        
+        break;
+      }
+      
+      // Passthrough tests
+      case "example_to_foo":
+      {
+        hardware.emitStatus('example_foo:' + commandParts[1]);
+        break;
+      }
+      
+      case "example_to_bar":
+      {
+        hardware.emitStatus('example_bar:' + commandParts[1]);
+        break;
+      }
+      
+      default:
+      {
+        debug( "Unsupported command: " + commandText );
+      }
     }
     
-    if (commandText === 'example_to_bar') 
-    {
-      hardware.emitStatus('example_bar:' + commandParts[1]);
-    }
-    
+    // Echo this command back to the MCU
     hardware.emitStatus('cmd:' + command);
   };
   
@@ -162,42 +168,65 @@ function Hardware()
     }
   };
   
+  hardware.connect = function () 
+  {
+    debug('!Serial port opened');
+    
+    // Add status interval functions
+    hardware.timeInterval    = setInterval( hardware.emitTime, 1000 );
+    hardware.statsInterval   = setInterval( hardware.emitStats, 3000 );
+    hardware.navDataInterval = setInterval( hardware.emitNavData, 2000 );
+    
+    // Emit serial port opened event
+  };
+  
   hardware.close = function () 
   {
     debug('!Serial port closed');
+    
+    // Remove status interval functions
+    clearInterval( hardware.timeInterval );
+    clearInterval( hardware.statsInterval );
+    clearInterval( hardware.navDataInterval );
+    
+    // Emit serial port closed event
   };
   
-  var time = 1000;
+  hardware.startRawSerialData = function startRawSerialData() 
+  {
+    emitRawSerial = true;
+  };
   
-  setInterval(function () 
+  hardware.stopRawSerialData = function stopRawSerialData() 
+  {
+    emitRawSerial = false;
+  };
+  
+  // Set up intervals to emit mocked 
+  hardware.emitTime = function () 
   {
     hardware.emit('status', reader.parseStatus('time:' + time));
     time += 1000;
-  }, 1000);
+  };
   
-  setInterval(sendEvent, 3000);
-  
-  function sendEvent() 
+  hardware.emitStats = function() 
   {
     var data = 'vout:9.9;iout:0.2;BT.1.I:0.3;BT.2.I:0.5;BNO055.enabled:true;BNO055.test1.pid:passed;BNO055.test2.zzz:passed;';
     var status = reader.parseStatus(data);
     hardware.emit('status', status);
-  }
+  };
 
-  var currentDepth = 1;
-  var currentHeading = 0;
-  var currentServo = 1500;
-  var current = 2;
-
-  var interval = setInterval(function() 
+  hardware.emitNavData = function() 
   {
     var result = "";
+    
+    // Generate depth
     var rnd = (Math.random() * 20 - 10)/100;
     currentDepth += currentDepth*rnd;
     currentDepth = Math.min(Math.max(currentDepth, 1), 100);
     result+='deep:' + currentDepth + ';'
 
-
+    // Generate heading
     currentHeading += 5;
     result+='hdgd:' + currentHeading + ';'
     if (currentHeading >= 360) 
@@ -205,27 +234,36 @@ function Hardware()
       currentHeading = 0;
     }
 
+    // Generate battery tube 1 current
     rnd = (Math.random() * 20 - 10)/100;
     current += current*rnd;
     current = Math.min(Math.max(current, 1), 10);
     result+='bt1i:' + current + ';'
 
+    // Generate battery tube 2 current
     rnd = (Math.random() * 20 - 10)/100;
     current += current*rnd;
     current = Math.min(Math.max(current, 1), 10);
     result+='bt2i:' + current + ';'
 
+    // Generate servo command
     currentServo +=50;
     result+='servo:' + currentServo + ';'
     if (currentServo >= 2000) {
       currentServo = 1000;
     }
 
+    // Emit status update
     hardware.emit('status', reader.parseStatus(result));
-    hardware.write('');
-
-  }, 2000);
-
+  };
+  
+  // Listen for firmware settings updates
+  // TODO: Has this been deprecated for TSET?
+  reader.on('firmwareSettingsReported', function (settings) 
+  {
+    hardware.emit('firmwareSettingsReported', settings);
+  });
+  
   return hardware;
 }
 
@@ -247,7 +285,7 @@ var StatusReader = function ()
       settingsCollection[lastParts[0]] = lastParts[1];
     }
     
-    reader.emit('Arduino-settings-reported', settingsCollection);
+    reader.emit('firmwareSettingsReported', settingsCollection);
     return settingsCollection;
   }
 

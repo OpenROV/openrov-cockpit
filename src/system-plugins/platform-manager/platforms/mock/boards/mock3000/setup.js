@@ -165,6 +165,9 @@ var SetupBoardInterface = function( board )
 	// ------------------------------------------------
 	// Setup Public API	
 	RegisterFunctions( board );
+	
+	// Call initialization routine
+	board.global.emit( "mcu.Initialize" );
 }
 
 
@@ -175,7 +178,9 @@ var RegisterFunctions = function( board )
 {
 	board.AddMethod( "Initialize", function()
 	{
-		console.log( "MCU Interface initialized!" );	
+		console.log( "MCU Interface initialized!" );
+		
+		board.global.emit( "mcu.StartSerial" );
 	}, false );
 	
 	board.AddMethod( "SendCommand", function( command )

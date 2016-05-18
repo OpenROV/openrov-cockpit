@@ -3,7 +3,7 @@ function telemetry(name, deps) {
 
   var statusdata = {};
 
-  deps.globalEventLoop.on( 'physicalInterface.status', function(data){
+  deps.globalEventLoop.on( 'mcu.status', function(data){
     for (var i in data) {
       if (i === 'cmd'){
         //filter out ping command echos

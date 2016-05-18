@@ -153,9 +153,9 @@ deps.cockpit.on('disconnect', function ()
 });
 
 // Handle global events
-deps.globalEventLoop.on( 'physicalInterface.rovsys', function( data ) 
+deps.globalEventLoop.on( 'mcu.rovsys', function( data ) 
 {
-    deps.cockpit.emit( 'physicalInterface.rovsys', data );
+    deps.cockpit.emit( 'mcu.rovsys', data );
 } );
 
 

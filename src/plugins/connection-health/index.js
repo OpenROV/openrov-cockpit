@@ -7,7 +7,7 @@ function ConnectionHealth(name, deps) {
   deps.cockpit.on('ping', function (id) {
     self.deps.cockpit.emit('pong', id);
     if (new Date().getTime() - lastping > 500) {
-      self.deps.globalEventLoop.emit( 'physicalInterface.send', 'ping(0)');
+      self.deps.globalEventLoop.emit( 'mcu.SendCommand', 'ping(0)');
       lastping = new Date().getTime();
     }
   });

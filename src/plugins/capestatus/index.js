@@ -18,7 +18,7 @@ function capestatus(name, deps) {
   console.log('Capestatus plugin started.');
   var preferences = getPreferences(deps.config);
 
-  deps.globalEventLoop.on( 'physicalInterface.status', function(data) {
+  deps.globalEventLoop.on( 'mcu.status', function(data) {
     handleStatus(deps.cockpit, data);
   });
   // ## routes

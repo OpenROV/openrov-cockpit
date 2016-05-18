@@ -26,8 +26,8 @@ var loadBoardConfig = function( platform )
 	
 	return getBoardInfo( board )
 			.then( loadPinMap )
-			.then( loadBoardFunctions )
-			.then( function( cpu )
+			.then( loadHardwareInterface )
+			.then( function( board )
 			{
 				// All steps were successful
 				return platform;
@@ -72,10 +72,10 @@ var loadPinMap = function( board )
 			} );
 }
 
-var loadBoardFunctions = function( board )
+var loadHardwareInterface = function( board )
 {
 	// Load functions for the board interface
-	require( "./boards/" + board.info.productId + "/functions.js" )( board );
+	require( "./boards/" + board.info.productId + "/setup.js" )( board );
 	
 	return board;
 };

@@ -11,6 +11,7 @@ function CPUInterface( deps )
 };
 util.inherits( CPUInterface, Interface );
 
+// Useful for creating "required" functions
 CPUInterface.prototype.RegisterDefaultAPI = function()
 {
 	this.AddMethod( "Initialize", function()

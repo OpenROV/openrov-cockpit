@@ -6,10 +6,11 @@ function Interface( interfaceName, deps )
 {
 	var self = this;
 	
-	this.interface 	= interfaceName;
-	this.global		= deps.globalEventLoop;
-	this.cockpit 	= deps.cockpit;
-	this.functions 	= {};
+	this.interface 		= interfaceName;
+	this.global			= deps.globalEventLoop;
+	this.cockpit 		= deps.cockpit;
+	this.vehicleConfig	= deps.config;
+	this.functions 		= {};
 };
 
 // TODO: Use ES6 default parameter for isDefault

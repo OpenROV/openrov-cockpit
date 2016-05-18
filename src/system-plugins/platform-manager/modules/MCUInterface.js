@@ -11,6 +11,7 @@ function MCUInterface( deps )
 };
 util.inherits( MCUInterface, Interface );
 
+// Useful for creating "required" functions
 MCUInterface.prototype.RegisterDefaultAPI = function()
 {
 	this.AddMethod( "Initialize", function()
@@ -23,7 +24,7 @@ MCUInterface.prototype.RegisterDefaultAPI = function()
 		console.log( this.oName + " not yet implemented!" );
 	}, true );
 	
-	this.AddMethod( "SendMotorTest", function( port, vertical, starboard )
+	this.AddMethod( "SendMotorTest", function( port, starboard, vertical )
 	{
 		console.log( this.oName + " not yet implemented!" );
 	}, true );

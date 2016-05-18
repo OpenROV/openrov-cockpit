@@ -1,8 +1,6 @@
 var Q 			= require( "q" );
 var fs 			= require( "fs" );
 var path		= require( "path" );
-var getFuncs 	= require( "./functions.js" );
-
 var EventEmitter = require("events").EventEmitter;
 
 var readFile = Q.denodeify( fs.readFile );
@@ -16,7 +14,7 @@ var loadCpuConfig = function( platform )
 	// Compose the CPU interface object
 	return lookupCpuDetails( cpu )
 			.then( checkSupport )
-			.then( loadFunctions )
+			.then( loadCPUInterface )
 			.then( function( cpu )
 			{
 				// All steps were successful, so we can add the cpu interface to the platform
@@ -83,12 +81,13 @@ var checkSupport = function( cpu )
 			} );
 };
 
-var loadFunctions = function( cpu )
+var loadCPUInterface = function( cpu )
 {
-	// Add supported CPU functions to the interface
-	getFuncs( cpu );
+	// Load functions for the board interface
+	require( "./setup.js" )( cpu );
 	
 	return cpu;
-}
+};
+
 
 module.exports = loadCpuConfig;

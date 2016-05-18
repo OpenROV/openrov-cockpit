@@ -5,11 +5,10 @@ var debug		= require('debug')( 'MCUInterface' );
 function MCUInterface( deps ) 
 {
 	// Inherit from Interface module
-	Interface.call( this );	
+	Interface.call( this, "mcu", deps );	
 
 	this.RegisterDefaultAPI();
 };
-
 util.inherits( MCUInterface, Interface );
 
 MCUInterface.prototype.RegisterDefaultAPI = function()

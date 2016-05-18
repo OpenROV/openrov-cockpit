@@ -2,20 +2,33 @@
 var STRIP_COMMENTS 	= /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
 var ARGUMENT_NAMES 	= /([^\s,]+)/g;
 
-function Interface( deps ) 
+function Interface( interfaceName, deps ) 
 {
 	var self = this;
-	this.functions = {};
+	
+	this.interface 	= interfaceName;
+	this.global		= deps.globalEventLoop;
+	this.cockpit 	= deps.cockpit;
+	this.functions 	= {};
 };
 
 // TODO: Use ES6 default parameter for isDefault
 Interface.prototype.AddMethod = function( name, func, isDefault )
 {
+	// Remove prior listener, if it exists
+	if( this.functions[ name ] !== undefined )
+	{
+		this.global.removeListener( this.interface + "." + name, this.functions[ name ] );
+	}
+	
 	// TODO: Use symbols instead of property names
 	func.oName = name;
 	func.oIsDefault = isDefault;
 	
 	this.functions[ name ] = func;
+	
+	// Add new listener
+	this.global.on( this.interface + "." + name, this.functions[ name ] );
 }
 
 // Creates a JSON string with function API

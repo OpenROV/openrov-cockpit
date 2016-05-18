@@ -5,7 +5,7 @@ var debug		= require('debug')( 'CPUInterface' );
 function CPUInterface( deps ) 
 {
 	// Inherit from Interface module
-	Interface.call( this );	
+	Interface.call( this, "cpu", deps );	
 
 	this.RegisterDefaultAPI();
 };

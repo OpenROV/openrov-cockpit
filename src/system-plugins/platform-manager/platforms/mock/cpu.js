@@ -84,7 +84,7 @@ var checkSupport = function( cpu )
 var loadCPUInterface = function( cpu )
 {
 	// Load functions for the board interface
-	require( "./setup.js" )( cpu );
+	require( "./cpu/setup.js" )( cpu );
 	
 	return cpu;
 };

@@ -11,6 +11,7 @@ function Interface( interfaceName, deps )
 	this.cockpit 		= deps.cockpit;
 	this.vehicleConfig	= deps.config;
 	this.functions 		= {};
+	this.debug			= require('debug')( this.interface );
 };
 
 // TODO: Use ES6 default parameter for isDefault
@@ -26,7 +27,14 @@ Interface.prototype.AddMethod = function( name, func, isDefault )
 	func.oName = name;
 	func.oIsDefault = isDefault;
 	
-	this.functions[ name ] = func;
+	if( func.oIsDefault )
+	{
+		this.functions[ name ] = func.bind( func );
+	}
+	else
+	{
+		this.functions[ name ] = func;
+	}
 	
 	// Add new listener
 	this.global.on( this.interface + "." + name, this.functions[ name ] );

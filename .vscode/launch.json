@@ -18,7 +18,7 @@
 				"USE_MOCK": "true",
 				"CPU_MOCK": "123MOCK",
 				"GEO_MOCK": "true",
-				"DEBUG": "bridge",
+				"DEBUG": "bridge, mcu, cpu",
 				"configfile": "/tmp/rovconfig.json",
 				"plugins__ui-manager__selectedUI": "new-ui",
 				"pluginsDownloadDirectory": "/tmp/plugins"

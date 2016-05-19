@@ -1,11 +1,13 @@
 var util 		= require( 'util' );
 var Interface 	= require( 'Interface.js' );
-var debug		= require('debug')( 'MCUInterface' );
+var debug		= {};
 
 function MCUInterface( deps ) 
 {
 	// Inherit from Interface module
-	Interface.call( this, "mcu", deps );	
+	Interface.call( this, "mcu", deps );
+	
+	debug = this.debug;
 
 	this.RegisterDefaultAPI();
 };
@@ -16,17 +18,17 @@ MCUInterface.prototype.RegisterDefaultAPI = function()
 {
 	this.AddMethod( "Initialize", function()
 	{
-		console.log( this.oName + " not yet implemented!" );
+		debug( this.oName + " not yet implemented!" );
 	}, true );
 	
 	this.AddMethod( "SendCommand", function( command )
 	{
-		console.log( this.oName + " not yet implemented!" );
+		debug( this.oName + " not yet implemented!" );
 	}, true );
 	
 	this.AddMethod( "SendMotorTest", function( port, starboard, vertical )
 	{
-		console.log( this.oName + " not yet implemented!" );
+		debug( this.oName + " not yet implemented!" );
 	}, true );
 };
 

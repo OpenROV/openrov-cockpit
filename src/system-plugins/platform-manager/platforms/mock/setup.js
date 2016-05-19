@@ -1,10 +1,12 @@
 var fs 				= require('fs');
 var path 			= require('path');
 var spawn 			= require('child_process').spawn;
+var debug			= {};
+
 
 var SetupCPUInterface = function( cpu )
 {
-	var debug = cpu.debug;
+	debug = cpu.debug;
 	
 	// Decorate the CPU interface with cpu specific properties
 	cpu.stats = 
@@ -36,6 +38,9 @@ var SetupCPUInterface = function( cpu )
 	// ------------------------------------------------
 	// Setup Public API	
 	RegisterFunctions( cpu );
+	
+	// Call initialization routine
+	cpu.global.emit( "cpu.Initialize" );
 }
 
 
@@ -46,18 +51,18 @@ var RegisterFunctions = function( cpu )
 {
 	cpu.AddMethod( "Initialize", function()
 	{
-		console.log( "Initializing cpu!" );
+		debug( "Initializing cpu!" );
 	}, false );
 	
 	cpu.AddMethod( "SetGovernor", function( governorName )
 	{
-		console.log( "Setting governor!" );
+		debug( "Setting governor!" );
 	}, false );
 	
 	cpu.AddMethod( "BuildFirmware", function( firmwarePath, buildConfig )
 	{
-		console.log( "Building firmware: " + firmwarePath );
-		console.log( "Build config: " + buildConfig );
+		debug( "Building firmware: " + firmwarePath );
+		debug( "Build config: " + buildConfig );
 		
 		cpu.global.emit( "cpu.firmwareBuildStatus", "building" );
 		

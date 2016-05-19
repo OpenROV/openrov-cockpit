@@ -1,11 +1,13 @@
 var util 		= require( 'util' );
 var Interface 	= require( 'Interface.js' );
-var debug		= require('debug')( 'CPUInterface' );
+var debug		= {};
 
 function CPUInterface( deps ) 
 {
 	// Inherit from Interface module
 	Interface.call( this, "cpu", deps );	
+	
+	debug = this.debug;
 
 	this.RegisterDefaultAPI();
 };
@@ -16,12 +18,12 @@ CPUInterface.prototype.RegisterDefaultAPI = function()
 {
 	this.AddMethod( "Initialize", function()
 	{
-		console.log( this.oName + " not yet implemented!" );
+		debug( this.oName + " not yet implemented!" );
 	}, true );
 	
 	this.AddMethod( "SetGovernor", function( governorName )
 	{
-		console.log( this.oName + " not yet implemented!" );
+		debug( this.oName + " not yet implemented!" );
 	}, true );
 };
 

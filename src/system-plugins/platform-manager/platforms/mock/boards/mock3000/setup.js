@@ -4,9 +4,11 @@ var spawn 			= require('child_process').spawn;
 var ArduinoHelper	= require('ArduinoHelper');
 var Hardware		= require('./bridge.js');
 
+var debug 			= {};
+
 var SetupBoardInterface = function( board )
 {
-	var debug = board.debug;
+	debug = board.debug;
 	
 	// Decorate the MCU interface with board specific properties
 	board.physics            = new ArduinoHelper().physics;
@@ -178,14 +180,14 @@ var RegisterFunctions = function( board )
 {
 	board.AddMethod( "Initialize", function()
 	{
-		console.log( "MCU Interface initialized!" );
+		debug( "MCU Interface initialized!" );
 		
 		board.global.emit( "mcu.StartSerial" );
 	}, false );
 	
 	board.AddMethod( "FlashFirmware", function( file )
 	{
-		console.log( "Flashing firmware: " + file );
+		debug( "Flashing firmware: " + file );
 		
 		board.bridge.close();
 		board.global.emit( "mcu.firmwareFlashStatus", "flashing" );
@@ -199,7 +201,7 @@ var RegisterFunctions = function( board )
 	
 	board.AddMethod( "DumpFirmware", function( path )
 	{
-		console.log( "Dumping firmware to: " + path );
+		debug( "Dumping firmware to: " + path );
 		
 		board.bridge.close();
 		board.global.emit( "mcu.firmwareDumpStatus", "dumping" );
@@ -213,7 +215,7 @@ var RegisterFunctions = function( board )
 	
 	board.AddMethod( "ResetMCU", function( path )
 	{
-		console.log( "Resetting MCU: " + path );
+		debug( "Resetting MCU: " + path );
 		
 		board.bridge.close();
 		
@@ -225,7 +227,7 @@ var RegisterFunctions = function( board )
 	
 	board.AddMethod( "FlashESC", function()
 	{
-		console.log( "Flashing ESCs" );
+		debug( "Flashing ESCs" );
 		
 		board.bridge.close();
 		board.global.emit( "mcu.escFlashStatus", "flashing" );

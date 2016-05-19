@@ -1,0 +1,23 @@
+{
+  "name": "cloud-profile",
+  "homepage": "https://github.com/BrianAdams/openrov-cockpit",
+  "authors": [
+    "BrianAdams <brian@babastik.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "paper-button": "PolymerElements/paper-button#^1.0.11",
+    "paper-menu-button": "PolymerElements/paper-menu-button#^1.1.0",
+    "paper-menu": "PolymerElements/paper-menu#^1.2.2",
+    "paper-item": "PolymerElements/paper-item#^1.2.1"
+  }
+}

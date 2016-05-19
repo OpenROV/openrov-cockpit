@@ -35,11 +35,12 @@ The node process expects certian environment flags to be set to change its behav
 
 The minimal items that need to be specified to run in a mock mode are:
 * USE_MOCK=true : Cockpit will load mock dependencies in place of the real ones (which also generate fake runtime events)
+* HARDWARE_MOCK=true : Cockpit will load a mock MCU interface, simulating the firmware.
 * configfile='<path'> : The location to read/write the rovconfig.json file.  Your account needs access to this location.
 * pluginsDownloadDirectory='/tmp/plugins' : Folder that will be created if missing, for downloading plugins
 
 ```
-USE_MOCK=true configfile='/tmp/rovconfig.json' pluginsDownloadDirectory='/tmp/plugins' node src/cockpit.js
+USE_MOCK=true HARDWARE_MOCK=true configfile='/tmp/rovconfig.json' pluginsDownloadDirectory='/tmp/plugins' node src/cockpit.js
 ```
 
 The minimal command line will start the node process, allowing you to connect to `http://localhost:8080` which will bring up the cockpit.  The mock dependencies will be sending fake data over the message bus causing compass dials to rotate etc.  The minimal command line will not start any video.
@@ -50,7 +51,7 @@ Some of the more common advanced command line options:
 * env plugins__ui-manager__selectedUI='classic-ui': Override the default theme that is loaded  (the env command on linux is needed since the theme name contains a dash.
 
 ```
-USE_MOCK=true GEO_MOCK=true configfile='/tmp/rovconfig.json' pluginsDownloadDirectory='/tmp/plugins' env plugins__ui-manager__selectedUI='classic-ui'  node src/cockpit.js
+USE_MOCK=true HARDWARE_MOCK=true GEO_MOCK=true configfile='/tmp/rovconfig.json' pluginsDownloadDirectory='/tmp/plugins' env plugins__ui-manager__selectedUI='classic-ui'  node src/cockpit.js
 ```
 
 ### Debugging the node processes
@@ -90,7 +91,7 @@ npm install -g forever
 And you then change your command that start cockpit to let the forever program load it for you:
 
 ```
-USE_MOCK=true configfile='/tmp/rovconfig.json' pluginsDownloadDirectory='/tmp/plugins' forever -w -c 'node --debug' src/cockpit.js
+USE_MOCK=true HARDWARE_MOCK=true configfile='/tmp/rovconfig.json' pluginsDownloadDirectory='/tmp/plugins' forever -w -c 'node --debug' src/cockpit.js
 ```
 
 ##### Using Visual Studio Code

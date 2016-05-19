@@ -34,8 +34,11 @@ var PlatformManager = function( name, deps )
 	{ 
 		var platformPath = "./platforms/" + platformName;
 		
-		// Attempt to create platform, passing it the deps object
-		return require( platformPath + "/platform.js" )( self.platform );
+		var loadCpu		= require( platformPath + "/cpu.js" );
+		var loadBoard	= require( platformPath + "/board.js" );
+		
+		return loadCpu( self.platform )	// This will detect the CPU. Success is required
+				.then( loadBoard );		// This will try to detect the attached controllerboard
 	};
 	
 	// Attempt to load the platform configuration for each supported CPU

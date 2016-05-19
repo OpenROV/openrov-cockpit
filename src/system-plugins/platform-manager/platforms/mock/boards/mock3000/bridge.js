@@ -12,6 +12,8 @@ function Bridge()
   var time            = 1000;
   var currentDepth    = 1;
   var currentHeading  = 0;
+  var currentPitch    = 0;
+  var currentRoll     = 0;
   var currentServo    = 1500;
   var current         = 2;
 
@@ -233,6 +235,14 @@ function Bridge()
     {
       currentHeading = 0;
     }
+    
+    // Generate pitch
+    currentPitch = ( 0.01 * ( Math.floor(Math.random() * 201) - 100 ) );
+    result+='pitc:' + currentPitch + ';'
+    
+    // Generate roll
+    currentRoll = ( 0.03 * ( Math.floor(Math.random() * 201) - 100 ) );
+    result+='roll:' + currentRoll + ';'
 
     // Generate battery tube 1 current
     rnd = (Math.random() * 20 - 10)/100;

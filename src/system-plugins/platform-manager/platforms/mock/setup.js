@@ -58,6 +58,13 @@ var RegisterFunctions = function( cpu )
 	{
 		console.log( "Building firmware: " + firmwarePath );
 		console.log( "Build config: " + buildConfig );
+		
+		cpu.global.emit( "cpu.firmwareBuildStatus", "building" );
+		
+		setTimeout( function()
+		{
+			cpu.global.emit( "cpu.firmwareBuildStatus", "success" );
+		}, 3000 );
 	}, false );
 }
 

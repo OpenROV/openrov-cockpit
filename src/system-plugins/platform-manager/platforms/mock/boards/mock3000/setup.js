@@ -186,21 +186,55 @@ var RegisterFunctions = function( board )
 	board.AddMethod( "FlashFirmware", function( file )
 	{
 		console.log( "Flashing firmware: " + file );
+		
+		board.bridge.close();
+		board.global.emit( "mcu.firmwareFlashStatus", "flashing" );
+		
+		setTimeout( function()
+		{
+			board.global.emit( "mcu.firmwareFlashStatus", "success" );
+			board.bridge.connect();
+		}, 3000 );
 	}, false );
 	
 	board.AddMethod( "DumpFirmware", function( path )
 	{
 		console.log( "Dumping firmware to: " + path );
+		
+		board.bridge.close();
+		board.global.emit( "mcu.firmwareDumpStatus", "dumping" );
+		
+		setTimeout( function()
+		{
+			board.global.emit( "mcu.firmwareDumpStatus", "success" );
+			board.bridge.connect();
+		}, 3000 );
 	}, false );
 	
 	board.AddMethod( "ResetMCU", function( path )
 	{
-		console.log( "Dumping firmware to: " + path );
+		console.log( "Resetting MCU: " + path );
+		
+		board.bridge.close();
+		
+		setTimeout( function()
+		{
+			board.bridge.connect();
+		}, 1000 );
 	}, false );
 	
 	board.AddMethod( "FlashESC", function()
 	{
 		console.log( "Flashing ESCs" );
+		
+		board.bridge.close();
+		board.global.emit( "mcu.escFlashStatus", "flashing" );
+		
+		setTimeout( function()
+		{
+			board.global.emit( "mcu.escFlashStatus", "success" );
+			board.bridge.connect();
+		}, 3000 );
 	}, false );
 	
 	board.AddMethod( "SendCommand", function( command )

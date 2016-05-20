@@ -1,5 +1,5 @@
 (function() {
-  function Laser(name, deps) {
+  function Lights(name, deps) {
     console.log('Lights plugin loaded');
     var lights = 0;
     var ArduinoHelper = require('../../lib/ArduinoHelper')();
@@ -13,10 +13,16 @@
       adjustLights(value);
     });
 
+    deps.cockpit.on('plugin.lights.set', function (value) {
+      setLights(value);
+    });
+
     // Arduino
-    deps.rov.on('status', function (data) {
+    deps.globalEventLoop.on( 'physicalInterface.status', function (data) {
       if ('LIGP' in data) {
-        deps.cockpit.emit('plugin.lights.level', data.LIGP);
+        //value of 0-1.0 representing percent
+        var level = data.LIGP;
+        deps.cockpit.emit('plugin.lights.state', {level:level});
       }
     });
 
@@ -31,7 +37,7 @@
       }
       setLights(lights);
     };
-    
+
     var toggleLights = function() {
       if (lights > 0) {
         setLights(0);
@@ -40,18 +46,28 @@
       }
     };
 
-    var setLights = function (value) {
+    var setLights = function (value) 
+    {
       lights = value;
-      if (lights > 1)
+      
+      if (lights >= 1)
+      {
         lights = 1;
-      if (lights < 0)
+      }
+      
+      if (lights <= 0)
+      {
         lights = 0;
+      }
 
-      var command = 'ligt(' + ArduinoHelper.serial.packPercent(value) + ')';
-      deps.rov.send(command);
+      var command = 'ligt(' + ArduinoHelper.serial.packPercent(lights) + ')';
+      deps.globalEventLoop.emit( 'physicalInterface.send', command);
 
     };
 
   }
-  module.exports = Laser;
+  module.exports = function (name, deps) {
+    return new Lights(name,deps);
+  };
+
 })();

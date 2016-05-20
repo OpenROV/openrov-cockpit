@@ -32,7 +32,7 @@ while [ $COUNTER -lt 9 ]; do
     EXITCODE=`$UPLOAD_TO_ATMEGA_COMMAND 1>&2`
 	if [ $? -eq 0 ]
 		then
-			echo upload successfull! 1>&2
+			echo upload successful! 1>&2
 			exit 0
 		fi
 	COUNTER=`expr $COUNTER + 1`

@@ -1,0 +1,51 @@
+<script src="utilities.js"></script>
+<script>
+(function (window) {
+  'use strict';
+  var behaviors = namespace('behaviors');
+  behaviors.oROVStandardImpl = {
+    properties: {
+      eventEmitter: {
+        type: Object,
+        value: function () {
+          return {
+            on: function (event, func) {
+            },
+            emit: function () {
+            },
+            off: function () {
+            },
+            withHistory: {
+              on:function(event,func) {}
+            }
+          };
+        },
+        observer: '_eventEmitterChanged'
+      }
+    },
+    created: function () {
+      console.log('oROV Emitter Behavior for ', this, 'enabled!');
+    },
+    attached: function () {
+      //Added a new lifecycle event for the control:
+      if (this.eventEmitter !== undefined && this.registerEmitterHanlders !== undefined) {
+        this.registerEmitterHanlders(this.eventEmitter);
+      }
+      console.log('OROV-BEHAVIOR: Registerd eventEmitter');
+      this.processedAttached=true;
+    },
+    _eventEmitterChanged: function (newvalue, oldvalue) {
+      var self = this;
+      if(this.processedAttached!==true)
+        return;
+      if (newvalue.on === undefined)
+        return;
+      if (oldvalue === newvalue)
+        return;
+      if (this.eventEmitter !== undefined && this.registerEmitterHanlders !== undefined) {
+        this.registerEmitterHanlders(this.eventEmitter);
+      }
+    }
+  };
+}(window));
+</script>

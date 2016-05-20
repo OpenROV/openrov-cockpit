@@ -1,0 +1,61 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<dom-module name="orov-plugin-manager">
+  <style>
+  </style>
+  <template>
+            <label>{{__('Plugins to enable/disable')}}</label>
+                    <ul>
+                      <template is="dom-repeat" items="{{controlablePlugins}}">
+
+                        <li>
+                            <div>
+                                <span>{{__(item.viewName)}}</span><span>{{__('Enabled:')}}</span><span>{{item.isEnabled}}</span>
+                                <button type="button" class="btn btn-xs btn-default" hidden="{{item.isEnabled}}" on-click="enable" >{{__('Enable')}}</button>
+                                <button type="button" class="btn btn-xs btn-default" hidden="{{!item.isEnabled}}" on-click="disable">{{__('Disable')}}</button>
+                            </div>
+                        </li>
+                      </template>
+                    </ul>
+
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        is: "orov-plugin-manager",
+        properties: {
+          controlablePlugins: {type: Array, value: []}
+        },
+        behaviors: [namespace('behaviors').oROVStandard],
+        attached: function () {
+          var self = this;
+          if (this.eventEmitter!==undefined){
+            self.eventEmitter.emit('plugin-manager.getControllablePlugins',function(results){
+              self.controlablePlugins = results;
+            });
+          }
+        },
+        registerEmitterHanlders: function(emitter){
+          var self = this;
+          emitter.on('plugin-manager.ControllablePluginsChanged',function(p){
+            self.controlablePlugins = p;
+          });
+        },
+//        isEnabled(e){
+//          var plugin = e.model.isEnabled;
+//        }
+        enable: function(e){
+          if (this.eventEmitter!==undefined){
+            this.eventEmitter.emit('plugin-manager.enablePlugin',e.model.item.name);
+          }
+        },
+        disable: function(e){
+          if (this.eventEmitter!==undefined){
+            this.eventEmitter.emit('plugin-manager.disablePlugin',e.model.item.name);
+          }
+        }
+      })
+    })();
+  </script>
+
+</dom-module>

@@ -1,0 +1,15 @@
+{
+  "Settings": "Settings",
+  "Diagnostic": "Diagnostic",
+  "Pre-Flight Check": "Pre-Flight Check",
+  "Callibration": "Callibration",
+  "Callibrate Compass": "Callibrate Compass",
+  "Zero Depth": "Zero Depth",
+  "ThrustFactor": "ThrustFactor",
+  "Connection": "Connection",
+  "Latency": "Latency",
+  "CPU %": "CPU %",
+  "Board Current": "Board Current",
+  "Battery": "Battery",
+  "Clock": "Clock"
+}

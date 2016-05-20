@@ -1,19 +1,17 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../drop-in-dialog/drop-in-dialog.html">
 
 
-<polymer-element name="rov-diagnostics" attributes="" >
-  <template>
-    <link rel="stylesheet" href="../../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../../themes/OpenROV/css/style.css">
+<dom-module id="rov-diagnostics">
 
-    <style>
+  <style>
       #calibrations > a{
         float: left;
       }
     </style>
+  <template>
 
-    <drop-in-dialog id="dropIn" childId="{{ childId }}" header="{{ header }}">
+    <drop-in-dialog id="dropIn" childid="{{ childId }}" header="{{ header }}">
       <div class="settings-block">
         <h4>Calibration</h4>
         <div id="calibrations">
@@ -24,11 +22,20 @@
 
   </template>
   <script>
-    (function() {
+    (function () {
       Polymer({
-        header: 'Diagnostics',
-        childId: 'diagnostics-settings',
-        open: function() {
+        is: 'rov-diagnostics',
+        properties: {
+          childId: {
+            type: String,
+            value: 'diagnostics-settings'
+          },
+          header: {
+            type: String,
+            value: 'Diagnostics'
+          }
+        },
+        open: function () {
           window.cockpit.sendUpdateEnabled = false;
           this.$.dropIn.open();
         },
@@ -36,11 +43,7 @@
           window.cockpit.sendUpdateEnabled = true;
           this.$.dropIn.hide();
         }
-      })
-    })();
+      });
+    }());
   </script>
-
-</polymer-element>
-  
-
-
+</dom-module>

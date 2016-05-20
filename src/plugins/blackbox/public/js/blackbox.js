@@ -1,212 +1,436 @@
-(function (window, document) {
+(function (window, document, jQuery) {
   'use strict';
-  /*
-         * Constructuor
-         */
-  var telemetry = [];
-  var server;
-  var idb;
+  var plugins = namespace('plugins');
+  const maxVideoSegmentSize = 200000000;
+
+  //jQuery.getScript('/components/dexie/dist/latest/Dexie.js');
+
+  var head = document.getElementsByTagName("head")[0];
+  var js = document.createElement("script");
+  js.type = "text/javascript";
+  js.src = 'components/dexie/dist/dexie.min.js';
+  head.appendChild(js);
+
+  var js = document.createElement("script");
+  js.type = "text/javascript";
+  js.src = 'components/comma-separated-values/csv.min.js';
+  head.appendChild(js);
 
   var Blackbox = function Blackbox(cockpit) {
     console.log('Loading Blackbox plugin.');
     this.cockpit = cockpit;
     this.recording = false;
-    var blackbox = this;
-    // add required UI elements
-    cockpit.extensionPoints.buttonPanel.append('<span id="blackboxstatus" class="false pull-right"></span>');
-    cockpit.extensionPoints.buttonPanel.append('<button id="exportButton" class="btn pull-right disabled">Download Data</button><a id="exportLink" download="data.json"></a>');
-    $('#keyboardInstructions').append('<p><i>r</i> to toggle recording of telemetry</p>');
-    cockpit.extensionPoints.buttonPanel.find('#exportButton').click(exportData);
-    this.cockpit.rov.on('plugin.navigationData.data', function (data) {
-      if (!jQuery.isEmptyObject(data)) {
-        blackbox.logNavData(data);
-      }
-    });
-    this.cockpit.rov.on('status', function (data) {
-      if (!jQuery.isEmptyObject(data)) {
-        blackbox.logStatusData(data);
-      }
-    });
-  };
-  /*
-         * Register keyboard event listener
-         */
-  Blackbox.prototype.listen = function listen() {
-    var self = this;
+    this.idb;
+    this.sessionID = this.newSession();
+    this.mp4Buffer = [];
+    this.statusBuffer = [];
+    this.navBuffer = [];
 
-    self.cockpit.extensionPoints.inputController.register(
+  };
+
+  plugins.Blackbox = Blackbox;
+
+
+  Blackbox.prototype.inputDefaults = function inputDefaults() {
+    var self = this;
+    return [
       {
         name: 'blackbox.record',
         description: 'Start recording telemetry data.',
         defaults: { keyboard: 'r' },
-        down: function() { self.keyDown();  }
-      });
-    };
-
-  var refreshintervalID;
-  //	var server;
-  //	var telemetry = [];
-  Blackbox.prototype.toggleRecording = function toggleRecording() {
-    console.log('Recording = ' + this.recording);
-    if (!this.recording) {
-      console.log('Recording Telemetry');
-      cockpit.extensionPoints.buttonPanel.find('#blackboxstatus').toggleClass('false true');
-      cockpit.extensionPoints.buttonPanel.find('#exportButton').toggleClass('disabled enabled');
-      var blackbox = this;
-      refreshintervalID = self.setInterval(blackbox.logTelemetryData, 1000);
-    } else {
-      console.log('Stopping Telemetry');
-      cockpit.extensionPoints.buttonPanel.find('#blackboxstatus').toggleClass('true false');
-      cockpit.extensionPoints.buttonPanel.find('#exportButton').toggleClass('enabled disabled');
-      clearInterval(refreshintervalID);
-    }
-    this.recording = !this.recording;
-  };
-  Blackbox.prototype.test = function () {
-    console.log('tteesstt');
-    blackbox.logTelemetryData();
-  };
-  /*
-         * Process onkeydown.
-         */
-  Blackbox.prototype.keyDown = function keyDown(ev) {
-    var self = this;
-    if (!this.recording) {
-      this.openDB(function() {self.toggleRecording();});
-    } else {
-      this.closeDB(function() {self.toggleRecording();});
-    }
-  };
-  Blackbox.prototype.logNavData = function logNavData(navdata) {
-    if (!this.recording) {
-      return;
-    }
-    navdata.timestamp = new Date().getTime();
-    server.navdata.add(navdata).done(function (item) {
-      console.log('saved');
-    });
-  };
-  Blackbox.prototype.logTelemetryData = function logTelemetryData() {
-    var clone = {};
-    for (var i in telemetry) {
-      clone[i] = telemetry[i];
-    }
-    clone.timestamp = new Date().getTime();
-    server.telemetry.add(clone).done(function (item) {
-      console.log('saved telemetry');
-    }).fail(function (a, x) {
-      console.log(x);
-    });
-  };
-  Blackbox.prototype.logStatusData = function logStatusData(data) {
-    if (!this.recording) {
-      return;
-    }
-    for (var i in data) {
-      telemetry[i] = data[i];
-    }
-  };
-  Blackbox.prototype.openDB = function openDB(callback) {
-    db.open({
-      server: 'openrov-blackbox',
-      version: 1,
-      schema: {
-        navdata: {
-          key: {
-            keyPath: 'timestamp',
-            autoIncrement: false
-          },
-          indexes: {}
-        },
-        telemetry: {
-          key: {
-            keyPath: 'timestamp',
-            autoIncrement: false
-          }
-        }
+        down: function() { self.toggleRecording();  }
       }
-    }).done(function (s) {
-      server = s;
-      idb = server.db();
-      callback();
-    });
-  };
-  Blackbox.prototype.closeDB = function closeDB(callback) {
-    server.close();
-    callback();
-  };
-  window.Cockpit.plugins.push(Blackbox);
-
-
-  var exportData = function (e) {
-    //block click before ready
-    if (!idb)
-      return;
-    e.preventDefault();
-    var link = cockpit.extensionPoints.buttonPanel.find('#exportLink');
-    //Ok, so we begin by creating the root object:
-    var data = {};
-    var promises = [];
-    var content = [];
-
-    var handleResult = function (event) {
-      var cursor = event.target.result;
-      if (cursor) {
-        content.push(cursor.value);
-        cursor.continue();
-      }
-    };
-
-    for (var i = 0; i < idb.objectStoreNames.length; i++) {
-      //thanks to http://msdn.microsoft.com/en-us/magazine/gg723713.aspx
-      promises.push($.Deferred(function (defer) {
-        var objectstore = idb.objectStoreNames[i];
-        console.log(objectstore);
-        var transaction = idb.transaction([objectstore], 'readonly');
-        content = [];
-        transaction.oncomplete = function (event) {
-          console.log('trans oncomplete for ' + objectstore + ' with ' + content.length + ' items');
-          defer.resolve({
-            name: objectstore,
-            data: content
-          });
-        };
-        transaction.onerror = function (event) {
-          // Don't forget to handle errors!
-          console.dir(event);
-        };
-        var objectStore = transaction.objectStore(objectstore);
-        objectStore.openCursor().onsuccess = handleResult;
-      }).promise()); /* jshint ignore:line */
-    }
-    $.when.apply(null, promises).then(function (result) {
-      //arguments is an array of structs where name=objectstorename and data=array of crap
-      //make a copy cuz I just don't like calling it argument
-      var dataToStore = arguments;
-      //serialize it
-      var serializedData = JSON.stringify(dataToStore);
-      //The Christian Cantrell solution
-      //document.location = 'data:Application/octet-stream,' + encodeURIComponent(serializedData);
-      var blob = new Blob([serializedData], { 'type': 'application/octet-stream' });
-      link.attr('href', window.URL.createObjectURL(blob));
-      //link.attr("href",'data:Application/octet-stream,'+encodeURIComponent(serializedData));
-      //link.trigger("click");
-      fakeClick(link[0]);
-    });
-  };
-  function fakeClick(anchorObj) {
-    if (anchorObj.click) {
-      anchorObj.click();
-    } else if (document.createEvent) {
-      if (event.target !== anchorObj) {
-        var evt = document.createEvent('MouseEvents');
-        evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-        var allowDefault = anchorObj.dispatchEvent(evt);  // you can check allowDefault for false to see if
-                                                          // any handler called evt.preventDefault().
-                                                          // Firefox will *not* redirect to anchorObj.href
-                                                          // for you. However every other browser will.
-      }
-    }
+    ]
   }
 
-}(window, document));
+  Blackbox.prototype.listen = function listen() {
+    var self = this;
+
+    if ((window.Dexie===undefined) || (window.CSV===undefined)){
+//      $.getScript('/components/dexie/dist/latest/Dexie.js',function(){
+//        self.listen();
+//      });
+      setTimeout(function(){self.listen()},1000);
+      return;
+    }
+    this.idb = this.defineDB(); //Readies the DB, ensures schema is consistent
+    this.idb.on('error', function (err) {
+        // Catch all uncatched DB-related errors and exceptions
+        console.error(err.message);
+        console.dir(err);
+        self.stopRecording();
+    });
+
+    this.cockpit.rov.on('plugin.navigationData.data', function (data) {
+      if (!jQuery.isEmptyObject(data)) {
+        self.logNavData(data);
+      }
+    });
+    this.cockpit.withHistory.on('status', function (data) {
+      if (!jQuery.isEmptyObject(data)) {
+        self.logStatusData(data);
+      }
+    });
+    this.cockpit.on('x-h264-video.data', function (data) {
+        self.logMP4Video(data);
+    });
+    this.cockpit.on('plugin-blackbox-export', function(options){
+      self.exportData(options);
+    });
+
+    this.cockpit.on('plugin-blackbox-recording-start', function(){
+      self.startRecording();
+    });
+
+    this.cockpit.on('plugin-blackbox-recording-stop', function(){
+      self.stopRecording();
+    });
+
+    this.cockpit.on('plugin-blackbox-get-sessions', function(callback){
+      self.recordedSessions(callback);
+    });
+
+    this.cockpit.on('plugin-blackbox-recording?', function(fn){
+      if(typeof(fn) === 'function'){
+        fn(self.recording);
+      }
+    });
+
+    this.recordedSessions(function(sessions){
+        self.cockpit.emit('plugin-blackbox-sessions',sessions)
+    });
+
+  };
+
+  var sessionIDRecorded = false;
+  Blackbox.prototype.newSession = function newSession(){
+     return generateUUID();
+  }
+
+  //TODO: Add sessions collection that each unique session is placed
+  var _recordedSessions = function recordedSessions(idb,callback){
+    idb.open(function(){
+      idb.sessions.toArray(function(data){
+        for(var i=0;i<=data.length;i++){
+          if(data[i].sessionID==null){
+            data[i].sessionID='';
+          }
+          idb.mp4.where("sessionID").equalsIgnoreCase(data[i].sessionID).toArray(function(j,dump){
+            var sizeofData = 0
+            var arrayOfData = dump.map(function(item){
+              var converted = new Uint8Array(item.data);
+              sizeofData+=converted.length;
+              return converted;
+            });
+            var segments = Math.ceil(sizeofData/maxVideoSegmentSize);
+            data[j].VideoSegments = new Array(segments);
+            if (j==data.length-1){
+              callback(data);
+            }
+          }.bind(this,i));
+        }
+      });
+    });
+  };
+
+  Blackbox.prototype.recordedSessions = function recordedSessions(callback){
+      _recordedSessions(this.idb,callback);
+  }
+
+  Blackbox.prototype.toggleRecording = function toggleRecording() {
+    if (this.recording){
+      this.stopRecording();
+    } else {
+      this.startRecording();
+    }
+  };
+
+
+  function formatBytes(bytes,decimals) {
+     if(bytes == 0) return '0 Byte';
+     var k = 1000; // or 1024 for binary
+     var dm = decimals + 1 || 3;
+     var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+     var i = Math.floor(Math.log(bytes) / Math.log(k));
+     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  }
+
+  Blackbox.prototype.startRecording = function startRecording() {
+    if (this.recording) {
+      return;
+    };
+    var self=this;
+    console.log('Recording Telemetry');
+    var blackbox = this;
+
+    //Create the session
+    this.idb.open();
+    if(!sessionIDRecorded){
+      this.idb.sessions.add({sessionID:this.sessionID,timestamp:Date.now()});
+      this.recordedSessions(function(sessions){
+        self.cockpit.emit('plugin-blackbox-sessions',sessions)
+      });
+      sessionIDRecorded=true;
+    }
+//    this.idb.close();
+    this.recording = true;
+    this.cockpit.emit('plugin-blackbox-recording-status',true);
+
+    var commitBuffers= function(){
+         self.idb.transaction("rw", self.idb.mp4, self.idb.navdata,self.idb.telemetry,function() {
+          while(self.mp4Buffer.length>0){
+            self.idb.mp4.add(self.mp4Buffer.shift());
+          }
+          while(self.navBuffer.length>0){
+            self.idb.navdata.add(self.navBuffer.shift());
+          }
+          while(self.statusBuffer.length>0){
+            self.idb.mp4.add(self.statusBuffer.shift());
+          }
+        })
+        .then(function () {
+          // Transaction complete.
+        })
+        .catch(function (error) {
+            console.error(error);
+            self.stopRecording();
+        });
+      if ((self.recording)|| (self.mp4Buffer.length>0 || self.navBuffer.length>0 || self.statusBuffer.length>0) ){
+        setTimeout(commitBuffers.bind(self),1000);
+        navigator.webkitTemporaryStorage.queryUsageAndQuota (
+            function(usedBytes, grantedBytes) {
+                console.log('we are using ', formatBytes(usedBytes,2), ' of ', formatBytes(grantedBytes,2), ' ', formatBytes(grantedBytes-usedBytes,2),' remaining.');
+            },
+            function(e) { console.log('Error', e);  }
+        );
+      }
+    }
+    commitBuffers.call(self);
+
+  };
+
+  Blackbox.prototype.stopRecording = function stopRecording() {
+    if (this.recording) {
+      console.log('Stopping Telemetry');
+      this.recording = false;
+      this.cockpit.emit('plugin-blackbox-recording-status',false);
+    }
+  };
+  var initFrame=null;
+
+  window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder ||
+                       window.MozBlobBuilder;
+
+  Blackbox.prototype.logMP4Video = function logMP4Video(data) {
+    var self=this;
+    if (!this.recording) {
+      return;
+    }
+    if (initFrame==null){
+      this.cockpit.emit('request_Init_Segment', function(init) {
+        initFrame=init;
+        self.logMP4Video.call(self,init);
+      });
+    } else {
+    //var myblob = new Blob([data]);
+    this.mp4Buffer.push({timestamp: Date.now(),sessionID:this.sessionID,data:data});
+/*
+    this.idb.mp4.add()
+      .catch(function (error) {
+        console.error(error);
+        self.stopRecording();
+      });
+*/
+    }
+
+  };
+
+  Blackbox.prototype.logNavData = function logNavData(navdata) {
+    var self=this;
+    if (!this.recording) {
+      return;
+    }
+    navdata.timestamp = Date.now();
+    navdata.sessionID= this.sessionID;
+    this.navBuffer.push(navdata);
+/*
+    this.idb.navdata.add(navdata)
+      .catch(function (error) {
+        console.error(error);
+        self.stopRecording();
+      });
+*/
+  };
+
+  Blackbox.prototype.logStatusData = function logStatusData(statusdata) {
+    var self=this;
+    if (!this.recording) {
+      return;
+    }
+    statusdata.timestamp = Date.now();
+    statusdata.sessionID= this.sessionID;
+    this.statusBuffer.push(statusdata);
+/*
+    this.idb.telemetry.add(statusdata)
+      .catch(function (error) {
+        console.error(error);
+        self.stopRecording();
+      });
+*/
+  };
+
+  Blackbox.prototype.defineDB = function defineDB(callback){
+    //Instructions to upgrade: https://github.com/dfahlander/Dexie.js/wiki/Design
+    var idb = new Dexie("openrov-blackbox2");
+    idb.version(3).stores({
+        navdata: 'id++,timestamp,sessionID',
+        telemetry: 'id++,timestamp,sessionID',
+        mp4: 'id++,timestamp,sessionID',
+        sessions: 'timestamp,sessionID'
+    }).upgrade(function(trans){
+      trans.navdata.each(function(data, cursor){
+        data.sessionID = 'pre-session'
+        cursor.update(data);
+      });
+      trans.telemetry.each(function(data, cursor){
+        data.sessionID = 'pre-session'
+        cursor.update(data);
+      });
+    });
+    return idb;
+  }
+
+  Blackbox.prototype.exportData = function exportData(options){
+    var cols;
+
+    if(options.collection === "*"){
+      cols = ['navdata','telemetry'];
+    } else {
+      cols = [options.collection];
+    }
+
+    for(var i in cols){
+      options.collection = cols[i];
+      if ((!this.idb.isOpen())) {
+        this.idb.open()
+          .catch(function (error) {
+            console.error(error);
+          });
+        this._exportData(options);
+        this.idb.close();
+      } else {
+        this._exportData(options);
+      }
+    }
+
+  };
+
+  Blackbox.prototype._exportData = function _exportData(options,callback){
+    if (options.collection=='mp4'){
+       this._exportVideo(options,callback);
+       return;
+    }
+
+    var fakeClick = function fakeClick(anchorObj) {
+      if (anchorObj.click) {
+        anchorObj.click();
+      } else if (document.createEvent) {
+        if (event.target !== anchorObj) {
+          var evt = document.createEvent('MouseEvents');
+          evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+          var allowDefault = anchorObj.dispatchEvent(evt);
+        }
+      }
+    };
+
+    var downloadInBrowser = function downloadInBrowser(data,name){
+      var blob = new Blob([data], { 'type': 'application/octet-stream' });
+      var link = document.createElement("A");
+      link.setAttribute('href', window.URL.createObjectURL(blob));
+      link.setAttribute('download',name);
+      link.setAttribute('target','_blank');
+      //download="data.json"
+      //link.attr('href', window.URL.createObjectURL(blob));
+      document.body.appendChild(link);
+      fakeClick(link);
+    };
+
+    this.idb[options.collection].where("sessionID").equalsIgnoreCase(options.sessionID).toArray(function(name,dump){
+      var serializedData;
+      switch(options.format){
+        case 'json': serializedData = JSON.stringify(dump);
+        break;
+        case 'xml': JSON.stringify(dump); //TODO:
+        break;
+        case 'csv':
+        default: serializedData = new CSV(dump, {header: true}).encode(); //TODO:
+      }
+      downloadInBrowser(serializedData,name+'-'+options.sessionID+'.'+options.format);
+    }.bind(null,options.collection));
+
+  };
+
+  var lastURL = null;
+  //TODO: Track this issue preventing easy download of large amounts of data.
+  //https://bugs.chromium.org/p/chromium/issues/detail?id=375297
+  Blackbox.prototype._exportVideo = function _exportVideo(options,callback){
+
+    var fakeClick = function fakeClick(anchorObj) {
+      if (anchorObj.click) {
+        anchorObj.click();
+      } else if (document.createEvent) {
+        if (event.target !== anchorObj) {
+          var evt = document.createEvent('MouseEvents');
+          evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+          var allowDefault = anchorObj.dispatchEvent(evt);
+        }
+      }
+    };
+
+    var downloadInBrowser = function downloadInBrowser(data,name){
+      if (lastURL!=null){
+        URL.revokeObjectURL(lastURL);
+        lastURL = null;
+      }
+      var blob = new Blob([data], { 'type': 'video/mp4' });
+      var link = document.createElement("A");
+      lastURL = window.URL.createObjectURL(blob);
+      link.setAttribute('href', lastURL);
+      link.setAttribute('download',name);
+      //download="data.json"
+      //link.attr('href', window.URL.createObjectURL(blob));
+      document.body.appendChild(link);
+      fakeClick(link);
+    };
+
+
+    this.idb[options.collection].where("sessionID").equalsIgnoreCase(options.sessionID).toArray(function(name,dump){
+        var sizeofData = 0
+        var arrayOfData = dump.map(function(item){
+          var converted = new Uint8Array(item.data);
+          sizeofData+=converted.length;
+          return converted;
+        });
+        var result = new Uint8Array(maxVideoSegmentSize*200000);
+        var initFrame=arrayOfData.shift();
+        result.set(initFrame,0);
+        var tail=initFrame.length;
+        var track = 0;
+        arrayOfData.forEach(function(item){
+          track+=item.length;
+          if (Math.ceil(track/maxVideoSegmentSize)==options.segment){
+            console.log(tail+item.length);
+            result.set(item,tail);
+            tail+=item.length;
+          }
+        });
+
+        downloadInBrowser(result.subarray(0,tail),name+'-'+options.sessionID+'-'+options.segment+'.'+'mp4');
+      }.bind(null,options.collection));
+
+  };
+
+
+  window.Cockpit.plugins.push(Blackbox);
+
+}(window, document, $));

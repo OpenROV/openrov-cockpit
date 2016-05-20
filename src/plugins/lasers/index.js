@@ -4,27 +4,30 @@
     var claserstate = 0;
 
     // Cockpit
-    deps.cockpit.on('plugin.laser.toggle', function () {
-      sendLaser();
+    deps.cockpit.on('plugin.laser.set', function (value) {
+      sendLaser(value);
     });
 
     // Arduino
-    deps.rov.on('status', function (data) {
+    deps.globalEventLoop.on( 'physicalInterface.status', function (data) {
       if ('claser' in data) {
         var enabled = data.claser == 255;
-        deps.cockpit.emit('plugin.laser.' + (enabled ? 'enabled' : 'disabled'));
+        deps.cockpit.emit('plugin.laser.state', {enabled:(enabled ? true : false)});
       }
     });
 
-    var sendLaser = function () {
-      if (claserstate === 0) {
+    var sendLaser = function (state) {
+      var claserstate;
+      if (state === 1) {
         claserstate = 255;
       } else {
         claserstate = 0;
       }
-      deps.rov.send('claser(' + claserstate + ')');
+      deps.globalEventLoop.emit( 'physicalInterface.send', 'claser(' + claserstate + ')');
     };
 
   }
-  module.exports = Laser;
+  module.exports = function (name, deps) {
+    return new Laser(name,deps);
+  };
 })();

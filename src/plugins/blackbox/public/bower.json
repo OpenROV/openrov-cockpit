@@ -1,0 +1,31 @@
+{
+  "name": "blackbox",
+  "version": "1.0.0",
+  "homepage": "https://github.com/BrianAdams/openrov-cockpit",
+  "authors": [
+    "BrianAdams <brian@babastik.com>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "dexie": "~1.3.6",
+    "comma-separated-values": "~3.6.4",
+    "fontawesome-iconset": "philya/font-awesome-polymer-icons#master",
+    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^1.2.0",
+    "paper-menu": "PolymerElements/paper-menu#^1.2.2",
+    "paper-item": "PolymerElements/paper-item#^1.2.0",
+    "paper-listbox": "PolymerElements/paper-listbox#^1.1.2",
+    "paper-card": "PolymerElements/paper-card#^1.1.1"
+  },
+  "resolutions": {
+    "polymer": "^1.2.1",
+    "webcomponentsjs": "^0.7.2"
+  }
+}

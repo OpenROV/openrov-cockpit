@@ -4,8 +4,10 @@
   plugins.CameraTilt = function(cockpit) {
     var self = this;
     self.cockpit = cockpit;
+    console.log("CameraTilt Plugin running");
 
-    self.cockpit.extensionPoints.inputController.register(
+
+    this.inputDefaults =
       [
         // camera up/centre/down
         {
@@ -32,7 +34,7 @@
             cockpit.rov.emit('plugin.cameraTilt.adjust', 0.1);
           }
         }
-      ]);
+      ];
   };
 
   plugins.CameraTilt.prototype.getTelemetryDefintions = function getTelemetryDefintions() {
@@ -44,6 +46,11 @@
   //This pattern will hook events in the cockpit and pull them all back
   //so that the reference to this instance is available for further processing
   plugins.CameraTilt.prototype.listen = function listen() {
+    var self = this;
+    this.cockpit.rov.withHistory.on('plugin.cameraTilt.angle',function(angle){
+      self.cockpit.emit('plugin.cameraTilt.angle',angle);
+    });
+
   };
 
   window.Cockpit.plugins.push(plugins.CameraTilt);

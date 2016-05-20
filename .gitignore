@@ -40,3 +40,12 @@ temp
 .idea
 etc/rovconfig.json
 share
+bower_components
+
+**/bower_components/*
+
+src/plugins/telemetry/public/bower_components
+
+# Visual Studio Code generated files #
+######################################
+.vscode/.browse*

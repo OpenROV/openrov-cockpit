@@ -1,0 +1,27 @@
+{
+  "name": "orov-behaviors",
+  "version": "30.0.0",
+  "homepage": "https://github.com/BrianAdams/openrov-cockpit",
+  "authors": [
+    "BrianAdams <brian@babastik.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "eventemitter2": "~1.0.0",
+    "web-component-tester": "~4.2.2"
+  },
+  "dependencies": {
+    "polymer": "~1.4.0"
+  },
+  "resolutions": {
+    "polymer": "~1.4.0",
+    "webcomponentsjs": "^0.7.20"
+  }
+}

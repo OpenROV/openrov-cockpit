@@ -4,24 +4,10 @@ var PREFERENCES = 'plugins:plugin-finder';
 function pluginFinder(name, deps) {
   console.log('Pugin Finder plugin loaded.');
   var preferences = getPreferences(deps.config);
-  deps.app.get('/system-plugin/plugin-finder/config', function (req, res) {
-    res.send(preferences);
-  });
-  deps.app.get('/system-plugin/plugin-finder/config/:pluginName', function (req, res) {
-    res.send(preferences[req.params.pluginName]);
-  });
-  deps.app.post('/system-plugin/plugin-finder/config/:pluginName', function (req, res) {
-    console.log(typeof req.body.isEnabled);
-    preferences[req.params.pluginName] = req.body;
-    res.status(200);
-    res.send(preferences[req.params.pluginName]);
-    deps.config.preferences.set(PREFERENCES, preferences);
-    deps.config.savePreferences();
-  });
 
-
-  deps.cockpit.on('plugin.pluginFinder.search', function (name) {
-    console.log('performing search for plugins');
+  deps.cockpit.on('plugin.pluginFinder.search', function (name,callback) {
+    console.log('performing search for plugins.');
+    console.dir(callback);
     bower.commands
     .list( {}, { cwd: '/usr/share/cockpit' })
     .on('end',function (listing) {
@@ -37,25 +23,33 @@ function pluginFinder(name, deps) {
             }
             console.log('sending plugins list to browser');
             deps.cockpit.emit('plugin.pluginFinder.searchResults',results);
+            if (typeof(callback) == "function"){
+              callback(results);
+            }
         });
     });
   });
 
-  deps.cockpit.on('plugin.pluginFinder.list', function (name) {
+  deps.cockpit.on('plugin.pluginFinder.list', function (name,callback) {
     console.log('performing list for plugins');
     bower.commands
     .list( {}, { cwd: '/usr/share/cockpit' })
     .on('end',function (results) {
         console.log('sending plugins list to browser');
         deps.cockpit.emit('plugin.pluginFinder.installed',results);
+        if (typeof(callback) == "function") {callback(results)}
     });
   });
 
-  deps.cockpit.on('plugin.pluginFinder.install', function (name) {
+  deps.cockpit.on('plugin.pluginFinder.install', function (name,callback) {
     bower.commands
-    .install([name], { save: false}, { cwd: '/usr/share/cockpit' })
+    .install([name], { save: false}, { cwd: '/usr/share/cockpit', force:true })
     .on('error', function(err){
         console.log(err);
+        deps.cockpit.emit('plugin.pluginFinder.installStatus',err);
+        if (typeof(callback) == "function"){
+          callback(err);
+        }
     })
     .on('log', function(info){
         console.log(info);
@@ -65,6 +59,10 @@ function pluginFinder(name, deps) {
         console.log('done processing plugin install');
         deps.cockpit.emit('plugin.pluginFinder.installResults',installed);
         deps.cockpit.emit('plugin.pluginFinder.restartRequired');
+
+        if (typeof(callback) == "function"){
+          callback(installed);
+        }
         //There is a bug with bower, possibly around re-installing
         //that causes the CPU to max out forever. This restart
         //is as much a work-around as it is needed to load the
@@ -74,7 +72,7 @@ function pluginFinder(name, deps) {
       });
   });
 
-  deps.cockpit.on('plugin.pluginFinder.uninstall', function (name) {
+  deps.cockpit.on('plugin.pluginFinder.uninstall', function (name,callback) {
     bower.commands
     .uninstall([name], {}, { cwd: '/usr/share/cockpit' })
     .on('error', function(err){
@@ -88,6 +86,9 @@ function pluginFinder(name, deps) {
         console.log('done processing plugin uninstall');
         deps.cockpit.emit('plugin.pluginFinder.uninstallResults',uninstalled);
         deps.cockpit.emit('plugin.pluginFinder.restartRequired');
+        if (typeof(callback) == "function"){
+          callback(uninstalled);
+        }
         //There is a bug with bower, possibly around re-installing
         //that causes the CPU to max out forever. This restart
         //is as much a work-around as it is needed to load the
@@ -109,4 +110,6 @@ function getPreferences(config) {
   console.log('Plugin Finder loaded preferences: ' + JSON.stringify(preferences));
   return preferences;
 }
-module.exports = pluginFinder;
+module.exports = function(name,deps){
+  return new pluginFinder(name,deps);
+}

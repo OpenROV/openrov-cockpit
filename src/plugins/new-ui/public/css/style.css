@@ -1,0 +1,105 @@
+#mainContent {
+    width: 100%;
+}
+#newuiContainer {
+    width: 100%;
+    color: white;
+}
+
+
+#newuiTopbar {
+  width:100%;
+}
+
+.navbar-fixed-top .navbar-inner {
+    height: 30px;
+}
+
+.logo {
+    width: 140px;
+    vertical-align: middle;
+}
+
+a .navbar-titel {
+    font-size: 20px;
+    line-height: 22px;
+}
+
+.navbar .brand {
+    padding-top: 5px;
+}
+
+.navbar .brand * {
+    vertical-align: middle;
+}
+
+#newuiVideo {
+    width:90%;
+    overflow:hidden
+}
+
+#newuiControlpad {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 10%;
+    min-width: 80px;
+    height: auto;
+    float: right;
+}
+
+.newui-item {
+    border: 1px solid white;
+    margin: 15px;
+    text-align: center;
+}
+
+#newui-depth {
+    top: -20px;
+}
+
+.newui-item h4 {
+    font-size: 1.1vw;
+    color: white;
+    top: -2.9vh;
+
+    background-color: black;
+    padding: 5px 10px;
+    display: inline-block;
+    /*width: 33%;*/
+    margin-right: auto;
+    margin-left: auto;
+}
+
+#heading-item { margin-top: 5px;}
+
+.control {
+    width: 100%;
+    top: -40px;
+    margin-bottom: -35px;
+    color: white;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+#newui-compass {
+    margin-bottom: -45px;
+}
+
+#newui-power {
+    margin-top: 8px;
+}
+
+orov-newui-switches {
+  margin-top: 10px;
+  display: flex;
+}
+
+#newui-time {
+    top: -35px;
+    margin-bottom: -30px;
+}
+
+iron-a11y-announcer {
+  display: none
+}

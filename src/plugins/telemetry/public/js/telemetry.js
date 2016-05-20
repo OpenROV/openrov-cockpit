@@ -9,12 +9,13 @@
     this.textcolor = 0;
     this.definitions = {};
     // Add required UI elements
-    cockpit.extensionPoints.keyboardInstructions.append('<p><i>h</i> to cycle text color of telemetry</p>');
+    //cockpit.extensionPoints.keyboardInstructions.append('<p><i>h</i> to cycle text color of telemetry</p>');
   };
   //This pattern will hook events in the cockpit and pull them all back
   //so that the reference to this instance is available for further processing
   Telemetry.prototype.listen = function listen() {
     var self = this;
+    /*
     self.cockpit.extensionPoints.inputController.register(
       {
         name: 'telemetry.cycleTextColor',
@@ -22,8 +23,8 @@
         defaults: { keyboard: 'h' },
         down: function() { cockpit.rov.emit('plugin.telemetry.cycleTextColor'); }
       });
-
-    self.cockpit.rov.on('telemetry.getDefinition',function(name,callback){
+*/
+    self.cockpit.on('telemetry.getDefinition',function(name,callback){
       if (self.definitions[name]!==undefined){
         callback(self.definitions[name]);
       } else {
@@ -31,7 +32,12 @@
       }
     });
 
-    self.cockpit.rov.on('telemetry.registerDefinition',function(data){
+    self.cockpit.rov.withHistory.on('plugin.telemetry.logData',function(data){
+      self.cockpit.emit('plugin.telemetry.logData',data);
+      self.cockpit.emit('status',data);
+    });
+
+    self.cockpit.on('telemetry.registerDefinition',function(data){
       if('name' in data){
         self.definitions[data.name]=data;
       }

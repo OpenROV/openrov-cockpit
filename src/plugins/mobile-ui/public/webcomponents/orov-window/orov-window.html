@@ -1,0 +1,52 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../orov-behaviors/orov-behavior.html">
+
+<link rel="import" href="../../paper-dialog/paper-dialog.html">
+
+<dom-module id="orov-window">
+
+	<style type="text/css">
+		:host
+		{
+			position: absolute;
+			top: 0;
+			left: 0px;
+		}
+
+		paper-dialog
+		{
+			border-radius: 5px;
+			background-color: rgba( 00, 00, 00, 0.7 );
+    	}
+
+	</style>
+
+	<template>
+		<paper-dialog id="dialog">
+			<content></content>
+		</paper-dialog>
+
+	</template>
+
+
+	<script>
+		( function()
+		{
+			Polymer(
+			{
+				is: 'orov-window',
+
+				listeners:
+				{
+
+				},
+
+				ready: function()
+				{
+
+				}
+			} );
+		}() );
+
+	</script>
+</dom-module>

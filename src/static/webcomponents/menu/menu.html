@@ -1,16 +1,14 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../polymer/polymer.html">
 
-<polymer-element name="rov-menu" attributes="">
-  <template>
-    <link rel="stylesheet" href="../../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../../themes/OpenROV/css/style.css">
+<dom-module id="rov-menu">
 
-    <style type="text/css">
+  <style type="text/css">
 
       .nav.pull-right {
         float: right;
       }
     </style>
+  <template>
 
     <div class="navbar">
       <ul id="menuitems" class="nav pull-right">
@@ -22,20 +20,15 @@
 
   </template>
   <script>
-    (function() {
+    (function () {
       Polymer({
-        domReady: function () {
-//          var self = this;
-//          $(this.$.settings).find('.back-button').click(self.hideSettings);
-        },
-        menuitems: function() {
-          return $('#menuitems')[0]; 
+        is: 'rov-menu',
+        //          var self = this;
+        //          $(this.$.settings).find('.back-button').click(self.hideSettings);
+        menuitems: function () {
+          return $('#menuitems')[0];
         }
-      })
-    })();
+      });
+    }());
   </script>
-
-</polymer-element>
-  
-
-
+</dom-module>

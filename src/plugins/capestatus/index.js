@@ -18,7 +18,7 @@ function capestatus(name, deps) {
   console.log('Capestatus plugin started.');
   var preferences = getPreferences(deps.config);
 
-  deps.rov.on('status', function(data) {
+  deps.globalEventLoop.on( 'physicalInterface.status', function(data) {
     handleStatus(deps.cockpit, data);
   });
   // ## routes
@@ -165,4 +165,6 @@ function capestatus(name, deps) {
     return preferences;
   }
 }
-module.exports = capestatus;
+module.exports = function (name, deps) {
+  return new capestatus(name,deps);
+};

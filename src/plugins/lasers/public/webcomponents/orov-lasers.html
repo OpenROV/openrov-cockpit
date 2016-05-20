@@ -1,0 +1,69 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<dom-module name="orov-lasers">
+<style>
+
+  #laserIcon.enabled {
+    background-color: #cd0a0a;
+  }
+
+  #laserIcon {
+    color: white;
+    border: 1px solid #cd0a0a;
+    width: auto;
+    height: 100%;
+  }
+
+</style>
+
+  <template>
+
+    <img id="laserIcon" on-click="toggle"
+     class$="{{computedLaserClass(lasersEnabled)}}"
+     src="data:image/png;base64,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"
+    >
+    </img>
+    <comment>{{lasersEnabled.type}}</comment>
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        is:'orov-lasers',
+        properties: {
+          lasersEnabled: {type: Boolean, value:false},
+        },
+        behaviors: [namespace('behaviors').oROVStandard],
+        toggle: function() {
+          this.fire('toggle-lasers');
+          if (this.eventEmitter !== undefined){
+            this.eventEmitter.emit("plugin.laser.set",!self.lasersEnabled);
+          }
+        },
+        attached: function(){
+          //register alt-menu
+          var self = this;
+          if (this.eventEmitter !== undefined){
+            this.eventEmitter.emit('plugin.headsupmenu.register',
+            {
+              label: 'Toggle lasers',
+              callback: function () {
+                cockpit.rov.emit('plugin.laser.toggle');
+              }
+            });
+          }
+
+        },
+        registerEmitterHanlders: function(emitter){
+          var self = this;
+          emitter.on('plugin.laser.state',function(state){
+            self.lasersEnabled = state.enabled;
+          });
+        },
+        computedLaserClass(value){
+          return 'indicator ' + (value ? 'enabled' : '')
+        }
+      })
+    })();
+  </script>
+
+</dom-module>

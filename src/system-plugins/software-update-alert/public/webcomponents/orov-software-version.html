@@ -1,0 +1,83 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<dom-module name="orov-software-version">
+  <style>
+  </style>
+  <template>
+      <label>{{__('OpenROV Version Information')}}</label>
+      <template is="dom-repeat" items="{{sn}}">
+        <label>{{__('Serial Number')}}</label>:<span>{{item.bbSerial}}</span>
+      </template>
+      <template is="dom-repeat" items="{{version}}">
+        <label>{{__('Current ROV Suite Version')}}</label>:<span>{{item.version}}</span>
+      </template>
+      <div hidden$={{calculateUpdateAvailable(data)}}>
+        <label>{{__('No Updates Pending')}}</label>
+      </div>
+
+      <div hidden$={{!calculateUpdateAvailable(data)}}>
+        <label>{{__('Update Available:')}}<label>
+      <template is="dom-repeat" items="{{data}}">
+        <span>{{item.package}}</span>:<span>{{item.version}}</span>
+      </template>
+      <a target='_blank' href?='{{}}'>{{__('update')}}</a>
+    </div>
+
+      <iron-ajax
+        auto
+        url='{{softwareUpdateCheckURL}}'
+        handle-as="json"
+        last-response="{{data}}" //package version
+        debounce-duration="300">
+      </iron-ajax>
+      <iron-ajax
+        auto
+        url='{{currentVersionInfoURL}}'
+        handle-as="json"
+        last-response="{{version}}" //package version
+        debounce-duration="300">
+      </iron-ajax>
+      <iron-ajax
+        auto
+        url='{{serialNumberURL}}'
+        handle-as="json"
+        last-response="{{sn}}" //package version
+        debounce-duration="300">
+      </iron-ajax>
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        is: "orov-software-version",
+        properties: {
+          softwareUpdateCheckURL: {type: String, value: '/dashboard/plugin/software/updates/openrov-rov-*'},
+          currentVersionInfoURL: {type: String, value: '/dashboard/plugin/software/installed/openrov-rov-suite'},
+          serialNumberURL: {type: String, value: '/dashboard/plugin/software/bbserial'},
+          applyUpdateURL: {type: String, value: '/dashboard'},
+          data: {type: Array, value: []}
+        },
+        behaviors: [namespace('behaviors').oROVStandard],
+        calculateUpdateAvailable: function(data){
+          if ((data===undefined) || (data===null)) return false;
+          return data.length>0;
+        },
+        attached: function () {
+          var self = this;
+          if (this.eventEmitter!==undefined){
+            self.eventEmitter.emit('plugin-manager.getControllablePlugins',function(results){
+              self.controlablePlugins = results;
+            });
+          }
+        },
+        registerEmitterHanlders: function(emitter){
+          var self = this;
+//          emitter.on('plugin.cameraTilt.angle',function(angle){
+//            self.servoAngle = angle;
+//          });
+        }
+      })
+    })();
+  </script>
+
+</dom-module>

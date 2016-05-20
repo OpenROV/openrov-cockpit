@@ -1,0 +1,82 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+
+<dom-module id="orov-topdowncompass">
+  <style type="text/css">
+  .topdowncompass{
+      display:block;
+      width:61px;
+      height:76px;
+      position:relative;
+      margin:10px;
+  }
+
+  .compassNeedle{
+      position:relative;
+      background-image: url(data:image/png;base64,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);
+      width:61px;
+      height:76px;
+      background-size:61px 76px;
+      background-repeat:no-repeat;
+      -webkit-transition: 100ms ease-in-out;
+      -moz-transition: 100ms ease-in-out;
+      -o-transition: 100ms ease-in-out;
+      transition: 100ms ease-in-out;
+  }
+
+  #readout{
+      position: absolute;
+      width: 61px;
+      top: 0px;
+      line-height: 76px;
+      vertical-align: middle;
+      text-align: center;
+  }
+
+    </style>
+  <template>
+
+    <div id="compass" class="topdowncompass pull-left">
+      <div id="needle" class="compassNeedle"></div>
+      <div id="readout" class=""></div>
+    </div>
+
+  </template>
+  <script>
+    (function () {
+      Polymer({
+        is: 'orov-topdowncompass',
+        behaviors: [namespace('behaviors').oROVStandard],
+        registerEmitterHanlders: function(emitter){
+          var self = this;
+          emitter.on('plugin.navigationData.data',function(data){
+            self.moveTo(data.heading);
+          });
+        },
+        moveTo: function (degrees) {
+          var aR;
+          this.heading = this.heading || 0;
+          // if rot undefined or 0, make 0, else rot
+          aR = this.heading % 360;
+          if (aR < 0) {
+            aR += 360;
+          }
+          if (aR < 180 && degrees > aR + 180) {
+            this.heading -= 360;
+          }
+          if (aR >= 180 && degrees <= aR - 180) {
+            this.heading += 360;
+          }
+          this.heading += degrees - aR;
+          var cp = $(this.$.needle);
+          cp.css({
+            'transform': 'rotate(' + this.heading + 'deg)',
+            '-ms-transform': 'rotate(' + this.heading + 'deg)',
+            '-webkit-transform': 'rotate(' + this.heading + 'deg)'
+          });
+          this.set('$.readout.innerText', degrees);
+        }
+      });
+    }());
+  </script>
+</dom-module>

@@ -1,5 +1,5 @@
 (function() {
-  function Laser(name, deps) {
+  function NavigationData(name, deps) {
     console.log('Navigation Data plugin loaded');
 
     var navdata = {
@@ -12,7 +12,7 @@
     };
 
     // Arduino
-    deps.rov.on('status', function (status) {
+    deps.globalEventLoop.on( 'physicalInterface.status', function (status) {
       if ('hdgd' in status) {
         navdata.heading = status.hdgd;
       }
@@ -34,10 +34,10 @@
     });
 
     deps.cockpit.on('plugin.navigationData.zeroDepth', function () {
-      deps.rov.send('dzer()');
+      deps.globalEventLoop.emit( 'physicalInterface.send', 'dzer()');
     });
     deps.cockpit.on('plugin.navigationData.calibrateCompass', function () {
-      deps.rov.send('ccal()');
+      deps.globalEventLoop.emit( 'physicalInterface.send', 'ccal()');
     });
 
     setInterval(function () {
@@ -45,5 +45,7 @@
     }, 100);
 
   }
-  module.exports = Laser;
+  module.exports = function (name, deps) {
+    return new NavigationData(name,deps);
+  };
 })();

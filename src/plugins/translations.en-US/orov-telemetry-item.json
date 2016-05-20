@@ -1,0 +1,7 @@
+{
+  "vout": "vout",
+  "iout": "iout",
+  "cpu": "cpu",
+  "cpuUsage": "cpuUsage",
+  "deep": "deep"
+}

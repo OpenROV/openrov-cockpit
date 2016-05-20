@@ -1,0 +1,24 @@
+{
+  "name": "orov-video",
+  "version": "1.0.1",
+  "homepage": "https://github.com/BrianAdams/openrov-cockpit",
+  "authors": [
+    "BrianAdams <brian@babastik.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "mjpeg-video-webcomponents": "~2.0.1",
+    "packet-video": "https://github.com/OpenROV-atoms/packet-video.git"
+  },
+  "resolutions": {
+    "webcomponentsjs": "^0.7.20",
+    "polymer": "^1.0.0"
+  }
+}

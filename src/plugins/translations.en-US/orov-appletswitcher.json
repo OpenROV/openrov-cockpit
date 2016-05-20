@@ -1,0 +1,14 @@
+{
+  "addons": "addons",
+  "settings": "settings",
+  "data": "data",
+  "cockpit": "cockpit",
+  "head": "head",
+  "map": "map",
+  "network": "network",
+  "social": "social",
+  "update": "update",
+  "vr": "vr",
+  "diagnostics": "diagnostics",
+  "diveprofile": "diveprofile"
+}

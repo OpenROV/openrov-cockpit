@@ -1,0 +1,155 @@
+
+/*Prevent overscroll behaviour, primarily for webapp*/
+html, body
+{
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.layer
+{
+	position: fixed;
+	top: 0;
+	left: 0;
+	pointer-events:none;
+}
+
+.rel-layer
+{
+    pointer-events:none;
+}
+
+.layer-no-input
+{
+    position: fixed;
+	top: 0;
+	left: 0;
+	pointer-events:none;
+}
+
+.layer > *
+{
+	pointer-events:all;
+}
+
+.rel-layer > *
+{
+	pointer-events:all;
+}
+
+.layer > .rel-layer
+{
+	pointer-events:none;
+}
+
+.layer > .layer
+{
+	pointer-events:none;
+}
+
+.rel-layer > .layer
+{
+	pointer-events:none;
+}
+
+.rel-layer > .rel-layer
+{
+	pointer-events:none;
+}
+
+.fill
+{
+	width: 100%;
+	height: 100%;
+}
+
+.video
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+	width: 100%;
+	height: 100%;
+}
+
+#ui-top
+{
+    display: -webkit-inline-flex;
+    display: inline-flex;
+    justify-content: space-between;
+
+    width: 100%;
+    padding: 10px 10px 0px 10px;
+}
+
+.action-bar
+{
+	float: left;
+	position: relative;
+	left: 50%;
+	pointer-events: none;
+}
+
+.action-bar-container
+{
+	float: left;
+	position: relative;
+	left: -50%;
+	vertical-align: top;
+  display: inline-table;
+
+}
+
+.action-bar-container div
+{
+  vertical-align: top;
+	display: inline-block;
+	background-color: rgba(0,0,0,0.4);
+  color: white;
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+.action-bar-container .rightend
+{
+	border-radius: 0 0 5px 0;
+  padding-right: 6px;
+}
+
+.action-bar-container .battery
+{
+	width: 70px;
+	color: white;
+	background-color: rgba(0,0,0,0.4);
+	border-radius: 0 0 0 5px;
+	vertical-align: top;
+	display: inline-block;
+}
+
+.action-bar-container orov-mobile-compass
+{
+	width: 120px;
+	background-color: rgba(0,0,0,0.4);
+	border-radius: 0 0 25px 25px;
+	vertical-align: top;
+	display: inline-block;
+	margin: 0;
+}
+
+.action-bar-container .depth
+{
+	text-align: right;
+	width: 78px;
+	color: white;
+	background-color: rgba(0,0,0,0.4);
+	vertical-align: top;
+	display: inline-block;
+}

@@ -125,11 +125,10 @@ VERBOSE=yes
 #
 do_start()
 {
-
 	APPLOG_FILE="/var/log/openrov.log"
 	ERRLOG_FILE="/var/log/openrov.err.log"
-	if [ ! -f $APPLOGFILE ];then touch $APPLOG_FILE;fi
-	if [ ! -f $ERRLOGFILE ];then touch $ERRLOG_FILE;fi
+	if [ ! -f $APPLOG_FILE ];then touch $APPLOG_FILE;fi
+	if [ ! -f $ERRLOG_FILE ];then touch $ERRLOG_FILE;fi
 	chown $NODEUSER $APPLOG_FILE
 	chown $NODEUSER $ERRLOG_FILE
 	arg1="1> $APPLOG_FILE"

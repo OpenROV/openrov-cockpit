@@ -1,13 +1,16 @@
 {
-  "name": "static openrov",
+  "name": "static_openrov",
   "dependencies": {
     "fpsmeter": "~0.3.1",
-    "mjpeg-video-webcomponents": "~1.1.0",
-    "knockout.validation": "~1.0.2",
-    "polymer": "Polymer/polymer#~0.5.2",
-    "paper-slider": "Polymer/paper-slider#~0.5.4",
+    "i18next": "~1.11.0",
     "jquery": "2.1",
     "jquery-ui": "1.11",
-    "knockoutjs": "3.2"
+    "mousetrap": "~1.5.3",
+    "polymer": "^1.4.0",
+    "webcomponentsjs": "^0.7.22"
+  },
+  "resolutions": {
+    "webcomponentsjs": "^0.7.20",
+    "polymer": "^1.4.0"
   }
 }

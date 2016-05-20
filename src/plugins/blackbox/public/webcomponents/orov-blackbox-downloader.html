@@ -1,0 +1,84 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-card/paper-card.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<dom-module name="orov-blackbox-downloader">
+  <style>
+  </style>
+  <template>
+    <template is="dom-repeat" items="{{sessions}}">
+      <paper-card heading="{{item.sessionID}}">
+        <div class="card-content">
+          Time details go here.  We can also grab a preview image.
+        </div>
+        <div class="card-actions">
+          <paper-button on-click='export_json'>{{__('Export JSON')}}</paper-button>
+          <paper-button on-click='export_xml'>{{__('Export XML')}}</paper-button>
+          <paper-button on-click='export_csv'>{{__('Export CSV')}}</paper-button>
+          <template is="dom-repeat" items="{{item.VideoSegments}}" outer-id="{{item.sessionID}}">
+            <paper-button on-click='export_video'>{{__('Export Video Segment')}} {{index}}</paper-button>
+          </template>
+        </div>
+      </paper-card>
+    </template>
+  </template>
+
+  <script>
+    (function() {
+      Polymer({
+        is: "orov-blackbox-downloader",
+        properties: {
+          format: {type: String, value: 'csv'},
+          sessions: {type: Array},
+          session: {type: String}
+        },
+        behaviors: [namespace('behaviors').oROVStandard],
+        registerEmitterHanlders: function(emitter){
+          var self=this;
+          emitter.withHistory.on('plugin-blackbox-sessions',function(sessions){
+            self.sessions = sessions;
+            self.session = sessions.length>0?sessions[sessions.length-1].sessionID:'';
+          });
+        },
+        start: function(){
+          if(this.eventEmitter !== undefined){
+            this.eventEmitter.emit('plugin-blackbox-recording-start');
+          }
+        },
+        stop: function(){
+          if(this.eventEmitter !== undefined){
+            this.eventEmitter.emit('plugin-blackbox-recording-stop');
+          }
+        },
+        export_json: function(e){
+          var model = e.model;
+          var options = {collection: '*', format: 'json', sessionID: e.model.item.sessionID};
+          this.export(options);
+        },
+        export_csv: function(e){
+          var model = e.model;
+          var options = {collection: '*', format: 'csv', sessionID: e.model.item.sessionID};
+          this.export(options);
+        },
+        export_xml: function(e){
+          var model = e.model;
+          var options = {collection: '*', format: 'xml', sessionID: e.model.item.sessionID};
+          this.export(options);
+        },
+        export_video: function(e){
+          var model = e.model;
+
+          var options = {collection: 'mp4', format: 'mp4', sessionID: e.model.dataHost.outerId, segment: e.model.index+1};
+          this.export(options);
+        },
+        export: function(options){
+          if(this.eventEmitter !== undefined){
+            this.eventEmitter.emit('plugin-blackbox-export',options);
+          }
+        }
+
+      })
+    })();
+  </script>
+
+</dom-module>

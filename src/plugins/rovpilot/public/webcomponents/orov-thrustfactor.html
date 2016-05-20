@@ -1,0 +1,49 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<dom-module name="orov-thrustfactor">
+  <style>
+  :host {
+    padding: 4px;
+  }
+  label {
+    font-size: var(--thrustfactor-label-font-size,1vw);
+    color: var(--thrustfactor-label-color,white);
+    @apply(--thrustfactor-label);
+  }
+  #tf {
+    background-color: inherit;
+    color: white;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 2vw;
+  }
+  </style>
+  <template>
+    <label hidden$="{{!displayLabel}}" for="tf">{{__('Thrust Factor')}}</label>
+    <span id='tf'>{{thrustFactor}}</span>
+
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        is: "orov-thrustfactor",
+        properties: {
+          thrustFactor: {
+            type: Number,
+            value: 2
+          },
+          displayLabel: {type:Boolean, value:false}
+        },
+        behaviors: [namespace('behaviors').oROVStandard],
+        registerEmitterHanlders: function(emitter){
+          var self = this;
+          emitter.on('plugin.rovpilot.setPowerLevel',function(level){
+            self.thrustFactor = level;
+          });
+        }
+      })
+    })();
+  </script>
+
+</dom-module>

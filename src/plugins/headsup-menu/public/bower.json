@@ -1,0 +1,20 @@
+{
+  "name": "heads-up-menu",
+  "version": "0.0.1",
+  "homepage": "https://github.com/BrianAdams/openrov-cockpit",
+  "authors": [
+    "BrianAdams <brian@babastik.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {},
+  "resolutions": {
+    "webcomponentsjs": "^0.6.0"
+  }
+}

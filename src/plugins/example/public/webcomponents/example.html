@@ -1,0 +1,47 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<dom-module name="orov-example">
+  <style>
+  </style>
+  <template>
+    <div><span on-click='handleClick'>{{__('Example')}}</span>:<span>{{Name}}</span></div>
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        is: "orov-example",
+        properties: {
+          Name: {
+            type: String,
+          }
+        },
+
+        //The oROVStandard behavior makes the widget eventEmitter enabled
+        behaviors: [namespace('behaviors').oROVStandard],
+
+        handleClick: function(){
+          //TODO: Raise the click event through the dom
+          this.fire('example-clicked');
+
+          //the eventEmitter is added by oROVStandard
+          if (this.eventEmitter !== undefined){
+            this.eventEmitter.emit("plugin.example.example-clicked");
+          }
+
+        },
+
+        //This function is called by the oROVStandard behavior
+        registerEmitterHanlders: function(emitter){
+          var self = this;
+
+          //For subscribing to changes on state information
+          emitter.withHistory.on('plugin.example.attributes-changed',function(attr){
+            self.Name=attr.name;
+          });
+        }
+
+      })
+    })();
+  </script>
+
+</dom-module>

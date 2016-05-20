@@ -1,0 +1,28 @@
+{
+  "name": "classic-ui",
+  "main": "index.js",
+  "version": "1.0",
+  "homepage": "https://github.com/openrov/openrov-software",
+  "authors": [
+    "badevguru <brian@openrov.com>",
+    "codewithpassion <dominik.fretz@gmail.com>"
+  ],
+  "description": "Classic UI for OpenROV",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "2.3.2",
+    "jquery": "~2.1.4"
+  },
+  "resolutions": {
+    "jquery": "~2.1.4",
+    "webcomponentsjs": "^0.6.0"
+  }
+}

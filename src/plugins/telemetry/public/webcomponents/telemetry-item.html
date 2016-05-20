@@ -1,0 +1,88 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<dom-module name="orov-telemetry-item">
+<style>
+.std {
+  background-color: var(--telemetry-item-text-background-color, inherit);
+  color: var(--telemetry-item-text-color, white);
+  width: var(--telemetry-item-text-width, 100px);
+  font-size: var(--telemetry-item-text-font-size, 2vw);
+  height: 40px;
+  line-height: 40px;
+  @apply(--telemetry-item-text);
+}
+
+label {
+  background-color: inherit;
+  color: white;
+  height: 40px;
+  line-height: 40px;
+  font-size: 1vw;
+}
+</style>
+  <template>
+    <label  hidden$="{{!showLabel}}">{{__(telemetryItem)}}</label>
+  <div on-click="toggle">
+  <!--link href="../grapp-graph-epoch/grapp-graph-epoch.html" rel="import"-->
+    <grapp-graph-epoch id="timegraph" hidden="{{!asGraph}}" type="time.line" axis="" width="100" height="40">
+      <grapp-graph-epoch-series label="Time Series 1"
+        data='[{"time":1370044800,"y":1},{"time":1370044801,"y":10}]'>
+      </grapp-graph-epoch-series>
+    </grapp-graph-epoch>
+  <span id="instantvalue" hidden="{{asGraph}}" class="std">{{formated(telemetryItemValue)}}</span>
+</div>
+  </template>
+
+  <script>
+    (function() {
+
+      Polymer({
+        is:'orov-telemetry-item',
+        properties:{
+          showLabel: {type:Boolean, value:false, presisted: true},
+          telemetryItem: {type:String, persisted: true},
+          telemetryItemValue: {type:String, observer: 'telemetryItemValueChanged'},
+          asGraph: {type: Boolean, value: false, persisted: true},
+          toggleEnabled: {type:Boolean, value: true}
+        },
+        behaviors: [namespace('behaviors').oROVStandard],
+        registerEmitterHanlders: function(emitter){
+          var self = this;
+          emitter.on('status',function(status){
+            self.logStatusData(status);
+          });
+        },
+        telemetryItemValueChanged: function(newvalue,oldvalue){
+          //should update graph
+        },
+        attached: function (){
+          this.importHref(this.resolveUrl('../grapp-graph-epoch/grapp-graph-epoch.html'), function(e) {
+              console.log("Imported grapp");
+          });
+        },
+        logStatusData: function (data) {
+          var t = Object.keys(data)
+          for (var i in t) {
+            if (this.telemetryItem == t[i]){
+              if (!Number.isNaN(data[t[i]])){
+                if (this.$.timegraph.push !== undefined){
+                  this.$.timegraph.push((new Date()).getTime()/1000, data[t[i]]);
+                }
+              }
+              this.telemetryItemValue = data[t[i]];
+            }
+          }
+        },
+        toggle: function(){
+          if (this.toggleEnabled){
+            this.asGraph = !this.asGraph;
+          }
+        },
+        formated: function(value){
+          return Number(value).toFixed(2);
+        }
+      })
+    })();
+  </script>
+
+</dom-module>

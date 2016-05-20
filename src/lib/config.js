@@ -8,20 +8,17 @@ var nconf = require('nconf');
 
 //Add your Mock objects here using this same naming convention of library-mock for the mock version.
 //be sure to add it to the expoft at the bottom of this file as well.
-var OpenROVCameraPath = './lib/OpenROVCamera';
-var OpenROVControllerPath = './lib/OpenROVController';
-var FirmwareInstallerPath = './lib/FirmwareInstaller';
-var HardwarePath = './lib/Hardware';
 var argv = require('optimist').argv;
 
+nconf.argv().env('__'); //Also look for overrides in environment settings
 // Will essentially rewrite the file when a change to the defaults are made if there is a parsing error.
 try {
-  nconf.use('file', { file: './etc/rovconfig.json' });
+  nconf.use('file', { file: (nconf.get('configfile') ? nconf.get('configfile') : '/etc/rovconfig.json') });
 } catch (err) {
   console.log('Unable to load the configuration file, resetting to defaults');
   console.log(err);
 }
-
+console.dir(nconf.get());
 nconf.env(); //Also look for overrides in environment settings
 
 // Do not change these values in this file for an individual ROV, use the ./etc/rovconfig.json instead
@@ -31,7 +28,7 @@ nconf.defaults({
   'deadzone_neg': 50,
   'smoothingIncriment': 40,
   'photoDirectory': '/var/www/openrov/photos',
-  'water_type': 0,
+  'pluginsDownloadDirectory': '/usr/share/cockpit/bower_components',
   'thrust_modifier_port': 1,
   'thrust_modifier_vertical': -1,
   'thrust_modifier_starbord': 1,
@@ -52,7 +49,7 @@ nconf.defaults({
   'serial_baud': 115200,
   'dashboardURL': '',
   'USE_MOCK' : false,
-  'video_url' : '/cockpit/camera1'
+  'video_url' : '/rov/forward-camera'
 });
 
 function savePreferences() {
@@ -90,10 +87,6 @@ module.exports = {
   serial_baud: nconf.get('serial_baud'),
   dashboardURL: nconf.get('dashboardURL'),
   preferences: nconf,
-  savePreferences: savePreferences,
-  OpenROVCamera: getLibPath(OpenROVCameraPath),
-  OpenROVController: OpenROVControllerPath,
-  FirmwareInstaller: getLibPath(FirmwareInstallerPath),
-  Hardware: getLibPath(HardwarePath)
+  savePreferences: savePreferences
 };
 console.log('config', module.exports);

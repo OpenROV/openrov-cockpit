@@ -1,0 +1,7 @@
+{
+  "Motor": "Motor",
+  "port": "port",
+  "vertical": "vertical",
+  "starboard": "starboard",
+  "Reversed": "Reversed"
+}

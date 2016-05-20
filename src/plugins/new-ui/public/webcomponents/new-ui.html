@@ -1,0 +1,46 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+
+<dom-module id="x-newui">
+  <template>
+  </template>
+  <script>
+    var hostname = document.location.hostname ? document.location.hostname : 'localhost';
+    Polymer({
+      is: 'x-newui',
+      setMenu: function (menuItem) {
+        menuItem.appendTo($(this.$.menu));
+      },
+      setSettingsPanel: function (element) {
+        element.appendTo($(this.$.newuiBody));
+      },
+      ready: function () {
+        var self = this;
+        var size = function () {
+          var bodyWidth = $(self.$.newuiBody).innerWidth();
+          var bodyHeight = $(self.$.newuiBody).innerHeight();
+          var topBarHeight = $(self.$.newuiTopbar).innerHeight();
+          $(self.$.mainContent).width(bodyWidth);
+          var controlpadWidth = $(self.$.newuiControlpad).innerWidth();
+          $(self.$.newuiVideo).width($(self.$.mainContent).innerWidth() - controlpadWidth);
+          $(self.$.newuiVideo).height(bodyHeight - topBarHeight);
+        };
+        size();
+        $(window).resize(size);
+        var serialMonitorWindow = undefined;
+        window.cockpit.rov.on('plugin.serial-monitor.toggle', function () {
+          if (serialMonitorWindow) {
+            serialMonitorWindow.close();
+            serialMonitorWindow = undefined;
+          } else {
+            serialMonitorWindow = window.open('new-ui/serial-monitor', '__telemetry', 'menubar=no, status=no, titlebar=no, toolbar=no, width=300, height=400, location=no');
+            serialMonitorWindow.cockpit = window.cockpit;
+            serialMonitorWindow.onclose = function () {
+              window.cockpit.rov.emit('plugin.serial-monitor.toggle');
+            };
+          }
+        });
+      }
+    });
+  </script>
+</dom-module>

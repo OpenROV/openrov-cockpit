@@ -1,0 +1,20 @@
+{
+  "Cockpit": "Cockpit",
+  "Zero Depth": "Zero Depth",
+  "Diagnostic": "Diagnostic",
+  "Heading": "Heading",
+  "Depth": "Depth",
+  "Throttle": "Throttle",
+  "Settings": "Settings",
+  "Switches": "Switches",
+  "Time": "Time",
+  "Pre-Flight Check": "Pre-Flight Check",
+  "Callibration": "Callibration",
+  "Callibrate Compass": "Callibrate Compass",
+  "Battery": "Battery",
+  "ThrustFactor": "ThrustFactor",
+  "Connection": "Connection",
+  "Latency": "Latency",
+  "CPU %": "CPU %",
+  "Board Current": "Board Current"
+}

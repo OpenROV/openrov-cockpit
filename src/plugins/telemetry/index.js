@@ -3,7 +3,7 @@ function telemetry(name, deps) {
 
   var statusdata = {};
 
-  deps.rov.on('status', function(data){
+  deps.globalEventLoop.on( 'physicalInterface.status', function(data){
     for (var i in data) {
       if (i === 'cmd'){
         //filter out ping command echos
@@ -21,4 +21,6 @@ function telemetry(name, deps) {
 
 
 }
-module.exports = telemetry;
+module.exports = function (name, deps) {
+  return new telemetry(name,deps);
+};

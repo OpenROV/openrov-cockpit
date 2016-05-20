@@ -21,22 +21,9 @@ Get a working environment
 *On a beaglebone:*
 **If you just getting started and want to have working environment for the OpenROV Cockpit, we recommend that you start with using our lastest stable release as reference from the readme in [openrov-software](https://github.com/OpenROV/openrov-software)**
 
-*On a laptop:*
-Download from github
-`git clone https://github.com/OpenROV/openrov-cockpit.git`
-Install
-```
-cd openrov-cockpit
-cd src
-npm install
-cd static
-npm install
-```
-Start with the mock hardware abstraction. On windows you will have to `SET USE_MOCK=true`
-```
-cd openrov-cockpit
-USE_MOCK=true node app.js 
-```
+*On a computer:*
+Follow our developer guide:
+https://github.com/OpenROV/openrov-software/tree/master/developer_guide
 
 Key Related Projects
 ----------------
@@ -68,3 +55,5 @@ How to Contribute
 5) Send a pull request back to the Master repository.
 
 Someone on the team will review the pull request and ensure the changes work on the ROVs before approving the pull request.
+
+env 'plugins__ui-manager__selectedUI=new-ui' USE_MOCK=true video_port=8092 photoDirectory="/tmp" plugins__video__forward_camera_url="http://localhost:8092/?action=stream" configfile="/tmp/rovconfig.js" forever -w -c 'node --debug' cockpit.js  

@@ -1,0 +1,62 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+
+<dom-module name="orov-blackbox-status">
+  <!--link rel="import" type="css" href="components-font-awesome/css/font-awesome.min.css"-->
+  <link rel="import" href="../fontawesome-iconset/fa-all.html">
+  <style>
+    iron-icon {
+      padding-top: 20%;
+      padding-bottom: 20%;
+    }
+    .recording{
+      color: green;
+    }
+  </style>
+  <template>
+    <paper-tooltip for="icon2">{{__('Data Recorder')}}</paper-tooltip>
+    <iron-icon on-click="handleClick" id='icon2' icon="fa:database"></iron-icon>
+    <!--i id='icon' class="fa fa-database fa-2x"></i-->
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        is: "orov-blackbox-status",
+        properties: {
+          status: {type: Boolean, value: false, observer: '_statusChanged'}
+        },
+        behaviors: [namespace('behaviors').oROVStandard],
+        registerEmitterHanlders: function(emitter){
+          var self = this;
+          emitter.on('plugin-blackbox-recording-status',function(status){
+            self.status = status;
+          });
+        },
+        attached: function (){
+  //        this.importHref(this.resolveUrl('components-font-awesome/css/font-awesome.min.css'), function(e) {
+  //          console.log("Imported font-awesome");
+  //        });
+        },
+        _statusChanged: function(newv, oldv){
+          if (newv){
+            this.$.icon2.className = this.$.icon2.className + ' recording';
+          } else {
+            this.$.icon2.className = this.$.icon2.className.replace(/\brecording\b/,'');
+          }
+        },
+        handleClick: function(){
+          if (this.eventEmitter !== undefined){
+            if (status===true) {
+              this.eventEmitter.emit('plugin-blackbox-recording-stop');
+            } else {
+              this.eventEmitter.emit('plugin-blackbox-recording-start');
+            }
+          }
+        }
+      })
+    })();
+  </script>
+
+</dom-module>

@@ -3,7 +3,7 @@
   inputController.InputController = function (cockpit) {
     var self = this;
     self.cockpit = cockpit;
-    self.model = { commands: ko.observableArray() };
+    self.model = {commands: []};
     self.registerdCommands = {};
     self.registerdControls = {};
     self.controllers = [];
@@ -34,19 +34,11 @@
         });
       });
       if (duplicateInformation.length > 0) {
-        alert('Found duplicate commands: \n' + duplicateInformation.join('\n'));
+        self.cockpit.emit('plugin-input-controller-duplicates',duplicateInformation);
+        console.log('Found duplicate commands: \n' + duplicateInformation.join('\n'));
       }
     };
 
-    this.cockpit.extensionPoints.rovSettings.append('<div id="inputcontroller-settings"></div>');
-
-    var jsFileLocation = urlOfJsFile('input-controller.js');
-    var controllerSettings = this.cockpit.extensionPoints.rovSettings.find('#inputcontroller-settings');
-    controllerSettings.load(jsFileLocation + '../settings.html', function () {
-      ko.applyBindings(self.model, controllerSettings[0]);
-    });
-
-    this.cockpit.extensionPoints.inputController = self;
     return self;
   };
 
@@ -56,6 +48,47 @@
   
   inputController.InputController.prototype.commands = function() {
     return this.model.commands();
+  };
+
+  inputController.InputController.prototype.listen = function listen() {
+    var self = this;
+    this.cockpit.on('InputController.activate',function(controls,fn){
+      self.acticate(controls);
+      if (fn!==undefined){
+        fn();
+      }
+    });
+    this.cockpit.on('InputController.deactivate',function(controls,fn){
+      self.deactivate(controls);
+      if (fn!==undefined){
+        fn();
+      }
+    });
+    this.cockpit.on('InputController.getCommands',function(fn){
+      var commands = [];
+      if (fn!==undefined){
+        fn(self.model.commands);
+      }
+    });
+    this.cockpit.on('InputController.register',function(controls,fn){
+      self.register(controls);
+      if (typeof(fn)=="function"){
+        fn();
+      }
+    });
+
+    /* Crawl the plugins looking for those with settings definitions */
+    this.cockpit.loadedPlugins.forEach(function(plugin){
+      if (plugin.inputDefaults !== undefined){
+        if (typeof(plugin.inputDefaults) == 'function'){
+          self.register(plugin.inputDefaults());
+        }else {
+          self.register(plugin.inputDefaults);
+        }
+      }
+    });
+
+
   };
 
   inputController.InputController.prototype._register = function (control, doCheck) {
@@ -71,6 +104,8 @@
       self.registerdCommands[command.name] = command;
 
       self.model.commands.push(command);
+      self.cockpit.emit('InputController.registeredCommand',command);
+
       console.log('InputController: Registering control ' + command.name);
       self.controllers.forEach(function (controller) {
         if (command.active) {

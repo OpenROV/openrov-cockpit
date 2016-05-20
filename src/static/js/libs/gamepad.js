@@ -198,7 +198,7 @@
         RIGHT_STICK_Y: 3
       }
     },
-    XBOX: {
+    STANDARD: {
       buttons: {
         A: 0,
         B: 1,
@@ -376,7 +376,7 @@
   Gamepad.prototype._getMapping = function (type) {
     switch (type) {
     case Gamepad.Type.STANDARD:
-      return Gamepad.Mapping.XBOX;
+      return Gamepad.Mapping.STANDARD;
       break;
     case Gamepad.Type.PLAYSTATION:
       if (this.platform === Gamepad.Platform.FIREFOX) {
@@ -400,9 +400,9 @@
       return Gamepad.Mapping.ROCKCANDY;
       break;
     case Gamepad.Type.XBOX:
-      return Gamepad.Mapping.XBOX;
+      return Gamepad.Mapping.STANDARD;
     }
-    return null;
+    return Gamepad.Mapping.STANDARD; //if not found, just use standard
   };
   /**
  * Registers given gamepad.
@@ -411,15 +411,15 @@
  * @return {Boolean} Was connecting the gamepad successful
  */
   Gamepad.prototype._connect = function (gamepad) {
-    gamepad.type = this._resolveControllerType(gamepad.id);
+    gamepad.type = this._resolveControllerType(gamepad);
     if (gamepad.type === Gamepad.Type.UNSUPPORTED) {
       this._fire(Gamepad.Event.UNSUPPORTED, gamepad);
-      return false;
+      //return false;
     }
     gamepad.libmapping = this._getMapping(gamepad.type);
     if (gamepad.libmapping === null) {
       this._fire(Gamepad.Event.UNSUPPORTED, gamepad);
-      return false;
+      //return false;
     }
     gamepad.state = {};
     gamepad.lastState = {};
@@ -461,9 +461,13 @@
  * @param {String} id Controller id
  * @return {String} Controller type, one of Gamepad.Type
  */
-  Gamepad.prototype._resolveControllerType = function (id) {
-    id = id.toLowerCase();
-    if (id.indexOf('rock candy') !== -1) {
+
+Gamepad.prototype._resolveControllerType = function (gamepad) {
+
+    var id = gamepad.id.toLowerCase();
+    if (gamepad.mapping=='standard'){
+      return Gamepad.Type.STANDARD;
+    } else if (id.indexOf('rock candy') !== -1) {
       return Gamepad.Type.ROCKCANDY;
     } else if (id.indexOf('xbox') !== -1 || id.indexOf('360') !== -1 || id.indexOf('standard gamepad') != -1) {
       return Gamepad.Type.XBOX;
@@ -629,5 +633,5 @@
     }
     return value;
   };
-  window.Gamepad = Gamepad;
+  window.HTML5Gamepad = Gamepad;
 }(window));

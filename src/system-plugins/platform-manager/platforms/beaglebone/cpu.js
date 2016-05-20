@@ -8,8 +8,15 @@ var readFile	= Q.denodeify( fs.readFile );
 
 var ComposeInterface = function( platform )
 {
+	// Temporary container used for cpu detection and info loading
+	var cpu =
+	{
+		info: {},
+		targetCPU: platform.cpu
+	};
+	
 	// Compose the CPU interface object
-	return LookupCpuInfo( platform.cpu )
+	return LookupCpuInfo( cpu )
 			.then( CheckSupport )
 			.then( LoadInterfaceImplementation )
 			.then( function( cpu )
@@ -83,6 +90,9 @@ var CheckSupport = function( cpu )
 					{
 						cpu.info[ prop ] = details[ prop ];
 					}
+					
+					// Add the info to the target CPU Interface
+					cpu.targetCPU.info = cpu.info;
 			
 					return cpu;
 				}
@@ -95,7 +105,8 @@ var CheckSupport = function( cpu )
 
 var LoadInterfaceImplementation = function( cpu )
 {
-	require( "./cpu/setup.js" )( cpu );	
+	// Load and apply the interface implementation to the actual CPU interface
+	require( "./cpu/setup.js" )( cpu.targetCPU );		
 	return cpu;
 };
 

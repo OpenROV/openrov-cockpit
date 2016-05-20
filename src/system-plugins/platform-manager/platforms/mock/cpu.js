@@ -6,8 +6,15 @@ var readFile 	= Q.denodeify( fs.readFile );
 
 var ComposeInterface = function( platform )
 {
+	// Temporary container used for cpu detection and info loading
+	var cpu =
+	{
+		info: {},
+		targetCPU: platform.cpu
+	};
+	
 	// Compose the CPU interface object
-	return LookupCpuInfo( platform.cpu )
+	return LookupCpuInfo( cpu )
 			.then( CheckSupport )
 			.then( LoadInterfaceImplementation )
 			.then( function( cpu )
@@ -19,15 +26,13 @@ var ComposeInterface = function( platform )
 
 var LookupCpuInfo = function( cpu )
 {
-	cpu.info = {};
-	
 	return Q.fcall( function()
 			{
 				if( process.env.CPU_MOCK !== undefined )
 				{
 					return {
-						Revision: "123MOCK",
-						Serial: "1234567890"
+						revision: "123MOCK",
+						serial: "1234567890"
 					}
 				}
 				else
@@ -36,11 +41,11 @@ var LookupCpuInfo = function( cpu )
 					throw "No mock cpu defined";
 				}
 			} )
-			.then( function( details )
+			.then( function( info )
 			{
 				// Add revision and serial details to the interface object
-				cpu.info.revision 	= details.Revision;
-				cpu.info.serial 	= details.Serial;
+				cpu.info.revision 	= info.revision;
+				cpu.info.serial 	= info.serial;
 				
 				return cpu;
 			} )
@@ -66,6 +71,9 @@ var CheckSupport = function( cpu )
 					{
 						cpu.info[ prop ] = details[ prop ];
 					}
+					
+					// Add the info to the target CPU Interface
+					cpu.targetCPU.info = cpu.info;
 			
 					return cpu;
 				}
@@ -78,7 +86,8 @@ var CheckSupport = function( cpu )
 
 var LoadInterfaceImplementation = function( cpu )
 {
-	require( "./cpu/setup.js" )( cpu );	
+	// Load and apply the interface implementation to the actual CPU interface
+	require( "./cpu/setup.js" )( cpu.targetCPU );	
 	return cpu;
 };
 

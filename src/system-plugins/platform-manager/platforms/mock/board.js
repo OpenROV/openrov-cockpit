@@ -3,8 +3,6 @@ var fs 		= require("fs");
 var path	= require('path');
 var Parser 	= require("binary-parser").Parser;
 
-var EventEmitter = require("events").EventEmitter;
-
 var fopen		= Q.denodeify( fs.open );
 var read 		= Q.denodeify( fs.read );
 var readFile	= Q.denodeify( fs.readFile );
@@ -19,13 +17,11 @@ var eepromParser = Parser.start()
         				length: "length"
 					} );
 
-var loadBoardConfig = function( platform )
-{
-	var board = platform.mcu;
-	
-	return getBoardInfo( board )
-			.then( loadPinMap )
-			.then( loadHardwareInterface )
+var ComposeInterface = function( platform )
+{	
+	return LoadBoardInfo( platform.mcu )
+			.then( LoadPinMap )
+			.then( LoadInterface )
 			.then( function( board )
 			{
 				// Success
@@ -40,7 +36,7 @@ var loadBoardConfig = function( platform )
 			} );
 };
 
-var getBoardInfo = function( board ) 
+var LoadBoardInfo = function( board ) 
 {
 	return readFile( path.resolve(__dirname, "mock_eeprom/eepromMock.bin" ) )
 			.then( function( data )
@@ -55,7 +51,7 @@ var getBoardInfo = function( board )
 			} );
 }
 
-var loadPinMap = function( board )
+var LoadPinMap = function( board )
 {
 	return readFile( path.resolve(__dirname, "boards/" + board.info.productId + "/pinmap.json" ) )
 			.then( JSON.parse )
@@ -71,12 +67,10 @@ var loadPinMap = function( board )
 			} );
 }
 
-var loadHardwareInterface = function( board )
+var LoadInterface = function( board )
 {
-	// Load functions for the board interface
 	require( "./boards/" + board.info.productId + "/setup.js" )( board );
-	
 	return board;
 };
 
-module.exports = loadBoardConfig;
+module.exports = ComposeInterface;

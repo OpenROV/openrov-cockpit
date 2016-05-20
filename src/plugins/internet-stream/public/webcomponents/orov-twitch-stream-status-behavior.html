@@ -1,0 +1,124 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<script src="https://player.twitch.tv/js/embed/v1.js"></script>
+<script src="../orov-behaviors/utilities.js"></script>
+<script>
+
+(function (window) {
+  'use strict';
+  var behaviors = namespace('behaviors');
+  behaviors.oROVTwitchStreamStatus = {
+      properties: {
+        _rawTwitch:{type:Object,value:null},
+        _rawFFMPEG:{type:Object,value:null},
+        viewers:{type:Number,value:0},
+        twitchFPS:{type:Number,value:0},
+        ChannelURL:{type:String,value:null},
+        ChannelName:{type:String,value:null},
+        PreviewImageURL:{type:String,observer: '_previewImageChanged',value:'data:image/jpeg;base64,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SaVE49V41RNe1eFW6qB4yAAAAAAAAAAAFgAhan6io+Y/3qBhAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFgAhan6io+Y/3qBhAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFgAhan6io+Y/3qBhAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFgAhan6io+Y/3qBhAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFgAhan6io+Y/3qBhAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFgAhan6io+Y/3qBhAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFgAhan6io+Y/3qBhAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFgAhan6io+Y/3qBhAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFgAhan6io+Y/3qBhAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFgAhan6io+Y/3qBhAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFgAhan6io+Y/3qBhAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFgA//Z'},
+        ffmpegFPS:{type:Number,value:0},
+        videoPacketsPS:{type:Number,value:0},
+        audioPacketsPS:{type:Number,value:0}
+      },
+      behaviors: [namespace('behaviors').oROVStandard],
+      attached: function(){
+        var self=this;
+        if(typeof(this.registerEmitterHanlders)=='function'){
+          console.log('twitch found function');
+          var org = this.registerEmitterHanlders;
+          this.registerEmitterHanlders=function(emitter){
+            self.registerBaseEmitterHanlders(emitter);
+            org(emitter);
+          };
+          this.registerBaseEmitterHanlders(this.eventEmitter);
+        }
+      },
+      registerBaseEmitterHanlders: function(emitter){
+        var self = this;
+        emitter.on('twitch-stream-status',function(stats){
+          self._rawTwitch=stats;
+          if (stats.stream==null){
+            self.status='offline';
+            self.viewers=0;
+            self.twitchFPS=0;
+            return;
+          }
+          self.set('viewers',stats.stream.viewers);
+          self.set('twitchFPS',stats.stream.average_fps);
+          self.ChannelURL=stats.stream.channel.url;
+          self.set('PreviewImageURL',stats.stream.preview.medium);
+          self.ChannelName=stats.stream.channel.name;
+        });
+        emitter.on('broadcast-stats',function(stats){
+          self._rawFFMPEG=stats;
+          self.ffmpegFPS=stats.ffmpeg.fps;
+          self.videoPacketsPS=stats.incoming.fps;
+          self.audioPacketsPS=stats.incoming.afps;
+        });
+        emitter.withHistory.on('internet-stream-status',function(status){
+          if(!status.isStreaming){
+            self.viewers=0;
+            self.twitchFPS=0;            
+          };
+        });
+      },
+      ready: function(){
+
+      },
+      _previewImageChanged: function(){
+        var e = this.$$('#pi531235');
+        if (e!==null){
+          e.src=this.PreviewImageURL;
+        }
+      },
+      showVideoPreview(element,options){
+        var e = this.$.preview;
+
+        if (this.PreviewImageURL==null){
+          setTimeout(this.showVideoPreview.bind(this),1000);
+          return;
+        };
+
+        if (e==undefined){
+          console.error('no preview container found.');
+          return;
+        }
+
+        if (this.$$('previewImage')!==null){
+          return;
+        }
+
+        var i = document.createElement("IMG");
+        i.src=this.PreviewImageURL;
+        i.id='pi531235';
+
+        e.appendChild(i);
+
+
+
+      //The issue is that you have to be of moderate size for twitch to transcode.  Don't want to pull down
+      //the full stream if we don't have to.
+       /*
+        if(this.ChannelName==null){
+          setTimeout(this.showVideoPreview.bind(this),1000);
+          return;
+        }
+        var options = {
+            width: 100,
+            height: 48,
+            channel: this.ChannelName,
+            autoplay: true
+
+            //video: "{VIDEO_ID}"
+        };
+        var player = new Twitch.Player('twitchembed', options);
+        player.setVolume(0.5);
+        player.setMuted(true);
+        player.setQuality('mobile');
+        //https://github.com/justintv/Twitch-API/blob/master/embed-video.md
+      */
+      }
+
+    }
+  })();
+</script>

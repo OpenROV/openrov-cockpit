@@ -21,8 +21,8 @@ var PlatformManager = function( name, deps )
 	var self = this;
 	this.platform = {};
 	
-	this.platform.mcuInterface = new MCUInterface( deps );
-	this.platform.cpuInterface = new CPUInterface( deps );
+	this.platform.mcu = new MCUInterface( deps );
+	this.platform.cpu = new CPUInterface( deps );
 	
 	// TODO: Wait for settings manager to emit settings for the MCU and CPU interface before creating platforms
 	

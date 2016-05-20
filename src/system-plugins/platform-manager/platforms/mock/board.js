@@ -21,29 +21,28 @@ var eepromParser = Parser.start()
 
 var loadBoardConfig = function( platform )
 {
-	// Create the CPU object
-	var board = platform.mcuInterface;
+	var board = platform.mcu;
 	
 	return getBoardInfo( board )
 			.then( loadPinMap )
 			.then( loadHardwareInterface )
 			.then( function( board )
 			{
-				// All steps were successful
+				// Success
 				return platform;
 			} )	
 			.catch( function( err )
 			{
 				console.log( "Err loading board info: " + err );
 				
-				// Return the platform anyway.
+				// Fail, but return anyway
 				return platform;
 			} );
 };
 
 var getBoardInfo = function( board ) 
 {
-	return readFile( path.resolve(__dirname, "config/eepromMock.bin" ) )
+	return readFile( path.resolve(__dirname, "mock_eeprom/eepromMock.bin" ) )
 			.then( function( data )
 			{
 				return eepromParser.parse( data ).data;

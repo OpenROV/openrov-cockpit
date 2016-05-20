@@ -1,31 +1,26 @@
 var Q 			= require( "q" );
 var fs 			= require( "fs" );
 var path		= require( "path" );
-var EventEmitter = require("events").EventEmitter;
 
-var readFile = Q.denodeify( fs.readFile );
+var readFile 	= Q.denodeify( fs.readFile );
 
-var loadCpuConfig = function( platform )
+var ComposeInterface = function( platform )
 {
-	// Create the CPU object
-	var cpu = platform.cpuInterface;
-	cpu.info = {};
-	
 	// Compose the CPU interface object
-	return lookupCpuDetails( cpu )
-			.then( checkSupport )
-			.then( loadCPUInterface )
+	return LookupCpuInfo( platform.cpu )
+			.then( CheckSupport )
+			.then( LoadInterfaceImplementation )
 			.then( function( cpu )
 			{
-				// All steps were successful, so we can add the cpu interface to the platform
-				platform.cpu = cpu;
-				
+				// Success
 				return platform;
 			} );
 };
 
-var lookupCpuDetails = function( cpu )
+var LookupCpuInfo = function( cpu )
 {
+	cpu.info = {};
+	
 	return Q.fcall( function()
 			{
 				if( process.env.CPU_MOCK !== undefined )
@@ -55,9 +50,9 @@ var lookupCpuDetails = function( cpu )
 			} );
 }
 
-var checkSupport = function( cpu )
+var CheckSupport = function( cpu )
 {
-	return readFile( path.resolve( __dirname, "config/cpuInfo.json" ) )
+	return readFile( path.resolve( __dirname, "cpu/revisionInfo.json" ) )
 			.then( JSON.parse )
 			.then( function( json )
 			{
@@ -81,13 +76,10 @@ var checkSupport = function( cpu )
 			} );
 };
 
-var loadCPUInterface = function( cpu )
+var LoadInterfaceImplementation = function( cpu )
 {
-	// Load functions for the board interface
-	require( "./cpu/setup.js" )( cpu );
-	
+	require( "./cpu/setup.js" )( cpu );	
 	return cpu;
 };
 
-
-module.exports = loadCpuConfig;
+module.exports = ComposeInterface;

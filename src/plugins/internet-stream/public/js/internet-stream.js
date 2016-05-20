@@ -230,6 +230,10 @@
         log_trace('broadcast_stats',JSON.stringify(stats));
         self.cockpit.emit('broadcast-stats',stats);
       })
+      socket.on('twitch-stream-status',function(stats){
+        log_trace('twitch_stats',JSON.stringify(stats));
+        self.cockpit.emit('twitch-stream-status',stats);
+      })
 
     });
 

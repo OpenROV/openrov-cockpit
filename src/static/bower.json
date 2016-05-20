@@ -10,7 +10,7 @@
     "webcomponentsjs": "^0.7.22"
   },
   "resolutions": {
-    "webcomponentsjs": "^0.7.20",
+    "webcomponentsjs": "0.7.22",
     "polymer": "^1.4.0"
   }
 }

@@ -5,38 +5,38 @@
   var SystemEnvionment = function SystemEnvironment(name, deps) {
     console.log('Controllerboard2x:SystemEnvironment plugin loaded');
 
-    deps.rov.on('status', function(data) {
+    deps.globalEventLoop.on( 'physicalInterface.status', function(data) {
       //Humidity Sensor
       //Temperature
       //cpu
       //time
     });
 
+
   };
 
-  var SystemPower = function SystemPower(name,deps){
+  var SystemPower = function SystemPower(name,deps)
+  {
     console.log('Controllerboard2x:SystemPower plugin loaded');
 
     this.config = deps.config;
     this.cockpit = deps.cockpit;
-    this.rov = deps.rov;
     var self = this;
 
-    deps.rov.on('status', function(data) {
+    deps.globalEventLoop.on( 'physicalInterface.status', function(data) 
+    {
       var mappedPowerObject = sharedFunctions.telemetryToSystemPower(data);
-//      if (mappedPowerObject !== null){console.dir(mappedPowerObject)}
     });
 
-    deps.cockpit.on('plugin.systemPower.powerOnESCs', function () {
-      self.rov.send('escp(1)');
+    deps.cockpit.on('plugin.systemPower.powerOnESCs', function () 
+    {
+      deps.globalEventLoop.emit( 'physicalInterface.send', 'escp(1)');
     });
 
-    deps.cockpit.on('plugin.systemPower.powerOffESCs', function () {
-      self.rov.send('escp(0)');
+    deps.cockpit.on('plugin.systemPower.powerOffESCs', function () 
+    {
+      deps.globalEventLoop.emit( 'physicalInterface.send', 'escp(0)');
     });
-
-
-
   };
 
   SystemPower.prototype.getSettingSchema = function getSettingSchema(){
@@ -48,7 +48,8 @@
     //types and inject them in to the schema.  TODO: signal an update
     //to the schema that is caches in several spots when a Battery
     //is changed.
-    BatteryOptions = [];
+
+    BatteryOptions = ['TrustFire','LiFePO4'];
     var b = this.config.preferences.get(PREFERENCES_NS);
     if ('batteryDefintions' in b){
       b.batteryDefintions.batteries.forEach(function(bat){
@@ -87,12 +88,26 @@
           },
           "required": [
             "0"
+          ],
+          "default": [
+            {
+              "name": "TrustFire",
+              "minVoltage": 8,
+              "maxVoltage": 13
+            },
+            {
+              "name": "LiFePO4",
+              "minVoltage": 7,
+              "maxVoltage": 10
+            }
           ]
+
         },
         "selectedBattery" : {
           "id" : "selectedBattery",
           "type" : "string",
-          "enum" : BatteryOptions
+          "enum" : BatteryOptions,
+          "default" : "LiFePO4"
         }
       },
       "required": [
@@ -122,7 +137,7 @@
   var Controllerboard2x=function Controllerboard2x(name, deps) {
     console.log('Controllerboard2x plugin loaded');
 
-    deps.rov.on('status', function(data) {
+    deps.globalEventLoop.on( 'physicalInterface.status', function(data) {
       //time, cpu
 
     });

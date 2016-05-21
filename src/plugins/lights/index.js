@@ -18,7 +18,7 @@
     });
 
     // Arduino
-    deps.rov.on('status', function (data) {
+    deps.globalEventLoop.on( 'physicalInterface.status', function (data) {
       if ('LIGP' in data) {
         //value of 0-1.0 representing percent
         var level = data.LIGP;
@@ -61,7 +61,7 @@
       }
 
       var command = 'ligt(' + ArduinoHelper.serial.packPercent(lights) + ')';
-      deps.rov.send(command);
+      deps.globalEventLoop.emit( 'physicalInterface.send', command);
 
     };
 

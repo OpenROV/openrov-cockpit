@@ -1,0 +1,68 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../internet-stream/orov-twitch-stream-status-behavior.html">
+<dom-module name="orov-twitch-stream-status">
+  <style>
+    paper-card{
+      --paper-card-background-color: white;
+       @apply(--layout-horizontal);
+       display:flex;
+       background-color: white;
+    }
+
+    #preview{
+      left:auto;
+      width:100px;
+    }
+
+    #stats{
+      width:100px;
+      font-size: 1.1vh;
+    }
+
+    #pi531235{
+      max-height:100%;
+      max-width:100%;
+    }
+  </style>
+  <template>
+    <div hidden={{!streaming}}>
+    <paper-card>
+      <div id='preview'></div>
+      <table id='stats'>
+        <tr>
+          <td>{{__('Viewers')}}:<td><td>{{viewers}}<td>
+        </tr>
+        <tr>
+          <td>{{__('Twitch FPS')}}:<td><td>{{twitchFPS}}<td>
+        </tr>
+        <tr>
+          <td>{{__('Encoder FPS')}}:<td><td>{{ffmpegFPS}}<td>
+        </tr>
+        <tr>
+          <td>{{__('Cloud PPS')}}:<td><td>{{videoPacketsPS}}<td>
+        </tr>
+      </table>
+    </paper-card>
+  </div>
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        is: "orov-twitch-stream-status",
+        properties: {
+          streaming:{type:Boolean,value:false}
+        },
+        behaviors: [namespace('behaviors').oROVStandard,namespace('behaviors').oROVTwitchStreamStatus],
+        registerEmitterHanlders: function(emitter){
+          var self=this;
+          emitter.withHistory.on('internet-stream-status',function(status){
+            self.set('streaming',status.isStreaming);
+          });
+          this.showVideoPreview(this.$.video);
+
+        }
+      })
+    })();
+  </script>
+
+</dom-module>

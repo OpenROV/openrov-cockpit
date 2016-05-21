@@ -73,6 +73,7 @@ settingsManager.prototype.loadSettings = function loadSettings(callback){
       var result = {}
       result[key]=this.settings[key];
       this.deps.cockpit.emit('settings-change.'+key,result);
+      this.deps.globalEventLoop.emit('settings-change.'+key,result);
     }
   }
   this.deps.cockpit.emit('settings-change',this.settings);
@@ -113,13 +114,13 @@ settingsManager.prototype.listen = function listen(){
 
   var self=this;
   //Wireup event listeners
-  this.deps.rov.on('status', function (status) {
+  self.deps.globalEventLoop.on('physicalInterface.status', function (status) {
   });
 
-  this.deps.cockpit.on('callibrate_escs', function () {
+  self.deps.cockpit.on('callibrate_escs', function () {
   });
 
-  this.deps.cockpit.on('plugin.settings-manager.getSchemas',function(fn){
+  self.deps.cockpit.on('plugin.settings-manager.getSchemas',function(fn){
 
     var s = {
       "title": "OpenROV Settings",
@@ -132,7 +133,7 @@ settingsManager.prototype.listen = function listen(){
     fn(s);
   });
 
-  this.deps.cockpit.on('plugin.settings-manager.getSettings',function(modulename,fn){
+  self.deps.cockpit.on('plugin.settings-manager.getSettings',function(modulename,fn){
     if ((modulename !== undefined) && (modulename !== null)){
       var result = {};
       result[modulename]=self.settings[modulename];
@@ -147,7 +148,7 @@ settingsManager.prototype.listen = function listen(){
     }
   })
 
-  this.deps.cockpit.on('plugin.settings-manager.saveSettings',function(settings,fn){
+  self.deps.cockpit.on('plugin.settings-manager.saveSettings',function(settings,fn){
 //    self.deps.config.preferences.set(PREFERENCES_NS, settings);
     self.loadSettings(function(){
       for(var item in settings){
@@ -155,11 +156,12 @@ settingsManager.prototype.listen = function listen(){
         result[item]=settings[item];
         self.deps.config.preferences.set(PREFERENCES_NS+":"+item, settings[item]);
         self.deps.config.savePreferences();
-        self.deps.cockpit.emit('settings-change.'+item,result);
+//        self.deps.cockpit.emit('settings-change.'+item,result);
       };
-      self.deps.cockpit.emit('settings-change',self.settings);
+      self.loadSettings();
+//      self.deps.cockpit.emit('settings-change',self.settings);
 
-      if (fn!==undefined){
+      if (fn!==undefined && typeof(fn)=='function'){
         fn();
       }
     });

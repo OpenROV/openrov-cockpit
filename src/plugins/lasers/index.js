@@ -9,7 +9,7 @@
     });
 
     // Arduino
-    deps.rov.on('status', function (data) {
+    deps.globalEventLoop.on( 'physicalInterface.status', function (data) {
       if ('claser' in data) {
         var enabled = data.claser == 255;
         deps.cockpit.emit('plugin.laser.state', {enabled:(enabled ? true : false)});
@@ -23,7 +23,7 @@
       } else {
         claserstate = 0;
       }
-      deps.rov.send('claser(' + claserstate + ')');
+      deps.globalEventLoop.emit( 'physicalInterface.send', 'claser(' + claserstate + ')');
     };
 
   }

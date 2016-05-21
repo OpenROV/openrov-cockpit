@@ -8,9 +8,6 @@ var nconf = require('nconf');
 
 //Add your Mock objects here using this same naming convention of library-mock for the mock version.
 //be sure to add it to the expoft at the bottom of this file as well.
-var OpenROVControllerPath = './lib/OpenROVController';
-var FirmwareInstallerPath = './lib/FirmwareInstaller';
-var HardwarePath = './lib/Hardware';
 var argv = require('optimist').argv;
 
 nconf.argv().env('__'); //Also look for overrides in environment settings
@@ -32,7 +29,6 @@ nconf.defaults({
   'smoothingIncriment': 40,
   'photoDirectory': '/var/www/openrov/photos',
   'pluginsDownloadDirectory': '/usr/share/cockpit/bower_components',
-  'water_type': 0,
   'thrust_modifier_port': 1,
   'thrust_modifier_vertical': -1,
   'thrust_modifier_starbord': 1,
@@ -91,9 +87,6 @@ module.exports = {
   serial_baud: nconf.get('serial_baud'),
   dashboardURL: nconf.get('dashboardURL'),
   preferences: nconf,
-  savePreferences: savePreferences,
-  OpenROVController: OpenROVControllerPath,
-  FirmwareInstaller: getLibPath(FirmwareInstallerPath),
-  Hardware: getLibPath(HardwarePath)
+  savePreferences: savePreferences
 };
 console.log('config', module.exports);

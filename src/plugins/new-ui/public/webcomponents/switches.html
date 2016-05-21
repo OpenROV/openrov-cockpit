@@ -11,7 +11,7 @@
       }
       .switches-row {
         display: table-row;
-        font-size: 1em;
+        font-size: 1.1vw;
         line-height: 1em;
       }
       .switches-switch-on,
@@ -150,7 +150,8 @@
                     }
                   }
                 },
-		WFL: {
+
+		            WFL: {
                   switchable: true,
                   state: false,
                   description: 'WiFi lights on/off',
@@ -162,6 +163,21 @@
                       var level = 1;
                       if (state==true) level = 0;
                       self.eventEmitter.emit('plugin.wifilights.set',level);
+                    }
+                  }
+                },
+                XLE: {
+                  switchable: true,
+                  state: false,
+                  description: 'External LED lights on/off',
+                  events: [
+                    {message:'plugin.externalLights.level',fn: function(level){return level>0;}}
+                  ],
+                  switch: function (state) {
+                    if (self.eventEmitter !== undefined){
+                      var level = 1;
+                      if (state==true) level = 0;
+                      self.eventEmitter.emit('plugin.externalLights.set',level);
                     }
                   }
                 },
@@ -181,6 +197,40 @@
                       }
                     }
                   }
+                },
+                REC:{
+                  switchable: true,
+                  state: false,
+                  events: [
+                    {message:'plugin-blackbox-recording-status', fn: function(state){return state;}}
+                  ],
+                  description: 'ROV ESCs active/inactive',
+                  switch: function (state) {
+                    if (self.eventEmitter !== undefined){
+                      if (state) {
+                        self.eventEmitter.emit('plugin-blackbox-recording-stop');
+                      } else {
+                        self.eventEmitter.emit('plugin-blackbox-recording-start');
+                      }
+                    }
+                  }
+                },
+                STR:{
+                  switchable: true,
+                  state: false,
+                  events: [
+                    {message:'internet-stream-status', fn: function(state){return state.isStreaming;}}
+                  ],
+                  description: 'Internet stream video',
+                  switch: function (state) {
+                    if (self.eventEmitter !== undefined){
+                      if (state) {
+                        self.eventEmitter.emit('internet-stream-stop');
+                      } else {
+                        self.eventEmitter.emit('internet-stream-start');
+                      }
+                    }
+                  }
                 }
               };
             }
@@ -190,6 +240,7 @@
         registerEmitterHanlders: function(emitter) {
           var self = this;
           var container = $(this.$.switchesContainer);
+          this.$.switchesContainer.innerHTML='';
           for (var aSwitch in self.switches) {
             container.append('<div class="switches-row ' + (self.switches[aSwitch].switchable ? 'switchable' : '') + '" id="' + aSwitch + '" title="' + self.switches[aSwitch].description + '">' + '<div class="switches-switch-on">' + aSwitch + '</div>' + '<div class="switches-switch-off">' + aSwitch + '</div>' + '</div>');
             if (self.switches[aSwitch].switchable) {

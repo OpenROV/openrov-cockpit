@@ -11,7 +11,18 @@
   };
 
   plugins.NewUI.prototype.listen = function listen(){
-    $('#t')[0]['cockpitEventEmitter'] = this.cockpit;
+    // Fixes timing issues with existence of cockpit_int at time of initial call
+    // TODO: Can we code startup in a way where this doesnt happen? Where else might this be happening?
+    if (window.cockpit_int === undefined)
+    {
+      setTimeout(this.listen.bind(this),250);
+      return;
+    }
+    else if( window.cockpit_int.i18n === undefined )
+    {
+        setTimeout(this.listen.bind(this),250);
+        return;
+    }
 
     window.cockpit_int.i18n.loadNamespace('new-ui', function() {  });
     var key_s = window.cockpit_int.i18n.options.keyseparator;

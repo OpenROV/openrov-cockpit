@@ -26,7 +26,8 @@
         framespersecond='{{framesPerSecond}}'
         canvas='{{canvas}}'
         cors='false'
-        showMenu='true'>
+        showMenu='true'
+        showStats='true'>
       <content></content>
     </packet-video>
     </template>
@@ -83,6 +84,7 @@
                 emitter.emit('request_Init_Segment',function(data){
                   self.$$('#camera1').init(new Uint8Array(data),function(){
                     packetVideo_initializationInProgress = false;
+                    emitter.emit('video.videoElementAvailable',self.$$('#camera1').getVideoElement());
                   });
                 });
                 //timeout and try agian after 1 second

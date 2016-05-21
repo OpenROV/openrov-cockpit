@@ -3,10 +3,8 @@ function example(name, deps) {
 
   //instance variables
   this.deps = deps; //hold a reference to the plugin dependencies if you are going to use them
-  this.rov = deps.rov; //explicitlly calling out the rov eventemitter
+  this.globalEventLoop = deps.globalEventLoop; //explicitlly calling out the rov eventemitter
   this.cockpit = deps.cockpit; //explicitly calling out cockpit eventemitter
-
-
 }
 
 // Start is executed after all plugins have loaded. Activate listeners here.
@@ -26,7 +24,7 @@ example.prototype.start = function start(){
 
   //For messages that are destined for the MCU, a helper function to simply
   //wire the browser cockpit messages directly to and from the MCU.
-  this.rov.registerPassthrough({
+  this.globalEventLoop.emit( 'physicalInterface.registerPassthrough', {
     messagePrefix: 'plugin.example',
     fromROV: [
       'example_foo',

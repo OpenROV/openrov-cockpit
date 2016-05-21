@@ -12,7 +12,7 @@
     };
 
     // Arduino
-    deps.rov.on('status', function (status) {
+    deps.globalEventLoop.on( 'physicalInterface.status', function (status) {
       if ('hdgd' in status) {
         navdata.heading = status.hdgd;
       }
@@ -34,10 +34,10 @@
     });
 
     deps.cockpit.on('plugin.navigationData.zeroDepth', function () {
-      deps.rov.send('dzer()');
+      deps.globalEventLoop.emit( 'physicalInterface.send', 'dzer()');
     });
     deps.cockpit.on('plugin.navigationData.calibrateCompass', function () {
-      deps.rov.send('ccal()');
+      deps.globalEventLoop.emit( 'physicalInterface.send', 'ccal()');
     });
 
     setInterval(function () {

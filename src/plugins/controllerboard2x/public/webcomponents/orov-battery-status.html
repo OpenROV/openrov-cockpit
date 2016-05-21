@@ -62,7 +62,7 @@
 
           emitter.on('plugin.controllerboard2x.systemPower.update', function(data){
               if ('voltage' in data.board){
-                this.voltage = Number(data.board.voltage);
+                self.set('voltage',Number(data.board.voltage));
               };
           });
 

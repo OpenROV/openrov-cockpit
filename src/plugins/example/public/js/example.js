@@ -41,12 +41,12 @@
 
   //Called by the plugin-manager to enable a plugin
   Example.prototype.enable = function enable() {
-    alert('example enabled');
+    console.log('example enabled');
   };
 
   //Called by the plugin-manager to disable a plugin
   Example.prototype.disable = function disable() {
-    alert('example disabled');
+    console.log('example disabled');
   };
 
 

@@ -11,6 +11,7 @@
           starboard: 0,
           vertical: 0
         }
+     this.settings = {};
 
     // Add required UI elements
   };
@@ -27,6 +28,10 @@
     this.cockpit.on('plugin.thrusters2x1.set', function(state){
       self.sendTestMotorMessage(data);
     });
+
+    this.cockpit.rov.withHistory.on('settings-change.thurster2x1',function(settings){
+     this.settigns=settings.thrusters2x1;
+    });
   };
 
 
@@ -36,11 +41,6 @@
   Thrusters2x1.prototype.setMotorTestSpeed = function setMotorTestSpeed(propertyName, value) {
     this[propertyName](value);
   };
-  Thrusters2x1.prototype.LoadSettings = function LoadSettings(settings) {
-  };
-  Thrusters2x1.prototype.SaveDiagnostics = function() {
-  };
-  Thrusters2x1.prototype.SaveSettings = function() {
-  };
+
   window.Cockpit.plugins.push(Thrusters2x1);
 }(window, jQuery));

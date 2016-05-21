@@ -40,6 +40,29 @@
       });
     });
 
+    this.startPlugins();
+
+  };
+
+  PluginManager.prototype.startPlugins = function startPlugins(fn){
+    this.EnumerateControllablePlugins(function(items){
+      items.forEach(function(p){
+        if(p.isEnabled === true){
+          p.isEnabled = true;
+          p.rawPlugin.isEnabled = true;
+          p.rawPlugin.enable();
+
+        } else {
+          p.isEnabled = false;
+          p.rawPlugin.isEnabled = false;
+          p.rawPlugin.disable();
+
+        }
+      });
+      if (typeof(fn) === 'function'){
+        fn();
+      }
+    });
 
   };
 
@@ -48,8 +71,9 @@
       items.forEach(function(p){
         if(p.name === plugin){
           if(p.isEnabled === false){
-            p.rawPlugin.enable();
             p.isEnabled = true;
+            p.rawPlugin.isEnabled = true;
+            p.rawPlugin.enable();
             if (typeof(fn) === 'function'){
               fn();
             }
@@ -66,8 +90,9 @@
       items.forEach(function(p){
         if(p.name === plugin){
           if(p.isEnabled === true){
-            p.rawPlugin.disable();
             p.isEnabled=false;
+            p.rawPlugin.isEnabled = false;
+            p.rawPlugin.disable();
             if (typeof(fn) === 'function'){
               fn();
             }
@@ -91,7 +116,7 @@
   }
 
   PluginManager.prototype.EnumerateControllablePlugins = function EnumerateControllablePlugins(callback){
-    self = this;
+    var self = this;
     if (_plugins !== null) {
         callback(_plugins);
         return;

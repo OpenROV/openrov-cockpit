@@ -1,12 +1,19 @@
 (function (window, document, jQuery) {
   'use strict';
   var plugins = namespace('plugins');
+  const maxVideoSegmentSize = 200000000;
+
   //jQuery.getScript('/components/dexie/dist/latest/Dexie.js');
 
   var head = document.getElementsByTagName("head")[0];
   var js = document.createElement("script");
   js.type = "text/javascript";
-  js.src = '/components/dexie/dist/latest/Dexie.js';
+  js.src = 'components/dexie/dist/dexie.min.js';
+  head.appendChild(js);
+
+  var js = document.createElement("script");
+  js.type = "text/javascript";
+  js.src = 'components/comma-separated-values/csv.min.js';
   head.appendChild(js);
 
   var Blackbox = function Blackbox(cockpit) {
@@ -15,10 +22,14 @@
     this.recording = false;
     this.idb;
     this.sessionID = this.newSession();
+    this.mp4Buffer = [];
+    this.statusBuffer = [];
+    this.navBuffer = [];
 
   };
 
   plugins.Blackbox = Blackbox;
+
 
   Blackbox.prototype.inputDefaults = function inputDefaults() {
     var self = this;
@@ -35,7 +46,7 @@
   Blackbox.prototype.listen = function listen() {
     var self = this;
 
-    if (window.Dexie===undefined){
+    if ((window.Dexie===undefined) || (window.CSV===undefined)){
 //      $.getScript('/components/dexie/dist/latest/Dexie.js',function(){
 //        self.listen();
 //      });
@@ -45,7 +56,9 @@
     this.idb = this.defineDB(); //Readies the DB, ensures schema is consistent
     this.idb.on('error', function (err) {
         // Catch all uncatched DB-related errors and exceptions
-        console.error(err);
+        console.error(err.message);
+        console.dir(err);
+        self.stopRecording();
     });
 
     this.cockpit.rov.on('plugin.navigationData.data', function (data) {
@@ -63,7 +76,6 @@
     });
     this.cockpit.on('plugin-blackbox-export', function(options){
       self.exportData(options);
-      self.exportVideo(options);
     });
 
     this.cockpit.on('plugin-blackbox-recording-start', function(){
@@ -97,23 +109,32 @@
 
   //TODO: Add sessions collection that each unique session is placed
   var _recordedSessions = function recordedSessions(idb,callback){
-    idb.sessions.toArray(function(data){
-      callback(data);
+    idb.open(function(){
+      idb.sessions.toArray(function(data){
+        for(var i=0;i<=data.length;i++){
+          if(data[i].sessionID==null){
+            data[i].sessionID='';
+          }
+          idb.mp4.where("sessionID").equalsIgnoreCase(data[i].sessionID).toArray(function(j,dump){
+            var sizeofData = 0
+            var arrayOfData = dump.map(function(item){
+              var converted = new Uint8Array(item.data);
+              sizeofData+=converted.length;
+              return converted;
+            });
+            var segments = Math.ceil(sizeofData/maxVideoSegmentSize);
+            data[j].VideoSegments = new Array(segments);
+            if (j==data.length-1){
+              callback(data);
+            }
+          }.bind(this,i));
+        }
+      });
     });
   };
 
   Blackbox.prototype.recordedSessions = function recordedSessions(callback){
-    if (!this.idb.isOpen()) {
-      this.idb.open()
-        .catch(function (error) {
-          console.error(error);
-        });
       _recordedSessions(this.idb,callback);
-      this.idb.close();
-    } else {
-      _recordedSessions(this.idb,callback);
-    }
-
   }
 
   Blackbox.prototype.toggleRecording = function toggleRecording() {
@@ -124,29 +145,74 @@
     }
   };
 
+
+  function formatBytes(bytes,decimals) {
+     if(bytes == 0) return '0 Byte';
+     var k = 1000; // or 1024 for binary
+     var dm = decimals + 1 || 3;
+     var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+     var i = Math.floor(Math.log(bytes) / Math.log(k));
+     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  }
+
   Blackbox.prototype.startRecording = function startRecording() {
-    if (!this.recording) {
-      var self=this;
-      console.log('Recording Telemetry');
-      var blackbox = this;
-      this.idb.open();
-      if(!sessionIDRecorded){
-        this.idb.sessions.add({sessionID:this.sessionID,timestamp:Date.now()});
-        this.recordedSessions(function(sessions){
-          self.cockpit.emit('plugin-blackbox-sessions',sessions)
-        });
-        sessionIDRecorded=true;
-      }
-      this.recording = true;
-      this.cockpit.emit('plugin-blackbox-recording-status',true);
+    if (this.recording) {
+      return;
+    };
+    var self=this;
+    console.log('Recording Telemetry');
+    var blackbox = this;
+
+    //Create the session
+    this.idb.open();
+    if(!sessionIDRecorded){
+      this.idb.sessions.add({sessionID:this.sessionID,timestamp:Date.now()});
+      this.recordedSessions(function(sessions){
+        self.cockpit.emit('plugin-blackbox-sessions',sessions)
+      });
+      sessionIDRecorded=true;
     }
+//    this.idb.close();
+    this.recording = true;
+    this.cockpit.emit('plugin-blackbox-recording-status',true);
+
+    var commitBuffers= function(){
+         self.idb.transaction("rw", self.idb.mp4, self.idb.navdata,self.idb.telemetry,function() {
+          while(self.mp4Buffer.length>0){
+            self.idb.mp4.add(self.mp4Buffer.shift());
+          }
+          while(self.navBuffer.length>0){
+            self.idb.navdata.add(self.navBuffer.shift());
+          }
+          while(self.statusBuffer.length>0){
+            self.idb.mp4.add(self.statusBuffer.shift());
+          }
+        })
+        .then(function () {
+          // Transaction complete.
+        })
+        .catch(function (error) {
+            console.error(error);
+            self.stopRecording();
+        });
+      if ((self.recording)|| (self.mp4Buffer.length>0 || self.navBuffer.length>0 || self.statusBuffer.length>0) ){
+        setTimeout(commitBuffers.bind(self),1000);
+        navigator.webkitTemporaryStorage.queryUsageAndQuota (
+            function(usedBytes, grantedBytes) {
+                console.log('we are using ', formatBytes(usedBytes,2), ' of ', formatBytes(grantedBytes,2), ' ', formatBytes(grantedBytes-usedBytes,2),' remaining.');
+            },
+            function(e) { console.log('Error', e);  }
+        );
+      }
+    }
+    commitBuffers.call(self);
+
   };
 
   Blackbox.prototype.stopRecording = function stopRecording() {
     if (this.recording) {
       console.log('Stopping Telemetry');
       this.recording = false;
-      this.idb.close();
       this.cockpit.emit('plugin-blackbox-recording-status',false);
     }
   };
@@ -167,35 +233,50 @@
       });
     } else {
     //var myblob = new Blob([data]);
-    this.idb.mp4.add({timestamp: Date.now(),sessionID:this.sessionID,data:data})
+    this.mp4Buffer.push({timestamp: Date.now(),sessionID:this.sessionID,data:data});
+/*
+    this.idb.mp4.add()
       .catch(function (error) {
         console.error(error);
+        self.stopRecording();
       });
+*/
     }
+
   };
 
   Blackbox.prototype.logNavData = function logNavData(navdata) {
+    var self=this;
     if (!this.recording) {
       return;
     }
     navdata.timestamp = Date.now();
     navdata.sessionID= this.sessionID;
+    this.navBuffer.push(navdata);
+/*
     this.idb.navdata.add(navdata)
       .catch(function (error) {
         console.error(error);
+        self.stopRecording();
       });
+*/
   };
 
   Blackbox.prototype.logStatusData = function logStatusData(statusdata) {
+    var self=this;
     if (!this.recording) {
       return;
     }
     statusdata.timestamp = Date.now();
     statusdata.sessionID= this.sessionID;
+    this.statusBuffer.push(statusdata);
+/*
     this.idb.telemetry.add(statusdata)
       .catch(function (error) {
         console.error(error);
+        self.stopRecording();
       });
+*/
   };
 
   Blackbox.prototype.defineDB = function defineDB(callback){
@@ -244,32 +325,11 @@
 
   };
 
-  Blackbox.prototype.exportVideo = function exportVideo(options){
-    var cols;
-
-//    if(options.collection === "*"){
-      cols = ['mp4'];
-//    } else {
-//      cols = [options.collection];
-//    }
-
-    for(var i in cols){
-      options.collection = cols[i];
-      if (!this.idb.isOpen()) {
-        this.idb.open()
-          .catch(function (error) {
-            console.error(error);
-          });
-        this._exportVideo(options);
-        this.idb.close();
-      } else {
-        this._exportVideo(options);
-      }
-    }
-
-  };
-
   Blackbox.prototype._exportData = function _exportData(options,callback){
+    if (options.collection=='mp4'){
+       this._exportVideo(options,callback);
+       return;
+    }
 
     var fakeClick = function fakeClick(anchorObj) {
       if (anchorObj.click) {
@@ -288,6 +348,7 @@
       var link = document.createElement("A");
       link.setAttribute('href', window.URL.createObjectURL(blob));
       link.setAttribute('download',name);
+      link.setAttribute('target','_blank');
       //download="data.json"
       //link.attr('href', window.URL.createObjectURL(blob));
       document.body.appendChild(link);
@@ -309,6 +370,9 @@
 
   };
 
+  var lastURL = null;
+  //TODO: Track this issue preventing easy download of large amounts of data.
+  //https://bugs.chromium.org/p/chromium/issues/detail?id=375297
   Blackbox.prototype._exportVideo = function _exportVideo(options,callback){
 
     var fakeClick = function fakeClick(anchorObj) {
@@ -324,9 +388,14 @@
     };
 
     var downloadInBrowser = function downloadInBrowser(data,name){
+      if (lastURL!=null){
+        URL.revokeObjectURL(lastURL);
+        lastURL = null;
+      }
       var blob = new Blob([data], { 'type': 'video/mp4' });
       var link = document.createElement("A");
-      link.setAttribute('href', window.URL.createObjectURL(blob));
+      lastURL = window.URL.createObjectURL(blob);
+      link.setAttribute('href', lastURL);
       link.setAttribute('download',name);
       //download="data.json"
       //link.attr('href', window.URL.createObjectURL(blob));
@@ -336,39 +405,28 @@
 
 
     this.idb[options.collection].where("sessionID").equalsIgnoreCase(options.sessionID).toArray(function(name,dump){
-      var sizeofData = 0
-      var arrayOfData = dump.map(function(item){
-        var converted = new Uint8Array(item.data);
-        sizeofData+=converted.length;
-        return converted;
-      });
-      var result = new Uint8Array(sizeofData);
-      var tail = 0;
-      arrayOfData.forEach(function(item){
-        result.set(item,tail);
-        tail+=item.length;
-      });
+        var sizeofData = 0
+        var arrayOfData = dump.map(function(item){
+          var converted = new Uint8Array(item.data);
+          sizeofData+=converted.length;
+          return converted;
+        });
+        var result = new Uint8Array(maxVideoSegmentSize*200000);
+        var initFrame=arrayOfData.shift();
+        result.set(initFrame,0);
+        var tail=initFrame.length;
+        var track = 0;
+        arrayOfData.forEach(function(item){
+          track+=item.length;
+          if (Math.ceil(track/maxVideoSegmentSize)==options.segment){
+            console.log(tail+item.length);
+            result.set(item,tail);
+            tail+=item.length;
+          }
+        });
 
-
-//      var result = Uint8Array.of.apply(this,arrayOfData);
-/*
-
-
-      var bufferlength=0;
-      var dataArray = dump.reduce(function(previous,current,index,array){
-        var b = new Uint8Array(current.data);
-        //var c = new Uint8Array(previous.length + b.length);
-        //c.set(previous);
-        if (bufferlength+b.length>previous.length){
-          var c =
-        }
-        previous.set(b, bufferlength);
-        bufferlength+=b.length
-        return c;
-      },new Uint8Array(2000000));
-*/
-      downloadInBrowser(result,name+'-'+options.sessionID+'.'+'mp4');
-    }.bind(null,options.collection));
+        downloadInBrowser(result.subarray(0,tail),name+'-'+options.sessionID+'-'+options.segment+'.'+'mp4');
+      }.bind(null,options.collection));
 
   };
 

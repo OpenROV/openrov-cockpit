@@ -2,7 +2,7 @@
 
 <dom-module id="dual-thumbstick">
 	<style type="text/css">
-		:host 
+		:host
 		{
 			display: block;
 			position: absolute;
@@ -11,74 +11,74 @@
 			width: 100%;
 			height: 100vh;
 		}
-		
+
 		canvas
 		{
-			display:block; 
-			
-			position:absolute; 
+			display:block;
+
+			position:absolute;
 		}
-		
-		.hidden 
-		{ 
-			display: none 
+
+		.hidden
+		{
+			display: none
 		}
-		
+
 	</style>
 
 	<template>
 		<canvas id="thumbstickcanvas" class="mobilecontrols" width="100%" height="100%">
 		</canvas>
 	</template>
-	
+
 	<script src="js/vector2.js"></script>
 	<script src="js/trackpad.js"></script>
 	<script>
 		( function()
 		{
-			// Private vars			
+			// Private vars
 			var canvas,
 				ctx,
-				canvasHalfWidth, 
+				canvasHalfWidth,
 				canvasHalfHeight,
-			
+
 				touches    		= [],
 				isTouchable  	= 'ontouchstart' in window,
 				isMouseDown 	= false,
 
 				leftTrack 		= new Trackpad(),
 				rightTrack 		= new Trackpad();
-				
+
 				var mouseX;
 				var mouseY;
-			
+
 			Polymer(
 			{
 				is: 'dual-thumbstick',
-				
-				properties: 
+
+				properties:
 				{
 				},
-				
+
 				listeners:
 				{
 				},
-		
-				attached: function ()
+
+				ready: function ()
 				{
 					canvas = this.$.thumbstickcanvas;
 					ctx    = canvas.getContext('2d');
-					
+
 					// Set up trackpad parameters
 					leftTrack.axisColor = "white";
 					rightTrack.axisColor = "white";
-					rightTrack.hasXAxis = false;				
-					
+					rightTrack.hasXAxis = false;
+
 					// Register event listeners
 					this.registerEvents();
-					this.resetCanvas();  
+					this.resetCanvas();
 				},
-				
+
 				registerEvents: function()
 				{
 					// Check for touch capability and register appropriate listeners
@@ -96,45 +96,50 @@
 						canvas.addEventListener( 'mousemove', this.onMouseMove.bind(this), false );
 						canvas.addEventListener( 'mouseup', this.onMouseUp.bind(this), false );
 					}
-					
-					window.onorientationchange 	= this.resetCanvas.bind(this);  
-					window.onresize 			= this.resetCanvas.bind(this); 
+
+					window.onorientationchange 	= this.resetCanvas.bind(this);
+					window.onresize 			= this.resetCanvas.bind(this);
 				},
-				
-				resetCanvas: function() 
-				{  
+
+				resetCanvas: function()
+				{
+					if (canvas.offsetWidth==0){
+						setTimeout(this.resetCanvas.bind(this),500);
+						return;
+					}
 					// Set both CSS and internal canvas size
 					canvas.style.width 	= '100%';
 					canvas.style.height	= '100%';
 					canvas.width  		= canvas.offsetWidth;
 					canvas.height 		= canvas.offsetHeight;
-					
-					canvasHalfWidth 	= canvas.width / 2; 
+
+					canvasHalfWidth 	= canvas.width / 2;
 					canvasHalfHeight 	= canvas.height / 2;
-					
+
 					leftTrack.drawPos.reset( leftTrack.size + leftTrack.xPadding, leftTrack.size + leftTrack.yPadding );
 					rightTrack.drawPos.reset( canvas.width - rightTrack.size - rightTrack.xPadding, rightTrack.size + rightTrack.yPadding );
-					
+
 					leftTrack.canvasPos.reset( canvas.getBoundingClientRect().left,  canvas.getBoundingClientRect().top );
 					rightTrack.canvasPos.reset( canvas.getBoundingClientRect().left,  canvas.getBoundingClientRect().top );
-					
+
 					this.draw();
 				},
-				
+
 				draw: function ()
 				{
+
 					// Clear the canvas
 					ctx.clearRect( 0, 0, canvas.width, canvas.height );
-					
+
 					// Handle touch rendering
 					if( isTouchable )
 					{
-						leftTrack.Render( ctx ); 
+						leftTrack.Render( ctx );
 						rightTrack.Render( ctx );
 					}
 					// Handle click rendering
 					else
-					{						
+					{
 						if( isMouseDown )
 						{
 							ctx.beginPath();
@@ -145,132 +150,132 @@
 						}
 					}
 				},
-				
+
 				onTouchStart: function (e)
 				{
 					e.preventDefault();
-					
+
 					for( var i = 0; i < e.changedTouches.length; i++ )
 					{
-						var touch = e.changedTouches[i]; 
-						
+						var touch = e.changedTouches[i];
+
 						if( ( leftTrack.id < 0 ) && ( touch.clientX < canvasHalfWidth ) && ( touch.clientY > canvasHalfHeight ) )
 						{
 							leftTrack.isVisible = true;
-							leftTrack.id = touch.identifier; 
-							
-							leftTrack.startPos.reset( touch.clientX, touch.clientY ); 	
-							leftTrack.currentPos.copyFrom( leftTrack.startPos ); 
-							leftTrack.vec.reset( 0, 0 ); 		
+							leftTrack.id = touch.identifier;
+
+							leftTrack.startPos.reset( touch.clientX, touch.clientY );
+							leftTrack.currentPos.copyFrom( leftTrack.startPos );
+							leftTrack.vec.reset( 0, 0 );
 						}
 						else if( ( rightTrack.id < 0 ) && touch.clientX > canvasHalfWidth && ( touch.clientY > canvasHalfHeight ) )
-						{			
-							rightTrack.isVisible = true;				
-							rightTrack.id = touch.identifier; 
-							
-							rightTrack.startPos.reset( touch.clientX, touch.clientY ); 	
-							rightTrack.currentPos.copyFrom( rightTrack.startPos ); 
+						{
+							rightTrack.isVisible = true;
+							rightTrack.id = touch.identifier;
+
+							rightTrack.startPos.reset( touch.clientX, touch.clientY );
+							rightTrack.currentPos.copyFrom( rightTrack.startPos );
 							rightTrack.vec.reset( 0, 0 );
 						}
 					}
-					
-					touches = e.touches; 
-					
+
+					touches = e.touches;
+
 					this.draw();
-					
+
 				},
-				
+
 				onTouchMove: function (e)
 				{
 					// Prevent the browser from doing its default thing (scroll, zoom)
 					e.preventDefault();
-	
+
 					for( var i = 0; i < e.changedTouches.length; i++ )
 					{
-						var touch = e.changedTouches[i]; 
-						
+						var touch = e.changedTouches[i];
+
 						if( leftTrack.id == touch.identifier )
 						{
-							
+
 							leftTrack.currentPos.reset( touch.clientX, touch.clientY );
-							leftTrack.vec.copyFrom( leftTrack.currentPos ); 
+							leftTrack.vec.copyFrom( leftTrack.currentPos );
 							leftTrack.vec.minusEq( leftTrack.startPos );
-							
+
 							if( leftTrack.xHasChanged )
 							{
 								this.fire( 'leftTrackX', { val: leftTrack.x } );
 							}
-							
+
 							if( leftTrack.yHasChanged )
 							{
 								this.fire( 'leftTrackY', { val: leftTrack.y } );
-							}	 		
+							}
 						}
 						else if( rightTrack.id == touch.identifier )
 						{
-							rightTrack.currentPos.reset( touch.clientX, touch.clientY ); 
-							rightTrack.vec.copyFrom( rightTrack.currentPos ); 
-							rightTrack.vec.minusEq( rightTrack.startPos );  
-							
+							rightTrack.currentPos.reset( touch.clientX, touch.clientY );
+							rightTrack.vec.copyFrom( rightTrack.currentPos );
+							rightTrack.vec.minusEq( rightTrack.startPos );
+
 							if( rightTrack.yHasChanged )
 							{
 								this.fire( 'rightTrackY', { val: rightTrack.y } );
 							}
-						}	
+						}
 					}
-					
-					touches = e.touches; 
-					
+
+					touches = e.touches;
+
 					this.draw();
 				},
-				
+
 				onTouchEnd: function (e)
 				{
-					touches = e.touches; 
-					
+					touches = e.touches;
+
 					for( var i = 0; i < e.changedTouches.length; i++ )
 					{
-						var touch = e.changedTouches[i]; 
+						var touch = e.changedTouches[i];
 						if( leftTrack.id == touch.identifier )
 						{
 							leftTrack.Reset();
 							this.fire( 'leftTrackX', { val: leftTrack.x } );
-							this.fire( 'leftTrackY', { val: leftTrack.y } );		
+							this.fire( 'leftTrackY', { val: leftTrack.y } );
 						}
 						else if( rightTrack.id == touch.identifier )
 						{
 							rightTrack.Reset();
 							this.fire( 'rightTrackY', { val: rightTrack.y } );
-						}	
+						}
 					}
-					
+
 					this.draw();
 				},
-				
+
 				onMouseDown: function (e)
 				{
 					//e.preventDefault();
 					isMouseDown = true;
 					this.draw();
 				},
-				
+
 				onMouseMove: function (e)
 				{
 					mouseX = e.offsetX;
 					mouseY = e.offsetY;
-					
+
 					this.draw();
 				},
-				
+
 				onMouseUp: function (e)
 				{
 					isMouseDown = false;
 					this.draw();
 				},
-				
+
 				handleGamepad: function()
 				{
-					
+
 				}
 			} );
 		}() );

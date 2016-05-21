@@ -1,0 +1,91 @@
+
+		<script>
+		window.openrovtheme = 'mobile-ui';
+
+		// Prevent safari overscroll behaviour
+		document.ontouchmove = function(event)
+		{
+			event.preventDefault();
+		}
+
+		// Prevent context menu
+		window.oncontextmenu = function(event) {
+			event.preventDefault();
+			event.stopPropagation();
+			return false;
+		};
+	</script>
+
+	<!-- Web components -->
+	<link rel="import" href="components/video/orov-video.html">
+	<link rel="import" href="components/mobile-ui/dual-thumbstick/dual-thumbstick.html">
+	<link rel="import" href="components/mobile-ui/orov-window/orov-window.html">
+	<link rel="import" href="components/mobile-ui/orov-mobile-compass/orov-mobile-compass.html">
+	<link rel="import" href="components/mobile-ui/orov-mobile-depth/orov-mobile-depth.html">
+	<link rel="import" href="components/mobile-ui/orov-mobile-battery/orov-mobile-battery.html">
+	<link rel="import" href="components/mobile-ui/orov-mobile-controls.html">
+	<link rel="import" href="components/internet-control/orov-internetControl-status.html">
+
+
+			<!-- Video Layer -->
+			<div id="layer-vid" class="layer-no-input fill" style="z-index: 10">
+				<!-- Video -->
+				<orov-video class="video" location="forward" event-emitter="{{cockpitEventEmitter}}"></orov-video>
+			</div>
+
+			<!-- HUD Layer -->
+			<div id="layer-hud" class="layer-no-input fill" style="z-index: 20">
+				<!--Horizon Display-->
+				<!--Depth Display-->
+			</div>
+
+			<!-- Controls Layer -->
+			<div id="layer-ctrl" class="layer fill" style="z-index: 30">
+				<orov-mobile-controls class="overlay" event-emitter="{{cockpitEventEmitter}}"></orov-mobile-controls>
+			</div>
+
+			<!-- UI Layer -->
+			<div id="layer-ui" class="layer fill" style="z-index: 40">
+
+				<!--Bottom-->
+				<div id="ui-bot" class="rel-layer fill" style="z-index: 10">
+					<div id="layer-widgets" class="layer" style="z-index: 0">
+					</div>
+
+					<div id="layer-win" class="layer fill" style="z-index: 10">
+						<orov-window id="ui-win">
+							yo
+						</orov-window>
+					</div>
+				</div>
+
+				<!--Absolute widget layer-->
+				<div id="layer-ui-absolute" class="layer fill" style="z-index: 0">
+
+					<div class="action-bar">
+						<div class="action-bar-container">
+							<div class="battery">
+								<orov-mobile-battery event-emitter="{{cockpitEventEmitter}}"></orov-mobile-battery>
+							</div>
+
+							 <orov-mobile-compass class="center" heading="0" event-emitter="{{cockpitEventEmitter}}"></orov-mobile-compass>
+
+							<div class="depth">
+								<orov-mobile-depth event-emitter="{{cockpitEventEmitter}}"></orov-mobile-depth>
+							</div>
+
+							<div class="rightend">
+								<orov-internetControl-status event-emitter="{{cockpitEventEmitter}}"><orov-internetControl-status>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+			<!-- Modal Layer -->
+			<div id="layer-modal" class="layer fill" style="z-index: 50;">
+				<orov-window id="modal-win" modal>
+					I'm modal
+				</orov-window>
+			</div>

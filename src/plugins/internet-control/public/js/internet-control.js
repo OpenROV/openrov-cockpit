@@ -39,21 +39,19 @@
 
     //Called by the plugin-manager to enable a plugin
     IC.prototype.enable = function enable() {
-      alert('Internet-control enabled');
-      this.listen();
+      this.startlisten();
     };
 
     //Called by the plugin-manager to disable a plugin
     IC.prototype.disable = function disable() {
-      alert('Internet-control disabled');
       //TODO: Impliment and unlisten
     };
 
 
     //listen gets called by the plugin framework after all of the plugins
     //have loaded.
-    IC.prototype.listen = function listen() {
-      if (!this.enabled){return;}
+    IC.prototype.startlisten = function startlisten() {
+      if (!this.isEnabled){return;}
       var self = this;
 
       var statusUpdate=function(){
@@ -100,11 +98,11 @@
 
           //TODO: Move to a pattern that can retry the connection when the setting changes
           $.getScript(self.settings.webRTCSignalServerURI + "/msgpack.min.js");
-          $.getScript(self.settings.webRTCSignalServerURI + "/simplepeer.js", function() {
+          $.getScript(self.settings.webRTCSignalServerURI + "/components/simple-peer/simplepeer.min.js", function() {
               var _self = self
               var Peer = window.SimplePeer;
               var io = window.io;
-              var socket = io(self.settings.webRTCSignalServerURI);
+              var socket = io(self.settings.webRTCSignalServerURI,{path:'/netcockpit-signal'});
               self.connecting = true;
               var peerOpts= {
                   channelConfig: {
@@ -184,9 +182,8 @@
                     _self.viewers++;
                     _self.peers.push(p);
                     //make last person to connect pilot by default
-                    pilot_sender_id = peer_id;
-                    _self.cockpit.emit('plugin.rovpilot.sendToROVEnabled',false);
-//                    var emitter = new EventEmitter2();
+//                    pilot_sender_id = peer_id;
+//                    _self.cockpit.emit('plugin.rovpilot.sendToROVEnabled',false);
                     p.sendemit = function sendemit(){
                       var args = new Array(arguments.length);
                       for(var i = 0; i < args.length; ++i) {
@@ -194,7 +191,6 @@
                           args[i] = arguments[i];
                       }
                       p.send(msgpack.encode(args));
-                      //p.send("THIS IS A STRING!!!!");
                     }
 
                     //Test data payload sizes

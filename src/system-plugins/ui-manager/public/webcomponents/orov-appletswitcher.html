@@ -1,0 +1,62 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<link rel="import" href="../mobile-ui/grid-menu/grid-menu.html">
+<link rel="import" href="../mobile-ui/grid-menu/grid-menu-button.html">
+<link rel="import" href="../fontawesome-iconset/fa-all.html">
+<dom-module name="orov-appletswitcher">
+<style>
+  grid-menu-button
+  {
+    color:white;
+  }
+
+  grid-menu-button[selected]
+  {
+    color: black;
+    background-color: white;
+    --grid-menu-button-fill-color: black;
+  }
+</style>
+<template>
+    <grid-menu trigger-icon="apps" horizontal-offset=[[horizontalOffset]]>
+      <template is="dom-repeat" items="{{applets}}">
+			<grid-menu-button label="{{__(item.name)}}" action="page-change" target="{{item.name}}" icon="{{item.iconMeta}}"></grid-menu-button>
+      </template>
+		</grid-menu>
+</template>
+<script>
+
+(function() {
+  var editor;
+  Polymer({
+    is:'orov-appletswitcher',
+    properties: {
+      applets: {type: Array, value: []},
+      showSelection: {type: Boolean, value: true},
+      selection: {type: String, value: '', notify: true},
+      horizontalOffset: {type: Number}
+    },
+    listeners:
+    {
+      'menuSelection': 'handleMenuSelection'
+    },
+    behaviors: [namespace('behaviors').oROVStandard],
+    registerEmitterHanlders: function(emitter){
+      var self = this;
+      emitter.withHistory.on('ui-manager-applets',function(applets){
+        self.set('applets',applets);
+      });
+
+    },
+    handleMenuSelection: function(e)
+    {
+      console.log( "Clicked App Menu Button: " + e.detail.label );
+      console.log( "Action: " + e.detail.action );
+      console.log( "Target: " + e.detail.target );
+      this.set('selection',e.detail.target);
+//      document.location.href = "mobile-ui?page=" + e.detail.target;
+    },
+  })
+})();
+</script>
+</dom-module>

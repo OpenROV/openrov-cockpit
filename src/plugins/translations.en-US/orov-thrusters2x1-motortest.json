@@ -2,5 +2,6 @@
   "Motor": "Motor",
   "port": "port",
   "vertical": "vertical",
-  "starboard": "starboard"
+  "starboard": "starboard",
+  "This is a test": "This is a test"
 }

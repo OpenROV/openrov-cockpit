@@ -148,7 +148,7 @@
                       if (state==true) level = 0;
                       self.eventEmitter.emit('plugin.lights.set',level);
                     }
-                  }
+                  }wifilights
                 },
 		WFL: {
                   switchable: true,

@@ -5,10 +5,10 @@
 			"name": "Launch",
 			"type": "node",
 			"request": "launch",
-			"program": "src/cockpit.js",
+			"program": "${workspaceRoot}/src/cockpit.js",
 			"stopOnEntry": false,
 			"args": [],
-			"cwd": ".",
+			"cwd": "${workspaceRoot}",
 			"runtimeExecutable": null,
 			"runtimeArgs": [
 				"--nolazy"

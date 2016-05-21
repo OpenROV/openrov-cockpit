@@ -150,6 +150,22 @@
                     }
                   }
                 },
+
+		            WFL: {
+                  switchable: true,
+                  state: false,
+                  description: 'WiFi lights on/off',
+                  events: [
+                    {message:'plugin.wifilights.state',fn: function(state){return state.level>0;}}
+                  ],
+                  switch: function (state) {
+                    if (self.eventEmitter !== undefined){
+                      var level = 1;
+                      if (state==true) level = 0;
+                      self.eventEmitter.emit('plugin.wifilights.set',level);
+                    }
+                  }
+                },
                 XLE: {
                   switchable: true,
                   state: false,

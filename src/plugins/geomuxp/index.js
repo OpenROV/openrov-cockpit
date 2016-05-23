@@ -112,8 +112,8 @@ geomux.prototype.startCamera = function startCamera(device){
   var self = this;
 
   monitor.on('stdout',function(data){
-//      var msg = data.toString('utf-8');
-//      console.log(msg);
+    //  var msg = data.toString('utf-8');
+    //  console.log(msg);
   });
 
   monitor.on('stderr',function(data)
@@ -125,6 +125,8 @@ geomux.prototype.startCamera = function startCamera(device){
     try 
     {
       status = JSON.parse(msg);
+      
+      console.log( "err output: " + JSON.stringify( status ) );
       
       if( status.type === undefined )
       {
@@ -145,9 +147,11 @@ geomux.prototype.startCamera = function startCamera(device){
         videoMimeType:      status.payload.txtRecord.videoMimeType,
         resolution:         status.payload.txtRecord.resolution,
         framerate:          status.payload.txtRecord.framerate,
-        relativeServiceUrl: status.payload.txtRecord.relativeServiceUrl,
+        wspath:             status.payload.txtRecord.wspath,
+        relativeServiceUrl: process.env.GEO_MOCK=='true'? '' : status.payload.txtRecord.relativeServiceUrl,
         sourcePort:         status.payload.port,
-        sourceAddress:      status.payload.addresses[0]
+        sourceAddress:      status.payload.addresses[0],
+        connectionType:     'socket.io'
       });  
     }
     else if( status.type === "ChannelHealth" )

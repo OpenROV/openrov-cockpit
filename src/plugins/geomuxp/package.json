@@ -12,6 +12,6 @@
     "geo-video-simulator": "https://github.com/OpenROV-Dev/geo-video-simulator.git"
   },
   "optionalDependencies": {
-    "geo-video-server": "https://github.com/OpenROV-Dev/geo-video-server.git"
+    "geo-video-server": "https://github.com/OpenROV-Dev/geo-video-server.git#geomuxpp_fork"
   }
 }

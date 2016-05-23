@@ -116,19 +116,65 @@ geomux.prototype.startCamera = function startCamera(device){
 //      console.log(msg);
   });
 
-  monitor.on('stderr',function(data){
+  monitor.on('stderr',function(data)
+  {
     var msg = data.toString('utf-8');
-    var service;
-    try {
-      service = JSON.parse(msg);
-    } catch (e) {
+    
+    var status;
+    
+    try 
+    {
+      status = JSON.parse(msg);
+      
+      if( status.type === undefined )
+      {
+        throw "Invalid message structure";
+      }
+    } 
+    catch (e) 
+    {
+      console.log( "Unknown message: " + msg );
       return; //abort, not a json message
     }
-    if ('service' in service){
-      self.deps.globalEventLoop.emit('CameraRegistration',{location:service.txtRecord.cameraLocation, videoMimeType:service.txtRecord.videoMimeType, resolution:service.txtRecord.resolution, framerate:service.txtRecord.framerate, relativeServiceUrl:process.env.GEO_MOCK=='true'?':8099':'', wspath:'/geovideo1', connectionType:'socket.io', sourcePort:service.port, sourceAddress:service.addresses[0]});
-      console.log('sending CameraRegistration');
+    
+    if( status.type === "ChannelAnnouncement" )
+    {
+      self.deps.globalEventLoop.emit('CameraRegistration',
+      { 
+        location:           status.payload.txtRecord.cameraLocation,
+        videoMimeType:      status.payload.txtRecord.videoMimeType,
+        resolution:         status.payload.txtRecord.resolution,
+        framerate:          status.payload.txtRecord.framerate,
+        relativeServiceUrl: status.payload.txtRecord.relativeServiceUrl,
+        sourcePort:         status.payload.port,
+        sourceAddress:      status.payload.addresses[0]
+      });  
     }
-
+    else if( status.type === "ChannelHealth" )
+    {
+      self.deps.globalEventLoop.emit('ChannelHealth',
+      { 
+        channel:        status.channel,
+        fps:            status.payload.fps,
+        droppedFrames:  status.payload.droppedFrames,
+        latency_us:     status.payload.latency_us
+      });  
+      
+      console.log( "Camera Health and Status Update:" );
+      console.log( "Dropped Frames: " + status.payload.droppedFrames );
+      console.log( "FPS: " + status.payload.fps );
+      console.log( "Latency (us): " + status.payload.latency_us );
+    }
+    else if( status.type === "ChannelSettings" )
+    {
+      self.deps.globalEventLoop.emit('ChannelSettings',
+      { 
+        channel:        status.channel,
+        settings:       status.payload
+      });  
+      
+      console.log( "Camera Settings Update: " + JSON.stringify( status.payload ) );
+    }
   });
 
   monitor.start();

@@ -138,9 +138,29 @@ var deps = {
 var numConnections = 0;
 
 // Handle socket.io events
-deps.cockpit.on('connect', function () 
+io.on('connection', function (client) 
 {
     numConnections++;
+    if (numConnections==1){
+        console.log('HASTHEBALL:TRUE');
+        client.hastheball=true;
+        client.emit('hastheball',true);
+    } else {
+        console.log('HASTHEBALL:FALSE');
+        client.hastheball=false;
+        client.killTimer = setTimeout(function(){
+            client.disconnect();
+        },2000);        
+     }
+    
+    client.on('doIhaveTheBall',function(force,callback){
+        if(force){
+            clearTimeout(client.killTimer);
+        }
+        callback(force==true?true:client.hastheball);
+        //TODO: On force, kill the other inbound connections
+    });
+    
     console.log('Connection detected');
     console.log('Current connections: ' + numConnections );
 });

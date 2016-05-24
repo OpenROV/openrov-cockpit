@@ -10,5 +10,6 @@
   "update": "update",
   "vr": "vr",
   "diagnostics": "diagnostics",
-  "diveprofile": "diveprofile"
+  "diveprofile": "diveprofile",
+  "RemoteAccess": "RemoteAccess"
 }

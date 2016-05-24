@@ -73,8 +73,8 @@
       //first read in.
 
           //TODO: Move to a pattern that can retry the connection when the setting changes
-          $.getScript("/msgpack.min.js");
-          $.getScript("/simplepeer.min.js", function() {
+          $.getScript("msgpack.min.js");
+          $.getScript("simplepeer.min.js", function() {
               var _self = self
               var Peer = window.SimplePeer;
               var io = window.io;

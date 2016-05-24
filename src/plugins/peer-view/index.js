@@ -7,7 +7,7 @@ function peerview(name, deps) {
   deps.app.get('/msgpack.min.js', function(req, res) {
     res.sendFile('msgpack.min.js', {root: __dirname+ '/node_modules/msgpack-lite/dist'});
   });
-  
+
     deps.app.get('/simplepeer.min.js', function(req, res) {
     res.sendFile('simplepeer.min.js', {root: __dirname+'/node_modules/simple-peer'});
   });

@@ -38,6 +38,10 @@ UIManager.prototype.start = function start(){
 
   this.deps.app.get('/', function (req, res) {
     var theme = self.deps.config.preferences.get("plugins:ui-manager").selectedUI;
+    //You can override the theme by passing theme=<themename> in the query string
+    if (req.query && req.query.theme){
+      theme = req.query.theme; 
+    }
     theme = theme === undefined ? "new-ui" : theme;
     var scriplets = self.getAppletsByTheme(self.getApplets(),theme);
     //TODO: Add theme to the message so you can differentiate the applets by theme
@@ -53,7 +57,8 @@ UIManager.prototype.start = function start(){
       styles: pathInfo.styles,
       sysscripts: pathInfo.sysscripts,
       config: self.deps.config,
-      scriplets: scriplets
+      scriplets: scriplets,
+      theme:theme
     });
   });
 

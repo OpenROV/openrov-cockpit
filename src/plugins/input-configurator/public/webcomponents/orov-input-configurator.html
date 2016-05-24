@@ -14,6 +14,18 @@
       .header {
           font-weight: bold;
       }
+      
+      .currentItem {
+          background-color: #dff0d8;
+      }
+      
+      .row:hover {
+          background-color: #ddd;
+      }
+      
+      .hidden {
+          display: none;
+      }
 
 
     </style>
@@ -23,13 +35,13 @@
 
       <div id="controls" class="center">
         <div id="commandsList" class="table">
-            <div class="aRow header">
+            <div class="header">
                 <div style="float:left; min-width:40%">{{__('Command')}}</div>
                 <div style="">{{__('Description')}}</div>
             </div>
-            <iron-list id="list" items="[[commands]]" as="item" selection-enabled >
+            <iron-list id="list" items="[[commands]]" as="item" selected-item="{{selectedItem}}" selection-enabled >
                 <template>
-                    <div class$="aRow [[getClassForItem(item, selected)]]">
+                    <div class$="row [[getClassForItem(item, selected)]]">
                         <div style="float:left; min-width:40%">{{__(item.name)}}</div>
                         <div style="">{{__(item.description)}}</div>
                     </tr>
@@ -38,13 +50,14 @@
         </div>
         </div>
         <label for="find">{{__('Find')}}:</label>
-        <input id="find" type="text" value="{{find::input}}" /> ... <p>{{find}}</p>
-        <div class="{{ selectedItem == undefined ? 'hidden' : '' }}">
-            <p>{{selectedItem.name}}: {{ selectedItem.description }}</p>
+        <input id="find" type="text" value="{{find::input}}" /> 
+        <div class$="[[showEditor(selectedItem)]]">
             <label for="keyboard">{{__('Keyboard')}}:</label>
             <input id="keyboard" type="text" value="{{selectedItem.bindings.keyboard}}" />
             <label for="gamepad">{{__('Gamepad')}}:</label>
             <input id="gamepad" type="text" value="{{__(selectedItem.bindings.gamepad)}}" />
+            <button on-tap="onSave">Save</button>
+            <button on-tap="onReset">Reset</button>
         </div>
   </template>
   <script>
@@ -59,6 +72,7 @@
           commands: {type: Array, value: []},
           unfilteredCommands: {type: Array, value: []},
           selectedItem: {type: Object, value: undefined},
+          selectedItems: {type: Object},
           commandFoo: {type: Array, value: [{name: 'a', description: 'aa'}, {name: 'b', description:'bb'}]}
         },
         behaviors: [namespace('behaviors').oROVStandard],
@@ -130,19 +144,25 @@
         commandsChanged: function() {
             var self = this;
             self.selectedItem = undefined;
-            $(this.$.commands).find('tr').each(function(){
-            $(this).css('cursor','pointer').hover(
-                function(){ 
-                    $(this).addClass('info');
-                },  
-                function(){ 
-                    $(this).removeClass('info'); 
-                }
-                );
-            });
         },
+        
+        onSave: function(e) {
+            this.selectedItem.bindings.keyboard = $(this.$.keyboard).val();
+            this.selectedItem.bindings.gamepad = $(this.$.gamepad).val();
+
+            //todo: save
+        },
+
+        onReset: function() {
+            $(this.$.keyboard).val(this.selectedItem.bindings.keyboard);
+            $(this.$.gamepad).val(this.selectedItem.bindings.gamepad);
+        },
+        
         getClassForItem: function(item, selected) {
-          return selected ? 'success' : '';
+          return selected ? 'currentItem' : '';
+        },
+        showEditor: function(selectedItem) {
+          return selectedItem === null ? 'hidden' : '';  
         },
         updateCommands: function() {
             var self = this;
@@ -163,9 +183,7 @@
             var newCommands = [];
             if (filtered) {
                 filtered.forEach(function(item) {
-                    // if (self.commands.indexOf(item) < 0) {
-                        newCommands.push(item);
-                    // }
+                    newCommands.push(item);
                 });        
             }
             self.commands = newCommands;

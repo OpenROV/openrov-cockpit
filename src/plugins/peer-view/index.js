@@ -5,12 +5,12 @@ function peerview(name, deps) {
   console.log('peer-webrtc plugin started.');
 
   deps.app.get('/msgpack.min.js', function(req, res) {
-    res.sendFile('msgpack.min.js', {root: 'src/plugins/peer-view/node_modules/msgpack-lite/dist'});
-  })
-  
+    res.sendFile('msgpack.min.js', {root: __dirname+ '/node_modules/msgpack-lite/dist'});
+  });
+
     deps.app.get('/simplepeer.min.js', function(req, res) {
-    res.sendFile('simplepeer.min.js', {root: 'src/plugins/peer-view/node_modules/simple-peer'});
-  })
+    res.sendFile('simplepeer.min.js', {root: __dirname+'/node_modules/simple-peer'});
+  });
 
   var connections = {};
 

@@ -2,10 +2,8 @@
 //with the webRTC data channel.
 $(function() {
   //TODO: Replace this with relative host logic
-  $.getScript(window.location.protocol + '//' +
-    window.location.hostname + ':'+window.location.port +'/msgpack.min.js')
-  $.getScript(window.location.protocol + '//' +
-    window.location.hostname + ':'+window.location.port +'/simplepeer.min.js', function() {
+  $.getScript('msgpack.min.js')
+  $.getScript('simplepeer.min.js', function() {
 
     var Peer = window.SimplePeer;
     var io = window.io;

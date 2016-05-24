@@ -62,19 +62,19 @@
         if (self.connected){
           status.status='streaming';
         }
-        status.stats.viewers = self.viewers;     
+        status.stats.viewers = self.viewers;
         self.cockpit.emit('plugin-peerview-status',status);
       }
       setInterval(statusUpdate,1000);
-      
+
       //Response from the getSettings call. Using the withHistory will call the
       //update function with the last copy of this message that had been sent.
       //The settings manager sends a change message for each section when
       //first read in.
 
           //TODO: Move to a pattern that can retry the connection when the setting changes
-          $.getScript("/msgpack.min.js");
-          $.getScript("/simplepeer.min.js", function() {
+          $.getScript("msgpack.min.js");
+          $.getScript("simplepeer.min.js", function() {
               var _self = self
               var Peer = window.SimplePeer;
               var io = window.io;
@@ -122,7 +122,7 @@
                   if (!self.connected){return;}
                   socket.emit('heartbeat','server');
                 },1000);
- 
+
                 socket.on('peer-connect-offer',function(peer_id,callback){
                   var p = new Peer(peerOpts);
 

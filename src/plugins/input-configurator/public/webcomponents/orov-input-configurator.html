@@ -1,10 +1,19 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-list/iron-list.html">
 <link rel="import" href="../orov-behaviors/orov-behavior.html">
-<link rel="stylesheet" href="../../../components/bootstrap/dist/css/bootstrap.min.css">
+<!--@import '../../../components/bootstrap/dist/css/bootstrap.min.css';-->
 
 <dom-module name="orov-input-configurator">
+    <style include="foundation5-styles"></style>
+    <style include="normalized-styles"></style>
+
     <style type="text/css">
+     
+      .row.full-width {
+        width: 100%;
+        max-width: 100%;
+      }
+        
       #controls {
         height: 150px;
         border: solid 1px black;
@@ -19,7 +28,7 @@
           background-color: #dff0d8;
       }
       
-      .row:hover {
+      .controlsRow:hover {
           background-color: #ddd;
       }
       
@@ -41,7 +50,7 @@
             </div>
             <iron-list id="list" items="[[commands]]" as="item" selected-item="{{selectedItem}}" selection-enabled >
                 <template>
-                    <div class$="row [[getClassForItem(item, selected)]]">
+                    <div class$="controlsRow [[getClassForItem(item, selected)]]">
                         <div style="float:left; min-width:40%">{{__(item.name)}}</div>
                         <div style="">{{__(item.description)}}</div>
                     </tr>
@@ -49,15 +58,70 @@
             </iron-list>
         </div>
         </div>
-        <label for="find">{{__('Find')}}:</label>
-        <input id="find" type="text" value="{{find::input}}" /> 
+        
+        <div class="row full-width">
+            <div class="small-6 columns">
+                <div class="row collapse prefix-radius">
+                    <div class="small-2 columns">
+                        <label class="prefix" for="find">{{__('Find')}}:</label>
+                    </div>
+                     <div class="small-3 columns left">
+                        <input id="find" type="text" value="{{find::input}}" />
+                     </div>
+                </div>
+            </div> 
+        </div>
+        
+<!--<div class="large-6 columns">
+    <div class="row">
+        <div class="large-4 columns">
+        <label>Input Label
+            <input type="text" placeholder="large-4.columns">
+        </label>
+        </div>
+        <div class="large-4 columns">
+        <label>Input Label
+            <input type="text" placeholder="large-4.columns">
+        </label>
+        </div>
+    </div>
+</div>-->
+
         <div class$="[[showEditor(selectedItem)]]">
-            <label for="keyboard">{{__('Keyboard')}}:</label>
-            <input id="keyboard" type="text" value="{{selectedItem.bindings.keyboard}}" />
-            <label for="gamepad">{{__('Gamepad')}}:</label>
-            <input id="gamepad" type="text" value="{{__(selectedItem.bindings.gamepad)}}" />
-            <button on-tap="onSave">Save</button>
-            <button on-tap="onReset">Reset</button>
+
+            <div class="row full-width">
+                <div class="small-6 columns">
+                    <div class="row collapse prefix-radius">
+                        <div class="small-2 columns">
+                            <label class="prefix" for="keyboard">{{__('Keyboard')}}:</label>
+                        </div>
+                        <div class="small-3 columns left">
+                            <input id="keyboard" type="text" class$="{{ getClassInCaseOfDupplicates(keyboardDuplicates.*, 'error') }}" value="{{selectedItem.bindings.keyboard}}" />
+                            <small class$="[[ getClassInCaseOfDupplicates(keyboardDuplicates.*, 'error', 'hide') ]]">Invalid entry</small>
+                        </div>
+                     </div>
+                 </div>
+            </div>
+            <div class="row full-width">
+                 <div class="small-6 columns">
+                    <div class="row collapse prefix-radius">
+                        <div class="small-2 columns">
+                            <label class="prefix" for="gamepad">{{__('Gamepad')}}:</label>
+                        </div>
+                        <div class="small-3 columns left">
+                            <input id="gamepad" type="text" value="{{__(selectedItem.bindings.gamepad)}}" />
+                        </div>                            
+                    </div>
+                </div>
+             </div>
+             <div class="row full-width">
+                 <div class="small-6 columns">
+                     <div>{{ keyboardDuplicates.length }}</div>
+                     <div clas$="[[ foo(keyboardDuplicates.*) ]]"> __</div>
+                    <button on-tap="onSave" type="button" class="button">Save</button>
+                    <button on-tap="onReset" type="button" class="button secondary">Reset</button>
+                 </div>
+             </div>
         </div>
   </template>
   <script>
@@ -71,9 +135,9 @@
           find: {type: String, value: '', observer: 'findChanged'},
           commands: {type: Array, value: []},
           unfilteredCommands: {type: Array, value: []},
-          selectedItem: {type: Object, value: undefined},
-          selectedItems: {type: Object},
-          commandFoo: {type: Array, value: [{name: 'a', description: 'aa'}, {name: 'b', description:'bb'}]}
+          selectedItem: {type: Object, value: undefined },
+          keyboardDuplicates: {type: Array, value: []},
+          gamepaddDuplicates: {type: Array, value: []},
         },
         behaviors: [namespace('behaviors').oROVStandard],
     
@@ -103,6 +167,11 @@
                         value = "shift+" + value;
                         }
                 $(self.$.keyboard).val(value);
+                self.unfilteredCommands.forEach(function(command) {
+                    if (command.bindings.keyboard === value) {
+                        self.push('keyboardDuplicates', command);
+                    }
+                });
                 event.preventDefault();
             });
 
@@ -152,10 +221,26 @@
 
             //todo: save
         },
+        foo: function(list) {
+          return "abc" +  list.base.length;  
+        },
+        getClassForDuplicates: function(duplicates, duplicateClass, nonDuplicateClass) {
+            if (duplicates) {
+              return duplicateClass;
+            }  
+            return nonDuplicateClass ? nonDuplicateClass : '';
+        },
 
         onReset: function() {
             $(this.$.keyboard).val(this.selectedItem.bindings.keyboard);
             $(this.$.gamepad).val(this.selectedItem.bindings.gamepad);
+        },
+        
+        getClassInCaseOfDupplicates: function(list, duplicateClass, nonDuplicateClass) {
+          if (list.base.length > 0) {
+              return duplicateClass;
+          }  
+          return nonDuplicateClass ? nonDuplicateClass : '';
         },
         
         getClassForItem: function(item, selected) {

@@ -67,7 +67,7 @@
     this.cockpit.on('InputController.getCommands',function(fn){
       if (fn!==undefined){
           // returning a clone of the commands so users can't just change things.
-          // To update a command send a InputController.update(control) message.
+          // To update a command send a InputController.updateBinding(controls) message.
           var commands = JSON.parse(JSON.stringify(self.model.commands));   
           fn(commands);
       }
@@ -78,6 +78,13 @@
         fn();
       }
     });
+    this.cockpit.on('InputController.updateBinding', function(controls, fn) {
+      self.updateBinding(controls);  
+      if (typeof(fn)=="function") {
+        fn();
+      }
+    });
+    
 
     /* Crawl the plugins looking for those with settings definitions */
     this.cockpit.loadedPlugins.forEach(function(plugin){
@@ -182,6 +189,23 @@
       command.replaced = [];
       console.log('Deactivated command ' + command.name);
     });
+  };
+  
+  inputController.InputController.prototype.updateBinding = function(controls) {
+    var self = this;
+    if (controls === undefined)
+      return;
+    var controlsToUpdate = [].concat(controls);
+    controlsToUpdate.forEach(function(control) {
+      self.deactivate(control.name);
+      var command = self.registerdCommands[control.name];
+      for(var property in command.bindings) {
+          if (control.bindings[property] != undefined)
+          command.bindings[property] = control.bindings[property];
+      }
+      self.activate(control.name);      
+    });
+        
   };
 
   inputController.InputController.prototype.suspend = function(controlName) {

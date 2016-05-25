@@ -65,9 +65,11 @@
       }
     });
     this.cockpit.on('InputController.getCommands',function(fn){
-      var commands = [];
       if (fn!==undefined){
-        fn(self.model.commands);
+          // returning a clone of the commands so users can't just change things.
+          // To update a command send a InputController.update(control) message.
+          var commands = JSON.parse(JSON.stringify(self.model.commands));   
+          fn(commands);
       }
     });
     this.cockpit.on('InputController.register',function(controls,fn){

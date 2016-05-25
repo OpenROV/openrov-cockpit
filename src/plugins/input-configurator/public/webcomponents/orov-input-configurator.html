@@ -53,7 +53,7 @@
                     <div class$="controlsRow [[getClassForItem(item, selected)]]">
                         <div style="float:left; min-width:40%">{{__(item.name)}}</div>
                         <div style="">{{__(item.description)}}</div>
-                    </tr>
+                    </div>
                 </template>
             </iron-list>
         </div>
@@ -97,14 +97,11 @@
                         </div>
                         <div class="small-3 columns left">
                             <input id="keyboard" type="text" class$="{{ getClassInCaseOfDupplicates(keyboardDuplicates.*, 'error') }}" value="{{selectedItem.bindings.keyboard}}" />
-                            <small class$="[[ getClassInCaseOfDupplicates(keyboardDuplicates.*, 'error', 'hide') ]]">Invalid entry</small>
+                            <small class$="[[ getClassInCaseOfDupplicates(keyboardDuplicates.*, 'error', 'hide') ]]">Duplicate!</small>
                         </div>
                      </div>
-                 </div>
-            </div>
-            <div class="row full-width">
-                 <div class="small-6 columns">
-                    <div class="row collapse prefix-radius">
+
+                     <div class="row collapse prefix-radius">
                         <div class="small-2 columns">
                             <label class="prefix" for="gamepad">{{__('Gamepad')}}:</label>
                         </div>
@@ -112,17 +109,48 @@
                             <input id="gamepad" type="text" value="{{__(selectedItem.bindings.gamepad)}}" />
                         </div>                            
                     </div>
-                </div>
-             </div>
-             <div class="row full-width">
-                 <div class="small-6 columns">
-                     <div>{{ keyboardDuplicates.length }}</div>
-                     <div clas$="[[ foo(keyboardDuplicates.*) ]]"> __</div>
-                    <button on-tap="onSave" type="button" class="button">Save</button>
-                    <button on-tap="onReset" type="button" class="button secondary">Reset</button>
+                    
+                    
                  </div>
-             </div>
+            </div>
+            <div class="row full-width">
+                <div class$="small-12 columns {{ getClass(duplicates, '', 'hide') }}">
+                    Duplicates:
+                    <div class="row full-width">
+                        <div class="small-9 columns left">
+                            <iron-list id="keyboardList" items="[[keyboardDuplicates]]" as="item" >
+                                <template>
+                                    <div class$="controlsRow [[getClassForItem(item, selected)]]">
+                                        <div style="float:left; min-width:40%">{{__(item.name)}}</div>
+                                        <div style="">{{__(item.description)}}</div>
+                                    </div>
+                                </template>
+                            </iron-list>
+                        </div>
+                        </div>
+                        <div class="row full-width">
+                        <div class="small-9 columns left">
+
+                            <iron-list id="gamepadList" items="[[gamepadDuplicates]]" as="item" >
+                                <template>
+                                    <div class$="controlsRow [[getClassForItem(item, selected)]]">
+                                        <div style="float:left; min-width:40%">{{__(item.name)}}</div>
+                                        <div style="">{{__(item.description)}}</div>
+                                    </div>
+                                </template>
+                            </iron-list>
+                        
+                        </div>
+                    </div>
+            </div>
+            <div class="row full-width">
+                 <div class="small-6 columns">
+                    <button on-tap="onSave" type="button" class$="button {{ getClass(duplicates,'secondary disabled') }}">Save</button>
+                    <button on-tap="onReset" type="button" class="button">Reset</button>
+                 </div>
+            </div>
         </div>
+        
   </template>
   <script>
     (function() {
@@ -135,9 +163,10 @@
           find: {type: String, value: '', observer: 'findChanged'},
           commands: {type: Array, value: []},
           unfilteredCommands: {type: Array, value: []},
-          selectedItem: {type: Object, value: undefined },
+          selectedItem: {type: Object, value: undefined, observer: 'selectedItemChanged' },
           keyboardDuplicates: {type: Array, value: []},
           gamepaddDuplicates: {type: Array, value: []},
+          duplicates: {type: Boolean, computed: 'hasDuplicates(keyboardDuplicates.*, gamepaddDuplicates.*)'}
         },
         behaviors: [namespace('behaviors').oROVStandard],
     
@@ -167,8 +196,9 @@
                         value = "shift+" + value;
                         }
                 $(self.$.keyboard).val(value);
+                self.keyboardDuplicates = [];
                 self.unfilteredCommands.forEach(function(command) {
-                    if (command.bindings.keyboard === value) {
+                    if (command.bindings.keyboard === value && command != self.selectedItem) {
                         self.push('keyboardDuplicates', command);
                     }
                 });
@@ -205,6 +235,10 @@
         //     this.eventEmitter.emit('plugin-manager.disablePlugin',e.model.item.name);
         //   }
         },
+        
+        selectedItemChanged: function() {
+            this.onReset();
+        },
 
         findChanged: function() {
             this.updateCommands();
@@ -216,15 +250,16 @@
         },
         
         onSave: function(e) {
-            this.selectedItem.bindings.keyboard = $(this.$.keyboard).val();
-            this.selectedItem.bindings.gamepad = $(this.$.gamepad).val();
-
+            if (this.selectedItem) {
+                this.selectedItem.bindings.keyboard = $(this.$.keyboard).val();
+                this.selectedItem.bindings.gamepad = $(this.$.gamepad).val();
+            }
             //todo: save
         },
         foo: function(list) {
           return "abc" +  list.base.length;  
         },
-        getClassForDuplicates: function(duplicates, duplicateClass, nonDuplicateClass) {
+        getClass: function(duplicates, duplicateClass, nonDuplicateClass) {
             if (duplicates) {
               return duplicateClass;
             }  
@@ -232,8 +267,11 @@
         },
 
         onReset: function() {
-            $(this.$.keyboard).val(this.selectedItem.bindings.keyboard);
-            $(this.$.gamepad).val(this.selectedItem.bindings.gamepad);
+            if (this.selectedItem) {
+                $(this.$.keyboard).val(this.selectedItem.bindings.keyboard);
+                $(this.$.gamepad).val(this.selectedItem.bindings.gamepad);
+                this.keyboardDuplicates = [];
+            }
         },
         
         getClassInCaseOfDupplicates: function(list, duplicateClass, nonDuplicateClass) {
@@ -241,6 +279,9 @@
               return duplicateClass;
           }  
           return nonDuplicateClass ? nonDuplicateClass : '';
+        },
+        hasDuplicates: function(keyboadDuplicates, gamepadDuplicates) {
+            return keyboadDuplicates.base.length > 0 || gamepadDuplicates.base.length > 0;
         },
         
         getClassForItem: function(item, selected) {

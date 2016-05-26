@@ -40,9 +40,7 @@ var geomux = function geomux( name, deps )
     // Channel announcement
     videoServer.on( "geomux.channel.announcement", function( camera, channel, info )
     {
-      console.log( "Channel came online: " + camera + "_" + channel );
-      
-      console.log( "Announcement info: " + JSON.stringify( info ) );
+       console.log( "Announcement info: " + JSON.stringify( info ) );
       
       // Emit message on global event loop to register with the Video plugin
       self.deps.globalEventLoop.emit('CameraRegistration',
@@ -98,6 +96,9 @@ var geomux = function geomux( name, deps )
       
       console.log( "Error MSG: " + error );
     });
+    
+    // Tell geo-video-server to start the daemons
+    videoServer.emit( "geomux.ready" );
   });
   
   videoServer.on( "disconnect", function()

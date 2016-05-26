@@ -126,6 +126,31 @@
               })
 
             });
+            
+            connection.on("reconnect",function()
+            {
+              console.log( "Reconnected" );
+            });
+            
+            connection.on("disconnect",function()
+            {
+              console.log( "Disconnected" );
+            });
+            
+            connection.on("reconnect_attempt",function()
+            {
+              console.log( "Attempting to reconnect" );
+            });
+            
+            connection.on("reconnect_failed",function()
+            {
+              console.log( "Reconnect failed" );
+            });
+            
+            connection.on("reconnect_error",function(err)
+            {
+              console.log( "Reconnect error: " + err );
+            });
 
         }
       }

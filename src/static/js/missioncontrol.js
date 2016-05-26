@@ -59,7 +59,9 @@ $(function() {
 
       p.on('error', function (err) {
         console.error(err);
-        connect(peer_id);
+        p.destroy();
+        connection_pending=false;
+        connected=false;
       })
 
       p.on('signal', function (data) {

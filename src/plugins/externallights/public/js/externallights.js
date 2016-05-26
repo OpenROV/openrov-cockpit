@@ -4,7 +4,7 @@
   plugins.ExternalLights = function(cockpit) {
     var self = this;
     self.cockpit = cockpit;
-
+    this.state = {};
   };
 
   plugins.ExternalLights.prototype.getTelemetryDefintions = function getTelemetryDefintions() {
@@ -15,25 +15,26 @@
 
 plugins.ExternalLights.prototype.inputDefaults = function (){
   var cockpit = this.cockpit;
+  var self = this;
   return [
     // lights increment
     {
       name: 'plugin.externalLights.adjust_increment',
       description: 'Makes the ROV lights brighter.',
-      defaults: { keyboard: ''},
+      defaults: { keyboard: '6+='},
       down: function () {
-        cockpit.rov.emit('plugin.externalLights.adjust', 0.1);
+        cockpit.rov.emit('plugin.externalLights.set', 0.1+ Number.parseFloat(self.state.level));
       }
     },
 
     // lights decrement
     {
-      name: 'plugin.externalLights.adjust_increment',
+      name: 'plugin.externalLights.adjust_decrememt',
       description: 'Makes the ROV lights dimmer.',
-      defaults: { keyboard: ''},
+      defaults: { keyboard: '6+-'},
 
       down: function () {
-        cockpit.rov.emit('plugin.externalLights.adjust', -0.1);
+        cockpit.rov.emit('plugin.externalLights.set', -0.1 + Number.parseFloat(self.state.level));
       }
     },
 
@@ -41,7 +42,7 @@ plugins.ExternalLights.prototype.inputDefaults = function (){
     {
       name: 'plugin.externalLights.toggle',
       description: 'Toggles the ROV lights on/off.',
-      defaults: { keyboard: '6' },
+      defaults: { keyboard: '6+0' },
       down: function () {
         cockpit.rov.emit('plugin.externalLights.toggle');
       }
@@ -57,6 +58,7 @@ plugins.ExternalLights.prototype.inputDefaults = function (){
 
       self.cockpit.rov.withHistory.on('plugin.externalLights.state', function(state) {
         self.cockpit.emit('plugin.externalLights.level',state.level);
+        self.state = state;
       });
 
       self.cockpit.on('plugin.externalLights.set',function(value){

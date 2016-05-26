@@ -23,7 +23,7 @@
       if ('LIGPE' in data) {
         //value of 0-1.0 representing percent
         var level = data.LIGPE;
-        self.lights = level;
+        self.lights = Number.parseFloat(level);
         deps.cockpit.emit('plugin.externalLights.state', {level:level});
       }
     });

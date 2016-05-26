@@ -1,0 +1,127 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../paper-slider/paper-slider.html">
+<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../../orov-behaviors/orov-behavior.html">
+
+<dom-module id="orov-geomux">
+  <style>
+	  :host paper-slider {
+		  width: 350px;
+	  }
+	  
+	  :host ::shadow .slider-input {
+		  width: 250px;
+	  }
+	  
+  </style>
+  
+  <template>
+	  
+	<h4>0_0 Settings</h4>
+
+	<paper-button on-click="ResetCamera">Reset Camera</paper-button>
+
+	<paper-toggle-button id="vui" on-change="SetBooleanValue">VUI</paper-toggle-button>
+	<paper-toggle-button id="pict_timing" on-change="SetBooleanValue">Picture Timing</paper-toggle-button>
+	<paper-toggle-button id="flip_vertical" on-change="SetBooleanValue">Flip Vertical</paper-toggle-button>
+	<paper-toggle-button id="flip_horizontal" on-change="SetBooleanValue">Flip Horizontal</paper-toggle-button>
+	<paper-toggle-button id="histogram_eq" on-change="SetBooleanValue">Histogram Equalization</paper-toggle-button>
+	
+	<span>Framerate</span><paper-slider editable pin id="framerate" 	min="1" max="60" on-change="SetSimpleValue"></paper-slider>
+	<span>Bitrate</span><paper-slider editable pin id="bitrate" 	min="1000" max="10000000" on-change="SetSimpleValue"></paper-slider>
+	<span>GOP Length</span><paper-slider editable pin id="goplen" 	min="1" max="300" on-change="SetSimpleValue"></paper-slider>
+	<span>GOP Hierarchy</span><paper-slider editable pin id="gop_hierarchy_level" 	min="0" max="4" on-change="SetSimpleValue"></paper-slider>
+	
+	<span>Zoom</span><paper-slider editable pin id="zoom" 	min="0" max="100" on-change="SetSimpleValue"></paper-slider>
+	<span>Pan</span><paper-slider editable pin id="pan" 	min="-648000" max="648000" on-change="SetSimpleValue"></paper-slider>
+	<span>Tilt</span><paper-slider editable pin id="tilt" 	min="-648000" max="648000" on-change="SetSimpleValue"></paper-slider>
+	
+	<span>Gamma</span><paper-slider editable pin id="gamma" 		min="100" max="300" on-change="SetSimpleValue"></paper-slider>
+	<span>Contrast</span><paper-slider editable pin id="contrast" 	min="0" max="200" on-change="SetSimpleValue"></paper-slider>
+	<span>Brightness</span><paper-slider editable pin id="brightness" 	min="-255" max="255" on-change="SetSimpleValue"></paper-slider>
+	<span>Hue</span><paper-slider editable pin id="hue" 	min="-18000" max="18000" on-change="SetSimpleValue"></paper-slider>
+	<span>Saturation</span><paper-slider editable pin id="saturation" 	min="0" max="200" on-change="SetSimpleValue"></paper-slider>
+	<span>Gain</span><paper-slider editable pin id="gain" 	min="1" max="100" on-change="SetSimpleValue"></paper-slider>
+	<span>Sharpness</span><paper-slider editable pin id="sharpness" 	min="1" max="100" on-change="SetSimpleValue"></paper-slider>
+	<span>Max Analog Gain</span><paper-slider editable pin id="max_analog_gain" 	min="0" max="15" on-change="SetSimpleValue"></paper-slider>
+	<span>Sharpen Filter</span><paper-slider editable pin id="sharpen_filter" 	min="0" max="2" on-change="SetSimpleValue"></paper-slider>
+	<span>Minimum Autoexposure Framerate</span><paper-slider editable pin id="min_exp_framerate" 	min="0" max="30" on-change="SetSimpleValue"></paper-slider>
+	<span>Gain Multiplier</span><paper-slider editable pin id="gain_multiplier" 	min="0" max="256" on-change="SetSimpleValue"></paper-slider>
+	
+	
+	
+  </template>
+  
+  <script>
+    Polymer({
+      is: 'orov-geomux',
+      properties: 
+	  {
+      },
+	  
+      behaviors: [namespace('behaviors').oROVStandard],
+	  
+      registerEmitterHanlders: function(emitter) 
+	  {
+        var self = this;
+		
+        // emitter.withHistory.on('plugin.rovpilot.headingHold.state', function(state) 
+		// {
+        // });
+      },
+	  
+      attached: function() 
+	  {
+      },
+	  
+	  SetSimpleValue: function(e)
+	  {
+		var settingID = e.srcElement.id;
+		var value = e.srcElement.value;
+
+		var command = 
+		{ 
+			"command": "apply_settings",
+			"channel": 0,
+			"params": 
+			{ 
+				"settings": {}
+			} 
+		}
+		
+		command.params.settings[ settingID ] = { "value": value };
+		
+		console.log( JSON.stringify( command ) );
+		
+		this.eventEmitter.emit( "plugin.geomuxp.command", 0, "chCmd", command );
+	  },
+	  
+	  SetBooleanValue: function(e)
+	  {
+		var settingID = e.srcElement.id;
+		var enabled = e.srcElement.checked;
+
+		var command = 
+		{ 
+			"command": "apply_settings",
+			"channel": 0,
+			"params": 
+			{ 
+				"settings": {}
+			} 
+		}
+		
+		command.params.settings[ settingID ] = { "enabled": enabled };
+		
+		console.log( JSON.stringify( command ) );
+		
+		this.eventEmitter.emit( "plugin.geomuxp.command", 0, "chCmd", command );
+	  },
+	  ResetCamera: function(e)
+	  {
+		this.eventEmitter.emit( "plugin.geomuxp.command", 0, "restart", {} );
+	  }
+    });
+  </script>
+</dom-module>

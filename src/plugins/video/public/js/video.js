@@ -106,7 +106,7 @@
       }
 
       var connection;
-      if(data.connectionType=='socket.io'){
+      if((data.connectionType=='socket.io')&&(!self.cockpit.peerConnected)){
         data.sourceAddress = ResolveURL(data.relativeServiceUrl);
         connection = window.io.connect(data.sourceAddress + data.wspath /*,{path:data.wspath}*/ );
 

@@ -109,7 +109,6 @@
 
   //TODO: Add sessions collection that each unique session is placed
   var _recordedSessions = function recordedSessions(idb,callback){
-    idb.open(function(){
       idb.sessions.toArray(function(data){
         for(var i=0;i<=data.length;i++){
           if(data[i].sessionID==null){
@@ -130,7 +129,6 @@
           }.bind(this,i));
         }
       });
-    });
   };
 
   Blackbox.prototype.recordedSessions = function recordedSessions(callback){
@@ -411,7 +409,7 @@
           sizeofData+=converted.length;
           return converted;
         });
-        var result = new Uint8Array(maxVideoSegmentSize*200000);
+        var result = new Uint8Array(maxVideoSegmentSize+200000);
         var initFrame=arrayOfData.shift();
         result.set(initFrame,0);
         var tail=initFrame.length;

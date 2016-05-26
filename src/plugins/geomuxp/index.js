@@ -8,7 +8,7 @@ const events  = require('events');
 var defaults =
 {
   port: 8099,
-  wspath: "geovideo"
+  wspath: "/geovideo"
 };
 
 var geomux = function geomux( name, deps ) 
@@ -22,8 +22,8 @@ var geomux = function geomux( name, deps )
   var emitter     = new events.EventEmitter();
   var global      = deps.globalEventLoop;
   var cockpit     = deps.cockpit;
-  var manager     = io.Manager( 'http://localhost:8099', { reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 10 } );
-  var videoServer = manager.socket( "/" + defaults.wspath );
+  var videoServer = io.connect( 'http://localhost:' + defaults.port, { path: defaults.wspath, reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 10 } );
+
   
   var cameras     = {};
   

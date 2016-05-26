@@ -10,6 +10,8 @@
     this.priorSetPoints = {};
     this.sendToROVEnabled = true;
     this.sendUpdateEnabled = true;
+    this.depthHold_state = {};
+    this.headingHold_state = {};
 
   };
 
@@ -22,7 +24,7 @@
         description: 'Toggles the heading hold on/off',
         defaults: { keyboard: 'm' },
         down: function () {
-          self.cockpit.rov.emit('plugin.rovpilot.headingHold.toggle');
+          self.cockpit.emit('plugin.rovpilot.headingHold.set-enabled',!self.headingHold_state.enabled);
         }
       },
 
@@ -32,7 +34,7 @@
         description: 'Toggles the depth hold on/off',
         defaults: { keyboard: 'n' },
         down: function () {
-          self.cockpit.rov.emit('plugin.rovpilot.depthHold.toggle');
+          self.cockpit.emit('plugin.rovpilot.depthHold.set-enabled',!self.depthHold_state.enabled);
         }
       }
     ]
@@ -46,13 +48,13 @@
       {
         label: 'Toggle Depth hold',
         callback: function () {
-          self.rov.cockpit.rov.emit('plugin.rovpilot.depthHold.toggle');
+          self.cockpit.emit('plugin.rovpilot.depthHold.set-enabled',!self.depthHold_state.enabled);
         }
       },
       {
         label: 'Toggle Heading hold',
         callback: function () {
-          self.rov.cockpit.rov.emit('plugin.rovpilot.headingHold.toggle');
+          self.cockpit.emit('plugin.rovpilot.headingHold.set-enabled',!self.headingHold_state.enabled);
         }
       }
     ]
@@ -66,10 +68,12 @@
 
     this.rov.withHistory.on('plugin.rovpilot.depthHold.state', function(state){
       self.cockpit.emit('plugin.rovpilot.depthHold.state',state);
+      self.depthHold_state=state;
     });
 
     this.rov.withHistory.on('plugin.rovpilot.headingHold.state', function(state){
       self.cockpit.emit('plugin.rovpilot.headingHold.state',state);
+      self.headingHold_state=state;      
     });
 
     this.cockpit.on('plugin.rovpilot.depthHold.set-enabled',function(value){

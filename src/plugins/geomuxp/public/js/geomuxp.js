@@ -46,26 +46,31 @@
 						self.rov.withHistory.on( "plugin.geomuxp." + cam + "_" + chan + ".settings", function( settings )
 						{
 							console.log( "Got settings: " + JSON.stringify( settings ) );
+							self.cockpit.emit( "plugin.geomuxp." + cam + "_" + chan + ".settings", settings );
 						} );
 						
 						self.rov.withHistory.on( "plugin.geomuxp." + cam + "_" + chan + ".api", function( api )
 						{
 							console.log( "Got API: " + JSON.stringify( api ) );
+							self.cockpit.emit( "plugin.geomuxp." + cam + "_" + chan + ".api", api );
 						} );
 						
 						self.rov.withHistory.on( "plugin.geomuxp." + cam + "_" + chan + ".health", function( health )
 						{
 							console.log( "Got health: " + JSON.stringify( health ) );
+							self.cockpit.emit( "plugin.geomuxp." + cam + "_" + chan + ".health", health );
 						} );
 						
 						self.rov.withHistory.on( "plugin.geomuxp." + cam + "_" + chan + ".status", function( status )
 						{
 							console.log( "Got status: " + status );
+							self.cockpit.emit( "plugin.geomuxp." + cam + "_" + chan + ".status", status );
 						} );
 						
 						self.rov.withHistory.on( "plugin.geomuxp." + cam + "_" + chan + ".error", function( error )
 						{
 							console.log( "Got error: " + error );
+							self.cockpit.emit( "plugin.geomuxp." + cam + "_" + chan + ".error", error );
 						} );
 					}
 				} );

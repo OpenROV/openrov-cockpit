@@ -181,7 +181,7 @@
             $(self.$.depthLock).addClass('hidden');
 }
           });
-          emitter.on('plugin.diveprofile.watertype', function (data) {
+          emitter.withHistory.on('plugin.diveprofile.watertype', function (data) {
             self.waterType = data.watertype;
           });
         },

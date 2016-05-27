@@ -29,14 +29,14 @@
       self.sendTestMotorMessage(data);
     });
 
-    this.cockpit.rov.withHistory.on('settings-change.thurster2x1',function(settings){
+    this.cockpit.rov.withHistory.on('settings-change.thrusters2x1',function(settings){
      self.settings=settings.thrusters2x1;
     });
   };
 
 
   Thrusters2x1.prototype.sendTestMotorMessage = function sendTestMotorMessage(motor_values) {
-    this.cockpit.rov.emit('plugin.thurster2x1.set', motor_values);
+    this.cockpit.rov.emit('plugin.thursters2x1.set', motor_values);
   };
   Thrusters2x1.prototype.setMotorTestSpeed = function setMotorTestSpeed(propertyName, value) {
     this[propertyName](value);

@@ -101,7 +101,7 @@
     this.cockpit.off('x-h264-video.data', h264dataHandler);
     this.cockpit.emit('local-media-audio-stop');
     this.streaming = false;
-    this.cockpit.emit('internet-stream-status',{isStreaming:false});
+    this.cockpit.emit('internet-stream-status',{isStreaming:false,testmode:this.settings.testmode});
 
   }
 
@@ -145,7 +145,7 @@
       self.cockpit.emit('local-media-audio-start');
     });
 
-    self.cockpit.emit('internet-stream-status',{isStreaming:true});
+    self.cockpit.emit('internet-stream-status',{isStreaming:true,testmode:self.settings.testmode});
 
   }
 
@@ -214,7 +214,7 @@
           self.stop();
         }
         log_trace('emitting broadcast-stream-on');
-        socket.emit('broadcast-stream-on', {test:true},function(ok) {
+        socket.emit('broadcast-stream-on', {test:settings.testmode},function(ok) {
           log_trace('received broadcast-stream-on');
           self.stream();
 

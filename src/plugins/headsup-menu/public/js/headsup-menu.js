@@ -25,6 +25,7 @@
     enablePlugin();
   };
 
+//TODO: Needs to be reworked
   HeadsUpMenu.prototype.inputDefaults_ = function inputDefaults(){
     return [
       {

@@ -18,14 +18,6 @@ inputController.Command = function(control) {
   if (control.up !== undefined) self.up = control.up;
   if (control.axis !== undefined) self.axis = control.axis;
 
-  if (control.secondary !== undefined) {
-    var secondaries = [];
-    control.secondary.forEach(function(secondary) {
-      secondaries.push(new inputController.Command(secondary));
-    });
-    self.secondary = secondaries;
-  }
-
   self.defaults = control.defaults;
   self.bindings = control.defaults; // entry point to load binding values from configuration
 

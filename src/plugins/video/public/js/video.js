@@ -136,34 +136,6 @@
 
   };
 
-  Video.prototype.inputDefaults = function inputDefaults(){
-    var self = this;
-    return [{
-      name: 'video.keyBoardMapping',
-      description: 'Video for keymapping.',
-      defaults: { keyboard: 'alt+0', gamepad: 'X' },
-      down: function() { console.log('0 down'); },
-      up: function() { console.log('0 up'); },
-      secondary: [
-        {
-          name: 'video.keyBoardMappingDepdent',
-          dependency: 'video.keyBoardMapping',
-          defaults: { keyboard: '9', gamepad: 'RB' },
-          down: function() { console.log('####'); }
-        }
-      ]
-    },
-      {
-        name: 'video.testMessage',
-        description: 'another video',
-        defaults: { keyboard: 'alt+T' },
-        down: function() {
-          showMessageFoo = true;
-          showMessageBar = true;
-          self.cockpit.rov.emit('plugin.video.video_to_foo', 'abc'); }
-      }]
-  };
-
   window.Cockpit.plugins.push(Video);
 
 }(window, document, $));

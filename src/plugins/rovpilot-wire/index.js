@@ -55,6 +55,20 @@
     return this;
   };
 
+
+ROVPilotWire.prototype.getSettingSchema = function getSettingSchema(){
+  return [
+    {
+        "title": "ROVPilot-wire",
+        "id" : "pilotwire",
+        "type": "object",
+        "properties": {
+           "controlResetsSetPoint" : {"type":"boolean", "format": "checkbox","default":false},
+        }
+    }
+  ]
+}
+
   module.exports = function (name, deps) {
     return new ROVPilotWire(deps);
   };

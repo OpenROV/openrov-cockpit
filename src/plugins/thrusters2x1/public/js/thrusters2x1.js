@@ -30,7 +30,7 @@
     });
 
     this.cockpit.rov.withHistory.on('settings-change.thurster2x1',function(settings){
-     this.settigns=settings.thrusters2x1;
+     self.settings=settings.thrusters2x1;
     });
   };
 

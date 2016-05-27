@@ -13,10 +13,7 @@ is.prototype.getSettingSchema = function getSettingSchema(){
 			"type": "string",
       "default" : "http://192.168.99.100:3030" //Added default
 		},
-		"secretKey": {
-			"type": "string",
-      "default" : "OpenROV" //Added default
-		}
+		"testmode": {"type":"boolean", "format": "checkbox","default":true}
 	}
 }];
 };

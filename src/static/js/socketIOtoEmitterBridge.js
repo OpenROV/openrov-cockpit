@@ -69,6 +69,17 @@
               self.socket.off(aType,handleEvent);
           })
           listeningTo[aType]=true;
+          self.socket.emit('fromcache',aType,function(){
+            if (arguments.length == 0 ){return};
+             var args = new Array(arguments.length);
+            for(var i = 0; i < args.length; ++i) {
+                        //i is always valid index in the arguments object
+                args[i] = arguments[i];
+            }
+            args = args.filter(function(item){return item!==null});
+             
+            emitter.emit.apply(self.emitter,[aType].concat(args)); //TODO: If this works, use the args pattern for performance.                
+          });          
         }  
     };
 

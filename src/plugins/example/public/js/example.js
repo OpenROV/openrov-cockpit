@@ -92,7 +92,7 @@
     this.cockpit.rov.on('plugin.example.example_foo', function(data) {
       if (showMessageFoo) {
         showMessageFoo = false;
-        alert('Message from arduino "example_foo": ' + data);
+        console.log('Message from arduino "example_foo": ' + data);
         cockpit.rov.emit('plugin.example.example_to_bar', 'foobar');
       }
     });
@@ -101,7 +101,7 @@
     this.cockpit.rov.on('plugin.example.example_bar', function(data) {
       if (showMessageBar) {
         showMessageBar = false;
-        alert('Message from arduino "example_bar": ' + data);
+        console.log('Message from arduino "example_bar": ' + data);
       }
     });
 

@@ -26,11 +26,11 @@ HASH=`find -type f -print0 | sort -z | xargs -0 sha1sum | sha1sum `
 
 cd $1 || error_exit "$LINENO: Cannot change directory! Aborting"
 
-mv $1/src/Device.cpp $1/src/Device.cpp.template
+mv $1/src/CModule.cpp $1/src/CModule.cpp.template
 
-sed 's/CUSTOM_BUILD/'"$HASH"'/g' $1/src/Device.cpp.template > $1/src/Device.cpp
+sed 's/CUSTOM_BUILD/'"$HASH"'/g' $1/src/CModule.cpp.template > $1/src/CModule.cpp
 
-rm $1/src/Device.cpp.template
+rm $1/src/CModule.cpp.template
 
 #setup required environment variables if not already set
 . /opt/openrov/cockpit/linux/openrov_config.sh

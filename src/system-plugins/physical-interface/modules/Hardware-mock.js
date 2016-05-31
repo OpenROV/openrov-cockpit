@@ -160,12 +160,12 @@ function Hardware( deps ) {
     rnd = (Math.random() * 20 - 10)/100;
     current += current*rnd;
     current = Math.min(Math.max(current, 1), 10);
-    result+='bt1i:' + current + ';'
+    result+='BT1I:' + current + ';'
 
     rnd = (Math.random() * 20 - 10)/100;
     current += current*rnd;
     current = Math.min(Math.max(current, 1), 10);
-    result+='bt2i:' + current + ';'
+    result+='BT2I:' + current + ';'
 
     currentServo +=50;
     result+='servo:' + currentServo + ';'

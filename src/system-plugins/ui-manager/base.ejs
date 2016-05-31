@@ -36,7 +36,11 @@
   <script type='text/javascript' src='js/message-manager.js'></script>
   <script type='text/javascript' src='js/eventEmitterStoreAndForward.js'></script>
   <script type='text/javascript' src='js/socketIOStoreAndForward.js'></script>
+<<<<<<< HEAD
+  <script type='text/javascript' src='js/socketIOtoEmitterBridge.js'></script>  
+=======
   <script type='text/javascript' src='js/SocketIOtoEmitterBridge.js'></script>  
+>>>>>>> OpenROV/master
   <script type='text/javascript' src="js/cockpit.js"></script>
   <script type="text/javascript" src="js/app.js"></script>
   <script type="text/javascript" src="plugin/new-ui/js/lib/0_jquery.svg.min.js"></script>
@@ -69,11 +73,20 @@
 </platinum-sw-register>
 
 <!-- Temporarily disabled pending solution for relative pathing -->
+<<<<<<< HEAD
+<!--
+<link rel="import" href="components/app-route/app-route.html">
+<link rel="import" href="components/app-route/app-location.html">
+<app-location use-hash-as-path url-space-regex="^/#/" route={{route}}></app-location>
+<app-route route="{{route}}" pattern="/:page" data={{routedata}} active="{{homeActive}}"></app-route>
+-->
+=======
 <!--link rel="import" href="components/app-route/app-route.html">
 <link rel="import" href="components/app-route/app-location.html">
 <app-location use-hash-as-path url-space-regex="^/#/" route={{route}}></app-location>
 <app-route route="{{route}}" pattern="/:page" data={{routedata}} active="{{homeActive}}"></app-route-->
 
+>>>>>>> OpenROV/master
 
   <%
     var header = scriplets.find(function(item){return item.name=='header'});

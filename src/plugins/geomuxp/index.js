@@ -149,28 +149,35 @@ geomux.prototype.start = function start()
   
   var self=this;
   
-  BootCameras(function()
+  if (process.env.GEO_MOCK == 'true')
   {
-    EnumerateCameras(function(results)
+    StartCameras( [] );
+  }
+  else
+  {
+    BootCameras(function()
     {
-      if (results.length==0)
+      EnumerateCameras(function(results)
       {
-        setTimeout(self.start.bind(this),1000*120*timeoutscale);
-        
-        if (timeoutscale<1)
+        if (results.length==0)
         {
-          timoutscale+=.1;
+          setTimeout(self.start.bind(this),1000*120*timeoutscale);
+          
+          if (timeoutscale<1)
+          {
+            timoutscale+=.1;
+          }
+          
+          return;
         }
         
-        return;
-      }
-      
-      self.deps.globalEventLoop.emit('video-deviceRegistration',results);
-      
-      sortedResults = results.sort( function(a,b){ return a.device.localeCompare(b.device) } );
-      StartCameras( sortedResults );
-    })
-  });
+        self.deps.globalEventLoop.emit('video-deviceRegistration',results);
+        
+        sortedResults = results.sort( function(a,b){ return a.device.localeCompare(b.device) } );
+        StartCameras( sortedResults );
+      })
+    });
+  }
 }
 
 // -----------------------
@@ -254,36 +261,42 @@ function BootCameras( callback )
 function StartCameras( cameras )
 {
   var geoprogram = '';
+  var cameraArgs;
  
-  // Find the geo-video-server app
-  try 
+  if (process.env.GEO_MOCK == 'true')
   {
-    geoprogram =require.resolve('geo-video-server')
-  } 
-  catch (er) 
+    geoprogram = require.resolve('geo-video-simulator');
+    cameraArgs = "-c=[0]";
+  }
+  else
   {
-    console.log("geo-video-server not installed")
-    return;
+    // Find the geo-video-server app
+    try 
+    {
+      geoprogram =require.resolve('geo-video-server');
+      
+      // Create list of cameras to start up
+      cameraArgs = "-c=[";
+      for( var i = 0; i < cameras.length; i++ ) 
+      {
+        if( i === cameras.length - 1 )
+        {
+          cameraArgs = cameraArgs.concat( cameras[ i ].device );
+        }
+        else
+        {
+          cameraArgs = cameraArgs.concat( cameras[ i ].device + "," );
+        }
+      }
+      cameraArgs = cameraArgs.concat( "]" );
+    } 
+    catch (er) 
+    {
+      console.log("geo-video-server not installed")
+      return;
+    }
   }
 
-  // Create list of cameras to start up
-  var cameraArgs = "-c=[";
-  for( var i = 0; i < cameras.length; i++ ) 
-  {
-    if( i === cameras.length - 1 )
-    {
-      cameraArgs = cameraArgs.concat( cameras[ i ].device );
-    }
-    else
-    {
-      cameraArgs = cameraArgs.concat( cameras[ i ].device + "," );
-    }
-  }
-  cameraArgs = cameraArgs.concat( "]" );
-  
-  // Set logging arguments
-  var debugArgs     = "app*,camera*,channel*";
-  
   // Create all launch options
   var launch_options = 
   [ 
@@ -300,8 +313,8 @@ function StartCameras( cameras )
       name: 'geomux',
       env: 
       { 
-        "DEBUG": debugArgs,
-	      "GEO_URL": '',
+        "DEBUG": "app*,camera*,channel*",
+	      "GEO_URL": process.env.NODE_ENV == 'development' ? ':8099' : '',
         "GEO_WSPATH": defaults.wspath,
         "GEO_PORT": defaults.port
       },

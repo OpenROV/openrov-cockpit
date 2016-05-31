@@ -42,7 +42,7 @@
             self.socket.emit('fromcache',type,function(){
                 emitter.emit(type,arguments); //TODO: If this works, use the args pattern for performance.                
             });
-            emitter.orig_wh(type,fn);
+            orig_wh(type,fn);
         }
         this.cleanupFunctions.push(function(){
             emitter.withHistory=orig_wh;

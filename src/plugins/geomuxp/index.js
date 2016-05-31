@@ -301,6 +301,7 @@ function StartCameras( cameras )
       env: 
       { 
         "DEBUG": debugArgs,
+	      "GEO_URL": '',
         "GEO_WSPATH": defaults.wspath,
         "GEO_PORT": defaults.port
       },

@@ -1,10 +1,5 @@
 //This is the support file for the /views/index.ejs
-$(function () {
-    var socket = window.io.connect(window.location.protocol + '//' +
-                 window.location.hostname+ ':' +  window.location.port,{path:'/cockpitsocket'});
-    socket=new window.SocketIOStoreAndForward(socket);
-    socket=new window.SocketIOEmitter(socket);
-
+$(function () {  
   //http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
   function getParameterByName(name, url) {
       if (!url) url = window.location.href;
@@ -16,22 +11,121 @@ $(function () {
       return decodeURIComponent(results[2].replace(/\+/g, " "));
   }
   
+  function setGetParameter(paramName, paramValue)
+{
+    var url = window.location.href;
+    var hash = location.hash;
+    url = url.replace(hash, '');
+    if (url.indexOf(paramName + "=") >= 0)
+    {
+        var prefix = url.substring(0, url.indexOf(paramName));
+        var suffix = url.substring(url.indexOf(paramName));
+        suffix = suffix.substring(suffix.indexOf("=") + 1);
+        suffix = (suffix.indexOf("&") >= 0) ? suffix.substring(suffix.indexOf("&")) : "";
+        url = prefix + paramName + "=" + paramValue + suffix;
+    }
+    else
+    {
+    if (url.indexOf("?") < 0)
+        url += "?" + paramName + "=" + paramValue;
+    else
+        url += "&" + paramName + "=" + paramValue;
+    }
+    window.location.href = url + hash;
+}
+  
   var force=getParameterByName('force');
   force=force==null?false:true;
+  var mc=getParameterByName('mc');
   
+  if (mc!==null){
+     $.getScript('js/missioncontrol.js');
+     return;
+  } 
   
-  //plugin hooks
-  socket.emit('doIhaveTheBall',force,function(hastheball){
-    if (hastheball){
-      var cockpit = new Cockpit(socket);
-      cockpit.rov.on('cockpit.pluginsLoaded', function() {
+  var e = new EventEmitter2();
+  e.ThisIsTheOne=true;
+  var blacklist=[
+      'CameraRegistration'
+  ];
+  var lvcCacheJSON = localStorage.getItem('lvc_cache');
+  var cacheSeed = {};
+  if (lvcCacheJSON !== null){
+      var lvcCache = JSON.parse(lvcCacheJSON);
+      var lvcArray = Object.keys(lvcCache);
+      lvcArray.forEach(function(key){
+          if (blacklist.includes(key)){return;}
+          var parms = lvcCache[key];
+   //       parms.unshift(key);
+          cacheSeed[key]={context:this,args:parms}
+          console.log('seeding event:',key);
       });
-      window.cockpit = cockpit;  
-    } else {
-      //Someone else is directly connected, attempt to peer connect to them
-      socket.emit('end');
-      $.getScript('js/missioncontrol.js');
-    }  
-  });  
+  }
+  
+    e = new window.EventEmiiterStoreAndForward(e,cacheSeed);
+  
+  var cockpit = new Cockpit(e);
+  window.cockpit = cockpit;  
+  $('#t')[0]['rovOnline']=false;
+    
+  
+  var socket = window.io.connect(window.location.protocol + '//' +
+                window.location.hostname+ ':' +  window.location.port,{path:'/cockpitsocket'});
+  socket=new window.SocketIOStoreAndForward(socket);
+ // socket=new window.SocketIOEmitter(socket);
+  
+  socket.on('connect',function(){
+
+    var CacheLVC = function(lvcdumpfn,millseconds){
+        var cache = lvcdumpfn();
+        localStorage.setItem('lvc_cache', JSON.stringify(cache));
+        setTimeout(CacheLVC.bind(this,lvcdumpfn,millseconds),millseconds);
+    }
+
+    //plugin hooks
+    socket.emit('doIhaveTheBall',force,function(hastheball){
+        if (hastheball){
+ /*
+           //Transfer the listeners over
+           Object.keys(window.cockpit.rov._events).forEach(function(event){
+               funcs = window.cockpit.rov._events[event];
+               if (funcs == null ){return;};
+               if (typeof(funcs)=='function'){
+                socket.socket.on(event,funcs);
+               } else {
+                funcs.forEach(function(fn){
+                    socket.socket.on(event,fn);
+                })
+               }
+               window.cockpit.rov.removeAllListeners(event);
+           });
+           
+           window.cockpit.newROV(socket); 
+
+*/
+
+           var bridge = new window.SocketIOtoEmitterBridge(socket,window.cockpit.rov);
+           
+
+            
+           $('#t')[0]['rovOnline']=true;
+           var lvcCache={};           
+           if(lvcCacheJSON!==null){
+               lvcCache=JSON.parse(lvcCacheJSON);
+           }
+
+            socket.lvcCache=lvcCache;    
+                    
+           //TESTING: Danger, if the serialization takes to long it might look like a hitch to performance every 3 minutes
+           CacheLVC(function(){return lvcCache},1000*10*3);
+        } else {
+        //Someone else is directly connected, attempt to peer connect to them
+        socket.emit('end');
+        setGetParameter('mc',true);
+        }  
+    });      
+  })
+  
+    
 
 });

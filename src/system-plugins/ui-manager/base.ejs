@@ -36,6 +36,7 @@
   <script type='text/javascript' src='js/message-manager.js'></script>
   <script type='text/javascript' src='js/eventEmitterStoreAndForward.js'></script>
   <script type='text/javascript' src='js/socketIOStoreAndForward.js'></script>
+  <script type='text/javascript' src='js/SocketIOtoEmitterBridge.js'></script>  
   <script type='text/javascript' src="js/cockpit.js"></script>
   <script type="text/javascript" src="js/app.js"></script>
   <script type="text/javascript" src="plugin/new-ui/js/lib/0_jquery.svg.min.js"></script>
@@ -59,13 +60,21 @@
   <script type="text/javascript" src="<%= scripts[i] %>"></script><% } %>
 
   <body>
+<link rel="import" href="components/platinum-sw/platinum-sw-register.html">
+<link rel="import" href="components/platinum-sw/platinum-sw-cache.html">
 <!--TODO: Add logic to support either popout or popin(swapping) of applets-->
 <template id="t" is="dom-bind"  strip-whitespace>
+<platinum-sw-register auto-register reload-on-install state="{{pswstate}}">
+  <platinum-sw-cache default-cache-strategy="networkFirst"></platinum-sw-cache>
+</platinum-sw-register>
+
 <!-- Temporarily disabled pending solution for relative pathing -->
 <!--link rel="import" href="components/carbon-route/carbon-route.html">
 <link rel="import" href="components/carbon-route/carbon-location.html">
 <carbon-location use-hash-as-path url-space-regex="^/#/" route={{route}}></carbon-location>
 <carbon-route route="{{route}}" pattern="/:page" data={{routedata}} active="{{homeActive}}"></carbon-route-->
+
+
   <%
     var header = scriplets.find(function(item){return item.name=='header'});
   %>

@@ -225,6 +225,20 @@
                           });
                         break;
                       }
+                      
+                      //co-pilot
+                      var copilot_blacklist = [
+                        'plugin.rovpilot.desiredControlRates'
+                      ];
+                      
+                      switch(p.rov_role){
+                        case 'co-pilot':
+                         if (copilot_blacklist.indexOf(msg[0])==-1){
+                           _self.rov.emit.apply(_self.rov,msg);
+                         }
+                        break;
+                      }
+                      
 
                     });
 

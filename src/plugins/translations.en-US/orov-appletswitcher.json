@@ -11,5 +11,7 @@
   "vr": "vr",
   "diagnostics": "diagnostics",
   "diveprofile": "diveprofile",
-  "RemoteAccess": "RemoteAccess"
+  "RemoteAccess": "RemoteAccess",
+  "comms": "comms",
+  "misctrl": "misctrl"
 }

@@ -4,8 +4,8 @@ var inputController = namespace('systemPlugin.inputController');
 inputController.Keyboard = function(cockpit) {
   var self = this;
   self.register = function(control) {
-    if (!Mousetrap){
-      setTimeout(self.register.bind(this),500);
+    if (typeof(Mousetrap)=='undefined'){
+      setTimeout(self.register.bind(this,control),500);
       return;
     }
     if (control.bindings.keyboard !== undefined) {

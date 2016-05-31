@@ -88,15 +88,17 @@
     //TODO: refactor like a crazy. This might only work with interent control because
     //the code below will *never* connect and thus be idle.  We really need to make
     //this more explicit behavior.
-    var lastCameraRegsitration = null;
+    var CameraRegsitrations = {};
     this.rov.withHistory.on('CameraRegistration',function(data){
       //TODO: More robust handling of duplicat CameraRegistration messages.  If the Camera
       //already is setup, we want to ignore.  But we also want to handle multiple Cameras
       //and camera's that change settings.
-      if ((lastCameraRegsitration !== null) &&(data.relativeServiceUrl == lastCameraRegsitration.relativeServiceUrl)){
+      data.sourceAddress = ResolveURL(data.relativeServiceUrl);
+      if (CameraRegsitrations[data.sourceAddress]){
         return;
       }
-      lastCameraRegsitration = data;
+      CameraRegsitrations[data.sourceAddress] = true;
+
       if (dataflowing){
           self.cockpit.emit('CameraRegistration',data);
       }

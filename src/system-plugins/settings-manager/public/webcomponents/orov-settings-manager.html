@@ -37,7 +37,8 @@
     },
     editor: {},
     behaviors: [namespace('behaviors').oROVStandard],
-    registerEmitterHanlders: function(emitter){
+    ready: function(){
+      var emitter = this.eventEmitter;
       var self = this;
       emitter.emit('plugin.settings-manager.getSchemas',function(schema){
         self.schema = schema;

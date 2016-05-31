@@ -35,6 +35,13 @@ UIManager.prototype.start = function start(){
   });
 
   var pathInfo = this.deps.pathInfo();
+  
+  this.deps.app.get('/sw-import.js', function(req,res){
+      var data = "if('function' === typeof importScripts) {importScripts('components/platinum-sw/service-worker.js');}";
+      res.writeHead(200, {'Content-Type': 'application/javascript','Content-Length':data.length});
+      res.write(data);
+      res.end();
+  })
 
   this.deps.app.get('/', function (req, res) {
     var theme = self.deps.config.preferences.get("plugins:ui-manager").selectedUI;

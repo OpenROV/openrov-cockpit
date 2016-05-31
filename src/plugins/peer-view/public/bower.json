@@ -20,7 +20,7 @@
     "paper-toggle-button": "polymerElements/paper-toggle-button#^1.1.2"
   },
   "resolutions": {
-    "polymer": "^1.2.0",
+    "polymer": "^1.2.1",
     "webcomponentsjs": "^0.7.20"
   }
 }

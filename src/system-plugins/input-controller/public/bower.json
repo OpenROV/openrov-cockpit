@@ -16,5 +16,8 @@
   ],
   "dependencies": {
     "mousetrap-js": "https://github.com/mousetrap-js/mousetrap.git#^1.6.0"
+  },
+  "resolutions": {
+    "webcomponentsjs": "^0.6.0"
   }
 }

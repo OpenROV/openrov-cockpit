@@ -22,7 +22,7 @@
   //so that the reference to this instance is available for further processing
   plugins.NavigatoinData.prototype.listen = function listen() {
     var self = this;
-    this.cockpit.rov.on('plugin.navigationData.data',function(navdata){
+    this.cockpit.rov.withHistory.on('plugin.navigationData.data',function(navdata){
       self.cockpit.emit('plugin.navigationData.data',navdata);
     });
   };

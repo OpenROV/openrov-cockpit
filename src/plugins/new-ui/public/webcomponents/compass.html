@@ -136,7 +136,7 @@
         this.heading = value;
         $(this.$.indicator).animate({
           svgTransform: 'rotate(' + value + ', 472.5, 472.5)'
-        }, 20);
+        }, {duration:20,queue:false});
         if (!this.target) {
           $(this.$.bearing).animate({
             svgTransform: 'rotate(' + value + ', 472.5, 472.5)'

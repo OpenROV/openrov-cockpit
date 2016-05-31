@@ -3,6 +3,10 @@ const express = require('express');
 function peerview(name, deps) {
 
   console.log('peer-webrtc plugin started.');
+  
+//  deps.app.get('/mc', function(req,res){
+//    
+//  });
 
   deps.app.get('/msgpack.min.js', function(req, res) {
     res.sendFile('msgpack.min.js', {root: __dirname+ '/node_modules/msgpack-lite/dist'});

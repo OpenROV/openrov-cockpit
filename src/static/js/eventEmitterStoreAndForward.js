@@ -10,9 +10,9 @@
 (function() {
   var root = this;
 
-  var EventEmiiterStoreAndForward = function(coveredEventEmitter) {
+  var EventEmiiterStoreAndForward = function(coveredEventEmitter,cacheSeed) {
     var self = this;
-    this.eventCache = {};
+    this.eventCache = cacheSeed==undefined?{}:cacheSeed;
     var original_on = coveredEventEmitter.on;
 
     coveredEventEmitter.withHistory = {};

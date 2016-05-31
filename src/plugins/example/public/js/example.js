@@ -117,15 +117,7 @@
       description: 'Example for keymapping.',
       defaults: { keyboard: 'alt+0', gamepad: 'X' },
       down: function() { console.log('0 down'); },
-      up: function() { console.log('0 up'); },
-      secondary: [
-        {
-          name: 'example.keyBoardMappingDepdent',
-          dependency: 'example.keyBoardMapping',
-          defaults: { keyboard: '9', gamepad: 'RB' },
-          down: function() { console.log('####'); }
-        }
-      ]
+      up: function() { console.log('0 up'); }
     },
       {
         name: 'example.testMessage',

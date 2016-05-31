@@ -307,6 +307,15 @@ function StartCameras( cameras )
   
   const infinite = -1;
   
+  if( process.env.DEV_MODE === "true" )
+  {
+    console.log( "yay" );
+  }
+  else
+  {
+    console.log( "boo" );
+  }
+  
   // Launch the video server with specified options. Attempt to restart every 1s.
   var monitor = respawn( launch_options,
   {
@@ -314,7 +323,7 @@ function StartCameras( cameras )
       env: 
       { 
         "DEBUG": "app*,camera*,channel*",
-	      "GEO_URL": process.env.NODE_ENV == 'development' ? ':8099' : '',
+	      "GEO_URL": process.env.DEV_MODE === "true" ? ':8099' : '',
         "GEO_WSPATH": defaults.wspath,
         "GEO_PORT": defaults.port
       },

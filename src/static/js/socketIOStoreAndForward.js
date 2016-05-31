@@ -31,11 +31,6 @@
         original_on.call(socket, aType, aListener);
       };
       
-      socket.on('fromcache',function(type,callback){
-        callback(self.eventCache[aType]);
-      })
-
-
       socket.emit = function(aType,data1, data2, data3, data4, data5){
         self.eventCache[this.event]={context:this,args:arguments};
         orignal_emit.apply(socket,arguments);
@@ -60,6 +55,16 @@
           aListener();
         }
       });
+      
+      socket.on('fromcache',function(aType,callback){
+        if (that.eventCache[aType]!==undefined){
+          var d = that.eventCache[aType];
+          callback.apply(d.context,d.args);
+        } else {
+          callback();
+        }
+      })
+      
     });
 
 

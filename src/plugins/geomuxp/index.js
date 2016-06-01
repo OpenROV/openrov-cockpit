@@ -150,7 +150,7 @@ geomux.prototype.start = function start()
   
   if (process.env.GEO_MOCK == 'true')
   {
-    StartCameras( [] );
+    StartCameras( [ "0" ] );
   }
   else
   {
@@ -261,12 +261,12 @@ function BootCameras( callback )
 function StartCameras( cameras )
 {
   var geoprogram = '';
-  var cameraArgs;
+  var cameraArgs = [ "--c" ];
  
   if (process.env.GEO_MOCK == 'true')
   {
     geoprogram = require.resolve('geo-video-simulator');
-    cameraArgs = "-c=[0]";
+    cameraArgs.push( "0" );
   }
   else
   {
@@ -276,19 +276,10 @@ function StartCameras( cameras )
       geoprogram =require.resolve('geo-video-server');
       
       // Create list of cameras to start up
-      cameraArgs = "-c=[";
       for( var i = 0; i < cameras.length; i++ ) 
       {
-        if( i === cameras.length - 1 )
-        {
-          cameraArgs = cameraArgs.concat( cameras[ i ].device );
-        }
-        else
-        {
-          cameraArgs = cameraArgs.concat( cameras[ i ].device + "," );
-        }
+          cameraArgs.push( cameras[ i ].device );
       }
-      cameraArgs = cameraArgs.concat( "]" );
     } 
     catch (er) 
     {
@@ -296,14 +287,16 @@ function StartCameras( cameras )
       return;
     }
   }
-
+  
   // Create all launch options
   var launch_options = 
   [ 
     "nice", "-1",
     "node", geoprogram,
-    cameraArgs
-  ];
+    "--p", defaults.port,
+    "--w", defaults.wspath,
+    "--u", ( process.env.DEV_MODE === "true" ? ":8099" : "" )
+  ].concat( cameraArgs );
   
   const infinite = -1;
  
@@ -313,10 +306,7 @@ function StartCameras( cameras )
       name: 'geomux',
       env: 
       { 
-        "DEBUG": "app*,camera*,channel*",
-	      "GEO_URL": process.env.DEV_MODE === "true" ? ':8099' : '',
-        "GEO_WSPATH": defaults.wspath,
-        "GEO_PORT": defaults.port
+        "DEBUG": "app*,camera*,channel*"
       },
       maxRestarts: infinite,
       sleep: 1000

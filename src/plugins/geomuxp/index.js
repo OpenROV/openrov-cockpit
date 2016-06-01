@@ -306,16 +306,7 @@ function StartCameras( cameras )
   ];
   
   const infinite = -1;
-  
-  if( process.env.DEV_MODE === "true" )
-  {
-    console.log( "yay" );
-  }
-  else
-  {
-    console.log( "boo" );
-  }
-  
+ 
   // Launch the video server with specified options. Attempt to restart every 1s.
   var monitor = respawn( launch_options,
   {

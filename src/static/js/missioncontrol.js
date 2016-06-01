@@ -12,8 +12,8 @@ $(function() {
 
     var peerOpts= {
         channelConfig: {
-          ordered: false,
-          maxRetransmits: 0
+     //     ordered: false,
+     //     maxRetransmits: 0
         },
         initiator: true,
         trickle: false
@@ -38,7 +38,7 @@ $(function() {
         });
         setTimeout(function(){
           connection_pending = false;
-        },5000);
+        },30000);
       }
     });
 
@@ -48,7 +48,7 @@ $(function() {
     var connect = function(peer_id){
       //okay, now we can send the offer
       var p = new Peer(peerOpts);
-      var emitter = new window.EventEmiiterStoreAndForward(new EventEmitter2());
+      var emitter = window.cockpit.rov;
       var self=this;
 
       p.withHistory = {
@@ -58,7 +58,8 @@ $(function() {
       };
 
       p.on('error', function (err) {
-        console.error(err);
+        console.error(err); 
+        socket.off('signal',signalHander);
         p.destroy();
         connection_pending=false;
         connected=false;
@@ -72,6 +73,8 @@ $(function() {
       signalHander = function(data,sender_id){
         if (sender_id !== peer_id){
           console.error('Invalid sender_id');
+          socket.off('signal',signalHander);          
+          p.destroy();
           return;
         }
         p.signal(data);
@@ -98,6 +101,7 @@ $(function() {
 
       p.on('connect', function () {
         console.log('CONNECT')
+        $('#t')[0]['rovOnline']=true;
         connected = true;
         p.on('data',function(data){  //where data is an array for emitter events
           var payload = msgpack.decode(data);
@@ -148,15 +152,14 @@ $(function() {
           connected = false;
           console.log('Connection to peer closed');
           //TODO: Architect the system to better handle new ROV connections
-          location.reload();
+          if (connected){
+            location.reload();
+          }
         });
 
-
-        var cockpit = new Cockpit(emitter);
         cockpit.peerConnected=true;
+        window.cockpit.rov.connection='p2p';
         cockpit.rov.on('cockpit.pluginsLoaded', function() {});
-
-        window.cockpit = cockpit;
       })
       return p;
 
@@ -165,7 +168,7 @@ $(function() {
     socket.on('connect',function(){
       heartbeatInterval=setInterval(function(){
         socket.emit('heartbeat','viewer');
-      },1000);
+      },10000);
     });
 
 
@@ -177,7 +180,6 @@ $(function() {
   $('#t')[0]['__'] = function(str) {
     return str;
   };
-  var e = new EventEmitter2();
-  $('#t')[0]['cockpitEventEmitter'] = new window.EventEmiiterStoreAndForward(e);
+
 
 });

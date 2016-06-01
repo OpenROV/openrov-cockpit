@@ -114,46 +114,29 @@
 
         if (data.videoMimeType=='video/mp4'){
             //We expect the mp4 data stream to be sent via a dedicated socket.io stream
-            connection.on("connect",function(){
-
-              //TODO: abstract the messages enough that we can have multiple cameras controls
-              self.cockpit.on('request_Init_Segment',function(fn){
+            
+            var handleInit=function(fn){
                 connection.emit('request_Init_Segment',function(data){
                   fn(data);
                 });
-              });
-
-              connection.on('x-h264-video.data',function(data){
+            };
+            
+            var handleData=function(data){
                 self.cockpit.emit('x-h264-video.data',data);
-              })
+             }
+            
+             //TODO: abstract the messages enough that we can have multiple cameras controls
+             self.cockpit.on('request_Init_Segment',handleInit);
 
-            });
+             connection.on('x-h264-video.data',handleData);
             
-            connection.on("reconnect",function()
-            {
-              console.log( "Reconnected" );
-            });
+             connection.on("connect",function(){
+             });
             
-            connection.on("disconnect",function()
-            {
-              console.log( "Disconnected" );
-            });
-            
-            connection.on("reconnect_attempt",function()
-            {
-              console.log( "Attempting to reconnect" );
-            });
-            
-            connection.on("reconnect_failed",function()
-            {
-              console.log( "Reconnect failed" );
-            });
-            
-            connection.on("reconnect_error",function(err)
-            {
-              console.log( "Reconnect error: " + err );
-            });
-
+            connection.on("close",function(){
+              self.cockpit.off(request_Init_Segment,handleInit);
+              connection.off('x-h264-video.data',handleData);
+            })
         }
       }
 

@@ -59,3 +59,23 @@ function generateUUID(){
     });
     return uuid;
 }
+
+//http://balpha.de/2011/10/jquery-script-insertion-and-its-consequences-for-debugging/
+var loadScript = function (path) {
+  var result = $.Deferred(),
+  script = document.createElement("script");
+  script.async = "async";
+  script.type = "text/javascript";
+  script.src = path;
+  script.onload = script.onreadystatechange = function (_, isAbort) {
+      if (!script.readyState || /loaded|complete/.test(script.readyState)) {
+         if (isAbort)
+             result.reject();
+         else
+            result.resolve();
+    }
+  };
+  script.onerror = function () { result.reject(); };
+  $("head")[0].appendChild(script);
+  return result.promise();
+};

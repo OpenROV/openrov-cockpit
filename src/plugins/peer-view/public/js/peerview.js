@@ -53,6 +53,9 @@
     PeerView.prototype.startlisten = function startlisten() {
       if (!this.isEnabled){return;}
       var self = this;
+      if(window.cockpit.rov.connection!=='socket.io'){
+        return;
+      }
 
       var statusUpdate=function(){
         var status = {status:'off',stats:{viewers:0,connection:{}}};
@@ -124,6 +127,7 @@
                 },1000);
 
                 socket.on('peer-connect-offer',function(peer_id,callback){
+                  console.log('got new peer connection offer');
                   var p = new Peer(peerOpts);
 
                   p.withHistory = {
@@ -134,6 +138,8 @@
 
                   p.on('error', function (err) {
                     console.error('error', err)
+                    socket.off('signal',onSignalHanlder);
+                    p.destroy();              
                   })
 
                   p.on('signal', function (data) {
@@ -144,6 +150,8 @@
                   var onSignalHanlder = function(data,sender_id){
                     if (sender_id !== peer_id){
                       console.error('Invalid sender_id');
+                      socket.off('signal',onSignalHanlder);
+                      p.destroy();
                       return;
                     }
                     p.signal(data);
@@ -173,17 +181,6 @@
                       var size = Math.pow(2,i);
                       p.sendemit('data-msg',size,new ArrayBuffer(size),'ok');
                     }
-
-                    var onevent = _self.rov.socket.onevent;
-
-                    _self.rov.socket.onevent = function (packet) {
-                        var args = packet.data || [];
-                        onevent.call (this, packet);    // original call
-
-                        if (p==null) {return;}
-                        args = args.filter(function(n){ return n != null });
-                        p.sendemit.apply(this,args);
-                    };
 
                     var onAnyHandler = function() {
                       var event = this.event;
@@ -243,6 +240,7 @@
                     });
 
                   p.on('close', function(){
+                    console.log('closing connection')
                     _self.viewers--;
                     socket.off('signal',onSignalHanlder);
                     _self.rov.offAny(onAnyHandler);

@@ -25,10 +25,10 @@
     template.displaySection= function displaySection(item1,item2){
       return item1==item2;
     }
-    template.routedata = {page: 'cockpit'}
-//    if ((window.location.pathname=="/") && (window.location.hash=='')){
-//      window.location.replace ('#/cockpit');
-//    } 
+//    template.routedata = {page: 'cockpit'}
+    if (window.location.hash==''){
+      window.location.replace ('#/cockpit');
+    } 
    
     this.registerEventListeners(this.cockpit,this.rov);
   }

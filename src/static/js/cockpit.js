@@ -10,42 +10,19 @@
   var hostname = document.location.hostname ? document.location.hostname : 'localhost';
 
   //Cockpit is inheriting from EventEmitter2.
+  //http://stackoverflow.com/questions/3900168/how-to-make-a-javascript-singleton-with-a-constructor-without-using-return
   var Cockpit = function Cockpit(csocket) {
+    if ( Cockpit.instance ){
+      alert('intercepted second instance of cockpit');
+      return Cockpit.instance;
+    }
+    Cockpit.instance = this;
     var self = this;
-//    this.uiLoader = new window.UiLoader();
+    
 
     this.rov = csocket;
     this.storeAndForward = new window.EventEmiiterStoreAndForward(this);
-/*    var onevent = csocket.onevent;
-    csocket.onevent = function (packet) {
-        var args = packet.data || [];
-        onevent.call (this, packet);    // original call
-        switch(args.length){
-          case 1: self.rov.emit(args.shift());      // additional call to catch-all
-          break;
-          case 2: self.rov.emit(args.shift(),args.shift());      // additional call to catch-all
-          break;
-          case 3: self.rov.emit(args.shift(),args.shift(),args.shift());
-          break;
-          case 4: self.rov.emit(args.shift(),args.shift(),args.shift(),args.shift());
-          break;
-          case 5: self.rov.emit(args.shift(),args.shift(),args.shift(),args.shift(),args.shift());
-          break;
-          case 6: self.rov.emit(args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift());
-          break;
-          case 7: self.rov.emit(args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift());
-          break;
-          case 8: self.rov.emit(args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift());
-          break;
-          case 9: self.rov.emit(args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift());
-          break;
-          case 10: self.rov.emit(args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift(),args.shift());
-          break;
 
-
-        }
-    };
-*/
     this.sendUpdateEnabled = true;
     this.capabilities = 0;
     this.loadedPlugins = [];
@@ -53,30 +30,8 @@
     this.loadUiTheme(function() {
       self.loadPlugins();
       console.log('loaded plugins');
-      // Register the various event handlers
       self.listen();
-       /*
-      self.extensionPoints = {
-        rovSettings: $('html /deep/ rov-settings'),
-        rovDiagnostics: $('html /deep/ rov-diagnostics /deep/ #dropIn'),
-        videoContainer: $('html /deep/ #video-container1'),
-        keyboardInstructions: $('html /deep/ #keyboardInstructions'),
-        buttonPanel: $('html /deep/ #buttonPanel'),
-        menu: $('html /deep/ rov-menu'),
-        inputController: undefined //will be set by the plugin
-      };
-(
-      self.extensionPoints.rovSettings.registerCloseHandler = function(handler) {
-        if (self.extensionPoints.rovSettings[0]) {
-          self.extensionPoints.rovSettings[0].registerCloseHandler(handler);
-        }
-       };
-      self.extensionPoints.rovDiagnostics.registerCloseHandler = function(handler) {
-        if (self.extensionPoints.rovDiagnostics[0]) {
-          self.extensionPoints.rovDiagnostics[0].registerCloseHandler(handler);
-        }
-      };
-    */
+
     });
 
   };
@@ -96,19 +51,6 @@
   Cockpit.prototype.loadUiTheme = function(done) {
     done();
     return;
-    /*short circuit */
-    var defaultUiName = 'standard-ui'; //temp
-    var self = this;
-    $.get('plugin/ui-selector', function (config) {
-      if (config.selectedUi && config.selectedUi.trim().length > 0) {
-        self.uiLoader.load(config.selectedUi, done);
-      }
-      else {
-        self.uiLoader.load(defaultUiName, done);
-      }
-    }).fail(function() {
-      self.uiLoader.load(defaultUiName, done);
-    });
   };
 
   Cockpit.prototype.loadPlugins = function loadPlugins() {
@@ -141,14 +83,7 @@
         }
       });
     });
-/*    setTimeout(function(){ //give a pause for constructor activities before calling listen
-      cockpit.loadedPlugins.forEach(function(plugin){
-        if (plugin.listen !== undefined){
-          plugin.listen();
-        }
-      });
-    },1000);
-*/
+
 
     Cockpit.plugins = [];  //flush them out for now. May move to a loaded array if we use in the future
     cockpit.rov.emit('cockpit.pluginsLoaded');

@@ -24,7 +24,6 @@ var geomux = function geomux( name, deps )
   var cockpit     = deps.cockpit;
   var videoServer = io.connect( 'http://localhost:' + defaults.port, { path: defaults.wspath, reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 10 } );
 
-  
   var cameras     = {};
   
   // Upon connecting to video server, set up listeners
@@ -216,6 +215,7 @@ function EnumerateCameras( callback )
         {
           var result = 
           {
+            // NOTE: Add another field for camera offset and change device back to "video0"?
             device:   file.slice( "video".length ),
             deviceid: stdout.slice("S: v4l/by-id/".length),
             format:   'MP4'

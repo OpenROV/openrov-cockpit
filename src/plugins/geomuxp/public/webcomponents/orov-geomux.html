@@ -68,66 +68,67 @@
       behaviors: [namespace('behaviors').oROVStandard],
 	  
       registerEmitterHanlders: function(emitter) 
-	  {
-        var self = this;
-		
-        emitter.withHistory.on( "plugin.geomuxp.0_0.settings", function(settings) 
-		{
-			console.log( "Settings: " + JSON.stringify( settings )  );
-			self.settings = settings;
-        });
-      },
+			{
+					var self = this;
+			
+					emitter.withHistory.on( "plugin.geomuxp.0_0.settings", function(settings) 
+					{
+						console.log( "Settings: " + JSON.stringify( settings )  );
+						self.settings = settings;
+					});
+			},
 	  
       attached: function() 
-	  {
-      },
+			{
+			},
 	  
-	  SetSimpleValue: function(e)
-	  {
-		var settingID = e.srcElement.id;
-		var value = e.srcElement.value;
+			SetSimpleValue: function(e)
+			{
+			var settingID = e.srcElement.id;
+			var value = e.srcElement.value;
 
-		var command = 
-		{ 
-			"command": "apply_settings",
-			"channel": 0,
-			"params": 
+			var command = 
 			{ 
-				"settings": {}
-			} 
-		}
+				"command": "apply_settings",
+				"channel": 0,
+				"params": 
+				{ 
+					"settings": {}
+				} 
+			}
 		
-		command.params.settings[ settingID ] = { "value": value };
-		
-		console.log( JSON.stringify( command ) );
-		
-		this.eventEmitter.emit( "plugin.geomuxp.command", 0, "chCmd", command );
+			command.params.settings[ settingID ] = { "value": value };
+			
+			console.log( JSON.stringify( command ) );
+			
+			this.eventEmitter.emit( "plugin.geomuxp.command", 0, "chCmd", command );
 	  },
 	  
 	  SetBooleanValue: function(e)
 	  {
-		var settingID = e.srcElement.id;
-		var enabled = e.srcElement.checked;
+			var settingID = e.srcElement.id;
+			var enabled = e.srcElement.checked;
 
-		var command = 
-		{ 
-			"command": "apply_settings",
-			"channel": 0,
-			"params": 
+			var command = 
 			{ 
-				"settings": {}
-			} 
-		}
-		
-		command.params.settings[ settingID ] = { "enabled": enabled };
-		
-		console.log( JSON.stringify( command ) );
-		
-		this.eventEmitter.emit( "plugin.geomuxp.command", 0, "chCmd", command );
+				"command": "apply_settings",
+				"channel": 0,
+				"params": 
+				{ 
+					"settings": {}
+				} 
+			}
+			
+			command.params.settings[ settingID ] = { "enabled": enabled };
+			
+			console.log( JSON.stringify( command ) );
+			
+			this.eventEmitter.emit( "plugin.geomuxp.command", 0, "chCmd", command );
 	  },
+		
 	  ResetCamera: function(e)
 	  {
-		this.eventEmitter.emit( "plugin.geomuxp.command", 0, "restart", {} );
+			this.eventEmitter.emit( "plugin.geomuxp.command", 0, "restart", {} );
 	  }
     });
   </script>

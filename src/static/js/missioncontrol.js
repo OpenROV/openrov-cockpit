@@ -12,8 +12,8 @@ $(function() {
 
     var peerOpts= {
         channelConfig: {
-          ordered: false,
-          maxRetransmits: 0
+     //     ordered: false,
+     //     maxRetransmits: 0
         },
         initiator: true,
         trickle: false
@@ -168,7 +168,7 @@ $(function() {
     socket.on('connect',function(){
       heartbeatInterval=setInterval(function(){
         socket.emit('heartbeat','viewer');
-      },1000);
+      },10000);
     });
 
 

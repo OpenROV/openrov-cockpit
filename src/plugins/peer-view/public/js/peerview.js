@@ -85,8 +85,8 @@
               self.connecting = true;
               var peerOpts= {
                   channelConfig: {
-                    ordered: false,
-                    maxRetransmits: 0
+         //           ordered: false,
+         //           maxRetransmits: 0
                   }
                 }
 
@@ -111,23 +111,72 @@
               })
 
               socket.on('heartbeat',function(data){
-                console.log('Heartbeat: ' + JSON.stringify(data));
+              //  console.log('Heartbeat: ' + JSON.stringify(data));
               });
 
               socket.on('connect',function(){
                 self.connected = true;
                 self.connecting= false;
+                
+                var buffer = [];
+                
+                var onAnyHandler = function() {
+                  var event = this.event;
+                  if (event !== 'newListener') {
+                  //  console.log(event);
+                    var args = new Array(arguments.length);
+                    for(var i = 0; i < args.length; ++i) {
+                                //i is always valid index in the arguments object
+                        args[i] = arguments[i];
+                    }
+                    args.unshift(event);
+                    buffer.push(args);
+                  }
+                }
+                _self.rov.onAny(onAnyHandler);
+                
+                var msgNumber = 0;
+                var flushBuffer = function(){
+                  while (buffer.length>0){
+                //    console.log('flushing buffer...');
+                    var args = buffer.shift();
+                    var pack = msgpack.encode(args);
+                     self.peers.forEach(function(p){
+                     // p.sendemit.apply(p,args);         
+                     p.sendPackedData(pack);           
+                    });
+                  }
+                  setTimeout(flushBuffer.bind(this),20);
+                }
+                flushBuffer();
 
+                //Since the video comes in via a different route...
+                const webRTCDataChannelChunkLimit=16*1024; //16KB Chunk Recommendation
+                var videodataHanlder = function(data){
+                  var chunk_count = 1;
+                  var sliceend=0;
+                  var end = 0;
+                  while(end<data.byteLength){
+                    var sliceend = sliceend+webRTCDataChannelChunkLimit>data.byteLength?data.byteLength:sliceend+webRTCDataChannelChunkLimit
+                    var chunk = data.slice(end,sliceend);
+                    buffer.push(['x-h264-video.chunk',chunk_count,data.byteLength-sliceend,chunk]);
+                    chunk_count++;
+                    end=sliceend;
+                  }
+                }
+                _self.cockpit.on('x-h264-video.data',videodataHanlder);
+                
 
                 //var msgpack = require("msgpack-lite");
 
                 heartbeatInterval=setInterval(function(){
                   if (!self.connected){return;}
                   socket.emit('heartbeat','server');
-                },1000);
+                },5000);
+                
 
                 socket.on('peer-connect-offer',function(peer_id,callback){
-                  console.log('got new peer connection offer');
+                  console.log('got new peer connection offer from:',peer_id);
                   var p = new Peer(peerOpts);
 
                   p.withHistory = {
@@ -149,11 +198,13 @@
 
                   var onSignalHanlder = function(data,sender_id){
                     if (sender_id !== peer_id){
-                      console.error('Invalid sender_id');
-                      socket.off('signal',onSignalHanlder);
-                      p.destroy();
+                      console.error('Invalid sender_id: got %s instead of %s, ignoring...',sender_id,peer_id);
+//                      socket.off('signal',onSignalHanlder);
+//                      p.destroy();
+
                       return;
                     }
+                    console.log('Got signal from %s for %s',sender_id,peer_id)
                     p.signal(data);
                   };
 
@@ -167,13 +218,20 @@
                     //make last person to connect pilot by default
                     //self.pilot_sender_id = peer_id;
                     //_self.cockpit.emit('plugin.rovpilot.sendToROVEnabled',false);
+
+                    p.sendPackedData = function sendPackedData(data){
+                      p.send(data);
+                    };
+
                     p.sendemit = function sendemit(){
                       var args = new Array(arguments.length);
+                      var pack = null;
                       for(var i = 0; i < args.length; ++i) {
                                   //i is always valid index in the arguments object
                           args[i] = arguments[i];
                       }
-                      p.send(msgpack.encode(args));
+                      pack = msgpack.encode(args);
+                      p.sendPackedData(pack);
                     }
 
                     //Test data payload sizes
@@ -181,37 +239,6 @@
                       var size = Math.pow(2,i);
                       p.sendemit('data-msg',size,new ArrayBuffer(size),'ok');
                     }
-
-                    var onAnyHandler = function() {
-                      var event = this.event;
-                      if (event !== 'newListener') {
-                      //  console.log(event);
-                        var args = new Array(arguments.length);
-                        for(var i = 0; i < args.length; ++i) {
-                                    //i is always valid index in the arguments object
-                            args[i] = arguments[i];
-                        }
-                        args.unshift(event);
-                        p.sendemit.apply(p,args);
-                      }
-                    }
-                    _self.rov.onAny(onAnyHandler);
-
-                    //Since the video comes in via a different route...
-                    const webRTCDataChannelChunkLimit=16*1024; //16KB Chunk Recommendation
-                    var videodataHanlder = function(data){
-                      var chunk_count = 1;
-                      var sliceend=0;
-                      var end = 0;
-                      while(end<data.byteLength){
-                        var sliceend = sliceend+webRTCDataChannelChunkLimit>data.byteLength?data.byteLength:sliceend+webRTCDataChannelChunkLimit
-                        var chunk = data.slice(end,sliceend);
-                        p.sendemit('x-h264-video.chunk',chunk_count,data.byteLength-sliceend,chunk);
-                        chunk_count++;
-                        end=sliceend;
-                      }
-                    }
-                    _self.cockpit.on('x-h264-video.data',videodataHanlder);
 
                     p.on('data',function(data){
                       var msg = msgpack.decode(data);
@@ -243,8 +270,8 @@
                     console.log('closing connection')
                     _self.viewers--;
                     socket.off('signal',onSignalHanlder);
-                    _self.rov.offAny(onAnyHandler);
-                    _self.cockpit.off('x-h264-video.data',videodataHanlder);
+           //         _self.rov.offAny(onAnyHandler);
+           //         _self.cockpit.off('x-h264-video.data',videodataHanlder);
                     _self.cockpit.emit('plugin.rovpilot.sendToROVEnabled',true);
                     var index = _self.peers.indexOf(p);
                     if (index > -1) {

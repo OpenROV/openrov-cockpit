@@ -70,6 +70,8 @@
     </div>
   </template>
   <script>
+    var lastData = null;
+    var newData = null;
     Polymer({
       is: 'orov-newui-compass',
       properties: {
@@ -116,8 +118,13 @@
           }
         });
         emitter.on('plugin.navigationData.data', function(data) {
-          self.setHeading(self.pad(parseFloat(data.heading).toFixed(0), 3));
+          newData = data;
         });
+        setInterval(function(){
+          if (newData == lastData) return;
+          lastData=newData;
+          self.setHeading(self.pad(parseFloat(newData.heading).toFixed(0), 3));          
+        },100);
       },
       attached: function() {
         var self = this;

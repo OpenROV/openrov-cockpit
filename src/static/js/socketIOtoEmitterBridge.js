@@ -37,15 +37,15 @@
     //checking for the last value in the cache and "seeding" the cache in the emitter with the value before letting the 
     //original withHistory call take place.
     if (emitter.withHistory){
-        var orig_wh = emitter.withHistory;
-        emitter.withHistory=function(type,fn){
+        var orig_wh = emitter.withHistory.on;
+        emitter.withHistory.on=function(type,fn){
             self.socket.emit('fromcache',type,function(){
                 emitter.emit(type,arguments); //TODO: If this works, use the args pattern for performance.                
             });
             orig_wh(type,fn);
         }
         this.cleanupFunctions.push(function(){
-            emitter.withHistory=orig_wh;
+            emitter.withHistory.on=orig_wh;
         })
         
     }

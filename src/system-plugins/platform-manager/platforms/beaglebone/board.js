@@ -3,30 +3,15 @@ var fs 		= require("fs");
 var path	= require('path');
 var Parser 	= require("binary-parser").Parser;
 
-var EventEmitter = require("events").EventEmitter;
-
 var fopen		= Q.denodeify( fs.open );
 var read 		= Q.denodeify( fs.read );
 var readFile	= Q.denodeify( fs.readFile );
 
-// Define a parser for the board information stored on the controller board's eeprom
-var eepromParser = Parser.start()
-					.endianess( "little" )
-					.uint32( "length" )
-					.string( "data",
-					{
-						encoding: "utf8",
-        				length: "length"
-					} );
-
-var loadBoardConfig = function( platform )
+var ComposeInterface = function( platform )
 {
-	// Create the CPU object
-	var board = platform.mcu;
-	
-	return getBoardInfo( board )
-			.then( loadPinMap )
-			.then( loadHardwareInterface )
+	return LoadBoardInfo( platform.mcu )
+			.then( LoadPinMap )
+			.then( LoadInterface )
 			.then( function( board )
 			{
 				// Success
@@ -41,22 +26,24 @@ var loadBoardConfig = function( platform )
 			} );
 };
 
-var getBoardInfo = function( board ) 
+var LoadBoardInfo = function( board ) 
 {
-	return readFile( path.resolve(__dirname, "config/eepromMock.bin" ) )
-			.then( function( data )
+	return Q.fcall( function()
 			{
-				return eepromParser.parse( data ).data;
-			} )
-			.then( JSON.parse )
-			.then( function( info )
-			{
-				board.info = info;
-				return board;
+				// Check SPI communication. If good, we're happy!
+				
+				board.info = 
+				{
+					productId: 0,
+					serial: 0
+				};
+				
 			} );
+			
+			// TODO: Check eeprom as well. If it exists, we are a 2.8 specifically
 }
 
-var loadPinMap = function( board )
+var LoadPinMap = function( board )
 {
 	return readFile( path.resolve(__dirname, "boards/" + board.info.productId + "/pinmap.json" ) )
 			.then( JSON.parse )
@@ -72,7 +59,7 @@ var loadPinMap = function( board )
 			} );
 }
 
-var loadHardwareInterface = function( board )
+var LoadInterface = function( board )
 {
 	// Load functions for the board interface
 	require( "./boards/" + board.info.productId + "/setup.js" )( board );
@@ -80,4 +67,4 @@ var loadHardwareInterface = function( board )
 	return board;
 };
 
-module.exports = loadBoardConfig;
+module.exports = ComposeInterface;

@@ -38,11 +38,6 @@ $(function () {
   force=force==null?false:true;
   var mc=getParameterByName('mc');
   
-  if (mc!==null){
-     $.getScript('js/missioncontrol.js');
-     return;
-  } 
-  
   var e = new EventEmitter2();
   e.ThisIsTheOne=true;
   var blacklist=[
@@ -67,7 +62,12 @@ $(function () {
   var cockpit = new Cockpit(e);
   window.cockpit = cockpit;  
   $('#t')[0]['rovOnline']=false;
-    
+
+  if (mc!==null){
+     loadScript('js/missioncontrol.js'); 
+     //$.getScript('js/missioncontrol.js');
+     return;
+  }     
   
   var socket = window.io.connect(window.location.protocol + '//' +
                 window.location.hostname+ ':' +  window.location.port,{path:'/cockpitsocket'});
@@ -109,6 +109,7 @@ $(function () {
 
             
            $('#t')[0]['rovOnline']=true;
+           window.cockpit.rov.connection='socket.io';
            var lvcCache={};           
            if(lvcCacheJSON!==null){
                lvcCache=JSON.parse(lvcCacheJSON);

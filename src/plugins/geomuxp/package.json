@@ -10,7 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "socket.io-client": "^1.4.6",
-    "geo-video-simulator": "https://github.com/OpenROV-Dev/geo-video-simulator.git"
+    "geo-video-simulator": "https://github.com/OpenROV-Dev/geo-video-simulator.git#feat_geomuxpp"
   },
   "optionalDependencies": {
     "geo-video-server": "https://github.com/OpenROV-Dev/geo-video-server.git#feat_geomuxpp"

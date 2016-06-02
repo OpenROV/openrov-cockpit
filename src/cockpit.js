@@ -136,34 +136,41 @@ var deps = {
 };
 
 var numConnections = 0;
-
+var socketConnectToken = null;
 // Handle socket.io events
 io.on('connection', function (client) 
 {
-    numConnections++;
-    if (numConnections==1){
+    if (socketConnectToken == null){
+        socketConnectToken = client.id;
+    } 
+    
+        numConnections++;
         console.log('HASTHEBALL:TRUE');
         client.hastheball=true;
-        client.emit('hastheball',true);
-    } else {
-        console.log('HASTHEBALL:FALSE');
-        client.hastheball=false;
-        client.killTimer = setTimeout(function(){
-            client.disconnect();
-        },2000);        
-     }
+        client.emit('hastheball',socketConnectToken);
     
-    client.on('doIhaveTheBall',function(force,callback){
-        if(force){
-            clearTimeout(client.killTimer);
-        }
-        callback(force==true?true:client.hastheball);
+    client.on('request-sessionToken',function(callback){
+        callback(socketConnectToken);
         //TODO: On force, kill the other inbound connections
     });
     
     console.log('Connection detected');
     console.log('Current connections: ' + numConnections );
 });
+
+io.use(function(socket, next){
+    console.log("Query: ", socket.handshake.query);
+    console.log("Auth expecting %s. got %s",socketConnectToken==null?'<NULL>':socketConnectToken,socket.handshake.query.token==undefined?'<UNDEFINED>':socket.handshake.query.token);
+    // return the result of next() to accept the connection.
+    if ((socketConnectToken == null) || (socketConnectToken == socket.handshake.query.token) || (socket.handshake.query.token == 'reset')){
+        if (socket.handshake.query.token == 'reset'){
+            socketConnectToken = null;
+        }
+        return next();
+    };
+    // call next() with an Error if you need to reject the connection.
+    next(new Error('Authentication error'));
+});  
 
 deps.cockpit.on('disconnect', function () 
 {

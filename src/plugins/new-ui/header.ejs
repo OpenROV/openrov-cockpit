@@ -19,7 +19,7 @@ body {
 
 </template>
 <style>
-.online-indicator {
+.online-indicator, .user-role {
   color: white;
   font-size: 2vh;
 }
@@ -29,6 +29,7 @@ body {
 <div class="navbar navbar-inverse navbar-fixed-top navbar-collapse">
   <div id="newuiTopbar" class="container"><div class="navbar-header"><a class="navbar-brand" href="#"><img src="themes/OpenROV/img/openrov.png" class="logo"><span class="navbar-titel">{{__('Cockpit')}}</span></a></div>
     <div class="online-indicator" hidden="{{rovOnline}}">ROV Offline</div>
+    <div class="user-role">{{userRole}}</div>
     <div id="menu">
       <div id="menuitems" class="nav pull-right navbar-nav">
         <li><orov-login event-emitter="{{cockpitEventEmitter}}" /></li>

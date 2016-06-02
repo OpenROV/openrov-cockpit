@@ -102,6 +102,7 @@ $(function() {
       p.on('connect', function () {
         console.log('CONNECT')
         $('#t')[0]['rovOnline']=true;
+        $('#t')[0]['userRole']='View-Only';
         connected = true;
         p.on('data',function(data){  //where data is an array for emitter events
           var payload = msgpack.decode(data);

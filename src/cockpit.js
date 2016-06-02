@@ -156,15 +156,34 @@ io.on('connection', function (client)
     
     console.log('Connection detected');
     console.log('Current connections: ' + numConnections );
+    
+    client.on('disconnect',function(){
+    });
+    
+    
 });
 
 io.use(function(socket, next){
-    console.log("Query: ", socket.handshake.query);
     console.log("Auth expecting %s. got %s",socketConnectToken==null?'<NULL>':socketConnectToken,socket.handshake.query.token==undefined?'<UNDEFINED>':socket.handshake.query.token);
     // return the result of next() to accept the connection.
     if ((socketConnectToken == null) || (socketConnectToken == socket.handshake.query.token) || (socket.handshake.query.token == 'reset')){
         if (socket.handshake.query.token == 'reset'){
             socketConnectToken = null;
+            //And kick anyone already connected
+         //   if (typeof(io.sockets.server.eio.clients) == 'Array'){
+              var socketCollection = io.sockets.connected;
+                Object.keys(socketCollection).forEach(function(key){
+                    var client = socketCollection[key];
+                    
+                    if (client.id !== socket.id){
+                        console.log('kicking out:',client.id);
+                        setTimeout(function(){
+                            client.emit('forced-disconnect');
+                            client.disconnect();},1000);
+
+                    }
+                });
+          //  }
         }
         return next();
     };
@@ -174,9 +193,14 @@ io.use(function(socket, next){
 
 deps.cockpit.on('disconnect', function () 
 {
+    
     numConnections--;
+    if (numConnections==0){
+        socketConnectToken = null;
+    }
     console.log('Disconnect detected');
     console.log('Current connections: ' + numConnections );
+
 });
 
 // Handle global events

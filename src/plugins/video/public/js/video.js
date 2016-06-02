@@ -132,11 +132,6 @@
             
              connection.on("connect",function(){
              });
-            
-            connection.on("close",function(){
-              self.cockpit.off(request_Init_Segment,handleInit);
-              connection.off('x-h264-video.data',handleData);
-            })
 
         }
       }

@@ -70,6 +70,9 @@
 							console.log( "Got error: " + error );
 							self.cockpit.emit( "plugin.geomuxp." + cam + "_" + chan + ".error", error );
 						} );
+						
+						// Alert webcomponents of new cameras/channels
+						self.cockpit.emit( "plugin.geomuxp.cameraInfo", self.cameras );
 					}
 				} );
 			} );

@@ -202,7 +202,7 @@ function EnumerateCameras( callback )
     
     if (f.length==0)
     {
-      callback(result);
+      callback(results);
       return;
     }
     
@@ -252,7 +252,7 @@ function BootCameras( callback )
       } 
       else 
       {
-        console.error('Error staring devices geo: ',JSON.stringify(error));
+        console.error('Error starting devices geo: ',JSON.stringify(error));
         callback();
       }
     });

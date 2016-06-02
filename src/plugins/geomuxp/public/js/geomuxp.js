@@ -45,13 +45,11 @@
 						// Register to updates from the server
 						self.rov.withHistory.on( "plugin.geomuxp." + cam + "_" + chan + ".settings", function( settings )
 						{
-							console.log( "Got settings: " + JSON.stringify( settings ) );
 							self.cockpit.emit( "plugin.geomuxp." + cam + "_" + chan + ".settings", settings );
 						} );
 						
 						self.rov.withHistory.on( "plugin.geomuxp." + cam + "_" + chan + ".api", function( api )
 						{
-							console.log( "Got API: " + JSON.stringify( api ) );
 							self.cockpit.emit( "plugin.geomuxp." + cam + "_" + chan + ".api", api );
 						} );
 						
@@ -78,9 +76,7 @@
 		} );
 		
 		this.cockpit.on( "plugin.geomuxp.command", function( camera, command, params ) 
-		{
-			console.log( "Got command" );
-			
+		{			
 			// Forward to server
 			self.rov.emit( "plugin.geomuxp.command", camera, command, params );
 		} );

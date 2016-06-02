@@ -22,7 +22,11 @@ $(function () {
         var suffix = url.substring(url.indexOf(paramName));
         suffix = suffix.substring(suffix.indexOf("=") + 1);
         suffix = (suffix.indexOf("&") >= 0) ? suffix.substring(suffix.indexOf("&")) : "";
-        url = prefix + paramName + "=" + paramValue + suffix;
+        if (paramValue==null){
+          url = prefix + suffix;            
+        } else {
+          url = prefix + paramName + "=" + paramValue + suffix;
+        }
     }
     else
     {
@@ -84,6 +88,10 @@ $(function () {
       }
   });
   
+  socket.on('forced-disconnect',function(){
+      window.location.reload();
+  });
+  
   socket.on('connect',function(){
 
     var CacheLVC = function(lvcdumpfn,millseconds){
@@ -98,10 +106,16 @@ $(function () {
            var bridge = new window.SocketIOtoEmitterBridge(socket,window.cockpit.rov);
            
            $('#t')[0]['rovOnline']=true;
+           $('#t')[0]['userRole']='Pilot';
            window.cockpit.rov.connection='socket.io';
            var lvcCache={};           
            if(lvcCacheJSON!==null){
                lvcCache=JSON.parse(lvcCacheJSON);
+           }
+           
+           //if they forced the session connect, we need to remove the parameter from the URL
+           if (force){
+               setGetParameter('force',null);
            }
 
             socket.lvcCache=lvcCache;    

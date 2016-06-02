@@ -155,7 +155,7 @@
                   state: false,
                   description: 'External LED lights on/off',
                   events: [
-                    {message:'plugin.externalLights.level',fn: function(lightNum, level){ if( lightNum == 0) return level>0; }}
+                    {message:'plugin.externalLights.level',fn: function(lightNum, level){ if( lightNum == 0){ return level > 0; } else{ return null; } }}
                   ],
                   switch: function (state) {
                     if (self.eventEmitter !== undefined){
@@ -170,7 +170,7 @@
                   state: false,
                   description: 'External LED lights on/off',
                   events: [
-                    {message:'plugin.externalLights.level',fn: function(lightNum, level){if( lightNum == 1){return level>0;}}}
+                    {message:'plugin.externalLights.level',fn: function(lightNum, level){if( lightNum == 1){ return level > 0; } else{ return null; } } }
                   ],
                   switch: function (state) {
                     if (self.eventEmitter !== undefined){
@@ -274,7 +274,8 @@
               var e = self.switches[aSwitch].events[i];
               console.log("Registering switch listener: " + e.message);
               emitter.withHistory.on(e.message,function(){
-                self.switches[aSwitch].state = e.fn.apply(this,arguments);
+                var newState = e.fn.apply(this,arguments);
+                self.switches[aSwitch].state = ( newState !== null ? newState : self.switches[aSwitch].state );
                 self.update();
               })// e.fn.bind(self.switches[aSwitch]));
             }

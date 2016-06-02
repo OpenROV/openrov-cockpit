@@ -40,7 +40,11 @@
         var orig_wh = emitter.withHistory.on;
         emitter.withHistory.on=function(type,fn){
             self.socket.emit('fromcache',type,function(){
-                emitter.emit(type,arguments); //TODO: If this works, use the args pattern for performance.                
+              var args = new Array(arguments.length);
+              for(var i = 0; i < args.length; ++i) {
+                args[i] = arguments[i];
+              }              
+              emitter.emit.apply(emitter,[type].concat(args)); //TODO: If this works, use the args pattern for performance.                
             });
             orig_wh(type,fn);
         }

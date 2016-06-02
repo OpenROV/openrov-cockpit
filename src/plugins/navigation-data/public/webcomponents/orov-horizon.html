@@ -87,9 +87,16 @@
         },
         registerEmitterHanlders: function(emitter){
           var self = this;
+          var lastData = null
           emitter.on('plugin.navigationData.data',function(data){
-            self.setData(data);
+            if (lastData == data) {return};
+            lastData = data;
           });
+          var updateData = function(){
+            self.setData(lastData);
+            setTimeout(updateData.bind(self),75);
+          }
+          updateData();
 
           //Not used currently, but it is a reference if we need raw
           //access to the video canvas.

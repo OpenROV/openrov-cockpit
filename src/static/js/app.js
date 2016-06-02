@@ -34,9 +34,9 @@ $(function () {
     window.location.href = url + hash;
 }
   
-  var force=getParameterByName('force');
+  var force=getParameterByName('force'); //resets the pilot position reservation
   force=force==null?false:true;
-  var mc=getParameterByName('mc');
+  var mc=getParameterByName('mc'); //forces going to mission control
   
   var e = new EventEmitter2();
   e.ThisIsTheOne=true;
@@ -68,11 +68,21 @@ $(function () {
      //$.getScript('js/missioncontrol.js');
      return;
   }     
-  
+  var tokenOption=force==false?sessionStorage.sessionID:'reset';
   var socket = window.io.connect(window.location.protocol + '//' +
-                window.location.hostname+ ':' +  window.location.port,{path:'/cockpitsocket'});
+                window.location.hostname+ ':' +  window.location.port,{path:'/cockpitsocket', query: 'token='+tokenOption  });
   socket=new window.SocketIOStoreAndForward(socket);
  // socket=new window.SocketIOEmitter(socket);
+ 
+ 
+  socket.on('error',function(error){
+      if (error == "Authentication error"){
+          console.log("Someone else already logged in to rov Pilot slot, redirecting to mission control");
+          setGetParameter('mc',true);
+          loadScript('js/missioncontrol.js'); 
+          return;
+      }
+  });
   
   socket.on('connect',function(){
 
@@ -83,31 +93,10 @@ $(function () {
     }
 
     //plugin hooks
-    socket.emit('doIhaveTheBall',force,function(hastheball){
-        if (hastheball){
- /*
-           //Transfer the listeners over
-           Object.keys(window.cockpit.rov._events).forEach(function(event){
-               funcs = window.cockpit.rov._events[event];
-               if (funcs == null ){return;};
-               if (typeof(funcs)=='function'){
-                socket.socket.on(event,funcs);
-               } else {
-                funcs.forEach(function(fn){
-                    socket.socket.on(event,fn);
-                })
-               }
-               window.cockpit.rov.removeAllListeners(event);
-           });
-           
-           window.cockpit.newROV(socket); 
-
-*/
-
+    socket.emit('request-sessionToken',function(sessionID){
+           sessionStorage.sessionID = sessionID; 
            var bridge = new window.SocketIOtoEmitterBridge(socket,window.cockpit.rov);
            
-
-            
            $('#t')[0]['rovOnline']=true;
            window.cockpit.rov.connection='socket.io';
            var lvcCache={};           
@@ -119,11 +108,6 @@ $(function () {
                     
            //TESTING: Danger, if the serialization takes to long it might look like a hitch to performance every 3 minutes
            CacheLVC(function(){return lvcCache},1000*10*3);
-        } else {
-        //Someone else is directly connected, attempt to peer connect to them
-        socket.emit('end');
-        setGetParameter('mc',true);
-        }  
     });      
   })
   

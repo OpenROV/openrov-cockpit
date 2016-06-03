@@ -3,8 +3,6 @@
   'use strict';
   var plugins = namespace('plugins');
   
-  console.log( "hey" );
-  
   plugins.ExternalLights = function(cockpit) {
     var self = this;
     self.cockpit = cockpit;
@@ -16,16 +14,12 @@
       {name: 'LIGPE0', description: 'External Light 0 percent power'},
       {name: 'LIGPE1', description: 'External Light 1 percent power'}
     ]);
-    
-    console.log( "guys" );
   }
 
 plugins.ExternalLights.prototype.inputDefaults = function ()
 {
   var cockpit = this.cockpit;
   var self = this;
-  
-  console.log( "heyyyyy" );
   
   return [
     // ELIGHT 0
@@ -34,8 +28,6 @@ plugins.ExternalLights.prototype.inputDefaults = function ()
       description: 'Makes the ROV lights brighter.',
       defaults: { keyboard: '6'},
       down: function () {
-        console.log( "a" );
-        console.log( 0.1+ Number.parseFloat(self.state[0].level) );
         cockpit.rov.emit('plugin.externalLights.set', 0, 0.1+ Number.parseFloat(self.state[0].level));
       }
     },
@@ -44,7 +36,6 @@ plugins.ExternalLights.prototype.inputDefaults = function ()
       description: 'Makes the ROV lights dimmer.',
       defaults: { keyboard: '7'},
       down: function () {
-        console.log( "b" );
         cockpit.rov.emit('plugin.externalLights.set', 0, -0.1 + Number.parseFloat(self.state[0].level));
       }
     },
@@ -53,7 +44,6 @@ plugins.ExternalLights.prototype.inputDefaults = function ()
       description: 'Toggles the ROV lights on/off.',
       defaults: { keyboard: '8' },
       down: function () {
-        console.log( "c" );
         cockpit.rov.emit('plugin.externalLights.toggle', 0);
       }
     },
@@ -64,8 +54,6 @@ plugins.ExternalLights.prototype.inputDefaults = function ()
       description: 'Makes the ROV lights brighter.',
       defaults: { keyboard: '9'},
       down: function () {
-        console.log( "d" );
-        console.log( 0.1+ Number.parseFloat(self.state[1].level) );
         cockpit.rov.emit('plugin.externalLights.set', 1, 0.1+ Number.parseFloat(self.state[1].level));
       }
     },
@@ -75,7 +63,6 @@ plugins.ExternalLights.prototype.inputDefaults = function ()
       defaults: { keyboard: '0'},
 
       down: function () {
-        console.log( "e" );
         cockpit.rov.emit('plugin.externalLights.set', 1, -0.1 + Number.parseFloat(self.state[1].level));
       }
     },
@@ -84,7 +71,6 @@ plugins.ExternalLights.prototype.inputDefaults = function ()
       description: 'Toggles the ROV lights on/off.',
       defaults: { keyboard: '-' },
       down: function () {
-        console.log( "f" );
         cockpit.rov.emit('plugin.externalLights.toggle', 1);
       }
     }
@@ -99,7 +85,6 @@ plugins.ExternalLights.prototype.inputDefaults = function ()
 
       self.cockpit.rov.withHistory.on('plugin.externalLights.state', function(lightNum, state) 
       {
-        console.log( "got elight state: " + lightNum + ": " + state.level );
         self.cockpit.emit('plugin.externalLights.level', lightNum, state.level);
         self.state[ lightNum ]  = state;
       });

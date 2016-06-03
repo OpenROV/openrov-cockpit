@@ -9,7 +9,7 @@
   behaviors.oROVMCStatusIndicator = {
       properties: {
            streaming:{type:Boolean,value:false},
-           viewers:{type:Array,value:[]}
+           viewers:{type:Array,value:function(){return [];}}
       },
       behaviors: [namespace('behaviors').oROVStandard],
       attached: function(){
@@ -27,6 +27,7 @@
           emitter.withHistory.on('plugin-peerview-status',function(status){
             self.set('streaming',status.viewers.length>0);
             self.set('viewers',status.viewers);
+            self.viewers=status.viewers;
           });
       }
     }

@@ -27,8 +27,9 @@
             args[i] = arguments[i];
         }
         if (args[args.length-1]===self.senderID) {return;}
-//        args.push(self.senderID)
+        //args.push(self.senderID)
         socket.emit.apply(socket,[this.event].concat(args));
+        //console.log("Socket <1- ",this.event);
       }
     });
 
@@ -43,8 +44,11 @@
               var args = new Array(arguments.length);
               for(var i = 0; i < args.length; ++i) {
                 args[i] = arguments[i];
-              }              
-              emitter.emit.apply(emitter,[type].concat(args)); //TODO: If this works, use the args pattern for performance.                
+              } 
+              if (args[args.length-1]===self.senderID) {return;}
+              args.push(self.senderID)                          
+              emitter.emit.apply(emitter,[type].concat(args)); //TODO: If this works, use the args pattern for performance.
+             // console.log("Socket -2> ",type);                
             });
             orig_wh(type,fn);
         }
@@ -67,6 +71,7 @@
             if (args[args.length-1]===self.senderID) {return;}
             args.push(self.senderID)
             self.emitter.emit.apply(self.emitter,[aType].concat(args));
+             //console.log("Socket -3> ",aType);
           };
           self.socket.on(aType,handleEvent);
           self.cleanupFunctions.push(function(){
@@ -81,8 +86,10 @@
                 args[i] = arguments[i];
             }
             args = args.filter(function(item){return item!==null});
-             
-            emitter.emit.apply(self.emitter,[aType].concat(args)); //TODO: If this works, use the args pattern for performance.                
+            if (args[args.length-1]===self.senderID) {return;}
+            args.push(self.senderID)             
+            emitter.emit.apply(self.emitter,[aType].concat(args)); //TODO: If this works, use the args pattern for performance.  
+            //console.log("Socket -4> ",aType);              
           });          
         }  
     };

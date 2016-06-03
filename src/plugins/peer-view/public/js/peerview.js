@@ -292,13 +292,13 @@
       PeerView.prototype.formatUsersMsg = function formatUsersMsg(peers){
         var msgData = peers.map(function(peer){
           return {
-            role : peer.rov_role,
+            role : peer.rov_role||'viewer',
             id : peer.peer_id,
             localAddress : peer.localAddress,
             localPort: peer.localPort,
             remoteAddress: peer.remoteAddress,
             remotePort: peer.remotePort,
-            userName: peer.userName
+            userName: peer.userName||'anonymous'
           };
         });
         return msgData;

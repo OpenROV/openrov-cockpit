@@ -51,16 +51,6 @@ $(function() {
       var emitter = window.cockpit.rov;
       var self=this;
       
-      var handleCloudProfile = function(status){
-        var userName;
-        if(status.loggedIn){
-          userName=status.name;
-        } else {
-          userName='anonymous';
-        }
-        p.send(msgpack.encode(['mission-control-register',userName]));
-      };      
-      window.cockpit.withHistory.on('cloudprofile-status',handleCloudProfile);
       p.withHistory = {
         on: function(event, fn) {
           p.on(event, fn);
@@ -115,6 +105,16 @@ $(function() {
         $('#t')[0]['userRole']='View-Only';
         connected = true;
         
+        var handleCloudProfile = function(status){
+          var userName='anonymous';
+          var photoURL;
+          if(status.loggedIn){
+            userName=status.profile.name;
+            photoURL=status.profile.picture;
+          }
+          p.send(msgpack.encode(['mission-control-register',userName,photoURL]));
+        };      
+        window.cockpit.withHistory.on('cloudprofile-status',handleCloudProfile);
         
         p.on('data',function(data){  //where data is an array for emitter events
           var payload = msgpack.decode(data);

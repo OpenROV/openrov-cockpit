@@ -1,0 +1,37 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../peer-view/orov-mc-status-indicator-behavior.html">
+<dom-module name="orov-mc-assignments">
+  <style>
+  </style>
+  <template>
+        <table>
+        <template is="dom-repeat" items="{{viewers}}">
+          <tr>
+            <td>{{item.userName}}</td><td>{{item.role}}</td>
+          </tr>
+        </template>
+        </table>      
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        is: "orov-mc-assignments",
+        properties: {
+
+        },
+        observers: [
+            'updateViewers(viewers.splice)'
+        ],        
+        behaviors: [namespace('behaviors').oROVStandard,namespace('behaviors').oROVMCStatusIndicator],
+        registerEmitterHanlders: function(emitter){
+          var self=this;
+
+        },
+        updateViewers: function(v){
+            console.log('got viewers update:',this.viewers.length);
+        }
+      })
+    })();
+  </script>
+
+</dom-module>

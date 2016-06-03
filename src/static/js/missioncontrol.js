@@ -116,6 +116,21 @@ $(function() {
         };      
         window.cockpit.withHistory.on('cloudprofile-status',handleCloudProfile);
         
+ /*       //These are forwarded on to the pilot mission control computer for processing
+        [
+          'plugin.rovpilot.incrementPowerLevel'
+         ,'plugin.rovpilot.setPowerLevel'
+        ].forEach(function(event){
+            window.cockpit.on(event,function(){
+              var args = new Array(arguments.length);
+              for(var i = 0; i < args.length; ++i) {
+                          //i is always valid index in the arguments object
+                  args[i] = arguments[i];
+              }              
+              p.send(msgpack.encode(['mc-linkedcmd'].concat([event]).concat(args)));
+            });          
+        });
+  */      
         p.on('data',function(data){  //where data is an array for emitter events
           var payload = msgpack.decode(data);
 

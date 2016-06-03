@@ -285,21 +285,33 @@
                       
                       var pilot_blacklist = [
                         'ping'
-                      ];                      
+                      ];
+                      
+                      var cockpit_commands = [
+                        'plugin.rovpilot.incrementPowerLevel'
+                        ,'plugin.rovpilot.setPowerLevel'
+                      ]                      
                       
                       switch(p.rov_role){
                         case 'pilot':
-                         if (pilot_blacklist.indexOf(msg[0])==-1){
-                           _self.rov.emit.apply(_self.rov,msg);
+                         if (pilot_blacklist.indexOf(msg[0])!=-1){
+                            return;
                          }
                         break;    
                         case 'co-pilot':
-                         if (copilot_blacklist.indexOf(msg[0])==-1){
-                           _self.rov.emit.apply(_self.rov,msg);
+                         if (copilot_blacklist.indexOf(msg[0])!=-1){
+                           return;
                          }
                         break;
+                        default:
+                          return; //If I get here, ignore the message and exit the method.
                       }
                       
+                      if (cockpit_commands.indexOf(msg[0])!=-1){
+                        _self.cockpit.emit.apply(_self.cockpit,msg);
+                      } else {
+                        _self.rov.emit.apply(_self.rov,msg);
+                      }                      
 
                     });
 

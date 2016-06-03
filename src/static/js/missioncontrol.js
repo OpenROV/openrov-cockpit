@@ -120,6 +120,9 @@ $(function() {
           var payload = msgpack.decode(data);
 
           switch(payload[0]){
+            case 'mc-assigned-role' :
+               $('#t')[0]['userRole']=payload[1];
+            break;
             case 'x-h264-video.chunk':
               processVideoChunk.apply(this,payload);
             break;
@@ -161,7 +164,7 @@ $(function() {
         p.on('close',function(){
           socket.off('signal',signalHander);
           emitter.offAny(onAnyHandler);
-          window.cockpit.withHistory.off('cloudprofile-status',handleCloudProfile);
+          window.cockpit.off('cloudprofile-status',handleCloudProfile);
           emitter.off('data-msg', ondataMsgHandler);
           connected = false;
           console.log('Connection to peer closed');

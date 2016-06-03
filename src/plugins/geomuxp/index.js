@@ -1,141 +1,358 @@
-const exec=require('child_process').exec;
-const fs=require('fs');
-const path=require('path');
+const exec    = require('child_process').exec;
+const fs      = require('fs');
+const path    = require('path');
 const respawn = require('respawn');
+const io      = require('socket.io-client');
+const events  = require('events');
 
-var geomux = function geomux(name, deps) {
+var defaults =
+{
+  port: 8099,
+  wspath: "/geovideo"
+};
+
+var geomux = function geomux( name, deps ) 
+{
   console.log('The geo-mux plugin.');
+  var self      = this;
+  
+  this.deps     = deps;
+  this.services = {};
+  
+  var emitter     = new events.EventEmitter();
+  var global      = deps.globalEventLoop;
+  var cockpit     = deps.cockpit;
+  var videoServer = io.connect( 'http://localhost:' + defaults.port, { path: defaults.wspath, reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 10 } );
 
-  //state variables
-  this.deps = deps;
-  var self=this;
-  this.services={};
-
-}
-
-geomux.prototype.enumerateDevices = function enumerateDevices(callback){
-  var results=[];
-  var i=0;
-  fs.readdir('/dev', function (err, files) {
-    if (err) {
-      callback(results);
-    }
-    var f = files.filter(function(file){
-        return file.indexOf('video') == 0;
-    });
-    if (f.length==0){
-      callback(result);
-      return;
-    }
-    f.forEach(function(file){
-      //udevadm info --query=all --name=/dev/' + file
-      //
-      i++;
-      exec('udevadm info --query=all --name=/dev/' + file + ' | grep "S: v4l/by-id/"', function(error, stdout, stderr){
-        if ((error == null) && (stdout.indexOf('GEO_Semi_Condor')>0)){
-          var result = {device: file, format:'MP4'}
-          result.deviceid = stdout.slice("S: v4l/by-id/".length);
-          results.push(result);
-        }
-        i--;
-        if(i==0){callback(results)};
+  var cameras     = {};
+  
+  // Upon connecting to video server, set up listeners
+  videoServer.on( "connect", function()
+  {
+    console.log( "Successfully connected to geo-video-server" );
+    
+    // ----------------------------
+    // Register all other listeners
+    
+    cockpit.on( "plugin.geomuxp.command", function( camera, command, params )
+    {
+      // Forward to geo-video-server
+      videoServer.emit( "geomux.command", camera, command, params );
+    } );
+    
+    // Video endpoint announcement
+    videoServer.on( "geomux.video.announcement", function( camera, channel, info )
+    {
+      console.log( "Announcement info: " + JSON.stringify( info ) );
+      
+      // Emit message on global event loop to register with the Video plugin
+      self.deps.globalEventLoop.emit('CameraRegistration',
+      { 
+        location:           info.txtRecord.cameraLocation,
+        videoMimeType:      info.txtRecord.videoMimeType,
+        resolution:         info.txtRecord.resolution,
+        framerate:          info.txtRecord.framerate,
+        wspath:             info.txtRecord.wspath,
+        relativeServiceUrl: info.txtRecord.relativeServiceUrl,
+        sourcePort:         info.port,
+        sourceAddress:      info.addresses[0],
+        connectionType:     'socket.io'
       });
     });
-  });
-}
-
-geomux.prototype.startDevices = function startDevices(callback){
-    exec('mxcam list | grep "Core: Condor"', function(error, stdout, stderr){
-      if (error == null){
-        exec(path.dirname(require.resolve('geo-video-server'))+'/platform/linux/bootcamera.sh', function(error, stdout, stderr){
-          setTimeout(function(){
-            callback();
-          },1000);  //give the system a moment to stabalize after the bootcamera script
-        });
-      } else {
-        console.error('Error staring devices geo: ',JSON.stringify(error));
-        callback();
-      }
+    
+    // Channel settings
+    videoServer.on( "geomux.channel.settings", function( camera, channel, settings )
+    {
+      UpdateCameraInfo( camera, channel );
+      self.deps.cockpit.emit("plugin.geomuxp." + camera + "_" + channel + ".settings", settings );
+    } );
+    
+    // Channel health
+    videoServer.on( "geomux.channel.health", function( camera, channel, health )
+    {
+      UpdateCameraInfo( camera, channel );
+      self.deps.cockpit.emit("plugin.geomuxp." + camera + "_" + channel + ".health", health );
     });
-
-
+    
+    // Channel api
+    videoServer.on( "geomux.channel.api", function( camera, channel, api )
+    {
+      UpdateCameraInfo( camera, channel );
+      self.deps.cockpit.emit("plugin.geomuxp." + camera + "_" + channel + ".api", api );
+    });
+    
+    // Channel status
+    videoServer.on( "geomux.channel.status", function( camera, channel, status )
+    {
+      UpdateCameraInfo( camera, channel );
+      self.deps.cockpit.emit("plugin.geomuxp." + camera + "_" + channel + ".status", status );
+    });
+    
+    // Channel error
+    videoServer.on( "geomux.channel.error", function( camera, channel, error )
+    {
+      UpdateCameraInfo( camera, channel );
+      self.deps.cockpit.emit("plugin.geomuxp." + camera + "_" + channel + ".error", error );
+    });
+    
+    // Tell geo-video-server to start the daemons
+    videoServer.emit( "geomux.ready" );
+  });
+  
+  videoServer.on( "disconnect", function()
+  {
+    console.log( "Disconnected from video server." );
+  });
+  
+  videoServer.on( "error", function( err )
+  {
+    console.log( "Video Server Connection Error: " + err );
+  });
+  
+  // Connect to video server
+  videoServer.on( "reconnect", function()
+  {
+    console.log( "Attempting to reconnect" );
+  });
+  
+  function UpdateCameraInfo( camera, channel )
+  {
+    if( cameras[ camera ] === undefined )
+    {
+      // Create the camera
+      cameras[ camera ] = {};
+      
+      // Add the channel
+      cameras[ camera ][ channel ] = {};
+      
+      self.deps.cockpit.emit( "plugin.geomuxp.cameraInfo", cameras );
+    }
+    else if( cameras[ camera ][ channel ] === undefined )
+    {
+      // Add the channel
+      cameras[ camera ][ channel ] = {};
+      
+      self.deps.cockpit.emit( "plugin.geomuxp.cameraInfo", cameras );
+    }
+    
+    // No changes, no need to emit update
+  }
 }
+
 var timeoutscale = .1;
-geomux.prototype.start = function start(){
+
+// This gets called when plugins are started
+geomux.prototype.start = function start()
+{
   console.log('geo:start');
+  
   var self=this;
-  if (process.env.GEO_MOCK == 'true'){
-    this.startCamera('/dev/video0');
-  } else {
-    this.startDevices(function(){
-      self.enumerateDevices(function(results){
-        if (results.length==0){
+  
+  if (process.env.GEO_MOCK == 'true')
+  {
+    StartCameras( [ "0" ] );
+  }
+  else
+  {
+    BootCameras(function()
+    {
+      EnumerateCameras(function(results)
+      {
+        if (results.length==0)
+        {
           setTimeout(self.start.bind(this),1000*120*timeoutscale);
-          if (timeoutscale<1){
+          
+          if (timeoutscale<1)
+          {
             timoutscale+=.1;
           }
+          
           return;
         }
+        
         self.deps.globalEventLoop.emit('video-deviceRegistration',results);
-        sortedResult=results.sort(function(a,b){return a.device.localeCompare(b.device)});
-        self.startCamera('/dev/' + sortedResult[0].device); //start first camera
+        
+        sortedResults = results.sort( function(a,b){ return a.device.localeCompare(b.device) } );
+        StartCameras( sortedResults );
       })
     });
   }
 }
 
-geomux.prototype.startCamera = function startCamera(device){
+// -----------------------
+// Helper functions
+  
+// Creates a list with all of the dectected video devices
+function EnumerateCameras( callback )
+{
+  var results = [];
+  var i = 0;
+  
+  fs.readdir('/dev', function (err, files) 
+  {
+    if(err) 
+    {
+      callback( results );
+    }
+    
+    var f = files.filter( function(file)
+    {
+        return file.indexOf('video') == 0;
+    });
+    
+    if (f.length==0)
+    {
+      callback(results);
+      return;
+    }
+    
+    f.forEach(function(file)
+    {
+      i++;
+      exec('udevadm info --query=all --name=/dev/' + file + ' | grep "S: v4l/by-id/"', function(error, stdout, stderr)
+      {
+        if ((error == null) && (stdout.indexOf('GEO_Semi_Condor')>0))
+        {
+          var result = 
+          {
+            // NOTE: Add another field for camera offset and change device back to "video0"?
+            device:   file.slice( "video".length ),
+            deviceid: stdout.slice("S: v4l/by-id/".length),
+            format:   'MP4'
+          }
+
+          results.push( result );
+        }
+        
+        i--;
+        
+        if( i == 0 )
+        {
+          callback(results)
+        };
+      });
+    });
+  });
+}
+
+function BootCameras( callback )
+{
+    exec('mxcam list | grep "Core: Condor"', function(error, stdout, stderr)
+    {
+      if (error == null)
+      {
+        exec(path.dirname(require.resolve('geo-video-server'))+'/platform/linux/bootcamera.sh', function(error, stdout, stderr)
+        {
+          // give the system a moment to stabalize after the bootcamera script
+          setTimeout(function()
+          {
+            callback();
+          },1000);  
+        } );
+      } 
+      else 
+      {
+        console.error('Error starting devices geo: ',JSON.stringify(error));
+        callback();
+      }
+    });
+}
+
+function StartCameras( cameras )
+{
   var geoprogram = '';
-  if (process.env.GEO_MOCK == 'true'){
+  var cameraArgs = [ "--c" ];
+ 
+  if (process.env.GEO_MOCK == 'true')
+  {
     geoprogram = require.resolve('geo-video-simulator');
+    cameraArgs.push( "0" );
   }
-  else {
-    try {
-      geoprogram =require.resolve('geo-video-server')
-    } catch (er) {
-      console.log(process.env.GEO_MOCK);
+  else
+  {
+    // Find the geo-video-server app
+    try 
+    {
+      geoprogram =require.resolve('geo-video-server');
+      
+      // Create list of cameras to start up
+      for( var i = 0; i < cameras.length; i++ ) 
+      {
+          cameraArgs.push( cameras[ i ].device );
+      }
+    } 
+    catch (er) 
+    {
       console.log("geo-video-server not installed")
       return;
     }
   }
-
-  var launch_options = ['nice','-1','node',geoprogram,'--wspath=/geovideo1','--port=8099'];
-  //TODO: Add device to the parameters once it is supported in geomux
-
-  const infinite=-1;
-  var monitor = respawn(launch_options,{
+  
+  // Create all launch options
+  var launch_options = 
+  [ 
+    "nice", "-1",
+    "node", geoprogram,
+    "--p", defaults.port,
+    "--w", defaults.wspath,
+    "--u", ( process.env.DEV_MODE === "true" ? ":8099" : "" )
+  ].concat( cameraArgs );
+  
+  const infinite = -1;
+ 
+  // Launch the video server with specified options. Attempt to restart every 1s.
+  var monitor = respawn( launch_options,
+  {
       name: 'geomux',
+      env: 
+      { 
+        "DEBUG": "app*,camera*,channel*"
+      },
       maxRestarts: infinite,
       sleep: 1000
-  })
+  } );
 
   var self = this;
-
-  monitor.on('stdout',function(data){
-//      var msg = data.toString('utf-8');
-//      console.log(msg);
+  
+  monitor.on('crash',function()
+  {
+      console.log("crashed");
+  });
+  
+  monitor.on('spawn',function(process)
+  {
+      console.log("spawned");
+  });
+  
+  monitor.on('warn',function(error)
+  {
+      console.log("error: " + error);
+  });
+  
+  monitor.on('exit',function(code, signal)
+  {
+      console.log("code: " + code + " signal: " + signal );
   });
 
-  monitor.on('stderr',function(data){
-    var msg = data.toString('utf-8');
-    var service;
-    try {
-      service = JSON.parse(msg);
-    } catch (e) {
-      return; //abort, not a json message
-    }
-    if ('service' in service){
-      self.deps.globalEventLoop.emit('CameraRegistration',{location:service.txtRecord.cameraLocation, videoMimeType:service.txtRecord.videoMimeType, resolution:service.txtRecord.resolution, framerate:service.txtRecord.framerate, relativeServiceUrl:process.env.GEO_MOCK=='true'?':8099':'', wspath:'/geovideo1', connectionType:'socket.io', sourcePort:service.port, sourceAddress:service.addresses[0]});
-      console.log('sending CameraRegistration');
-    }
-
+  // Optional stdio logging
+  monitor.on('stdout',function(data)
+  {
+      var msg = data.toString('utf-8');
+      console.log(msg);
   });
 
+  monitor.on('stderr',function(data)
+  {
+      var msg = data.toString('utf-8');
+      console.log(msg);
+  });
+
+  console.log( "Starting geovideoserver" );
   monitor.start();
-
 };
 
 //Export provides the public interface
-module.exports = function (name, deps) {
+module.exports = function (name, deps) 
+{
   return new geomux(name,deps);
 };

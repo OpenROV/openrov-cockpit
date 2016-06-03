@@ -110,7 +110,7 @@
       var connection;
       if((data.connectionType=='socket.io')&&(!self.cockpit.peerConnected)){
         data.sourceAddress = ResolveURL(data.relativeServiceUrl);
-        connection = window.io.connect(data.sourceAddress,{path:data.wspath});
+        connection = window.io.connect(data.sourceAddress ,{path:data.wspath} );
 
         if (data.videoMimeType=='video/mp4'){
             //We expect the mp4 data stream to be sent via a dedicated socket.io stream
@@ -132,7 +132,6 @@
             
              connection.on("connect",function(){
              });
-
         }
       }
 

@@ -26,11 +26,11 @@ function GPS(name, deps)
 
 GPS.prototype.start = function start()
 {
-  // Register callbacks for events emitted by the listener
-  this.registerListenerEvents();
+  // // Register callbacks for events emitted by the listener
+  // this.registerListenerEvents();
 
-  // Start attempts to connect to gpsd
-  this.connectToGpsd();
+  // // Start attempts to connect to gpsd
+  // this.connectToGpsd();
 }
 
 GPS.prototype.registerListenerEvents = function()

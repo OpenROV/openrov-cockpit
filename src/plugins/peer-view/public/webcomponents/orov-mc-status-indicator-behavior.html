@@ -1,0 +1,34 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<script src="../orov-behaviors/utilities.js"></script>
+<script>
+
+(function (window) {
+  'use strict';
+  var behaviors = namespace('behaviors');
+  behaviors.oROVMCStatusIndicator = {
+      properties: {
+           streaming:{type:Boolean,value:false},
+           viewers:{type:Array,value:[]}
+      },
+      behaviors: [namespace('behaviors').oROVStandard],
+      attached: function(){
+        if(typeof(this.registerEmitterHanlders)=='function'){
+          var org = this.registerEmitterHanlders;
+          this.registerEmitterHanlders=function(emitter){
+            self.registerBaseEmitterHanlders(emitter);
+            org(emitter);
+          };
+          this.registerBaseEmitterHanlders(this.eventEmitter);
+        }          
+      },
+      registerBaseEmitterHanlders: function(emitter){
+        var self = this;
+          emitter.withHistory.on('plugin-peerview-status',function(status){
+            self.set('streaming',status.viewers.length>0);
+            self.set('viewers',status.viewers);
+          });
+      }
+    }
+  })();
+</script>

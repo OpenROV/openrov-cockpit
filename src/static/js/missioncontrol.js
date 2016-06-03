@@ -50,7 +50,17 @@ $(function() {
       var p = new Peer(peerOpts);
       var emitter = window.cockpit.rov;
       var self=this;
-
+      
+      var handleCloudProfile = function(status){
+        var userName;
+        if(status.loggedIn){
+          userName=status.name;
+        } else {
+          userName='anonymous';
+        }
+        p.send(msgpack.encode(['mission-control-register',userName]));
+      };      
+      window.cockpit.withHistory.on('cloudprofile-status',handleCloudProfile);
       p.withHistory = {
         on: function(event, fn) {
           p.on(event, fn);
@@ -104,6 +114,8 @@ $(function() {
         $('#t')[0]['rovOnline']=true;
         $('#t')[0]['userRole']='View-Only';
         connected = true;
+        
+        
         p.on('data',function(data){  //where data is an array for emitter events
           var payload = msgpack.decode(data);
 
@@ -149,6 +161,7 @@ $(function() {
         p.on('close',function(){
           socket.off('signal',signalHander);
           emitter.offAny(onAnyHandler);
+          window.cockpit.withHistory.off('cloudprofile-status',handleCloudProfile);
           emitter.off('data-msg', ondataMsgHandler);
           connected = false;
           console.log('Connection to peer closed');

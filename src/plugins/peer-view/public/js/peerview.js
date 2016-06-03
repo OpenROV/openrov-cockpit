@@ -54,18 +54,13 @@
       if (!this.isEnabled){return;}
       var self = this;
       if(window.cockpit.rov.connection!=='socket.io'){
+        setTimeout(self.startlisten.bind(this),5000);
         return;
       }
 
       var statusUpdate=function(){
-        var status = {status:'off',stats:{viewers:0,connection:{}}};
-        if (self.connecting){
-          status.status='starting';
-        }
-        if (self.connected){
-          status.status='streaming';
-        }
-        status.stats.viewers = self.viewers;
+        var status = {status:'on',viewers:[],stats:{}};
+        status.viewers = self.formatUsersMsg(self.peers);
         self.cockpit.emit('plugin-peerview-status',status);
       }
       setInterval(statusUpdate,1000);
@@ -178,6 +173,7 @@
                 socket.on('peer-connect-offer',function(peer_id,callback){
                   console.log('got new peer connection offer from:',peer_id);
                   var p = new Peer(peerOpts);
+                  p.peer_id = peer_id;
 
                   p.withHistory = {
                     on: function(event, fn) {
@@ -215,6 +211,7 @@
                   p.on('connect', function(){
                     _self.viewers++;
                     _self.peers.push(p);
+                    _self.cockpit.emit('missionControl-users',_self.formatUsersMsg(_self.peers));
                     //make last person to connect pilot by default
                     //self.pilot_sender_id = peer_id;
                     //_self.cockpit.emit('plugin.rovpilot.sendToROVEnabled',false);
@@ -247,6 +244,9 @@
                           _self.cockpit.emit('request_Init_Segment',function(init){
                               p.sendemit('x-h264-video.init',init);
                           });
+                        break;
+                        case 'mission-control-register':
+                          p.userName = msg[1];
                         break;
                       }
                       
@@ -289,6 +289,20 @@
 
       });
   }
+      PeerView.prototype.formatUsersMsg = function formatUsersMsg(peers){
+        var msgData = peers.map(function(peer){
+          return {
+            role : peer.rov_role,
+            id : peer.peer_id,
+            localAddress : peer.localAddress,
+            localPort: peer.localPort,
+            remoteAddress: peer.remoteAddress,
+            remotePort: peer.remotePort,
+            userName: peer.userName
+          };
+        });
+        return msgData;
+      };
 
       PeerView.prototype.inputDefaults = function inputDefaults() {
         var self = this;

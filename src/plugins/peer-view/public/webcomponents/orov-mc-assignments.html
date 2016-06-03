@@ -1,0 +1,81 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../peer-view/orov-mc-status-indicator-behavior.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<dom-module name="orov-mc-assignments">
+  <style>
+    paper-button[toggles] {
+      background: dimgrey;
+      color: white;
+    }
+          
+    paper-button[toggles][active] {
+      background: green;  
+    }
+    
+    paper-button .kick {
+      background: red;  
+    }        
+  </style>
+  <template>
+        <table>
+        <template is="dom-repeat" items="{{viewers}}">
+          <tr>
+            <td>{{item.userName}}</td><td>{{item.remoteAddress}}</td><td>
+              <paper-button toggles role='viewer' active="{{roleMatches('viewer',item.role)}}" on-click='change_role'>{{__('viewer')}}</paper-button>
+              <paper-button toggles role='co-pilot' active="{{roleMatches('co-pilot',item.role)}}" on-click='change_role'>{{__('co-pilot')}}</paper-button>
+              <paper-button toggles role='pilot' active="{{roleMatches('pilot',item.role)}}" on-click='change_role'>{{__('pilot')}}</paper-button>
+            </td>
+            <td>
+              <paper-button class='kick' on-click='kick'>{{__('Kick')}}</paper-button>
+            </td>
+          </tr>
+        </template>
+        </table> 
+ <!--Peer Limit: <paper-slider min="0" max="50" value="50" on-immediate-value-change='PeerLimitChange'></paper-slider-->            
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        is: "orov-mc-assignments",
+        properties: {
+
+        },
+        observers: [
+            'updateViewers(viewers.splice)'
+        ],        
+        behaviors: [namespace('behaviors').oROVStandard,namespace('behaviors').oROVMCStatusIndicator],
+        registerEmitterHanlders: function(emitter){
+          var self=this;
+
+        },
+        updateViewers: function(v){
+            console.log('got viewers update:',this.viewers.length);
+        },
+        kick: function(e){
+          var model = e.model;
+          var item = model.item;
+          
+          //TODO: Move in to behavior, and proper emitter handling
+          if (this.eventEmitter !== null){
+            this.eventEmitter.emit('mc-kick',item.id);
+          }         
+          
+        },
+        change_role: function(e){
+          var model = e.model;
+          var item = model.item;
+          var role = e.srcElement.attributes.getNamedItem('role').value;
+          
+          //TODO: Move in to behavior, and proper emitter handling
+          if (this.eventEmitter !== null){
+            this.eventEmitter.emit('mc-promote',item.id,role);
+          }
+        },
+        roleMatches: function(role1,role2){
+          return role1==role2;
+        }        
+      })
+    })();
+  </script>
+
+</dom-module>

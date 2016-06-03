@@ -62,8 +62,35 @@
         var status = {status:'on',viewers:[],stats:{}};
         status.viewers = self.formatUsersMsg(self.peers);
         self.cockpit.emit('plugin-peerview-status',status);
+        var pilot = self.peers.find(function(item){
+          return item.rov_role == 'pilot';
+        });
+        if (pilot==null){
+          self.cockpit.emit('plugin.rovpilot.sendToROVEnabled',true);
+        } else {
+          self.cockpit.emit('plugin.rovpilot.sendToROVEnabled',false);
+        }
       }
       setInterval(statusUpdate,1000);
+     
+      self.cockpit.on('mc-promote',function(id,role){
+        var peer = self.peers.find(function(item){
+          return item.id = id;
+        })
+        if (peer !== null){          
+          peer.rov_role=role;
+          peer.sendemit('mc-assigned-role',role);
+        }
+      });      
+      
+      self.cockpit.on('mc-kick',function(id){
+        var peer = self.peers.find(function(item){
+          return item.id = id;
+        })
+        if (peer !== null){          
+          peer.destroy();
+        }
+      });         
 
       //Response from the getSettings call. Using the withHistory will call the
       //update function with the last copy of this message that had been sent.
@@ -252,17 +279,39 @@
                       
                       //co-pilot
                       var copilot_blacklist = [
-                        'plugin.rovpilot.desiredControlRates'
+                        'plugin.rovpilot.desiredControlRates',
+                        'ping'
                       ];
                       
+                      var pilot_blacklist = [
+                        'ping'
+                      ];
+                      
+                      var cockpit_commands = [
+                        'plugin.rovpilot.incrementPowerLevel'
+                        ,'plugin.rovpilot.setPowerLevel'
+                      ]                      
+                      
                       switch(p.rov_role){
+                        case 'pilot':
+                         if (pilot_blacklist.indexOf(msg[0])!=-1){
+                            return;
+                         }
+                        break;    
                         case 'co-pilot':
-                         if (copilot_blacklist.indexOf(msg[0])==-1){
-                           _self.rov.emit.apply(_self.rov,msg);
+                         if (copilot_blacklist.indexOf(msg[0])!=-1){
+                           return;
                          }
                         break;
+                        default:
+                          return; //If I get here, ignore the message and exit the method.
                       }
                       
+                      if (cockpit_commands.indexOf(msg[0])!=-1){
+                        _self.cockpit.emit.apply(_self.cockpit,msg);
+                      } else {
+                        _self.rov.emit.apply(_self.rov,msg);
+                      }                      
 
                     });
 
@@ -292,13 +341,13 @@
       PeerView.prototype.formatUsersMsg = function formatUsersMsg(peers){
         var msgData = peers.map(function(peer){
           return {
-            role : peer.rov_role,
+            role : peer.rov_role||'viewer',
             id : peer.peer_id,
             localAddress : peer.localAddress,
             localPort: peer.localPort,
             remoteAddress: peer.remoteAddress,
             remotePort: peer.remotePort,
-            userName: peer.userName
+            userName: peer.userName||'anonymous'
           };
         });
         return msgData;

@@ -218,7 +218,7 @@
                   switchable: true,
                   state: false,
                   events: [
-                    {message:'internet-stream-status', fn: function(state){return state.isStreaming;}}
+                    {message:'internet-stream-status', fn: function(state){return state.isStreaming||state.connecting;}}
                   ],
                   description: 'Internet stream video',
                   switch: function (state) {

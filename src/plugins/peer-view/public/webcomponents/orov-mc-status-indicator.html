@@ -1,0 +1,42 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../peer-view/orov-mc-status-indicator-behavior.html">
+<dom-module name="orov-mc-status-indicator">
+  <style>
+
+  span.circle {
+    background: var(--indicator-circle-color, grey);
+    border-radius: 0.8em;
+    -moz-border-radius: 0.8em;
+    -webkit-border-radius: 0.8em;
+    -webkit-box-shadow: 7px 7px 5px 0px rgba(50, 50, 50, 0.75);
+    -moz-box-shadow:    7px 7px 5px 0px rgba(50, 50, 50, 0.75);
+    box-shadow:         7px 7px 5px 0px rgba(50, 50, 50, 0.75);    
+    color: var(--indicator-font-color, #ffffff);
+    display: inline-block;
+    font-weight: bold;
+    line-height: 1.6em;
+    margin-right: 15px;
+    text-align: center;
+    width: 1.6em; 
+  }    
+  </style>
+  <template>
+    <span class="circle">[[viewers.length]]</span>  
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        is: "orov-mc-status-indicator",
+        properties: {
+
+        },
+        behaviors: [namespace('behaviors').oROVStandard,namespace('behaviors').oROVMCStatusIndicator],
+        registerEmitterHanlders: function(emitter){
+          var self=this;
+
+        }
+      })
+    })();
+  </script>
+
+</dom-module>

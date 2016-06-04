@@ -1,48 +1,67 @@
+<!--
+  https://github.com/PolymerElements/app-localize-behavior/issues/9
+  currently disabled due to above bug. 
+-->
 <script src="utilities.js"></script>
+<script type='text/javascript' src="../i18next/i18next-latest.js"></script>
 <script>
 (function(window) {
   'use strict';
   var behaviors = namespace('behaviors');
-
+  if (window.cockpit_int == undefined){
+      i18n.init({
+        lng: "en-US",
+        sendMissing: true,
+        resPostPath: 'locales/add/__lng__/__ns__',
+        sendMissingTo: 'current',
+        nsseparator : ':::',
+        keyseparator : '::',
+        load: "current",
+        fallbackLng: "en-US"
+      }, function(err, t) {
+        window.cockpit_int = {};
+        window.cockpit_int.__=i18n.t;
+        window.cockpit_int.i18n = i18n;
+      })
+  };
+  
   behaviors.oROVGlobalization = {
 
     properties: {
+      namespace:{type:String,value:function(){return ''}},
+      language:{type:String,value:'na'},
+      ___: { //change back to __ after bug fixed
+        computed: '__compute__(namespace)'
+      }      
     },
-
-    created: function() {
+    __: function(str){
+      return str;
+    },
+    append: function() {
+      var self = this;
       console.log('oROV Globalization behavior for ', this, 'enabled!');
-//      if(this.eventEmitter !== undefined){
-        //var result = this.notifyPath('eventEmitter',this.eventEmitter);
-//        this.eventEmitterHasChanged(null,this.eventEmitter);
-//      }
-      var self=this;
-      if(this.__ === null){
-        window.cockpit_int.i18n.loadNamespace(this.is, function() {  });
+      window.cockpit_int.i18n.loadNamespace(this.is, function() { 
+        self.set('namespace',self.is)  
+        console.log('...loaded' + self.is + 'globalization namespace');
+      });
+ 
+    },
+    __compute__: function(namespace){
         var key_s = window.cockpit_int.i18n.options.keyseparator;
         var ns_s =  window.cockpit_int.i18n.options.nsseparator;
-        var prefix = self.is;
-        self.__=function(str){
-          window.cockpit_int.i18n.options.ns.defaultNs = prefix
-          return window.cockpit_int.__(str);
-        };
+        var prefix = this.is;
 
+        var xform = function(str){
+         if (prefix==''){
+           console.warn('no prefix!');
+         }
+         window.cockpit_int.i18n.options.ns.defaultNs = prefix
+         var result = window.cockpit_int.__(str);
+         console.log(str+'->'+result);
+         return result;
       }
-
-    },
-    __:null,
-    ready: function() {
-      //Added a new lifecycle event for the control:
-//      this.__=function(str){console.log("translate: "+str);return str};
-
-      if (this.globalizationFunctions !== undefined){
-  //      this.__ = this.globalizationFunctions.__;
-      }
-    },
-    _globalizationFunctionsChanged:function(){
-      //Attempt to set a global function for the scope of the webcontrol
-      if(this.globalizationFunctions!==undefined){
-//        __ = this.globalizationFunctions.__;
-      }
+     return xform;
+ 
     }
   };
 

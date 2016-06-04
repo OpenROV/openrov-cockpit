@@ -20,12 +20,12 @@
         foundData = true;
       }
 
-      if ('bt1i' in data) {
-        result.battery.current.port = parseFloat(data.bt1i);
+      if ('BT1I' in data) {
+        result.battery.current.port = parseFloat(data.BT1I);
         foundData = true;
       }
-      if ('bt2i' in data) {
-        result.battery.current.starboard = parseFloat(data.bt2i);
+      if ('BT2I' in data) {
+        result.battery.current.starboard = parseFloat(data.BT2I);
         foundData = true;
       }
       if ('SC1I' in data) {

@@ -41,10 +41,25 @@
     });
 
     this.startPlugins();
+    
+      //TODO: zip the server saved config of plugins over the defaults
+    this.rov.withHistory.on('settings-change.pluginmgr',function(settings){
+      if ('pluginmgr' in settings){
+        _plugins.forEach(function(item){
+            if (item.name in settings.pluginmgr){
+              Object.assign(item,settings.pluginmgr[item.name])
+            }
+          });
+        self.startPlugins();
+      }
+      
+    });
+   
 
   };
 
   PluginManager.prototype.startPlugins = function startPlugins(fn){
+    
     this.EnumerateControllablePlugins(function(items){
       items.forEach(function(p){
         if(p.isEnabled === true){
@@ -148,17 +163,7 @@
         //option to async get additional properies from config here.
         return p;
       });
-      //TODO: zip the server saved config of plugins over the defaults
-      this.rov.emit('plugin.settings-manager.getSettings','pluginmgr',function(settings){
-        if ('pluginmgr' in settings){
-          _plugins.forEach(function(item){
-              if (item.name in settings.pluginmgr){
-                Object.assign(item,settings.pluginmgr[item.name])
-              }
-            });
-        }
-        callback(_plugins);
-      });
+      callback(_plugins);
   };
 
   window.Cockpit.plugins.push(PluginManager);

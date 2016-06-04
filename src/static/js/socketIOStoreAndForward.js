@@ -30,7 +30,7 @@
         }
         original_on.call(socket, aType, aListener);
       };
-
+      
       socket.emit = function(aType,data1, data2, data3, data4, data5){
         self.eventCache[this.event]={context:this,args:arguments};
         orignal_emit.apply(socket,arguments);
@@ -55,6 +55,16 @@
           aListener();
         }
       });
+      
+      socket.on('fromcache',function(aType,callback){
+        if (that.eventCache[aType]!==undefined){
+          var d = that.eventCache[aType];
+          callback.apply(d.context,d.args);
+        } else {
+          callback();
+        }
+      })
+      
     });
 
 
@@ -81,6 +91,15 @@
         this.element.emit('withHistory',aType,function(){
           if (arguments.length>0){
             aListener.apply(this,arguments);
+
+            if (socket.lvcCache){
+              var args = new Array(arguments.length);
+              for(var i = 0; i < args.length; ++i) {
+                          //i is always valid index in the arguments object
+                  args[i] = arguments[i];
+              }              
+              socket.lvcCache[aType]=args;
+            }
           }
           socket.on(aType,aListener);  //delay until the callback takes place to keep order
         })

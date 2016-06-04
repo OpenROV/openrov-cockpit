@@ -4,5 +4,6 @@
   "Cloud FPS": "Cloud FPS",
   "Cloud Recieved Packets/S": "Cloud Recieved Packets/S",
   "Encoder FPS": "Encoder FPS",
-  "Cloud PPS": "Cloud PPS"
+  "Cloud PPS": "Cloud PPS",
+  "Mode": "Mode"
 }

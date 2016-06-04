@@ -7,6 +7,15 @@ location /cockpitsocket{
   proxy_cache_bypass $http_upgrade;
 }
 
+location /peerview{
+  proxy_pass http://127.0.0.1:8080/peerview;
+  proxy_http_version 1.1;
+  proxy_set_header Upgrade $http_upgrade;
+  proxy_set_header Connection "upgrade";
+  proxy_set_header Host $host;
+  proxy_cache_bypass $http_upgrade;
+}
+
 location /cockpit/ {
   rewrite /cockpit/(.*) /$1 break;
   proxy_pass http://127.0.0.1:8080/;
@@ -38,6 +47,15 @@ location /rov/forward-camera {
 
 location /geovideo1 {
   proxy_pass http://127.0.0.1:8099/geovideo1;
+  proxy_http_version 1.1;
+  proxy_set_header Upgrade $http_upgrade;
+  proxy_set_header Connection "upgrade";
+  proxy_set_header Host $host;
+  proxy_cache_bypass $http_upgrade;
+}
+
+location /geovideo0_0 {
+  proxy_pass http://127.0.0.1:8099/geovideo0_0;
   proxy_http_version 1.1;
   proxy_set_header Upgrade $http_upgrade;
   proxy_set_header Connection "upgrade";

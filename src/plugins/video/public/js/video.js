@@ -88,15 +88,17 @@
     //TODO: refactor like a crazy. This might only work with interent control because
     //the code below will *never* connect and thus be idle.  We really need to make
     //this more explicit behavior.
-    var lastCameraRegsitration = null;
+    var CameraRegsitrations = {};
     this.rov.withHistory.on('CameraRegistration',function(data){
       //TODO: More robust handling of duplicat CameraRegistration messages.  If the Camera
       //already is setup, we want to ignore.  But we also want to handle multiple Cameras
       //and camera's that change settings.
-      if ((lastCameraRegsitration !== null) &&(data.relativeServiceUrl == lastCameraRegsitration.relativeServiceUrl)){
+      data.sourceAddress = ResolveURL(data.relativeServiceUrl);
+      if (CameraRegsitrations[data.sourceAddress]){
         return;
       }
-      lastCameraRegsitration = data;
+      CameraRegsitrations[data.sourceAddress] = true;
+
       if (dataflowing){
           self.cockpit.emit('CameraRegistration',data);
       }
@@ -106,27 +108,30 @@
       }
 
       var connection;
-      if(data.connectionType=='socket.io'){
+      if((data.connectionType=='socket.io')&&(!self.cockpit.peerConnected)){
         data.sourceAddress = ResolveURL(data.relativeServiceUrl);
-        connection = window.io.connect(data.sourceAddress,{path:data.wspath});
+        connection = window.io.connect(data.sourceAddress ,{path:data.wspath} );
 
         if (data.videoMimeType=='video/mp4'){
             //We expect the mp4 data stream to be sent via a dedicated socket.io stream
-            connection.on("connect",function(){
-
-              //TODO: abstract the messages enough that we can have multiple cameras controls
-              self.cockpit.on('request_Init_Segment',function(fn){
+            
+            var handleInit=function(fn){
                 connection.emit('request_Init_Segment',function(data){
                   fn(data);
                 });
-              });
-
-              connection.on('x-h264-video.data',function(data){
+            };
+            
+            var handleData=function(data){
                 self.cockpit.emit('x-h264-video.data',data);
-              })
+             }
+            
+             //TODO: abstract the messages enough that we can have multiple cameras controls
+             self.cockpit.on('request_Init_Segment',handleInit);
 
-            });
-
+             connection.on('x-h264-video.data',handleData);
+            
+             connection.on("connect",function(){
+             });
         }
       }
 
@@ -134,34 +139,6 @@
 
     });
 
-  };
-
-  Video.prototype.inputDefaults = function inputDefaults(){
-    var self = this;
-    return [{
-      name: 'video.keyBoardMapping',
-      description: 'Video for keymapping.',
-      defaults: { keyboard: 'alt+0', gamepad: 'X' },
-      down: function() { console.log('0 down'); },
-      up: function() { console.log('0 up'); },
-      secondary: [
-        {
-          name: 'video.keyBoardMappingDepdent',
-          dependency: 'video.keyBoardMapping',
-          defaults: { keyboard: '9', gamepad: 'RB' },
-          down: function() { console.log('####'); }
-        }
-      ]
-    },
-      {
-        name: 'video.testMessage',
-        description: 'another video',
-        defaults: { keyboard: 'alt+T' },
-        down: function() {
-          showMessageFoo = true;
-          showMessageBar = true;
-          self.cockpit.rov.emit('plugin.video.video_to_foo', 'abc'); }
-      }]
   };
 
   window.Cockpit.plugins.push(Video);

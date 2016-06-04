@@ -141,6 +141,8 @@ $(function() {
             case 'x-h264-video.chunk':
               processVideoChunk.apply(this,payload);
             break;
+            case 'CameraRegistration':
+              payload[1].connectionType = 'rov'; //override the http/socket.io since we will tunnel the traffic through the rov emitter
             default:
               emitter.emit.apply(emitter,payload.concat(['!nc!']));
           }

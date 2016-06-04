@@ -1,0 +1,140 @@
+<link rel="import" href="../polymer/polymer.html">
+<dom-module id="orov-engineering-chart">
+	<style>
+		.content-container,#chart{
+			position: absolute;
+			left:0;
+			top:0;
+			bottom:0;
+			right:0;
+		}
+		.area {
+		    fill: rgba(255,255,255,.17);
+		    stroke-width: 0;
+		
+		}
+
+	</style>
+	<template>
+		<div class="content-container">
+			<content>
+				<div id="chart" class="poly-bars">
+
+				</div>
+			</content>
+		</div>
+	</template>
+	<script>
+
+		Polymer({
+			is: 'orov-engineering-chart',
+
+			properties: {
+				barData: {
+					Type: String,
+					notify: true
+				},
+				width: Number,
+				height: {
+					type: Number,
+					value: 400
+				}
+			},
+
+			observers: [
+			    'dataChanged(barData)'
+			],
+
+			created: function() {
+				
+			},
+
+
+			dataChanged: function(val) {
+				
+				if(!this.data) this.data = [];
+				this.data.push(val);
+
+				if(this.data.length > this.n){
+					this.data.shift();
+				}
+				this.draw();
+				
+			},
+
+			draw: function() {
+				var self = this;
+				if (!this.data) { return; }
+				if (!this.elem) { return; }
+
+
+				var maxList = [];
+                self.data.forEach(function(d){maxList[maxList.length] = d});
+            
+               // self.x.domain([0, self.data.length - 1])
+
+               	self.width = self.elem.offsetWidth;
+				self.height = self.elem.offsetHeight;
+
+				self.area.y0(self.height);
+
+				self.x.range([0, self.width]);
+				self.y.range([self.height, 0]);
+
+				self.x.domain([0, self.n-1]);
+                self.y.domain([d3.min(maxList),  d3.max(maxList)]);
+
+				self.path.attr("d", self.area);
+
+			},
+
+			ready: function() {
+				this.elem = this.$.chart;
+				var self = this;
+
+				self.n = 60;
+			
+				self.width = self.$.chart.clientWidth;
+				self.height = self.$.chart.clientHeight;
+
+				self.data = [];
+
+				self.x = d3.scale.linear()
+				    .domain([0, self.n-1])
+				    .range([0, self.width]);
+				self.y = d3.scale.linear()
+				    .domain([0, 5])
+				    .range([self.height, 0]);
+
+				self.area = d3.svg.area()
+					.x(function(d, i) { return self.x(i); })
+					.y0(self.height)
+					.y1(function(d) { return self.y(d); });
+
+				var svg = d3.select(self.$.chart).append("svg")
+				    .attr("width",'100%')
+				    .attr("height", '100%');
+
+
+				self.path = svg.append("g")
+				    .attr("clip-path", "url(#clip)")
+				  .append("path")
+				    .datum(self.data)
+				    .attr("class", "area")
+				    .attr("d", self.area);
+
+				window.addEventListener('resize', function() {
+				    self.width = self.elem.offsetWidth;
+					self.height = self.elem.offsetHeight;
+
+					self.area.y0(self.height);
+
+					self.x.range([0, self.width]);
+					self.y.range([self.height, 0]);
+
+					self.path.attr("d", self.area);
+				}, true);
+			}
+		});
+	</script>
+</dom-module>

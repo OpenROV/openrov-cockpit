@@ -257,7 +257,7 @@
         _self.cockpit.emit('missionControl-users', _self.formatUsersMsg(_self.peers));
         //make last person to connect pilot by default
         //self.pilot_sender_id = peer_id;
-        //_self.cockpit.emit('plugin.rovpilot.sendToROVEnabled',false);
+        //_self.cockpit.emit('plugin.rovpilot.sendToROVEnabled',false);       
 
         p.sendPackedData = function sendPackedData(data) {
           p.send(data);
@@ -273,6 +273,18 @@
           pack = msgpack.encode(args);
           p.sendPackedData(pack);
         }
+
+        var handleSettingChange = function(settings){
+            p.sendemit('settings-change',settings);
+            self.rov.off('settings-change',handleSettingChange);
+         }
+         self.rov.withHistory.on('settings-change',handleSettingChange);
+         
+         var handleApplets = function(settings){
+            p.sendemit('ui-manager-applets',settings);
+            self.rov.off('ui-manager-applets',handleApplets);
+         }
+         self.rov.withHistory.on('ui-manager-applets',handleApplets);         
 
         //Test data payload sizes
         for (var i = 1; i <= 10; i++) {

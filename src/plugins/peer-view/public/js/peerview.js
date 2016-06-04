@@ -94,7 +94,7 @@
 
     self.cockpit.on('mc-kick', function(id) {
       var peer = self.peers.find(function(item) {
-        return item.id = id;
+        return item.peer_id == id;
       })
       if (peer !== null) {
         peer.destroy();

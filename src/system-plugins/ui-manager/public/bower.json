@@ -22,7 +22,7 @@
     "app-route": "PolymerElements/app-route#^0.9.1"
   },
   "resolutions": {
-    "polymer": "1.4.0",
+    "polymer": "1.5.0",
     "webcomponentsjs": "^0.7.20"
   }
 }

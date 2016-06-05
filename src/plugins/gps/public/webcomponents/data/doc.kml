@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.opengis.net/kml/2.2 http://schemas.opengis.net/kml/2.2.0/ogckml22.xsd http://www.google.com/kml/ext/2.2 http://code.google.com/apis/kml/schema/kml22gx.xsd">
+<Document id="ShadedRelief_tahoebathy0">
+  <name>ShadedRelief_tahoebathy0</name>
+  <Snippet></Snippet>
+  <GroundOverlay id="0">
+    <Snippet></Snippet>
+    <drawOrder>1000</drawOrder>
+    <name>ShadedRelief_tahoebathy0</name>
+    <Icon>
+      <href>components/gps/data/Layer0.png</href>
+      <viewBoundScale>1.0</viewBoundScale>
+    </Icon>
+    <LatLonBox>
+      <north>39.28369944399024</north>
+      <south>38.90780756297184</south>
+      <east>-119.901573810968</east>
+      <west>-120.1930323779605</west>
+      <rotation>0</rotation>
+    </LatLonBox>
+  </GroundOverlay>
+</Document>
+</kml>
+

@@ -160,7 +160,7 @@ geomux.prototype.start = function start()
       {
         if (results.length==0)
         {
-          setTimeout(self.start.bind(this),1000*120*timeoutscale);
+          setTimeout(self.start.bind(self),1000*120*timeoutscale);
           
           if (timeoutscale<1)
           {

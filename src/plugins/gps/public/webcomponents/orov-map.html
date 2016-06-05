@@ -1,0 +1,164 @@
+
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+
+<dom-module id="orov-map">
+	<style>	
+		:host 
+		{
+			display: block;
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100vh;;
+		}
+
+		#map
+		{
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100vh;
+		}  
+	</style>
+
+	<template>
+		<div id="map" class="map"></div>
+	</template>
+
+	<script src="../openlayers/ol.js"></script>
+	<link rel="stylesheet" type="text/css" href="../openlayers/ol.css" />
+
+	<script>
+		Polymer(
+		{
+			is: 'orov-map',
+			
+			properties: 
+			{
+				currentCenter: Array,
+				currentView: ol.View,
+				olmap: ol.Map,
+				layer: Object,
+				
+				longitude:
+				{
+					type: Number,
+					value:12.889101100000062,
+					notify: true,
+					observer: '_updateLongitude'
+				},
+				
+				latitude: 
+				{
+					type: Number,
+					value: 15.7622695,
+					notify: true,
+					observer: '_updateLatitude'
+				},
+			
+				elemReady: Boolean,
+			},
+
+			behaviors: [namespace('behaviors').oROVStandard],
+			
+			ready: function()
+			{				
+			},
+
+			registerEmitterHanlders: function(emitter) 
+			{
+				var self = this;
+
+				emitter.withHistory.on( "plugin.gps.boat.position", function(position) 
+				{
+					console.log( "Got boat position: " + position );
+				});
+			},
+
+			attached: function()
+			{
+				this.async(function()
+				{
+					this.initialConfig(); // Create your ol.Map here
+					this.elemReady = true;
+					this.setCenter(this.latitude,this.longitude);
+					
+					this.olmap.updateSize();
+					
+					console.log('openlayer-map ready');
+				});
+			},
+			
+			initialConfig: function()
+			{
+				console.log('initial config for the map...');
+
+				this.currentView = new ol.View(
+				{
+					zoom: 14
+				});
+
+
+				var source = new ol.source.OSM();
+				this.layer =  new ol.layer.Tile();
+				
+				this.layer.setSource(source); 
+				
+				this.olmap = new ol.Map(
+				{
+					layers: [this.layer],
+					target: this.$.map,
+					controls: ol.control.defaults(
+					{
+						attributionOptions: /** @type {olx.control.AttributionOptions} */ (
+						{
+							collapsible: false
+						})
+					}),
+					view: this.currentView
+				});
+			},
+
+
+			_updateLatitude: function(newValue, oldValue)
+			{
+					if(this.elemReady)
+					{
+						console.log('update latitude from '+oldValue+' to '+newValue);
+						this.setCenter(newValue, this.longitude);
+					}
+					else
+					{
+						console.log('_updateLatitude: waiting element to be ready');
+					}
+			},
+
+			_updateLongitude: function(newValue, oldValue)
+			{
+				if(this.elemReady)
+				{
+					console.log('update longitude from '+oldValue+' to '+newValue);
+					this.setCenter(this.latitude, newValue);
+				}
+				else
+				{
+					console.log('_updateLatitude: waiting element to be ready');
+				}
+			},
+
+			setCenter: function(latitude, longitude)
+			{
+
+				var center = [longitude, latitude];
+				this.currentCenter = ol.proj.fromLonLat(center);
+				console.log('update center of the map with latitude = '+latitude+' and longitude = '+longitude);
+				this.currentView.centerOn(this.currentCenter,[400,400], [0,0]);
+			},
+		} );
+	</script>
+</dom-module>
+

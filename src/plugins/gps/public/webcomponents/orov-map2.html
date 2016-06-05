@@ -1,0 +1,77 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+
+<link rel="import" href="../leaflet-map/leaflet-map.html">
+
+
+<script src='//api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js'></script>
+<script src="data/KML.js"></script>
+
+<dom-module id="orov-map">
+	<style>	
+		:host 
+		{
+			display: block;
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100vh;
+		}
+		
+		leaflet-map {
+			height: 100%;
+		}
+	</style>
+
+	<template>
+		<leaflet-map id="leaf" >
+			<leaflet-marker latitude="39" longitude="-120" title="Icon json" icon='{"iconUrl": "https://stendhalgame.org/images/mapmarker/dungeon.png"}'> 
+			</leaflet-marker>
+		</leaflet-map>
+	</template>
+
+	<script>
+		Polymer(
+		{
+			is: 'orov-map',
+			
+			properties: 
+			{
+			},
+			
+			listeners:
+			{
+				"load": "mapReady"
+			},
+
+			behaviors: [namespace('behaviors').oROVStandard],
+
+			registerEmitterHanlders: function(emitter) 
+			{
+				var self = this;
+
+				emitter.withHistory.on( "plugin.gps.boat.position", function(position) 
+				{
+					console.log( "Got boat position: " + position );
+				});
+			},
+			
+			ready: function()
+			{
+				L.Icon.Default.imagePath="components/gps/images";
+			},
+			
+			mapReady: function()
+			{
+				var self = this;
+				
+				console.log("hey");
+				var track = new L.KML("components/gps/data/doc.kml", {async: true});
+				track.on("loaded", function(e) { self.$.leaf.map.fitBounds(e.target.getBounds()); });
+				self.$.leaf.map.addLayer(track);
+				self.$.leaf.map.addControl(new L.Control.Layers({}, {'Track':track}));
+			}
+		} );
+	</script>
+</dom-module>

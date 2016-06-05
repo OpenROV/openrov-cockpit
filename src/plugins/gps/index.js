@@ -13,7 +13,7 @@ function GPS(name, deps)
 	this.listener = new gpsd.Listener(
 	{
 		port: 2947,
-		hostname: '192.168.254.210',
+		hostname: '192.168.254.1',
 		logger: 
 		{
 			info: function() {},
@@ -26,11 +26,11 @@ function GPS(name, deps)
 
 GPS.prototype.start = function start()
 {
-  // // Register callbacks for events emitted by the listener
-  // this.registerListenerEvents();
+  // Register callbacks for events emitted by the listener
+  this.registerListenerEvents();
 
-  // // Start attempts to connect to gpsd
-  // this.connectToGpsd();
+  // Start attempts to connect to gpsd
+  this.connectToGpsd();
 }
 
 GPS.prototype.registerListenerEvents = function()

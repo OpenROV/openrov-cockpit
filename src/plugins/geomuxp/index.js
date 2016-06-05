@@ -139,151 +139,27 @@ var geomux = function geomux( name, deps )
   }
 }
 
-var timeoutscale = .1;
-
 // This gets called when plugins are started
 geomux.prototype.start = function start()
 {
   console.log('geo:start');
   
-  var self=this;
-  
-  if (process.env.GEO_MOCK == 'true')
-  {
-    StartCameras( [ "0" ] );
-  }
-  else
-  {
-    BootCameras(function()
-    {
-      EnumerateCameras(function(results)
-      {
-        if (results.length==0)
-        {
-          setTimeout(self.start.bind(self),1000*120*timeoutscale);
-          
-          if (timeoutscale<1)
-          {
-            timeoutscale+=.1;
-          }
-          
-          return;
-        }
-        
-        self.deps.globalEventLoop.emit('video-deviceRegistration',results);
-        
-        sortedResults = results.sort( function(a,b){ return a.device.localeCompare(b.device) } );
-        StartCameras( sortedResults );
-      })
-    });
-  }
-}
-
-// -----------------------
-// Helper functions
-  
-// Creates a list with all of the dectected video devices
-function EnumerateCameras( callback )
-{
-  var results = [];
-  var i = 0;
-  
-  fs.readdir('/dev', function (err, files) 
-  {
-    if(err) 
-    {
-      callback( results );
-    }
-    
-    var f = files.filter( function(file)
-    {
-        return file.indexOf('video') == 0;
-    });
-    
-    if (f.length==0)
-    {
-      callback(results);
-      return;
-    }
-    
-    f.forEach(function(file)
-    {
-      i++;
-      exec('udevadm info --query=all --name=/dev/' + file + ' | grep "S: v4l/by-id/"', function(error, stdout, stderr)
-      {
-        if ((error == null) && (stdout.indexOf('GEO_Semi_Condor')>0))
-        {
-          var result = 
-          {
-            // NOTE: Add another field for camera offset and change device back to "video0"?
-            device:   file.slice( "video".length ),
-            deviceid: stdout.slice("S: v4l/by-id/".length),
-            format:   'MP4'
-          }
-
-          results.push( result );
-        }
-        
-        i--;
-        
-        if( i == 0 )
-        {
-          callback(results)
-        };
-      });
-    });
-  });
-}
-
-function BootCameras( callback )
-{
-    exec('mxcam list | grep "Core: Condor"', function(error, stdout, stderr)
-    {
-      if (error == null)
-      {
-        exec(path.dirname(require.resolve('geo-video-server'))+'/platform/linux/bootcamera.sh', function(error, stdout, stderr)
-        {
-          // give the system a moment to stabalize after the bootcamera script
-          setTimeout(function()
-          {
-            callback();
-          },1000);  
-        } );
-      } 
-      else 
-      {
-        console.error('Error starting devices geo: ',JSON.stringify(error));
-        callback();
-      }
-    });
-}
-
-function StartCameras( cameras )
-{
   var geoprogram = '';
-  var cameraArgs = [ "--c" ];
  
   if (process.env.GEO_MOCK == 'true')
   {
     geoprogram = require.resolve('geo-video-simulator');
-    cameraArgs.push( "0" );
   }
   else
   {
     // Find the geo-video-server app
     try 
     {
-      geoprogram =require.resolve('geo-video-server');
-      
-      // Create list of cameras to start up
-      for( var i = 0; i < cameras.length; i++ ) 
-      {
-          cameraArgs.push( cameras[ i ].device );
-      }
+      geoprogram = require.resolve( 'geo-video-server' );
     } 
     catch (er) 
     {
-      console.log("geo-video-server not installed")
+      console.error( "geo-video-server not installed" );
       return;
     }
   }
@@ -296,7 +172,7 @@ function StartCameras( cameras )
     "--p", defaults.port,
     "--w", defaults.wspath,
     "--u", ( process.env.DEV_MODE === "true" ? ":8099" : "" )
-  ].concat( cameraArgs );
+  ];
   
   const infinite = -1;
  
@@ -313,21 +189,6 @@ function StartCameras( cameras )
   } );
 
   var self = this;
-  
-  monitor.on('crash',function()
-  {
-      console.log("crashed");
-  });
-  
-  monitor.on('spawn',function(process)
-  {
-      console.log("spawned");
-  });
-  
-  monitor.on('warn',function(error)
-  {
-      console.log("error: " + error);
-  });
   
   monitor.on('exit',function(code, signal)
   {
@@ -346,10 +207,112 @@ function StartCameras( cameras )
       var msg = data.toString('utf-8');
       console.log(msg);
   });
-
-  console.log( "Starting geovideoserver" );
+  
   monitor.start();
-};
+}
+
+
+// BootCameras(function()
+//     {
+//       EnumerateCameras(function(results)
+//       {
+//         if (results.length==0)
+//         {
+//           setTimeout(self.start.bind(self),1000*120*timeoutscale);
+          
+//           if (timeoutscale<1)
+//           {
+//             timeoutscale+=.1;
+//           }
+          
+//           return;
+//         }
+        
+//         self.deps.globalEventLoop.emit('video-deviceRegistration',results);
+        
+//         sortedResults = results.sort( function(a,b){ return a.device.localeCompare(b.device) } );
+//         StartCameras( sortedResults );
+//       })
+//     });
+
+// -----------------------
+// Helper functions
+  
+// // Creates a list with all of the dectected video devices
+// function EnumerateCameras( callback )
+// {
+//   var results = [];
+//   var i = 0;
+  
+//   fs.readdir('/dev', function (err, files) 
+//   {
+//     if(err) 
+//     {
+//       callback( results );
+//     }
+    
+//     var f = files.filter( function(file)
+//     {
+//         return file.indexOf('video') == 0;
+//     });
+    
+//     if (f.length==0)
+//     {
+//       callback(results);
+//       return;
+//     }
+    
+//     f.forEach(function(file)
+//     {
+//       i++;
+//       exec('udevadm info --query=all --name=/dev/' + file + ' | grep "S: v4l/by-id/"', function(error, stdout, stderr)
+//       {
+//         if ((error == null) && (stdout.indexOf('GEO_Semi_Condor')>0))
+//         {
+//           var result = 
+//           {
+//             // NOTE: Add another field for camera offset and change device back to "video0"?
+//             device:   file.slice( "video".length ),
+//             deviceid: stdout.slice("S: v4l/by-id/".length),
+//             format:   'MP4'
+//           }
+
+//           results.push( result );
+//         }
+        
+//         i--;
+        
+//         if( i == 0 )
+//         {
+//           callback(results)
+//         };
+//       });
+//     });
+//   });
+// }
+
+// function BootCameras( callback )
+// {
+//     exec('mxcam list | grep "Core: Condor"', function(error, stdout, stderr)
+//     {
+//       if (error == null)
+//       {
+//         exec(path.dirname(require.resolve('geo-video-server'))+'/platform/linux/bootcamera.sh', function(error, stdout, stderr)
+//         {
+//           // give the system a moment to stabalize after the bootcamera script
+//           setTimeout(function()
+//           {
+//             callback();
+//           },1000);  
+//         } );
+//       } 
+//       else 
+//       {
+//         console.error('Error starting devices geo: ',JSON.stringify(error));
+//         callback();
+//       }
+//     });
+// }
 
 //Export provides the public interface
 module.exports = function (name, deps) 

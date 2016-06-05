@@ -40,7 +40,7 @@
     this.loggedIn = false;
     this.enabled = false;
     var self=this;
-    this.cockpit.on('cloudprofile-status',function(status){
+    this.cockpit.withHistory.on('cloudprofile-status',function(status){
       self.loggedIn=status.loggedIn;
     });
 
@@ -71,6 +71,12 @@
 
   InternetStream.prototype.startlisten = function startlisten(){
     var self = this;
+    
+    this.rov.withHistory.on('settings-change.internetstreaming', function(settings) {
+      //sharing the internet server settings
+      self.settings = settings.internetstreaming;
+    });    
+    
     this.cockpit.on('internet-stream-start',function(){
       if (!self.enabled){return;}
       self.startService();
@@ -101,7 +107,7 @@
     this.cockpit.off('x-h264-video.data', h264dataHandler);
     this.cockpit.emit('local-media-audio-stop');
     this.streaming = false;
-    this.cockpit.emit('internet-stream-status',{isStreaming:false,testmode:this.settings.testmode});
+    this.cockpit.emit('internet-stream-status',{isStreaming:false,connecting:false,testmode:this.settings.testmode});
 
   }
 
@@ -145,7 +151,7 @@
       self.cockpit.emit('local-media-audio-start');
     });
 
-    self.cockpit.emit('internet-stream-status',{isStreaming:true,testmode:self.settings.testmode});
+    self.cockpit.emit('internet-stream-status',{isStreaming:true,connecting:false,testmode:self.settings.testmode});
 
   }
 
@@ -183,11 +189,11 @@
     }
 
     var self = this;
-    this.rov.withHistory.on('settings-change.internetstreaming', function(settings) {
-      //sharing the internet server settings
-      self.settings = settings.internetstreaming;
+    if (self.settings==null) {return;};
+    
+    
       socket = io(self.settings.streamingServerURI,{path:'/internetcomms','multiplex':false, query: 'token=' + localStorage.getItem('id_token')});
-
+      self.cockpit.emit('internet-stream-status',{isStreaming:false,connecting:true,testmode:self.settings.testmode});
       socket.on("error", function(error) {
         if (error.type == "UnauthorizedError" || error.code == "invalid_token") {
           // redirect user to login page perhaps?
@@ -214,7 +220,7 @@
           self.stop();
         }
         log_trace('emitting broadcast-stream-on');
-        socket.emit('broadcast-stream-on', {test:settings.testmode},function(ok) {
+        socket.emit('broadcast-stream-on', {test:self.settings.testmode},function(ok) {
           log_trace('received broadcast-stream-on');
           self.stream();
 
@@ -235,14 +241,13 @@
         self.cockpit.emit('twitch-stream-status',stats);
       })
 
-    });
-
   }
 
   InternetStream.prototype.stopService = function stopService() {
     socket.close();
     socket.off('close', closeHandler);
     socket.off('connect', connectHandler);
+    this.cockpit.emit('internet-stream-status',{isStreaming:false,connecting:false,testmode:this.settings.testmode});   
   }
 
   InternetStream.prototype.inputDefaults = function inputDefaults() {

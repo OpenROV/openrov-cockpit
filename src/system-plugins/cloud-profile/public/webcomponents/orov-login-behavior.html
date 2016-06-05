@@ -18,10 +18,21 @@
         },
       },
       behaviors: [namespace('behaviors').oROVStandard],
-      registerEmitterHanlders: function(emitter){
+     attached: function(){
+        var self=this;
+        if(typeof(this.registerEmitterHanlders)=='function'){
+          var org = this.registerEmitterHanlders;
+          this.registerEmitterHanlders=function(emitter){
+            self.registerBaseEmitterHanlders(emitter);
+            org(emitter);
+          };
+          this.registerBaseEmitterHanlders(this.eventEmitter);
+        }
+      },
+      registerBaseEmitterHanlders: function(emitter){
         var self = this;
         if (this.loggedIn){
-          emitter.emit('cloudprofile-status',{loggedIn:true,profile:localStorage.getItem('id_profile')});
+          emitter.emit('cloudprofile-status',{loggedIn:true,profile:JSON.parse(localStorage.getItem('id_profile'))});
         } else {
           emitter.emit('cloudprofile-status',{loggedIn:false,profile:null});
         }
@@ -33,6 +44,15 @@
           var profile = localStorage.getItem('id_profile');
           if (profile !== null){
             profile=JSON.parse(profile);
+          }
+          if (profile!==null){
+            var d = new Date();
+            var e = new Date(profile.exp*1000);
+            if(d>e){
+              localStorage.removeItem('id_profile');
+              localStorage.removeItem('id_token');
+              this.set('loggedIn',false);             
+            }
           }
           if ((profile!==null)&&(profile.picture!==undefined)){
             this.profilePictureURL=profile.picture;

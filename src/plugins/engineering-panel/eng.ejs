@@ -1,1 +1,31 @@
-<p>Put the interactive engineering panel here.</p>
+<link rel="import" href="components/engineering-panel/orov-engineering-widget.html">
+<link rel="import" href="components/video/orov-video.html">
+<link rel="import" href="components/navigation-data/orov-horizon.html">
+<link rel="import" href="components/connection-health/orov-ping-graph.html">
+<link rel="import" href="components/serial-monitor/orov-serial-monitor.html">
+<link rel="import" href="components/telemetry/orov-telemetry-monitor.html">
+<link rel="import" href="components/controllerboard2x/orov-time.html">
+<link rel="import" href="components/controllerboard2x/orov-battery-status.html">
+<link rel="import" href="components/connection-health/orov-connection-health.html">
+<link rel="import" href="components/camera-tilt/orov-servo-tilt.html">
+<link rel="import" href="components/externallights/orov-external-brightness-indicator.html">
+<link rel="import" href="components/lasers/orov-lasers.html">
+<link rel="import" href="components/rovpilot/orov-thrustfactor.html">
+<link rel="import" href="components/rovpilot-wire/orov-depthHold.html">
+<link rel="import" href="components/rovpilot-wire/orov-headingHold.html">
+<link rel="import" href="components/blackbox/orov-blackbox-status.html">
+
+<style>
+	body{
+		background: #1c1c1c;
+	}
+	.navbar-inverse{
+		background: transparent;
+		border-color: transparent;
+		position: absolute;
+	}
+	.navbar-header, .navbar-brand{
+		display: none;
+	}
+</style>
+<orov-engineering-widget event-emitter="{{cockpitEventEmitter}}"></orov-engineering-widget>

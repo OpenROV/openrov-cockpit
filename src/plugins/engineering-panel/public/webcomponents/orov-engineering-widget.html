@@ -1,0 +1,364 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<link rel="import" href="orov-engineering-chart.html">
+<link rel="import" href="orov-engineering-button.html">
+<link rel="import" href="/components/video/container.html">
+
+<script type="text/javascript" src="js/d3.min.js"></script>
+
+<dom-module id="orov-engineering-widget">
+  <style>
+    orov-login {
+      display: none;
+    }
+    .container{position: fixed;left:5%;top:10%;bottom:10%;right:5%;}
+    .widget{
+      width: 100%;
+      height: 100%;
+      display: inline-block;
+      background: #3f3f3f;
+      border-radius: 0.4vw;
+      color:#fff;
+      overflow: hidden;
+      position: relative;
+    }
+    .widget > .title{
+      font-size: 0.9vw;
+      position: absolute;
+      top: 0.5vw;
+      left: 1vw;
+      font-weight: 300;
+      z-index: 10;
+    }
+    .container-child{position: absolute;left:0;top:0;right:0;bottom:0;}
+    .widget > .value{
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%) translateX(-50%);
+      left: 50%;
+      font-size: 2vw;
+      font-weight: 300;
+    }
+    .widget > .value[prefix]:after{
+        content: " " attr(prefix);
+        font-size: 1vw;
+    }
+    .widget #camera1{
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%) translateX(-50%);
+      left: 50%;
+      width: 100%;
+      overflow: hidden;
+      border-radius: 5px;
+    }
+    
+    .widget-c{
+      width: 16.6666%;
+      height: 20%;
+      display: inline-block;
+      position: absolute;
+      padding: 0.4vw;
+      box-sizing: border-box;
+    }
+    orov-time{position: absolute;top: 55%;transform: translateY(-55%) translateX(-50%);left: 50%;}
+    orov-horizon{position: absolute;top: 50%!important;transform: translateY(-50%) translateX(-50%);left: 50%!important;width:50%!important;height: 50%!important;}
+    
+  </style>
+  <template>
+    <div class="container" id="maincontainer">
+      <template is="dom-repeat" items="{{grid}}" as="row" index-as="rowindex">
+        <template is="dom-repeat" items="{{row}}" as="col" index-as="colindex">
+          <template is="dom-if" if="{{ getFilter(rowindex, colindex) }}">
+            <div class="widget-c" style$="width:{{getWidth(rowindex,colindex)}}%; height:{{getHeight(rowindex,colindex)}}%; left:{{getLeft(colindex)}}%; top:{{getTop(rowindex)}}%;" >
+              <div class="widget" data-id$="{{col}}">
+                <span class="title" title$="[[getValue(element.*, col, 'description')]]">[[getValue(element.*, col, 'title')]]</span>
+                <template is="dom-if" if="{{ isType(col, 'chart') }}">
+                  <span class="value" prefix$="{{ getProperty(col,'prefix') }}" >[[getValue(element.*, col, 'value')]]</span>
+                  <orov-engineering-chart bar-data="[[getValue(element.*, col, 'raw')]]" ></orov-engineering-chart> 
+                </template>
+              </div>
+            </div>
+          </template>
+        </template>
+      </template>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: 'orov-engineering-widget',
+      properties: {
+          define: {type: Function},
+          grid: {
+            type: Array,
+            value: function(){
+              return [
+                ['orov-time', 'cpuusage', 'deep','deep','container','container','container'],
+                ['servo','hdgd', 'deep', 'deep','container','container','container'],
+                ['FMEM','LIGPE0', 'temp', 'temp','container','container','container'],
+                ['vout','btti','BT1I','BT2I','SC1I','SC2I','SC3I'],
+                ['BRDI','BRDV','AVCC','LIGPE0','ESCP','I2CP','LIGP'],
+                ['DLK', 'HLK', 'LSR', 'LED', 'XL0', 'XL1', 'STR']
+              ]
+            }
+          },
+          element: {
+            type: Object,
+            notify: true,
+            value: function(){
+              return {
+                 'orov-time':{
+                   title: 'Time'
+                 },
+                 'deep':{
+                     tickLength: 500
+                 },
+                 'cam1':{
+                    type : 'orov-video',
+                    attr : {
+                      id : 'camera 1',
+                      location :'forward'
+                    }
+                 },
+                 'COM':{
+                    type : 'orov-engineering-button',
+                     attr : {
+                      type : 'COM'
+                    }
+                 },
+                 'GPD':{
+                    type : 'orov-engineering-button',
+                     attr : {
+                      type : 'GPD'
+                    }
+                 },
+                 'TNK':{
+                    type : 'orov-engineering-button',
+                     attr : {
+                      type : 'TNK'
+                    }
+                 },
+                 'DLK':{
+                    type : 'orov-engineering-button',
+                     attr : {
+                      type : 'DLK'
+                    }
+                 },
+                 'HLK':{
+                    type : 'orov-engineering-button',
+                     attr : {
+                      type : 'HLK'
+                    }
+                 },
+                 'LSR':{
+                    type : 'orov-engineering-button',
+                     attr : {
+                      type : 'LSR'
+                    }
+                 },
+                 'LED':{
+                    type : 'orov-engineering-button',
+                     attr : {
+                      type : 'LED'
+                    }
+                 },
+                 'XL0':{
+                    type : 'orov-engineering-button',
+                     attr : {
+                      type : 'XL0'
+                    }
+                 },
+                 'XL1':{
+                    type : 'orov-engineering-button',
+                     attr : {
+                      type : 'XL1'
+                    }
+                 },
+                 'ESC':{
+                    type : 'orov-engineering-button',
+                     attr : {
+                      type : 'ESC'
+                    }
+                 },
+                 'REC':{
+                    type : 'orov-engineering-button',
+                     attr : {
+                      type : 'REC'
+                    }
+                 },
+                 'STR':{
+                    type : 'orov-engineering-button',
+                     attr : {
+                      type : 'STR'
+                    }
+                 },
+                 'container':{
+                    title : 'ROV Camera',
+                    type : 'container',
+                    value : ['cam1','orov-horizon']
+                 }
+              };
+            }
+          }
+      },
+      behaviors: [namespace('behaviors').oROVStandard],
+      registerEmitterHanlders: function(emitter) {
+        var self = this;
+        emitter.on('plugin.engineering.data', function(data) {
+          for(var x in data){
+            var id = x.toLowerCase();
+            if(!self.element[id]) self.element[id] = {};
+            self.element[id]['value'] = parseFloat(data[x]).toFixed(1);
+            self.element[id]['raw'] = parseFloat(data[x]);
+            self.notifyPath('element.'+id+'.value', self.element[id]['value']);
+            self.notifyPath('element.'+id+'.raw', self.element[id]['raw']);
+          }
+
+        });
+        self.define = function(item,callback){
+          emitter.emit('telemetry.getDefinition',item,callback);
+        }
+      },
+      
+      getValue: function(change, index, path) {
+        return this.get(path, change.base[index]);
+      },
+      ready: function() {
+        var self = this;
+        
+        //set default to chart
+        for(var r in this.grid){
+          for(var c in this.grid[r]){
+            var id = this.grid[r][c];
+            if(!self.element[id]) self.element[id] = {};
+            if(!self.element[id].type) self.element[id].type = "";
+            if(id.substr(0,4) != 'orov' && self.element[id].type == ""){
+              self.element[id].type = 'chart';
+            }
+            
+          }
+        }
+        setTimeout(function() {
+          //dynamic add all configuration
+          var widgets = Polymer.dom(self.$.maincontainer).querySelectorAll('.widget');
+          for(var id in widgets){
+            var widgetId = widgets[id].getAttribute('data-id');
+
+              if(!self.element[widgetId]) self.element[widgetId] = {};
+              if(!self.element[widgetId].type) self.element[widgetId].type = "";
+              if(widgetId.substr(0,4) == 'orov' || self.element[widgetId].type.substr(0,4) == 'orov'){
+                widgets[id].appendChild(self.addElement(self, widgetId)); 
+              }else if(self.element[widgetId].type == 'container' && self.element[widgetId].value){
+                for(var y in self.element[widgetId].value){
+                  var containerElement = self.addElement(self, self.element[widgetId].value[y]);
+                  containerElement.className = 'container-child';
+                  widgets[id].appendChild(containerElement); 
+                }
+              }
+              if(!self.element[widgetId].title){
+                  self.define(widgetId,function(data){
+                    if(data.name)  self.element[widgetId].title = self.__(data.name) || '';
+                    if(data.prefix) self.element[widgetId].prefix = self.__(data.prefix) || '';
+                    if(data.description) self.element[widgetId].description = self.__(data.description) || '';
+                  });
+              }
+          }
+        }, 10);
+      },
+      addElement: function(self, widgetId){
+        var dynamicChart = document.createElement(widgetId.substr(0,4) == 'orov'?widgetId:self.element[widgetId].type);
+        dynamicChart.eventEmitter = self.eventEmitter;
+        if(self.element[widgetId]){
+          if(self.element[widgetId].attr){
+            for(var x in self.element[widgetId].attr){
+              dynamicChart.setAttribute(x,self.element[widgetId].attr[x]);
+            }
+          }
+        }
+        return dynamicChart;
+      },
+      getPrevCol: function(r,c){
+        var self = this;
+        if(c >= 1){
+          if(self.grid[r][c-1] == self.grid[r][c]){
+            return false;
+          }
+        }
+        return true;
+      },
+      getPrevRow: function(r,c){
+        var self = this;
+        if(r >= 1){
+          if(self.grid[r-1][c] == self.grid[r][c]){
+            return false;
+          }
+        }
+        return true;
+
+      },
+      getWidth: function(r,c){
+        var self = this;
+
+        var w = self.getWSize(r,c);
+        return w * (100/self.grid[r].length);
+      },
+      getHeight: function(r,c){
+        var self = this;
+        var h = self.getHSize(r,c);
+        return h * (100 / self.grid.length);
+      },
+      getTop:function(h){
+        var self = this;
+
+        return h * (100 / self.grid.length);
+      },
+      getLeft:function(w){
+        var self = this;
+
+        return w * (100 / self.grid[0].length);
+      },
+      getWSize:function(r,c,s){
+        var self = this;
+
+        if(!s) s = 1;
+        if(self.grid[r][c+1] == self.grid[r][c]){
+          //s++;
+          s += self.getWSize(r,c+1,s);
+        }
+        return s;
+      },
+      getHSize:function(r,c,s){
+        var self = this;
+
+        if(!s) s = 1;
+        if(self.grid[r+1] != undefined){
+          if(self.grid[r+1][c] == self.grid[r][c]){
+            s += self.getHSize(r+1,c,s);
+          }
+        }
+        return s;
+      },
+      getFilter: function(r,c){
+        if(this.getPrevCol(r,c) && this.getPrevRow(r,c)) return true;
+        return false; 
+      },
+      getProperty: function(index,property){
+        if(this.element[index]){
+          if(this.element[index][property]){
+            return this.element[index][property];
+          }
+        }
+        return '';
+      },
+      isType: function(index, type){
+        if(this.element[index]){
+          if(this.element[index]['type']){
+            return (this.element[index]['type'] == type?true:false);
+          }
+        }
+
+        return false;
+      }
+    });
+  </script>
+</dom-module>

@@ -45,7 +45,13 @@
         self.cockpit.emit('plugin.diveprofile.watertype',watertype);
     });
 
-
+    this.cockpit.on('plugin.diveprofile.watertype.set', function(watertype){
+        self.rov.emit('plugin.diveprofile.watertype.set',watertype);
+    });
+    
+    this.cockpit.on('plugin.diveprofile.depth.zero', function(){
+        self.rov.emit('plugin.diveprofile.depth.zero');
+    });   
 
 
   };

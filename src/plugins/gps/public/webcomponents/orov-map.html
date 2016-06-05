@@ -23,10 +23,33 @@
 			width: 100%;
 			height: 100vh;
 		}  
+		
+		#marker {
+			width: 10px;
+			height: 10px;
+			border: 1px solid #B00;
+			border-radius: 10px;
+			background-color: #F00;
+			opacity: 0.5;
+		}
+	  
+		#ship {
+			width: 10px;
+			height: 10px;
+			border: 1px solid #0BB;
+			border-radius: 10px;
+			background-color: #0FF;
+			opacity: 0.5;
+		}
 	</style>
 
 	<template>
 		<div id="map" class="map"></div>
+		
+		<div style="display: none;">
+			<div id="marker" title="Marker"></div>
+			<div id="ship" title="Ship"></div>
+		</div>
 	</template>
 
 	<script src="../openlayers/ol.js"></script>
@@ -43,11 +66,13 @@
 				currentView: ol.View,
 				olmap: ol.Map,
 				layer: Object,
+				marker: ol.Overlay,
+				ship: ol.Overlay,
 				
 				longitude:
 				{
 					type: Number,
-					value:12.889101100000062,
+					value:-120.0,
 					notify: true,
 					observer: '_updateLongitude'
 				},
@@ -55,12 +80,17 @@
 				latitude: 
 				{
 					type: Number,
-					value: 15.7622695,
+					value: 29.0,
 					notify: true,
 					observer: '_updateLatitude'
 				},
 			
 				elemReady: Boolean,
+			},
+			
+			listeners:
+			{
+				"gps": "UpdateMarker" 
 			},
 
 			behaviors: [namespace('behaviors').oROVStandard],
@@ -73,9 +103,10 @@
 			{
 				var self = this;
 
-				emitter.withHistory.on( "plugin.gps.boat.position", function(position) 
+				emitter.withHistory.on( "plugin.gps.data", function(data) 
 				{
-					console.log( "Got boat position: " + position );
+					console.log( "Got boat position: " + data.lat + "," + data.lon );
+					self.fire( "gps", data );
 				});
 			},
 
@@ -101,7 +132,26 @@
 				{
 					zoom: 14
 				});
+				
+				var pos = ol.proj.fromLonLat([-119.9542667, 39.0916667]);
 
+				// Vienna marker
+				this.marker = new ol.Overlay({
+					position: pos,
+					positioning: 'center-center',
+					element: this.$.marker,
+					stopEvent: false
+				});
+
+				var shipPos = ol.proj.fromLonLat([-119.9542667, 39.0916667]);
+
+				// Vienna marker
+				this.ship = new ol.Overlay({
+					position: shipPos,
+					positioning: 'center-center',
+					element: this.$.ship,
+					stopEvent: false
+				});
 
 				var source = new ol.source.OSM();
 				this.layer =  new ol.layer.Tile();
@@ -121,6 +171,9 @@
 					}),
 					view: this.currentView
 				});
+				
+				this.olmap.addOverlay( this.marker );
+				this.olmap.addOverlay( this.ship );
 			},
 
 
@@ -158,6 +211,16 @@
 				console.log('update center of the map with latitude = '+latitude+' and longitude = '+longitude);
 				this.currentView.centerOn(this.currentCenter,[400,400], [0,0]);
 			},
+			
+			UpdateMarker: function( data )
+			{
+				var pos = ol.proj.fromLonLat([ data.detail.lon, data.detail.lat ]);
+				
+				if( this.marker != undefined )
+				{
+					this.marker.setPosition( pos );
+				}
+			}
 		} );
 	</script>
 </dom-module>

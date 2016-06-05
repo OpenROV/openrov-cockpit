@@ -19,8 +19,9 @@ function GPS(name, deps)
     {
       var tpv =
       {
-        lat: 39 + (Math.random() * (0.120 - 0.0200) + 0.0200),
-        lon: -120 + (Math.random() * (0.120 - 0.0200) + 0.0200),
+     
+        lat: 39.0916667 + (Math.random() * 0.0050 ),
+        lon: -119.9542667 + (Math.random() * 0.0050 ),
         speed: 0.1,
         alt: 6000
       };

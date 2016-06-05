@@ -1,36 +1,63 @@
+var gpsd = require( 'node-gpsd' );
+  
 function GPS(name, deps) 
 {
+  var self = this;
+  
 	// Instance variables
-	this.deps 	= deps; 		// hold a reference to the plugin dependencies if you are going to use them
-	this.cockpit 	= deps.cockpit; // explicitly calling out cockpit eventemitter
-	
-	var gpsd = require( 'node-gpsd' );
-	
-	this.isConnecting 				= false;
+	this.deps 	  = deps; 		
+	this.cockpit 	= deps.cockpit;
+	this.global   = deps.globalEventLoop;
+  
+	this.isConnecting 				    = false;
 	this.automaticallyReconnect 	= true;
-	this.reconnectTimer;
-	
-	this.listener = new gpsd.Listener(
-	{
-		port: 2947,
-		hostname: '192.168.254.1',
-		logger: 
-		{
-			info: function() {},
-			warn: console.warn,
-			error: console.error
-		},
-		parse: true
-	} ); 
+	this.reconnectTimer           = {};
+  
+  if( process.env.USE_MOCK == "true" )
+  {
+    setInterval( function()
+    {
+      var tpv =
+      {
+        lat: 39 + (Math.random() * (0.120 - 0.0200) + 0.0200),
+        lon: -120 + (Math.random() * (0.120 - 0.0200) + 0.0200),
+        speed: 0.1,
+        alt: 6000
+      };
+        
+      self.cockpit.emit( 'plugin.gps.TPV', tpv );
+    }, 1000 );
+  }
+  else
+  {
+    this.global.withHistory.on('settings-change.gps',function( data )
+    {
+      self.listener = new gpsd.Listener(
+      {
+        port: 2947,
+        hostname: data.gps.server,
+        logger: 
+        {
+          info: function() {},
+          warn: console.warn,
+          error: console.error
+        },
+        parse: true
+      } );
+      
+      // Register callbacks for events emitted by the listener
+      self.registerListenerEvents();
+
+      // Start attempts to connect to gpsd
+      self.connectToGpsd();
+    });
+  }
+  
 }
 
 GPS.prototype.start = function start()
 {
-  // Register callbacks for events emitted by the listener
-  this.registerListenerEvents();
-
-  // Start attempts to connect to gpsd
-  this.connectToGpsd();
+  console.log( "GPS plugin started" );
 }
 
 GPS.prototype.registerListenerEvents = function()
@@ -104,6 +131,26 @@ GPS.prototype.connectToGpsd = function()
       // On successful connect, announce ourselves as a watcher to GPSD
       self.listener.watch();
     } ); 
+};
+
+// This is all that is required to enable settings for a plugin. They are
+// automatically made editable, saved, etc from this definition.
+GPS.prototype.getSettingSchema = function getSettingSchema()
+{
+  return [
+  {
+    "title": "GPS Settings",
+    "id" :"gps",
+    "type" : "object",
+    "properties": 
+    {
+      "server": 
+      {
+        "type": "string",
+        "default" : "192.168.250.10"
+      }
+    }
+  }];
 };
 
 module.exports = function( name, deps ) 

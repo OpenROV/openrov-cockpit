@@ -164,7 +164,7 @@ geomux.prototype.start = function start()
           
           if (timeoutscale<1)
           {
-            timoutscale+=.1;
+            timeoutscale+=.1;
           }
           
           return;

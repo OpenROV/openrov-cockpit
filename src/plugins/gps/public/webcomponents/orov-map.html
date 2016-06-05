@@ -121,6 +121,11 @@
 					this.olmap.updateSize();
 					
 					console.log('openlayer-map ready');
+					
+					setTimeout( function()
+					{
+						window.dispatchEvent( new Event( "resize" ) );
+					}, 1000 );
 				});
 			},
 			

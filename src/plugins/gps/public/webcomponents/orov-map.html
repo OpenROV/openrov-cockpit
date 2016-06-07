@@ -36,9 +36,18 @@
 		#ship {
 			width: 10px;
 			height: 10px;
-			border: 1px solid #0BB;
+			border: 1px solid #0B0;
 			border-radius: 10px;
-			background-color: #0FF;
+			background-color: #0F0;
+			opacity: 0.5;
+		}
+
+		.points {
+			width: 5px;
+			height: 5px;
+			border: 1px solid #0B0;
+			border-radius: 10px;
+			background-color: #0F0;
 			opacity: 0.5;
 		}
 	</style>
@@ -51,6 +60,12 @@
 		<div style="display: none;">
 			<div id="marker" title="Marker"></div>
 			<div id="ship" title="Ship"></div>
+
+			<div id="point1" class="points" title="Rear of boat"></div>
+			<div id="point2" class="points" title="Mishap Starboard"></div>
+			<div id="point3" class="points" title="GPS midship"></div>
+			<div id="point4" class="points" title="Just aft of mid ship"></div>
+
 		</div>
 	</template>
 
@@ -69,6 +84,11 @@
 				layer: Object,
 				marker: ol.Overlay,
 				ship: ol.Overlay,
+				point1: ol.Overlay,
+				point2: ol.Overlay,
+				point3: ol.Overlay,
+				point4: ol.Overlay,
+
 				
 				longitude:
 				{
@@ -132,6 +152,7 @@
 			
 			initialConfig: function()
 			{
+				var self = this;
 				console.log('initial config for the map...');
 
 				this.currentView = new ol.View(
@@ -159,6 +180,32 @@
 					stopEvent: false
 				});
 
+
+
+				this.point1 = new ol.Overlay({
+					position: ol.proj.fromLonLat([-119.954127937, 39.09148231]),
+					positioning: 'center-center',
+					element: this.$.point1,
+					stopEvent: false
+				});
+				this.point2 = new ol.Overlay({
+					position: ol.proj.fromLonLat([-119.954248419, 39.091445143]),
+					positioning: 'center-center',
+					element: this.$.point2,
+					stopEvent: false
+				});
+				this.point3 = new ol.Overlay({
+					position: ol.proj.fromLonLat([-119.954289654, 39.091358763]),
+					positioning: 'center-center',
+					element: this.$.point3,
+					stopEvent: false
+				});
+				this.point4 = new ol.Overlay({
+					position: ol.proj.fromLonLat([-119.954299665, 39.091362917]),
+					positioning: 'center-center',
+					element: this.$.point4,
+					stopEvent: false
+				});
 				var source = new ol.source.OSM();
 				this.layer =  new ol.layer.Tile();
 				
@@ -178,8 +225,33 @@
 					view: this.currentView
 				});
 				
+				this.historyLines = new ol.geom.LineString([]);
+
+
+				this.layerLines = new ol.layer.Vector({
+					source: new ol.source.Vector({
+						features: [new ol.Feature({
+							geometry: self.historyLines
+						})]
+					}),
+					style: new ol.style.Style({
+						stroke: new ol.style.Stroke({
+							width: 0.5,
+							color: '#000000',
+						})
+					})
+				});
+
+				this.olmap.addLayer( this.layerLines );
+
 				this.olmap.addOverlay( this.marker );
 				this.olmap.addOverlay( this.ship );
+
+				this.olmap.addOverlay( this.point1 );
+				this.olmap.addOverlay( this.point2 );
+				this.olmap.addOverlay( this.point3 );
+				this.olmap.addOverlay( this.point4 );
+
 			},
 
 
@@ -225,6 +297,7 @@
 				if( this.marker != undefined )
 				{
 					this.marker.setPosition( pos );
+					this.historyLines.appendCoordinate(pos);
 				}
 			}
 		} );

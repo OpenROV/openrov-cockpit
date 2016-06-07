@@ -132,6 +132,7 @@
 			
 			initialConfig: function()
 			{
+				var self = this;
 				console.log('initial config for the map...');
 
 				this.currentView = new ol.View(
@@ -178,6 +179,25 @@
 					view: this.currentView
 				});
 				
+				this.historyLines = new ol.geom.LineString([]);
+
+
+				this.layerLines = new ol.layer.Vector({
+					source: new ol.source.Vector({
+						features: [new ol.Feature({
+							geometry: self.historyLines
+						})]
+					}),
+					style: new ol.style.Style({
+						stroke: new ol.style.Stroke({
+							width: 0.5,
+							color: '#000000',
+						})
+					})
+				});
+
+				this.olmap.addLayer( this.layerLines );
+
 				this.olmap.addOverlay( this.marker );
 				this.olmap.addOverlay( this.ship );
 			},
@@ -225,6 +245,7 @@
 				if( this.marker != undefined )
 				{
 					this.marker.setPosition( pos );
+					this.historyLines.appendCoordinate(pos);
 				}
 			}
 		} );

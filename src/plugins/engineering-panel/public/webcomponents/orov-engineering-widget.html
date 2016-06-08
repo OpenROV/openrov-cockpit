@@ -31,18 +31,7 @@
       z-index: 10;
     }
     .container-child{position: absolute;left:0;top:0;right:0;bottom:0;}
-    .widget > .value{
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%) translateX(-50%);
-      left: 50%;
-      font-size: 2vw;
-      font-weight: 300;
-    }
-    .widget > .value[prefix]:after{
-        content: " " attr(prefix);
-        font-size: 1vw;
-    }
+    
     .widget #camera1{
       position: absolute;
       top: 50%;
@@ -63,7 +52,9 @@
     }
     orov-time{position: absolute;top: 55%;transform: translateY(-55%) translateX(-50%);left: 50%;}
     orov-horizon{position: absolute;top: 50%!important;transform: translateY(-50%) translateX(-50%);left: 50%!important;width:50%!important;height: 50%!important;}
-    
+    .tick{position: fixed;right:3%;bottom:3%;color:#fff;}
+    .tick span{display:inline-block; cursor: pointer;}
+    .tick span.active{border-bottom:3px solid #fff;}
   </style>
   <template>
     <div class="container" id="maincontainer">
@@ -73,21 +64,34 @@
             <div class="widget-c" style$="width:{{getWidth(rowindex,colindex)}}%; height:{{getHeight(rowindex,colindex)}}%; left:{{getLeft(colindex)}}%; top:{{getTop(rowindex)}}%;" >
               <div class="widget" data-id$="{{col}}">
                 <span class="title" title$="[[getValue(element.*, col, 'description')]]">[[getValue(element.*, col, 'title')]]</span>
-                <template is="dom-if" if="{{ isType(col, 'chart') }}">
-                  <span class="value" prefix$="{{ getProperty(col,'prefix') }}" >[[getValue(element.*, col, 'value')]]</span>
-                  <orov-engineering-chart bar-data="[[getValue(element.*, col, 'raw')]]" ></orov-engineering-chart> 
-                </template>
               </div>
             </div>
           </template>
         </template>
       </template>
     </div>
+    <div class="tick">
+      <span on-tap="changeTickMode1" class$="[[getTickClass(tick, 10800)]]">3h</span>
+      <span on-tap="changeTickMode2" class$="[[getTickClass(tick, 3600)]]">1h</span>
+      <span on-tap="changeTickMode3" class$="[[getTickClass(tick, 1800)]]">30m</span>
+      <span on-tap="changeTickMode4" class$="[[getTickClass(tick, 600)]]">10m</span>
+      <span on-tap="changeTickMode5" class$="[[getTickClass(tick, 60)]]">1m</span>
+    </div>
+
   </template>
   <script>
     Polymer({
       is: 'orov-engineering-widget',
       properties: {
+          tick: {
+            Type: Number,
+            value: 600,
+            observer: 'tickChanged'
+          },
+          chartelem: {
+            type: Array,
+            value: []
+          },
           define: {type: Function},
           grid: {
             type: Array,
@@ -111,7 +115,11 @@
                    title: 'Time'
                  },
                  'deep':{
-                     tickLength: 500
+                    attr:{
+                      min: 0.1,
+                      max: 5,
+                      inverted: true
+                    }
                  },
                  'cam1':{
                     type : 'orov-video',
@@ -195,7 +203,7 @@
                  'container':{
                     title : 'ROV Camera',
                     type : 'container',
-                    value : ['cam1','orov-horizon']
+                    value : ['cam1','orov-horizon','deep' ]
                  }
               };
             }
@@ -203,23 +211,10 @@
       },
       behaviors: [namespace('behaviors').oROVStandard],
       registerEmitterHanlders: function(emitter) {
-        var self = this;
-        emitter.on('plugin.engineering.data', function(data) {
-          for(var x in data){
-            var id = x.toLowerCase();
-            if(!self.element[id]) self.element[id] = {};
-            self.element[id]['value'] = parseFloat(data[x]).toFixed(1);
-            self.element[id]['raw'] = parseFloat(data[x]);
-            self.notifyPath('element.'+id+'.value', self.element[id]['value']);
-            self.notifyPath('element.'+id+'.raw', self.element[id]['raw']);
-          }
-
-        });
-        self.define = function(item,callback){
+        this.define = function(item,callback){
           emitter.emit('telemetry.getDefinition',item,callback);
         }
       },
-      
       getValue: function(change, index, path) {
         return this.get(path, change.base[index]);
       },
@@ -233,7 +228,7 @@
             if(!self.element[id]) self.element[id] = {};
             if(!self.element[id].type) self.element[id].type = "";
             if(id.substr(0,4) != 'orov' && self.element[id].type == ""){
-              self.element[id].type = 'chart';
+              self.element[id].type = 'orov-engineering-chart';
             }
             
           }
@@ -257,17 +252,28 @@
               }
               if(!self.element[widgetId].title){
                   self.define(widgetId,function(data){
-                    if(data.name)  self.element[widgetId].title = self.__(data.name) || '';
+                    if(data.name){
+                      self.element[widgetId].title = self.__(data.name) || '';
+                      self.notifyPath('element.'+widgetId+'.title', self.element[widgetId].title);
+                    }  
                     if(data.prefix) self.element[widgetId].prefix = self.__(data.prefix) || '';
                     if(data.description) self.element[widgetId].description = self.__(data.description) || '';
+
                   });
               }
           }
         }, 10);
       },
       addElement: function(self, widgetId){
-        var dynamicChart = document.createElement(widgetId.substr(0,4) == 'orov'?widgetId:self.element[widgetId].type);
+        var thisType = widgetId.substr(0,4) == 'orov'?widgetId:self.element[widgetId].type;
+        var dynamicChart = document.createElement(thisType);
         dynamicChart.eventEmitter = self.eventEmitter;
+        if(thisType == 'orov-engineering-chart'){
+          dynamicChart.type = widgetId;
+          dynamicChart.tick = self.tick;
+          self.chartelem.push(dynamicChart);
+
+        }
         if(self.element[widgetId]){
           if(self.element[widgetId].attr){
             for(var x in self.element[widgetId].attr){
@@ -276,6 +282,13 @@
           }
         }
         return dynamicChart;
+      },
+      tickChanged: function(newValue){
+        if(this.chartelem){
+          this.chartelem.forEach(function(el){
+            el.tick = newValue;   
+          });
+        }
       },
       getPrevCol: function(r,c){
         var self = this;
@@ -297,43 +310,29 @@
 
       },
       getWidth: function(r,c){
-        var self = this;
-
-        var w = self.getWSize(r,c);
-        return w * (100/self.grid[r].length);
+        return this.getWSize(r,c) * (100/this.grid[r].length);
       },
       getHeight: function(r,c){
-        var self = this;
-        var h = self.getHSize(r,c);
-        return h * (100 / self.grid.length);
+        return this.getHSize(r,c) * (100 / this.grid.length);
       },
       getTop:function(h){
-        var self = this;
-
-        return h * (100 / self.grid.length);
+        return h * (100 / this.grid.length);
       },
       getLeft:function(w){
-        var self = this;
-
-        return w * (100 / self.grid[0].length);
+        return w * (100 / this.grid[0].length);
       },
       getWSize:function(r,c,s){
-        var self = this;
-
         if(!s) s = 1;
-        if(self.grid[r][c+1] == self.grid[r][c]){
-          //s++;
-          s += self.getWSize(r,c+1,s);
+        if(this.grid[r][c+1] == this.grid[r][c]){
+          s += this.getWSize(r,c+1,s);
         }
         return s;
       },
       getHSize:function(r,c,s){
-        var self = this;
-
         if(!s) s = 1;
-        if(self.grid[r+1] != undefined){
-          if(self.grid[r+1][c] == self.grid[r][c]){
-            s += self.getHSize(r+1,c,s);
+        if(this.grid[r+1] != undefined){
+          if(this.grid[r+1][c] == this.grid[r][c]){
+            s += this.getHSize(r+1,c,s);
           }
         }
         return s;
@@ -358,6 +357,25 @@
         }
 
         return false;
+      },
+      getTickClass: function(value, eValue){
+        return value == eValue?'active':'';
+      },
+      changeTickMode1: function(){
+        this.tick = 180*60;
+      },
+      changeTickMode2: function(){
+        this.tick = 60*60;
+      },
+      changeTickMode3: function(){
+        this.tick = 30*60;
+      },
+      changeTickMode4: function(){
+        this.tick = 10*60;
+      },
+      changeTickMode5: function(){
+        this.tick = 60;
+       
       }
     });
   </script>

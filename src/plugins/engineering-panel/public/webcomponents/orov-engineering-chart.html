@@ -1,25 +1,40 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
 <dom-module id="orov-engineering-chart">
 	<style>
-		.content-container,#chart{
-			position: absolute;
-			left:0;
-			top:0;
-			bottom:0;
-			right:0;
-		}
-		.area {
-		    fill: rgba(255,255,255,.17);
-		    stroke-width: 0;
-		
-		}
-
+	.content-container,#chart{
+		position: absolute;
+		left:0;
+		top:0;
+		bottom:0;
+		right:0;
+	}
+	.area {
+	    fill: rgba(255,255,255,.25);
+	    stroke-width: 0;
+	
+	}
+	svg {
+		font: 10px sans-serif;
+	}
+	.value{
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%) translateX(-50%);
+      left: 50%;
+      font-size: 2vw;
+      font-weight: 300;
+    }
+    .value[prefix]:after{
+        content: " " attr(prefix);
+        font-size: 1vw;
+    }
 	</style>
 	<template>
 		<div class="content-container">
 			<content>
+			<span class="value" >{{value}}</span>
 				<div id="chart" class="poly-bars">
-
 				</div>
 			</content>
 		</div>
@@ -30,49 +45,65 @@
 			is: 'orov-engineering-chart',
 
 			properties: {
-				barData: {
+				value:{
+					Type: Number
+				},
+				type: {
 					Type: String,
 					notify: true
+				},
+				tick:{
+					Type:Number,
+					value:40,
+					observer: 'tickChanged'
 				},
 				width: Number,
 				height: {
 					type: Number,
 					value: 400
-				}
+				},
+				min: Number,
+				max: Number,
+				inverted: {
+					Type: Boolean,
+					value: false
+				},
+				data: Array,
 			},
-
-			observers: [
-			    'dataChanged(barData)'
-			],
-
-			created: function() {
-				
+			behaviors: [namespace('behaviors').oROVStandard],
+			registerEmitterHanlders: function(emitter) {
+				var self = this;
+				emitter.on('plugin.engineering.data', function(data) {
+					if(data[self.type]){
+						//if(data[self.type] != self.lastData){
+							self.dataChanged(parseFloat(data[self.type]));
+						//}
+						self.lastData = data[self.type];
+					}
+				});
 			},
-
-
-			dataChanged: function(val) {
-				
-				if(!this.data) this.data = [];
-				this.data.push(val);
-
-				if(this.data.length > this.n){
-					this.data.shift();
-				}
+			tickChanged: function(val){
 				this.draw();
-				
+			},
+			dataChanged: function(val) {
+				if(!this.data) this.data = [];
+
+				if(/^-?[0-9]+$/.test(val)){
+					this.value = val;
+				}else{
+					this.value = parseFloat(val).toFixed(2);
+				}
+
+				this.data.push(val);
+				this.draw();
 			},
 
 			draw: function() {
 				var self = this;
 				if (!this.data) { return; }
-				if (!this.elem) { return; }
-
-
-				var maxList = [];
-                self.data.forEach(function(d){maxList[maxList.length] = d});
-            
-               // self.x.domain([0, self.data.length - 1])
-
+				var tmpdata = self.data.slice(self.data.length-self.tick<=0?0:self.data.length-self.tick,self.data.length);
+				self.tmpLength = tmpdata.length-1
+				
                	self.width = self.elem.offsetWidth;
 				self.height = self.elem.offsetHeight;
 
@@ -80,27 +111,24 @@
 
 				self.x.range([0, self.width]);
 				self.y.range([self.height, 0]);
-
-				self.x.domain([0, self.n-1]);
-                self.y.domain([d3.min(maxList),  d3.max(maxList)]);
-
-				self.path.attr("d", self.area);
+				self.x.domain([0, self.tick-1]);
+                self.y.domain([(self.min?self.min:d3.min(tmpdata)),  (self.max?self.max:d3.max(tmpdata))]);
+				self.path.attr('transform','translate('+(self.width-((self.width/(self.tick-1))*self.tmpLength))+',0)').datum(tmpdata).attr("d", self.area);
 
 			},
 
 			ready: function() {
+
+				if(!this.data) this.data = [];
+
 				this.elem = this.$.chart;
 				var self = this;
-
-				self.n = 60;
-			
+				self.tmpLength = 0;
 				self.width = self.$.chart.clientWidth;
 				self.height = self.$.chart.clientHeight;
 
-				self.data = [];
-
 				self.x = d3.scale.linear()
-				    .domain([0, self.n-1])
+				    .domain([0, self.tick-1])
 				    .range([0, self.width]);
 				self.y = d3.scale.linear()
 				    .domain([0, 5])
@@ -119,9 +147,10 @@
 				self.path = svg.append("g")
 				    .attr("clip-path", "url(#clip)")
 				  .append("path")
-				    .datum(self.data)
 				    .attr("class", "area")
+				    .datum([])
 				    .attr("d", self.area);
+
 
 				window.addEventListener('resize', function() {
 				    self.width = self.elem.offsetWidth;
@@ -132,7 +161,7 @@
 					self.x.range([0, self.width]);
 					self.y.range([self.height, 0]);
 
-					self.path.attr("d", self.area);
+					self.path.attr('transform','translate('+(self.width-((self.width/(self.tick-1))*self.tmpLength))+',0)').attr("d", self.area);
 				}, true);
 			}
 		});

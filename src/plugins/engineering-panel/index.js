@@ -19,9 +19,12 @@ engineeringPanel.prototype.start = function start(){
 			}
 			self.statusdata[i] = data[i];
 		}
-		self.deps.cockpit.emit('plugin.engineering.data', self.statusdata);
+
 	});
 
+	setInterval(function () {
+		self.deps.cockpit.emit('plugin.engineering.data', self.statusdata);
+	}, 1000);
 }
 
 module.exports = function (name, deps) {

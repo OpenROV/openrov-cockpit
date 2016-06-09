@@ -92,7 +92,7 @@ $(function () {
       window.location.reload();
   });
   
-  socket.on('connect',function(){
+
 
     var CacheLVC = function(lvcdumpfn,millseconds){
         var cache = lvcdumpfn();
@@ -100,10 +100,19 @@ $(function () {
         setTimeout(CacheLVC.bind(this,lvcdumpfn,millseconds),millseconds);
     }
 
-    //plugin hooks
+ //plugin hooks
+ var bridge = null;
+
+  socket.on('connect',function(){
+    console.log('connection or reconnection to ROV established');
+
+    if (bridge!==null) {return;} //Only do the code below once
     socket.emit('request-sessionToken',function(sessionID){
+           if (bridge!== null){
+               alert('This should not be called');
+           }
            sessionStorage.sessionID = sessionID; 
-           var bridge = new window.SocketIOtoEmitterBridge(socket,window.cockpit.rov);
+           bridge = new window.SocketIOtoEmitterBridge(socket,window.cockpit.rov);
            
            $('#t')[0]['rovOnline']=true;
            $('#t')[0]['userRole']='Pilot';

@@ -25,7 +25,7 @@
     this.mp4Buffer = [];
     this.statusBuffer = [];
     this.navBuffer = [];
-
+  
   };
 
   plugins.Blackbox = Blackbox;
@@ -66,13 +66,18 @@
         self.logNavData(data);
       }
     });
+    this.cockpit.on('plugin.gps.data', function (data) {
+      if (!jQuery.isEmptyObject(data)) {
+        self.logNavData(data);
+      }
+    });    
     this.cockpit.withHistory.on('status', function (data) {
       if (!jQuery.isEmptyObject(data)) {
         self.logStatusData(data);
       }
     });
     this.cockpit.on('x-h264-video.data', function (data) {
-        self.logMP4Video(data);
+       self.logMP4Video(data);
     });
     this.cockpit.on('plugin-blackbox-export', function(options){
       self.exportData(options);

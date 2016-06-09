@@ -13,7 +13,7 @@ function GPS(name, deps)
 	this.automaticallyReconnect 	= true;
 	this.reconnectTimer           = {};
   
-  if( process.env.USE_MOCK == "true" )
+  if( process.env.USE_MOCK_GPS == "true" )
   {
     setInterval( function()
     {

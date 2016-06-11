@@ -99,22 +99,26 @@ var geomux = function geomux( name, deps )
     videoServer.emit( "geomux.ready" );
   });
   
+
+  // Disconnection
   videoServer.on( "disconnect", function()
   {
     console.log( "Disconnected from video server." );
   });
   
+  // Error
   videoServer.on( "error", function( err )
   {
     console.log( "Video Server Connection Error: " + err );
   });
   
-  // Connect to video server
+  // Reconnect attempt
   videoServer.on( "reconnect", function()
   {
     console.log( "Attempting to reconnect" );
   });
   
+  // Helper function to update local store of cameras and channels
   function UpdateCameraInfo( camera, channel )
   {
     if( cameras[ camera ] === undefined )
@@ -134,8 +138,6 @@ var geomux = function geomux( name, deps )
       
       self.deps.cockpit.emit( "plugin.geomuxp.cameraInfo", cameras );
     }
-    
-    // No changes, no need to emit update
   }
 }
 
@@ -146,6 +148,7 @@ geomux.prototype.start = function start()
   
   var geoprogram = '';
  
+  // Figure out which video server to use
   if (process.env.GEO_MOCK == 'true')
   {
     geoprogram = require.resolve('geo-video-simulator');
@@ -176,7 +179,7 @@ geomux.prototype.start = function start()
   
   const infinite = -1;
  
-  // Launch the video server with specified options. Attempt to restart every 1s.
+  // Set up monitor with specified options
   var monitor = respawn( launch_options,
   {
       name: 'geomux',
@@ -188,28 +191,32 @@ geomux.prototype.start = function start()
       sleep: 1000
   } );
 
-  var self = this;
-  
-  monitor.on('exit',function(code, signal)
+  monitor.on( 'exit',function(code, signal)
   {
-      console.log("code: " + code + " signal: " + signal );
+      console.log( "Geo-video-server exited. Code: [" + code + "] Signal: [" + signal + "]" );
   });
 
-  // Optional stdio logging
-  monitor.on('stdout',function(data)
+  monitor.on( 'stdout',function(data)
   {
       var msg = data.toString('utf-8');
-      console.log(msg);
+      console.log( "geo-video-server STDOUT: " + msg );
   });
 
-  monitor.on('stderr',function(data)
+  monitor.on( 'stderr',function(data)
   {
       var msg = data.toString('utf-8');
-      console.log(msg);
+      console.error( "geo-video-server STDERR: " + msg );
   });
   
+  // Start the monitor
   monitor.start();
 }
+
+//Export provides the public interface
+module.exports = function (name, deps) 
+{
+  return new geomux(name,deps);
+};
 
 
 // BootCameras(function()
@@ -314,8 +321,3 @@ geomux.prototype.start = function start()
 //     });
 // }
 
-//Export provides the public interface
-module.exports = function (name, deps) 
-{
-  return new geomux(name,deps);
-};

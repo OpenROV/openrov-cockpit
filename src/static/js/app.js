@@ -41,6 +41,7 @@ $(function () {
   var force=getParameterByName('force'); //resets the pilot position reservation
   force=force==null?false:true;
   var mc=getParameterByName('mc'); //forces going to mission control
+  var replay=getParameterByName('rp');
   
   var e = new EventEmitter2();
   e.ThisIsTheOne=true;
@@ -72,6 +73,13 @@ $(function () {
      //$.getScript('js/missioncontrol.js');
      return;
   }     
+
+  if (replay!==null){
+     loadScript('js/replay.js'); 
+     //$.getScript('js/missioncontrol.js');
+     return;
+  }    
+
   var tokenOption=force==false?sessionStorage.sessionID:'reset';
   var socket = window.io.connect(window.location.protocol + '//' +
                 window.location.hostname+ ':' +  window.location.port,{path:'/cockpitsocket', query: 'token='+tokenOption  });

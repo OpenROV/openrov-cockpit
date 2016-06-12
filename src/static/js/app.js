@@ -41,6 +41,7 @@ $(function () {
   var force=getParameterByName('force'); //resets the pilot position reservation
   force=force==null?false:true;
   var mc=getParameterByName('mc'); //forces going to mission control
+  var replay=getParameterByName('rp');
   
   var e = new EventEmitter2();
   e.ThisIsTheOne=true;
@@ -72,6 +73,13 @@ $(function () {
      //$.getScript('js/missioncontrol.js');
      return;
   }     
+
+  if (replay!==null){
+     loadScript('js/replay.js'); 
+     //$.getScript('js/missioncontrol.js');
+     return;
+  }    
+
   var tokenOption=force==false?sessionStorage.sessionID:'reset';
   var socket = window.io.connect(window.location.protocol + '//' +
                 window.location.hostname+ ':' +  window.location.port,{path:'/cockpitsocket', query: 'token='+tokenOption  });
@@ -92,7 +100,7 @@ $(function () {
       window.location.reload();
   });
   
-  socket.on('connect',function(){
+
 
     var CacheLVC = function(lvcdumpfn,millseconds){
         var cache = lvcdumpfn();
@@ -100,10 +108,19 @@ $(function () {
         setTimeout(CacheLVC.bind(this,lvcdumpfn,millseconds),millseconds);
     }
 
-    //plugin hooks
+ //plugin hooks
+ var bridge = null;
+
+  socket.on('connect',function(){
+    console.log('connection or reconnection to ROV established');
+
+    if (bridge!==null) {return;} //Only do the code below once
     socket.emit('request-sessionToken',function(sessionID){
+           if (bridge!== null){
+               alert('This should not be called');
+           }
            sessionStorage.sessionID = sessionID; 
-           var bridge = new window.SocketIOtoEmitterBridge(socket,window.cockpit.rov);
+           bridge = new window.SocketIOtoEmitterBridge(socket,window.cockpit.rov);
            
            $('#t')[0]['rovOnline']=true;
            $('#t')[0]['userRole']='Pilot';

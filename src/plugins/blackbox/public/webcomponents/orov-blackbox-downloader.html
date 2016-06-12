@@ -12,6 +12,7 @@
           Time details go here.  We can also grab a preview image.
         </div>
         <div class="card-actions">
+          <paper-button on-click='replay'>{{__('Replay Dive')}}</paper-button>
           <paper-button on-click='export_json'>{{__('Export JSON')}}</paper-button>
           <paper-button on-click='export_xml'>{{__('Export XML')}}</paper-button>
           <paper-button on-click='export_csv'>{{__('Export CSV')}}</paper-button>
@@ -55,6 +56,10 @@
           var options = {collection: '*', format: 'json', sessionID: e.model.item.sessionID};
           this.export(options);
         },
+        replay: function(e){
+          var model = e.model;
+          window.open("/?rp="+e.model.item.sessionID);
+        },        
         export_csv: function(e){
           var model = e.model;
           var options = {collection: '*', format: 'csv', sessionID: e.model.item.sessionID};

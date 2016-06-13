@@ -10,7 +10,6 @@
 
          var session = getParameterByName('rp');
          //Get the data for the session
-         session = '6a96e08f-3c45-4468-8815-d1013ee64a3f';
 
          var spawn = Dexie.spawn;
 

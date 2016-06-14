@@ -35,23 +35,30 @@
     var self = this;
     var current = settings.currentMap;
     var result = settings;
-    if (current.length == 1 && current[0] === null) { // the default mapping isn't setup as the current map yet.
-      self.loadDefaultMapping(function(map) {
-        result = { currentMap: map, maps: [] };
-        loaded(result);
-      })
-    }
-    else {
-      loaded(result);
-    }
 
+    self.loadDefaultMapping(function(defaultMap) {
+      debugger;
+      if (current.length == 1 && current[0] === null) { // the default mapping isn't setup as the current map yet.
+        result = { currentMap: defaultMap, maps: [] };
+      }
+      else {
+        result = settings;
+        result.currentMap.forEach(function(mapping) {
+          var defaultItem = defaultMap.find(function(item) {
+            return mapping.name == item.name;
+          });
+          if (defaultItem) { mapping.description = defaultItem.description; } // copy description
+        });
+      }
+      loaded(result);
+    });
   };
 
   InputConfigurator.prototype.loadDefaultMapping = function (callback) {
     var self = this;
     self.cockpit.emit('InputController.getCommands', function (commands) {
       var currentMap = commands.map(function (command) {
-        var result = { name: command.name, bindings: [] };
+        var result = { name: command.name, bindings: [], description: command.description };
         for (var bindingName in command.bindings) {
           result.bindings.push({ name: bindingName, binding: command.bindings[bindingName] });
         }

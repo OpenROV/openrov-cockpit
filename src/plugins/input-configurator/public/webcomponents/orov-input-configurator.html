@@ -197,6 +197,7 @@
             //         self.$.list.dispatchEvent(new Event('iron-resize'));
             //     }, 500);
             // });
+            self.async(function() { self.$.list.dispatchEvent(new Event('iron-resize')); }, 500);
 
 
             $(self.$.keyboard).keydown(function(event) {

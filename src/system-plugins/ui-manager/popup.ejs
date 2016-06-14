@@ -9,36 +9,17 @@
     <script type='text/javascript' src="components/jquery/dist/jquery.js"></script>
     <!--script type='text/javascript' src="components/jquery-ui/jquery-ui.min.js"></script-->
     <title><%= title %></title>
-    <%
-      var head = scriplets.find(function(item){return item.name=='head'});
-    %>
-    <%if (header !== undefined){ %>
-    <%- include(head.path,{
-      title: title,
-      scripts: scripts,
-      styles: styles,
-      sysscripts: sysscripts,
-      config: config
-    })%>
-    <%}%>
   </head>
 
   <script type='text/javascript' src="js/libs/eventemitter2.js"></script>
-  <!--<script type='text/javascript' src="js/libs/bootstrap.min.js"></script>-->
-  <script type='text/javascript' src="components/bootstrap/dist/js/bootstrap.js"></script>
-
   <script type='text/javascript' src='js/libs/gamepad.js'></script>
   <script type='text/javascript' src='js/utilities.js'></script>
-
   <script type='text/javascript' src="config.js"></script>
   <script type='text/javascript' src="cockpitsocket/socket.io.js"></script>
   <script type='text/javascript' src="system-plugin/globalization/js/initGlobalization.js"></script>
-  <script type='text/javascript' src='js/message-manager.js'></script>
   <script type='text/javascript' src='js/eventEmitterStoreAndForward.js'></script>
   <script type='text/javascript' src='js/socketIOStoreAndForward.js'></script>
   <script type='text/javascript' src='js/socketIOtoEmitterBridge.js'></script>  
-  <script type='text/javascript' src="js/cockpit.js"></script>
-  <script type="text/javascript" src="js/app.js"></script>
   <script type="text/javascript" src="plugin/new-ui/js/lib/0_jquery.svg.min.js"></script>
   <script type="text/javascript" src="plugin/new-ui/js/lib/1_jquery.svgdom.min.js"></script>
   <script type="text/javascript" src="plugin/new-ui/js/lib/2_jquery.svganim.min.js"></script>
@@ -55,9 +36,6 @@
   </script>
   <script>window.openrovtheme='<%=theme%>'</script>
   <link rel="import" href="components/polymer/polymer.html">
-  <!-- Load the browser global services -->
-  <% for(var i=0; i<scripts.length; i++) {%>
-  <script type="text/javascript" src="<%= scripts[i] %>"></script><% } %>
 
   <body>
 <link rel="import" href="components/platinum-sw/platinum-sw-register.html">
@@ -68,51 +46,17 @@
   <platinum-sw-cache default-cache-strategy="networkFirst"></platinum-sw-cache>
 </platinum-sw-register>
 
-<!-- Temporarily disabled pending solution for relative pathing -->
-<link rel="import" href="components/app-route/app-route.html">
-<link rel="import" href="components/app-route/app-location.html">
-<app-location use-hash-as-path url-space-regex="^/#/" route={{route}}></app-location>
-<app-route route="{{route}}" pattern="/:page" data={{routedata}} active="{{homeActive}}"></app-route>
-
-  <%
-    var header = scriplets.find(function(item){return item.name=='header'});
-  %>
-  <%if (header !== undefined){ %>
-  <%- include(header.path,{
-    title: title,
-    scripts: scripts,
-    styles: styles,
-    sysscripts: sysscripts,
-    config: config
-  })%>
-  <%}%>
-
-  <% for(var i=0; i<scriplets.length; i++) {
-    if ((scriplets[i].name == 'header') || (scriplets[i].name == 'footer')|| (scriplets[i].name == 'head')){continue;}%>
-  <template is="dom-if" restamp=true if="{{displaySection(routedata.page,'<%= scriplets[i].name %>')}}">
-
-  <%- include(scriplets[i].path,{
+  <%- include(scriplet.path,{
     title: title,
     scripts: scripts,
     styles: styles,
     sysscripts: sysscripts,
     config: config
   }) %>
-  </template>
-  <% } %>
-
-  <%
-    var footer = scriplets.find(function(item){return item.name=='footer'});
-  %>
-  <%if (footer !== undefined){ %>
-  <%- include(footer.path,{
-    title: title,
-    scripts: scripts,
-    styles: styles,
-    sysscripts: sysscripts,
-    config: config
-  })%>
-  <%}%>
+ 
 </template>
+<script>
+  $('#t')[0]['cockpitEventEmitter']=window.opener.cockpit;
+</script>
   </body>
 </html>

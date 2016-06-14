@@ -1,3 +1,6 @@
+<!--
+TODO:  Change the interface for motors to -1/1 with deadzone accounted for to true up the indicators to the actual ranges
+-->
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../orov-behaviors/orov-behavior.html">
 <dom-module id="orov-newui-throttle">
@@ -257,11 +260,10 @@
       behaviors: [namespace('behaviors').oROVStandard],
       registerEmitterHanlders: function(emitter) {
         var self = this;
-        emitter.on('plugin.rovpilot.setPowerLevel', function (level) {
+        emitter.withHistory.on('plugin.rovpilot.setPowerLevel', function (level) {
           self.setPowerLevel(level);
         });
-        emitter.on('plugin.rovpilot.controls', function (data) {
-          console.log(data);
+        emitter.withHistory.on('plugin.rovpilot.controls', function (data) {
           self.setVertical(Number(data.vertical));
           self.setPort(Number(data.port));
           self.setStarboard(Number(data.starbord));

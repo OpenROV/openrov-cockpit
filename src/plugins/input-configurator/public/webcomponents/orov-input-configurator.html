@@ -209,7 +209,12 @@
 
             emitter.withHistory.on('plugin.inputConfigurator.currentMap.update', function(keyMap) {
                 self.unfilteredCommands = keyMap.map(function(mapping) { // map from array to object 
-                    var result = { name: mapping.name, description: mapping.description ? mapping.description : '', bindings: {} };
+                    var result = { 
+                        name: mapping.name, 
+                        description: mapping.description ? mapping.description : '', 
+                        bindings: {},
+                        defaults: mapping.defaults 
+                    };
                     mapping.bindings.forEach(function(binding) {
                         result.bindings[binding.name] = binding.binding;
                     });

@@ -37,7 +37,6 @@
     var result = settings;
 
     self.loadDefaultMapping(function(defaultMap) {
-      debugger;
       if (current.length == 1 && current[0] === null) { // the default mapping isn't setup as the current map yet.
         result = { currentMap: defaultMap, maps: [] };
       }
@@ -47,7 +46,10 @@
           var defaultItem = defaultMap.find(function(item) {
             return mapping.name == item.name;
           });
-          if (defaultItem) { mapping.description = defaultItem.description; } // copy description
+          if (defaultItem) { 
+            mapping.description = defaultItem.description;
+            mapping.defaults = defaultItem.defaults; 
+          } // copy description and defaults
         });
       }
       loaded(result);
@@ -58,7 +60,7 @@
     var self = this;
     self.cockpit.emit('InputController.getCommands', function (commands) {
       var currentMap = commands.map(function (command) {
-        var result = { name: command.name, bindings: [], description: command.description };
+        var result = { name: command.name, bindings: [], description: command.description, defaults: command.defaults };
         for (var bindingName in command.bindings) {
           result.bindings.push({ name: bindingName, binding: command.bindings[bindingName] });
         }

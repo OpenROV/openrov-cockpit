@@ -17,8 +17,18 @@
   InputConfigurator.prototype.listen = function listen() {
     var self = this;
 
-    self.cockpit.on(plugin + '.currentMap.save', function (newMap) {
-      self.cockpit.rov.emit('plugin.settings-manager.saveSettings', { inputConfigurator: { currentMap: newMap } })
+    // self.cockpit.on(plugin + '.currentMap.save', function (newMap) {
+      
+    // });
+
+    self.cockpit.on(plugin + '.updateBinding', function(arg, callback) {
+      var mapping = self.settings.currentMap.find(function(item) { return item.name == arg.name });
+      debugger;
+      if (mapping) {
+        mapping.bindings = arg.bindings;
+        self.cockpit.rov.emit('plugin.settings-manager.saveSettings', { inputConfigurator: self.settings }, callback);
+      }
+      // else handle error?
     });
 
     self.rov.on('settings-change.inputConfigurator', function (settings) {

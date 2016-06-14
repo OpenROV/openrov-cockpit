@@ -269,7 +269,12 @@
                 this.selectedItem.bindings.gamepad = $(this.$.gamepad).val();
             }
             if (this.eventEmitter!==undefined) {
-                this.eventEmitter.emit('InputController.updateBinding', this.selectedItem, function() {
+                var arg = { name: this.selectedItem.name, bindings: [
+                    { name: 'keyboard', binding: this.selectedItem.bindings.keyboard },
+                    { name: 'gamepad', binding: this.selectedItem.bindings.gamepad },
+                ] };
+
+                this.eventEmitter.emit('plugin.inputConfigurator.updateBinding', arg, function() {
                     self.set('successfullySaved', true);
                     self.async(function() { self.set('successfullySaved', false); }, 2000);
                 });

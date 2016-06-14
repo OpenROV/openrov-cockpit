@@ -27,6 +27,7 @@
   }
 
   plugins.SystemPower.prototype.inputDefaults = function inputDefaults(){
+    var self = this;
     return [
       // Power on ESC
       {
@@ -34,7 +35,7 @@
         description: 'Switches the ESCs on',
         defaults: { keyboard: '[' },
         down: function () {
-          rov.cockpit.rov.emit('plugin.systemPower.powerOnESCs');
+          self.cockpit.rov.emit('plugin.systemPower.powerOnESCs');
         }
       },
 
@@ -44,7 +45,7 @@
         description: 'Switches the ESCs off',
         defaults: { keyboard: ']' },
         down: function () {
-          rov.cockpit.rov.emit('plugin.systemPower.powerOffESCs');
+          self.cockpit.rov.emit('plugin.systemPower.powerOffESCs');
         }
       },
 

@@ -8,80 +8,77 @@
     <style include="normalized-styles"></style>
 
     <style type="text/css">
-     
-      .row.full-width {
-        width: 100%;
-        max-width: 100%;
-      }
+        .row.full-width {
+            width: 100%;
+            max-width: 100%;
+        }
         
-      #controls {
-        height: 150px;
-        border: solid 1px black;
-        overflow: scroll;
-      }
-      
-      .successfullySaved {
-        opacity: 1;
-      }
-      
-      .successfullySaved.hide {
-        opacity: 0;
-        display: block;
-        transition: opacity 1.5s ease-out;
-      }
-      
-      .header {
-          font-weight: bold;
-      }
-      
-      .currentItem {
-          background-color: #dff0d8;
-      }
-      
-      .controlsRow:hover {
-          background-color: #ddd;
-      }
-      
-      .hidden {
-          display: none;
-      }
-
-
+        #controls {
+            height: 150px;
+            border: solid 1px black;
+            overflow: scroll;
+        }
+        
+        .successfullySaved {
+            opacity: 1;
+        }
+        
+        .successfullySaved.hide {
+            opacity: 0;
+            display: block;
+            transition: opacity 1.5s ease-out;
+        }
+        
+        .header {
+            font-weight: bold;
+        }
+        
+        .currentItem {
+            background-color: #dff0d8;
+        }
+        
+        .controlsRow:hover {
+            background-color: #ddd;
+        }
+        
+        .hidden {
+            display: none;
+        }
     </style>
-  <template>
-      <p>&nbsp;<br/><br/><br/><br/></p>
-      <label>{{__('Input configurator')}}</label>
+    <template>
+        <p>&nbsp;<br/><br/><br/><br/></p>
+        <label>{{__('Input configurator')}}</label>
 
-      <div id="controls" class="center">
-        <div id="commandsList" class="table">
-            <div class="header">
-                <div style="float:left; min-width:40%">{{__('Command')}}</div>
-                <div style="">{{__('Description')}}</div>
+        <div id="controls" class="center">
+            <div id="commandsList" class="table">
+                <div class="header">
+                    <div style="float:left; min-width:40%">{{__('Command')}}</div>
+                    <div style="">{{__('Description')}}</div>
+                </div>
+                <iron-list id="list" items="[[commands]]" as="item" selected-item="{{selectedItem}}" selection-enabled>
+                    <template>
+                        <div class$="controlsRow [[getClassForItem(item, selected)]]">
+                            <div style="float:left; min-width:40%">{{__(item.name)}}</div>
+                            <div style="">{{__(item.description)}}</div>
+                        </div>
+                    </template>
+                </iron-list>
             </div>
-            <iron-list id="list" items="[[commands]]" as="item" selected-item="{{selectedItem}}" selection-enabled >
-                <template>
-                    <div class$="controlsRow [[getClassForItem(item, selected)]]">
-                        <div style="float:left; min-width:40%">{{__(item.name)}}</div>
-                        <div style="">{{__(item.description)}}</div>
-                    </div>
-                </template>
-            </iron-list>
         </div>
-        </div>
-        
+
         <div class="row full-width">
             <div class="small-6 columns">
                 <div class="row collapse prefix-radius">
                     <div class="small-2 columns">
                         <label class="prefix" for="find">{{__('Find')}}:</label>
                     </div>
-                     <div class="small-3 columns left">
+                    <div class="small-3 columns left">
                         <input id="find" type="text" value="{{find::input}}" />
-                     </div>
+                    </div>
                 </div>
-            </div> 
+            </div>
         </div>
-        
+
         <div class$="[[showEditor(selectedItem)]]">
 
             <div class="row full-width">
@@ -91,29 +88,30 @@
                             <label class="prefix" for="keyboard">{{__('Keyboard')}}:</label>
                         </div>
                         <div class="small-3 columns left">
-                            <input id="keyboard" type="text" class$="{{ getClassInCaseOfDupplicates(keyboardDuplicates.*, 'error') }}" value="{{selectedItem.bindings.keyboard}}" />
+                            <input id="keyboard" type="text" class$="{{ getClassInCaseOfDupplicates(keyboardDuplicates.*, 'error') }}" value="{{selectedItem.bindings.keyboard}}"
+                            />
                             <small class$="[[ getClassInCaseOfDupplicates(keyboardDuplicates.*, 'error', 'hide') ]]">Duplicate!</small>
                         </div>
-                     </div>
+                    </div>
 
-                     <div class="row collapse prefix-radius">
+                    <div class="row collapse prefix-radius">
                         <div class="small-2 columns">
                             <label class="prefix" for="gamepad">{{__('Gamepad')}}:</label>
                         </div>
                         <div class="small-3 columns left">
                             <input id="gamepad" type="text" value="{{__(selectedItem.bindings.gamepad)}}" />
-                        </div>                            
+                        </div>
                     </div>
-                    
-                    
-                 </div>
+
+
+                </div>
             </div>
             <div class="row full-width">
                 <div class$="small-12 columns {{ getClass(duplicates, '', 'hide') }}">
                     Duplicates:
                     <div class="row full-width">
                         <div class="small-9 columns left">
-                            <iron-list id="keyboardList" items="[[keyboardDuplicates]]" as="item" >
+                            <iron-list id="keyboardList" items="[[keyboardDuplicates]]" as="item">
                                 <template>
                                     <div class$="controlsRow [[getClassForItem(item, selected)]]">
                                         <div style="float:left; min-width:40%">{{__(item.name)}}</div>
@@ -121,44 +119,44 @@
                                     </div>
                                 </template>
                             </iron-list>
-                        </div>
-                        </div>
-                        <div class="row full-width">
-                        <div class="small-9 columns left">
-
-                            <iron-list id="gamepadList" items="[[gamepadDuplicates]]" as="item" >
-                                <template>
-                                    <div class$="controlsRow [[getClassForItem(item, selected)]]">
-                                        <div style="float:left; min-width:40%">{{__(item.name)}}</div>
-                                        <div style="">{{__(item.description)}}</div>
-                                    </div>
-                                </template>
-                            </iron-list>
-                        
                         </div>
                     </div>
-            </div>
+                    <div class="row full-width">
+                        <div class="small-9 columns left">
 
-            <div class="row full-width">
-                 <div class="small-6 columns">
-                    <button on-tap="onSave" type="button" class$="button {{ getClass(duplicates,'secondary disabled') }}">Save</button>
-                    <button on-tap="onReset" type="button" class="button">Reset</button>
-                 </div>
-                 
-                <div class="small-6 columns">
-                    <div class$="small-4 columns successfullySaved {{ getClass(successfullySaved, '', 'hide') }}">
-                        <div data-alert class="alert-box success">
-                            Binding saved!
+                            <iron-list id="gamepadList" items="[[gamepadDuplicates]]" as="item">
+                                <template>
+                                    <div class$="controlsRow [[getClassForItem(item, selected)]]">
+                                        <div style="float:left; min-width:40%">{{__(item.name)}}</div>
+                                        <div style="">{{__(item.description)}}</div>
+                                    </div>
+                                </template>
+                            </iron-list>
+
                         </div>
                     </div>
                 </div>
-                 
+
+                <div class="row full-width">
+                    <div class="small-6 columns">
+                        <button on-tap="onSave" type="button" class$="button {{ getClass(duplicates,'secondary disabled') }}">Save</button>
+                        <button on-tap="onReset" type="button" class="button">Reset</button>
+                    </div>
+
+                    <div class="small-6 columns">
+                        <div class$="small-4 columns successfullySaved {{ getClass(successfullySaved, '', 'hide') }}">
+                            <div data-alert class="alert-box success">
+                                Binding saved!
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
 
-        </div>
-        
-  </template>
-  <script>
+    </template>
+    <script>
     (function() {
 
       var keyboardMap = ["","","","CANCEL","","","HELP","","BACK_SPACE","TAB","","","CLEAR","ENTER","RETURN","","SHIFT","CTRL","ALT","PAUSE","CAPSLOCK","KANA","EISU","JUNJA","FINAL","HANJA","","ESC","CONVERT","NONCONVERT","ACCEPT","MODECHANGE","SPACE","PAGE_UP","PAGE_DOWN","END","HOME","LEFT","UP","RIGHT","DOWN","SELECT","PRINT","EXECUTE","PRINTSCREEN","INSERT","DELETE","","0","1","2","3","4","5","6","7","8","9",":",";","LESS_THAN","=","GREATER_THAN","QUESTION_MARK","AT","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","WIN","","CONTEXT_MENU","","SLEEP","NUMPAD0","NUMPAD1","NUMPAD2","NUMPAD3","NUMPAD4","NUMPAD5","NUMPAD6","NUMPAD7","NUMPAD8","NUMPAD9","MULTIPLY","ADD","SEPARATOR","SUBTRACT","DECIMAL","DIVIDE","F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12","F13","F14","F15","F16","F17","F18","F19","F20","F21","F22","F23","F24","","","","","","","","","NUM_LOCK","SCROLL_LOCK","WIN_OEM_FJ_JISHO","WIN_OEM_FJ_MASSHOU","WIN_OEM_FJ_TOUROKU","WIN_OEM_FJ_LOYA","WIN_OEM_FJ_ROYA","","","","","","","","","","CIRCUMFLEX","EXCLAMATION","\"","#","$","%","&","_","(",")","*","+","|","HYPHEN_MINUS","{","}","~","","","","","VOLUME_MUTE","VOLUME_DOWN","VOLUME_UP","","",";","=",",","-",".","/","`","","","","","","","","","","","","","","","","","","","","","","","","","","","[","\\","]","'","","META","ALTGR","","WIN_ICO_HELP","WIN_ICO_00","","WIN_ICO_CLEAR","","","WIN_OEM_RESET","WIN_OEM_JUMP","WIN_OEM_PA1","WIN_OEM_PA2","WIN_OEM_PA3","WIN_OEM_WSCTRL","WIN_OEM_CUSEL","WIN_OEM_ATTN","WIN_OEM_FINISH","WIN_OEM_COPY","WIN_OEM_AUTO","WIN_OEM_ENLW","WIN_OEM_BACKTAB","ATTN","CRSEL","EXSEL","EREOF","PLAY","ZOOM","","PA1","WIN_OEM_CLEAR",""];
@@ -181,24 +179,7 @@
           var self = this;
           if (this.eventEmitter!==undefined){
               
-            // this.eventEmitter.emit('InputController.getCommands',function(results){
-            //     self.unfilteredCommands = results;
-            //     self.updateCommands();
-
-            //     var commands = results;
-            //     self.eventEmitter.emit('plugin.settings-manager.getSettings','inputConfigurator',function(settings){
-
-            //     });
-
-
-            //     // The polymer iron-list is a bit funny when you don't size it absolutely.
-            //     // On the first load it doesn't show items properly, this fixes it:
-            //     self.async(function() {
-            //         self.$.list.dispatchEvent(new Event('iron-resize'));
-            //     }, 500);
-            // });
             self.async(function() { self.$.list.dispatchEvent(new Event('iron-resize')); }, 500);
-
 
             $(self.$.keyboard).keydown(function(event) {
                 var value = keyboardMap[event.which].toLowerCase();
@@ -234,7 +215,6 @@
                     });
                     return result;
                 });
-                debugger;
                 self.updateCommands();
             });
 

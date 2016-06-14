@@ -17,16 +17,17 @@
   InputConfigurator.prototype.listen = function listen() {
     var self = this;
 
-    // self.cockpit.on(plugin + '.currentMap.save', function (newMap) {
-      
-    // });
-
     self.cockpit.on(plugin + '.updateBinding', function(arg, callback) {
       var mapping = self.settings.currentMap.find(function(item) { return item.name == arg.name });
       debugger;
       if (mapping) {
         mapping.bindings = arg.bindings;
         self.cockpit.rov.emit('plugin.settings-manager.saveSettings', { inputConfigurator: self.settings }, callback);
+
+        // apply to inputConfigurator
+        var control = { name: mapping.name, bindings: {}};
+        mapping.bindings.forEach(function(aBinding) { control.bindings[aBinding.name] = aBinding.binding })
+        self.cockpit.emit('InputController.updateBinding', control, function() {  console.log('done');  });
       }
       // else handle error?
     });

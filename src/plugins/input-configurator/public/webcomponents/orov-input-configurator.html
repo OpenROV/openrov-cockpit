@@ -20,6 +20,16 @@
         overflow: scroll;
       }
       
+      .successfullySaved {
+        opacity: 1;
+      }
+      
+      .successfullySaved.hide {
+        opacity: 0;
+        display: block;
+        transition: opacity 1.5s ease-out;
+      }
+      
       .header {
           font-weight: bold;
       }
@@ -72,21 +82,6 @@
             </div> 
         </div>
         
-<!--<div class="large-6 columns">
-    <div class="row">
-        <div class="large-4 columns">
-        <label>Input Label
-            <input type="text" placeholder="large-4.columns">
-        </label>
-        </div>
-        <div class="large-4 columns">
-        <label>Input Label
-            <input type="text" placeholder="large-4.columns">
-        </label>
-        </div>
-    </div>
-</div>-->
-
         <div class$="[[showEditor(selectedItem)]]">
 
             <div class="row full-width">
@@ -143,12 +138,23 @@
                         </div>
                     </div>
             </div>
+
             <div class="row full-width">
                  <div class="small-6 columns">
                     <button on-tap="onSave" type="button" class$="button {{ getClass(duplicates,'secondary disabled') }}">Save</button>
                     <button on-tap="onReset" type="button" class="button">Reset</button>
                  </div>
+                 
+                <div class="small-6 columns">
+                    <div class$="small-4 columns successfullySaved {{ getClass(successfullySaved, '', 'hide') }}">
+                        <div data-alert class="alert-box success">
+                            Binding saved!
+                        </div>
+                    </div>
+                </div>
+                 
             </div>
+
         </div>
         
   </template>
@@ -166,21 +172,41 @@
           selectedItem: {type: Object, value: undefined, observer: 'selectedItemChanged' },
           keyboardDuplicates: {type: Array, value: []},
           gamepaddDuplicates: {type: Array, value: []},
-          duplicates: {type: Boolean, computed: 'hasDuplicates(keyboardDuplicates.*, gamepaddDuplicates.*)'}
+          duplicates: {type: Boolean, computed: 'hasDuplicates(keyboardDuplicates.*, gamepaddDuplicates.*)'},
+          successfullySaved: {type: Boolean, value: false}
         },
         behaviors: [namespace('behaviors').oROVStandard],
     
         attached: function () {
           var self = this;
           if (this.eventEmitter!==undefined){
-
+              
             this.eventEmitter.emit('InputController.getCommands',function(results){
                 self.unfilteredCommands = results;
                 self.updateCommands();
 
+                var commands = results;
+                self.eventEmitter.emit('plugin.settings-manager.getSettings','inputConfigurator',function(settings){
+                    var current = settings.inputConfigurator.currentMap;
+                    if (current.length == 1 && current[0] === null) { // the default mapping isn't setup as the current map yet.
+                        var currentMap = commands.map(function(command) {
+                            var result = { name: command.name, bindings: [] };
+                            for(var bindingName in command.bindings) {
+                                result.bindings.push({name: bindingName, binding: command.bindings[bindingName] });
+                            }
+                            return result; 
+                        });
+                        // settings.inputConfigurator.currentMap = currentMap;
+                        self.eventEmitter.emit('plugin.inputConfigurator.currentMap.update', currentMap);
+                    }
+                });
+
+
                 // The polymer iron-list is a bit funny when you don't size it absolutely.
-                // On the first load it doesn't show items properly, this fixes it:                
-                self.$.list.dispatchEvent(new Event('iron-resize'));
+                // On the first load it doesn't show items properly, this fixes it:
+                self.async(function() {
+                    self.$.list.dispatchEvent(new Event('iron-resize'));
+                }, 500);
             });
 
 
@@ -226,18 +252,17 @@
             });         
         },
         enable: function(e){
-        //   if (this.eventEmitter!==undefined){
-        //     this.eventEmitter.emit('plugin-manager.enablePlugin',e.model.item.name);
-        //   }
         },
         disable: function(e){
-        //   if (this.eventEmitter!==undefined){
-        //     this.eventEmitter.emit('plugin-manager.disablePlugin',e.model.item.name);
-        //   }
         },
         
         selectedItemChanged: function() {
-            this.onReset();
+            if (this.selectedItem) {
+                debugger;
+                $(this.$.keyboard).val(this.selectedItem.bindings.keyboard);
+                $(this.$.gamepad).val(this.selectedItem.bindings.gamepad);
+                this.keyboardDuplicates = [];
+            }
         },
 
         findChanged: function() {
@@ -250,18 +275,17 @@
         },
         
         onSave: function(e) {
+            var self = this;
             if (this.selectedItem) {
                 this.selectedItem.bindings.keyboard = $(this.$.keyboard).val();
                 this.selectedItem.bindings.gamepad = $(this.$.gamepad).val();
             }
             if (this.eventEmitter!==undefined) {
                 this.eventEmitter.emit('InputController.updateBinding', this.selectedItem, function() {
-                    console.log('done');
+                    self.set('successfullySaved', true);
+                    self.async(function() { self.set('successfullySaved', false); }, 2000);
                 });
             }
-        },
-        foo: function(list) {
-          return "abc" +  list.base.length;  
         },
         getClass: function(duplicates, duplicateClass, nonDuplicateClass) {
             if (duplicates) {
@@ -272,8 +296,8 @@
 
         onReset: function() {
             if (this.selectedItem) {
-                $(this.$.keyboard).val(this.selectedItem.bindings.keyboard);
-                $(this.$.gamepad).val(this.selectedItem.bindings.gamepad);
+                $(this.$.keyboard).val(this.selectedItem.defaults.keyboard);
+                $(this.$.gamepad).val(this.selectedItem.defaults.gamepad);
                 this.keyboardDuplicates = [];
             }
         },

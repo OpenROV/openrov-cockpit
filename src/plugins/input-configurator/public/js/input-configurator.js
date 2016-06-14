@@ -29,8 +29,17 @@
   };
 
   InputConfigurator.prototype.LoadSettings = function LoadSettings(settings) {
+    debugger;
   };
   InputConfigurator.prototype.SaveSettings = function() {
   };
+  
+  InputConfigurator.prototype.listen = function listen() {
+    var self=this;
+    self.cockpit.on('plugin.inputConfigurator.currentMap.update', function(newMap) {
+      self.cockpit.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: {currentMap: newMap}})
+    });  
+  };
+  
   window.Cockpit.plugins.push(InputConfigurator);
 }(window, jQuery));

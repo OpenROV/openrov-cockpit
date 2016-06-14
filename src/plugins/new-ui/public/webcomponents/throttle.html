@@ -290,7 +290,7 @@
         var verticalMaxElement = $(this.$.vertical).find('#maxThrottle rect');
         var starboardMaxElement = $(this.$.starboard).find('#maxThrottle rect');
         //815 is the design height of the throttle SVG element, 200 the min height of the throttle display at power level 1
-        var height = level.map(1, 5, 0, 815) + 200;
+        var height = level.map(0, 5, 0, 815);
         var y = 815 / 2 - height / 2;
         portMaxElement.animate({
           svgHeight: height,

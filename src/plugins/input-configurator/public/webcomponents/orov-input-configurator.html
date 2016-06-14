@@ -181,33 +181,22 @@
           var self = this;
           if (this.eventEmitter!==undefined){
               
-            this.eventEmitter.emit('InputController.getCommands',function(results){
-                self.unfilteredCommands = results;
-                self.updateCommands();
+            // this.eventEmitter.emit('InputController.getCommands',function(results){
+            //     self.unfilteredCommands = results;
+            //     self.updateCommands();
 
-                var commands = results;
-                self.eventEmitter.emit('plugin.settings-manager.getSettings','inputConfigurator',function(settings){
-                    var current = settings.inputConfigurator.currentMap;
-                    if (current.length == 1 && current[0] === null) { // the default mapping isn't setup as the current map yet.
-                        var currentMap = commands.map(function(command) {
-                            var result = { name: command.name, bindings: [] };
-                            for(var bindingName in command.bindings) {
-                                result.bindings.push({name: bindingName, binding: command.bindings[bindingName] });
-                            }
-                            return result; 
-                        });
-                        // settings.inputConfigurator.currentMap = currentMap;
-                        self.eventEmitter.emit('plugin.inputConfigurator.currentMap.update', currentMap);
-                    }
-                });
+            //     var commands = results;
+            //     self.eventEmitter.emit('plugin.settings-manager.getSettings','inputConfigurator',function(settings){
+
+            //     });
 
 
-                // The polymer iron-list is a bit funny when you don't size it absolutely.
-                // On the first load it doesn't show items properly, this fixes it:
-                self.async(function() {
-                    self.$.list.dispatchEvent(new Event('iron-resize'));
-                }, 500);
-            });
+            //     // The polymer iron-list is a bit funny when you don't size it absolutely.
+            //     // On the first load it doesn't show items properly, this fixes it:
+            //     self.async(function() {
+            //         self.$.list.dispatchEvent(new Event('iron-resize'));
+            //     }, 500);
+            // });
 
 
             $(self.$.keyboard).keydown(function(event) {
@@ -235,10 +224,24 @@
         },
         registerEmitterHanlders: function(emitter){
             var self = this;
+
+            emitter.withHistory.on('plugin.inputConfigurator.currentMap.update', function(keyMap) {
+                self.unfilteredCommands = keyMap.map(function(mapping) { // map from array to object 
+                    var result = { name: mapping.name, description: mapping.description ? mapping.description : '', bindings: {} };
+                    mapping.bindings.forEach(function(binding) {
+                        result.bindings[binding.name] = binding.binding;
+                    });
+                    return result;
+                });
+                debugger;
+                self.updateCommands();
+            });
+
             emitter.on('InputController.registeredCommand',function(command){
                 self.push('commands',command);
             });
             
+            //TODO Add dupplicates handling!
             emitter.on('systemPlugin.inputController.gamepad.buttonDown', function(button) {
                 if (self.selectedItem) {
                     $(self.$.gamepad).val(button);   
@@ -258,7 +261,6 @@
         
         selectedItemChanged: function() {
             if (this.selectedItem) {
-                debugger;
                 $(this.$.keyboard).val(this.selectedItem.bindings.keyboard);
                 $(this.$.gamepad).val(this.selectedItem.bindings.gamepad);
                 this.keyboardDuplicates = [];

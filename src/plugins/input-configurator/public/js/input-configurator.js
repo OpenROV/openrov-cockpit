@@ -1,45 +1,66 @@
 /*jshint multistr: true*/
 (function (window, $, undefined) {
   'use strict';
+  const plugin = 'plugin.inputConfigurator';
+
   var InputConfigurator;
   InputConfigurator = function InputConfigurator(cockpit) {
-    console.log('Loading Motor_diags plugin in the browser.');
-    // Instance variables
+    console.log('Loading InputConfigurator in the browser.');
     this.cockpit = cockpit;
-    // Add required UI elements
+    var self = this;
+    self.settings = undefined;
+
+    self.rov = self.cockpit.rov.withHistory;
+
+  };
+
+  InputConfigurator.prototype.listen = function listen() {
     var self = this;
 
-    // var jsFileLocation = urlOfJsFile('input-configurator.js');
-    // // the js folder path
-    // this.cockpit.extensionPoints.rovSettings.find('#inputConfigurator').load(jsFileLocation + '../settings.html', function () {
-    //   self.cockpit.extensionPoints.rovSettings.find('#inputConfigurator').find('button#show').click(function() {
-    //     $('body').find('#inputConfiguratorDialogContainer')  
-    //       .find('#inputConfiguratorDialog').modal('show');
-    //     self.cockpit.extensionPoints.inputController.suspend();
-    //     $('body').find('#inputConfiguratorDialogContainer')  
-    //       .find('#inputConfiguratorDialog').on('hidden.bs.modal', function (e) {
-    //         self.cockpit.extensionPoints.inputController.resume();
-    //       })
-    //   })
-    //   $('body').find('#inputConfiguratorDialogContainer')
-    //     .load(jsFileLocation + '../configuratorDialog.html', function () {
-    //     });
-    // });
+    self.cockpit.on(plugin + '.currentMap.save', function (newMap) {
+      self.cockpit.rov.emit('plugin.settings-manager.saveSettings', { inputConfigurator: { currentMap: newMap } })
+    });
+
+    self.rov.on('settings-change.inputConfigurator', function (settings) {
+      self.loadSettings(settings.inputConfigurator, function(loadedSettings) {
+        self.settings = loadedSettings;
+        self.cockpit.emit(plugin + '.currentMap.update', loadedSettings.currentMap);
+      });
+
+    });
 
   };
 
-  InputConfigurator.prototype.LoadSettings = function LoadSettings(settings) {
-    debugger;
+  InputConfigurator.prototype.loadSettings = function (settings, loaded) {
+    var self = this;
+    var current = settings.currentMap;
+    var result = settings;
+    if (current.length == 1 && current[0] === null) { // the default mapping isn't setup as the current map yet.
+      self.loadDefaultMapping(function(map) {
+        result = { currentMap: map, maps: [] };
+        loaded(result);
+      })
+    }
+    else {
+      loaded(result);
+    }
+
   };
-  InputConfigurator.prototype.SaveSettings = function() {
-  };
-  
-  InputConfigurator.prototype.listen = function listen() {
-    var self=this;
-    self.cockpit.on('plugin.inputConfigurator.currentMap.update', function(newMap) {
-      self.cockpit.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: {currentMap: newMap}})
-    });  
-  };
-  
+
+  InputConfigurator.prototype.loadDefaultMapping = function (callback) {
+    var self = this;
+    self.cockpit.emit('InputController.getCommands', function (commands) {
+      var currentMap = commands.map(function (command) {
+        var result = { name: command.name, bindings: [] };
+        for (var bindingName in command.bindings) {
+          result.bindings.push({ name: bindingName, binding: command.bindings[bindingName] });
+        }
+        return result;
+      });
+      callback(currentMap);
+    });
+
+  }
+
   window.Cockpit.plugins.push(InputConfigurator);
-}(window, jQuery));
+} (window, jQuery));

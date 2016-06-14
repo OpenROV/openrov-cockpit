@@ -178,6 +178,7 @@
         attached: function () {
           var self = this;
           if (this.eventEmitter!==undefined){
+            this.eventEmitter.emit('InpitController.suspendAll')
               
             self.async(function() { self.$.list.dispatchEvent(new Event('iron-resize')); }, 500);
 
@@ -203,6 +204,11 @@
             });
 
           }
+        },
+        detached: function() {
+            if (this.eventEmitter!==undefined){
+                this.eventEmitter.emit('InpitController.resumeAll')
+            }
         },
         registerEmitterHanlders: function(emitter){
             var self = this;

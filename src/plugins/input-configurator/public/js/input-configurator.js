@@ -59,7 +59,16 @@
 
     self.loadDefaultMapping(function(defaultMap) {
       if (current.length == 1 && current[0] === null) { // the default mapping isn't setup as the current map yet.
-        result = { currentMap: defaultMap, maps: [] };
+        result = { 
+          currentMap: defaultMap, 
+          maps: [
+            { 
+              name: 'OpenROV Default', 
+              map: JSON.parse(JSON.stringify(defaultMap)) 
+            }
+          ]
+        };
+        self.cockpit.rov.emit('plugin.settings-manager.saveSettings', { inputConfigurator: result });
       }
       else {
         result = settings;

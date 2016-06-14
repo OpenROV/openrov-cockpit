@@ -84,6 +84,20 @@
         fn();
       }
     });
+
+    this.cockpit.on('InpitController.suspendAll', function(fn) {
+      self.model.commands.forEach(function(command) {
+        self.suspend(command.name);  
+      });
+      if (fn) {fn();}
+    });
+    
+    this.cockpit.on('InpitController.resumeAll', function(fn) {
+      self.model.commands.forEach(function(command) {
+        self.resume(command.name);  
+      });
+      if (fn) {fn();}
+    });
     
 
     /* Crawl the plugins looking for those with settings definitions */
@@ -210,7 +224,7 @@
 
   inputController.InputController.prototype.suspend = function(controlName) {
     var self = this;
-    self.previouslyActiveCommands = self.commands()
+    self.previouslyActiveCommands = self.model.commands
       .filter(function(command) {return command.active});
     
      self.controllers.forEach(function (controller) {

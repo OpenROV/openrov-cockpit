@@ -19,15 +19,12 @@
 
     self.cockpit.on(plugin + '.updateBinding', function(arg, callback) {
       var mapping = self.settings.currentMap.find(function(item) { return item.name == arg.name });
-      debugger;
       if (mapping) {
         mapping.bindings = arg.bindings;
         self.cockpit.rov.emit('plugin.settings-manager.saveSettings', { inputConfigurator: self.settings }, callback);
 
         // apply to inputConfigurator
-        var control = { name: mapping.name, bindings: {}};
-        mapping.bindings.forEach(function(aBinding) { control.bindings[aBinding.name] = aBinding.binding })
-        self.cockpit.emit('InputController.updateBinding', control, function() {  console.log('done');  });
+        self.sendToInputController(mapping);
       }
       // else handle error?
     });
@@ -36,10 +33,23 @@
       self.loadSettings(settings.inputConfigurator, function(loadedSettings) {
         self.settings = loadedSettings;
         self.cockpit.emit(plugin + '.currentMap.update', loadedSettings.currentMap);
+
+        //load mapping into input controller
+        loadedSettings.currentMap.forEach(function(item) {
+          self.sendToInputController(item);
+        });
+
       });
 
     });
 
+  };
+
+  InputConfigurator.prototype.sendToInputController = function (mapping) {
+    var self = this;
+    var control = { name: mapping.name, bindings: {}};
+    mapping.bindings.forEach(function(aBinding) { control.bindings[aBinding.name] = aBinding.binding })
+    self.cockpit.emit('InputController.updateBinding', control, function() {  console.log('done');  });
   };
 
   InputConfigurator.prototype.loadSettings = function (settings, loaded) {

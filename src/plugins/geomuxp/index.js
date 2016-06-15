@@ -26,87 +26,84 @@ var geomux = function geomux( name, deps )
 
   var cameras     = {};
   
+  // ----------------------------
+  // Register all other listeners
+  
+  cockpit.on( "plugin.geomuxp.command", function( camera, command, params )
+  {
+    // Forward to geo-video-server
+    videoServer.emit( "geomux.command", camera, command, params );
+  } );
+  
+  videoServer.on( "video-deviceRegistration", function( update )
+  {
+    console.log( "Got device update" );
+    // self.deps.globalEventLoop.emit('video-deviceRegistration',update);
+  } );
+
+  // Video endpoint announcement
+  videoServer.on( "geomux.video.announcement", function( camera, channel, info )
+  {
+    console.log( "Announcement info: " + JSON.stringify( info ) );
+    
+    // Emit message on global event loop to register with the Video plugin
+    self.deps.globalEventLoop.emit('CameraRegistration',
+    { 
+      location:           info.txtRecord.cameraLocation,
+      videoMimeType:      info.txtRecord.videoMimeType,
+      resolution:         info.txtRecord.resolution,
+      framerate:          info.txtRecord.framerate,
+      wspath:             info.txtRecord.wspath,
+      relativeServiceUrl: info.txtRecord.relativeServiceUrl,
+      sourcePort:         info.port,
+      sourceAddress:      info.addresses[0],
+      connectionType:     'socket.io'
+    });
+  });
+  
+  // Channel settings
+  videoServer.on( "geomux.channel.settings", function( camera, channel, settings )
+  {
+    UpdateCameraInfo( camera, channel );
+    self.deps.cockpit.emit("plugin.geomuxp." + camera + "_" + channel + ".settings", settings );
+  } );
+  
+  // Channel health
+  videoServer.on( "geomux.channel.health", function( camera, channel, health )
+  {
+    UpdateCameraInfo( camera, channel );
+    self.deps.cockpit.emit("plugin.geomuxp." + camera + "_" + channel + ".health", health );
+  });
+  
+  // Channel api
+  videoServer.on( "geomux.channel.api", function( camera, channel, api )
+  {
+    UpdateCameraInfo( camera, channel );
+    self.deps.cockpit.emit("plugin.geomuxp." + camera + "_" + channel + ".api", api );
+  });
+  
+  // Channel status
+  videoServer.on( "geomux.channel.status", function( camera, channel, status )
+  {
+    UpdateCameraInfo( camera, channel );
+    self.deps.cockpit.emit("plugin.geomuxp." + camera + "_" + channel + ".status", status );
+  });
+  
+  // Channel error
+  videoServer.on( "geomux.channel.error", function( camera, channel, error )
+  {
+    UpdateCameraInfo( camera, channel );
+    self.deps.cockpit.emit("plugin.geomuxp." + camera + "_" + channel + ".error", error );
+  });
+
   // Upon connecting to video server, set up listeners
   videoServer.on( "connect", function()
   {
     console.log( "Successfully connected to geo-video-server" );
     
-    // ----------------------------
-    // Register all other listeners
-    
-    cockpit.on( "plugin.geomuxp.command", function( camera, command, params )
-    {
-      // Forward to geo-video-server
-      videoServer.emit( "geomux.command", camera, command, params );
-    } );
-    
-
-    videoServer.on( "video-deviceRegistration", function( update )
-    {
-      console.log( "Got device update" );
-      // self.deps.globalEventLoop.emit('video-deviceRegistration',update);
-    } );
-
-
-    // Video endpoint announcement
-    videoServer.on( "geomux.video.announcement", function( camera, channel, info )
-    {
-      console.log( "Announcement info: " + JSON.stringify( info ) );
-      
-      // Emit message on global event loop to register with the Video plugin
-      self.deps.globalEventLoop.emit('CameraRegistration',
-      { 
-        location:           info.txtRecord.cameraLocation,
-        videoMimeType:      info.txtRecord.videoMimeType,
-        resolution:         info.txtRecord.resolution,
-        framerate:          info.txtRecord.framerate,
-        wspath:             info.txtRecord.wspath,
-        relativeServiceUrl: info.txtRecord.relativeServiceUrl,
-        sourcePort:         info.port,
-        sourceAddress:      info.addresses[0],
-        connectionType:     'socket.io'
-      });
-    });
-    
-    // Channel settings
-    videoServer.on( "geomux.channel.settings", function( camera, channel, settings )
-    {
-      UpdateCameraInfo( camera, channel );
-      self.deps.cockpit.emit("plugin.geomuxp." + camera + "_" + channel + ".settings", settings );
-    } );
-    
-    // Channel health
-    videoServer.on( "geomux.channel.health", function( camera, channel, health )
-    {
-      UpdateCameraInfo( camera, channel );
-      self.deps.cockpit.emit("plugin.geomuxp." + camera + "_" + channel + ".health", health );
-    });
-    
-    // Channel api
-    videoServer.on( "geomux.channel.api", function( camera, channel, api )
-    {
-      UpdateCameraInfo( camera, channel );
-      self.deps.cockpit.emit("plugin.geomuxp." + camera + "_" + channel + ".api", api );
-    });
-    
-    // Channel status
-    videoServer.on( "geomux.channel.status", function( camera, channel, status )
-    {
-      UpdateCameraInfo( camera, channel );
-      self.deps.cockpit.emit("plugin.geomuxp." + camera + "_" + channel + ".status", status );
-    });
-    
-    // Channel error
-    videoServer.on( "geomux.channel.error", function( camera, channel, error )
-    {
-      UpdateCameraInfo( camera, channel );
-      self.deps.cockpit.emit("plugin.geomuxp." + camera + "_" + channel + ".error", error );
-    });
-    
     // Tell geo-video-server to start the daemons
     videoServer.emit( "geomux.ready" );
   });
-  
   
   // Disconnection
   videoServer.on( "disconnect", function()

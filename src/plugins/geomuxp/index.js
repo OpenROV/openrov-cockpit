@@ -40,6 +40,14 @@ var geomux = function geomux( name, deps )
       videoServer.emit( "geomux.command", camera, command, params );
     } );
     
+
+    videoServer.on( "video-deviceRegistration", function( update )
+    {
+      console.log( "Got device update" );
+      // self.deps.globalEventLoop.emit('video-deviceRegistration',update);
+    } );
+
+
     // Video endpoint announcement
     videoServer.on( "geomux.video.announcement", function( camera, channel, info )
     {
@@ -99,7 +107,7 @@ var geomux = function geomux( name, deps )
     videoServer.emit( "geomux.ready" );
   });
   
-
+  
   // Disconnection
   videoServer.on( "disconnect", function()
   {
@@ -174,6 +182,7 @@ geomux.prototype.start = function start()
     "node", geoprogram,
     "--p", defaults.port,
     "--w", defaults.wspath,
+    "--c", 0,
     "--u", ( process.env.DEV_MODE === "true" ? ":8099" : "" )
   ];
   

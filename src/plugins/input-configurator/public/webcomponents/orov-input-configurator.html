@@ -162,7 +162,7 @@
         </div>
         <div class="row full-width">
             <div class="small-12 columns">
-                <div class="small-4 columns">
+                <div class="small-8 columns">
                     <paper-dropdown-menu id="preset" label="Presets">
                         <paper-listbox class="dropdown-content" selected="{{selectedPreset}}">
                             <template is="dom-repeat" items="{{presets}}" as="p">
@@ -172,6 +172,7 @@
                     </paper-dropdown-menu>
                     <button on-tap="onLoadPreset" type="button" class$="button {{ getClass(canLoadPreset,'', 'secondary disabled') }}">Load</button>
                     <button on-tap="onSavePreset" type="button" class$="button {{ getClass(canSavePreset, '', 'secondary disabled') }}">Save</button>
+                    <button on-tap="onDeletePreset" type="button" class$="button {{ getClass(canSavePreset, '', 'secondary disabled') }}">Delete</button>
                     <button on-tap="onWantSavePreset" type="button" class$="button {{ getClass(saveNewPreset, 'secondary disabled') }}">Save new preset</button>
 
                     <div class$="successfullySaved {{ getClass(presetLoaded, '', 'hide') }}">
@@ -219,7 +220,7 @@
           successfullySaved: {type: Boolean, value: false},
           saveNewPreset: {type: Boolean, value: false},
           canSavePreset: {type: Boolean, computed: 'getCanSavePreset(selectedPreset)'},
-          canLoadPreset: {type: Boolean, computed: 'getCanLoadPreset(selectedPreset)'}
+          canLoadPreset: {type: Boolean, computed: 'getCanLoadPreset(selectedPreset)'},
         },
         behaviors: [namespace('behaviors').oROVStandard],
     
@@ -356,6 +357,15 @@
             }
         },
 
+        onDeletePreset: function() {
+            var self = this;
+            if (self.eventEmitter!==undefined) {
+                self.eventEmitter.emit('plugin.inputConfigurator.deletePreset', self.presets[self.selectedPreset], function() {
+                    self.set('selectedPreset', -1);
+                });
+            }
+        },
+
         onWantSavePreset: function() {
             this.set('saveNewPreset', true);
         },
@@ -364,6 +374,13 @@
             var self = this;
             if (self.eventEmitter) {
                 self.eventEmitter.emit('plugin.inputConfigurator.saveNewPreset', self.newPresetName);
+                self.set('saveNewPreset', false);
+            }
+        },
+        onSavePreset: function() {
+            var self = this;
+            if (self.eventEmitter) {
+                self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.presets[self.selectedPreset]);
                 self.set('saveNewPreset', false);
             }
         },

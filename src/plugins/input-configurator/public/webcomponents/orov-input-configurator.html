@@ -4,10 +4,7 @@
 <link rel="import" href="../orov-behaviors/orov-behavior.html">
 <link rel="import" href="../paper-item/paper-item.html">">
 <link rel="import" href="../paper-listbox/paper-listbox.html">">
-<!--<link rel="import" href="../paper-tabs/paper-tabs.html">">-->
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
-
-<!--@import '../../../components/bootstrap/dist/css/bootstrap.min.css';-->
 
 <dom-module name="orov-input-configurator">
     <style include="foundation5-styles"></style>
@@ -52,8 +49,7 @@
         }
     </style>
     <template>
-        <p>&nbsp;<br/><br/><br/><br/></p>
-        <label>{{__('Input configurator')}}</label>
+        <h2>{{__('Input configurator')}}</h2>
 
         <div id="controls" class="center">
             <div id="commandsList" class="table">
@@ -96,7 +92,7 @@
                         <div class="small-3 columns left">
                             <input id="keyboard" type="text" class$="{{ getClassInCaseOfDupplicates(keyboardDuplicates.*, 'error') }}" value="{{selectedItem.bindings.keyboard}}"
                             />
-                            <small class$="[[ getClassInCaseOfDupplicates(keyboardDuplicates.*, 'error', 'hide') ]]">Duplicate!</small>
+                            <small class$="[[ getClassInCaseOfDupplicates(keyboardDuplicates.*, 'error', 'hide') ]]">{{__('Duplicate!')}}</small>
                         </div>
                     </div>
 
@@ -145,14 +141,14 @@
 
                 <div class="row full-width">
                     <div class="small-6 columns">
-                        <button on-tap="onSave" type="button" class$="button {{ getClass(duplicates,'secondary disabled') }}">Save</button>
-                        <button on-tap="onReset" type="button" class="button">Reset</button>
+                        <button on-tap="onSave" type="button" class$="button {{ getClass(duplicates,'secondary disabled') }}">{{__('Save')}}</button>
+                        <button on-tap="onReset" type="button" class="button">{{__('Reset')}}</button>
                     </div>
 
                     <div class="small-6 columns">
                         <div class$="small-4 columns successfullySaved {{ getClass(successfullySaved, '', 'hide') }}">
                             <div data-alert class="alert-box success">
-                                Binding saved!
+                                {{__('Binding saved!')}}
                             </div>
                         </div>
                     </div>
@@ -170,14 +166,14 @@
                             </template>
                         </paper-listbox>
                     </paper-dropdown-menu>
-                    <button on-tap="onLoadPreset" type="button" class$="button {{ getClass(canLoadPreset,'', 'secondary disabled') }}">Load</button>
-                    <button on-tap="onSavePreset" type="button" class$="button {{ getClass(canSavePreset, '', 'secondary disabled') }}">Save</button>
-                    <button on-tap="onDeletePreset" type="button" class$="button {{ getClass(canSavePreset, '', 'secondary disabled') }}">Delete</button>
-                    <button on-tap="onWantSavePreset" type="button" class$="button {{ getClass(saveNewPreset, 'secondary disabled') }}">Save new preset</button>
+                    <button on-tap="onLoadPreset" type="button" class$="button {{ getClass(canLoadPreset,'', 'secondary disabled') }}">{{__('Load')}}</button>
+                    <button on-tap="onSavePreset" type="button" class$="button {{ getClass(canSavePreset, '', 'secondary disabled') }}">{{__('Save')}}</button>
+                    <button on-tap="onDeletePreset" type="button" class$="button {{ getClass(canSavePreset, '', 'secondary disabled') }}">{{__('Delete')}}</button>
+                    <button on-tap="onWantSavePreset" type="button" class$="button {{ getClass(saveNewPreset, 'secondary disabled') }}">{{__('Save new preset')}}</button>
 
                     <div class$="successfullySaved {{ getClass(presetLoaded, '', 'hide') }}">
                         <div data-alert class="alert-box success">
-                            Loaded!
+                            {{__('Loaded!')}}
                         </div>
                     </div>
                 </div>
@@ -190,7 +186,7 @@
                     
                     <div class$="{{ getClass(saveNewPreset, '', 'hide' )}}">
                         <paper-input label="Save a new preset" floatingLabel value="{{newPresetName}}"></paper-input>
-                        <button on-tap="onSaveNewPreset" type="button" class="button">Save</button>
+                        <button on-tap="onSaveNewPreset" type="button" class="button">{{__('Save')}}</button>
                     </div>
 
                 </div>

@@ -71,7 +71,7 @@
           self.settings.maps.splice(index, 1);
         }
 
-        self.settings.maps.push({ name: presetName, map: JSON.parse(JSON.stringify(self.settings.currentMap))})
+        self.settings.maps.push({ name: preset.name, map: JSON.parse(JSON.stringify(self.settings.currentMap))})
         self.cockpit.emit(plugin + '.presets.update', self.settings.maps);
         self.cockpit.rov.emit('plugin.settings-manager.saveSettings', { inputConfigurator: self.settings }, fn);
 

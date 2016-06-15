@@ -29,20 +29,33 @@
       // else handle error?
     });
 
+    self.cockpit.on(plugin + '.loadPreset', function(preset, fn) {
+      preset.map.forEach(function(item) {
+        self.sendToInputController(item);
+      });
+      self.settings.currentMap = JSON.parse( JSON.stringify(preset.map)); //clone
+      self.cockpit.emit(plugin + '.currentMap.update', self.settings.currentMap);
+      if (fn) {fn();}
+    });
+
+    self.cockpit.on(plugin + '.saveNewPreset', function(presetName, fn){
+        self.settings.maps.push({ name: presetName, map: JSON.parse(JSON.stringify(self.settings.currentMap))})
+        self.cockpit.emit(plugin + '.presets.update', self.settings.maps);
+        self.cockpit.rov.emit('plugin.settings-manager.saveSettings', { inputConfigurator: self.settings }, fn);
+    });
+
     self.rov.on('settings-change.inputConfigurator', function (settings) {
       self.loadSettings(settings.inputConfigurator, function(loadedSettings) {
         self.settings = loadedSettings;
         self.cockpit.emit(plugin + '.currentMap.update', loadedSettings.currentMap);
+        self.cockpit.emit(plugin + '.presets.update', loadedSettings.maps);
 
         //load mapping into input controller
         loadedSettings.currentMap.forEach(function(item) {
           self.sendToInputController(item);
         });
-
       });
-
     });
-
   };
 
   InputConfigurator.prototype.sendToInputController = function (mapping) {

@@ -1,6 +1,12 @@
 <link rel="import" href="../polymer/polymer.html">
+
 <link rel="import" href="../iron-list/iron-list.html">
 <link rel="import" href="../orov-behaviors/orov-behavior.html">
+<link rel="import" href="../paper-item/paper-item.html">">
+<link rel="import" href="../paper-listbox/paper-listbox.html">">
+<!--<link rel="import" href="../paper-tabs/paper-tabs.html">">-->
+<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
+
 <!--@import '../../../components/bootstrap/dist/css/bootstrap.min.css';-->
 
 <dom-module name="orov-input-configurator">
@@ -152,8 +158,48 @@
                     </div>
 
                 </div>
-
             </div>
+        </div>
+        <div class="row full-width">
+            <div class="small-12 columns">
+                <div class="small-4 columns">
+                    <paper-dropdown-menu id="preset" label="Presets">
+                        <paper-listbox class="dropdown-content" selected="{{selectedPreset}}">
+                            <template is="dom-repeat" items="{{presets}}" as="p">
+                                <paper-item>{{p.name}}</paper-item>
+                            </template>
+                        </paper-listbox>
+                    </paper-dropdown-menu>
+                    <button on-tap="onLoadPreset" type="button" class$="button {{ getClass(selectedPreset,'secondary disabled') }}">Load</button>
+                    <button on-tap="onWantSavePreset" type="button" class$="button {{ getClass(saveNewPreset, 'secondary disabled') }}">Save preset</button>
+
+                    <div class$="successfullySaved {{ getClass(presetLoaded, '', 'hide') }}">
+                        <div data-alert class="alert-box success">
+                            Loaded!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row full-width">
+            <div class="small-12 columns">
+                <div class="small-4 columns">
+                    
+                    
+                    <div class$="{{ getClass(saveNewPreset, '', 'hide' )}}">
+                        <paper-input label="Save a new preset" floatingLabel value="{{newPresetName}}"></paper-input>
+                        <button on-tap="onPresetSave" type="button" class="button">Save</button>
+                    </div>
+
+                    <div class$="successfullySaved {{ getClass(presetLoaded, '', 'hide') }}">
+                        <div data-alert class="alert-box success">
+                            Loaded!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
     </template>
     <script>
@@ -167,11 +213,15 @@
           find: {type: String, value: '', observer: 'findChanged'},
           commands: {type: Array, value: []},
           unfilteredCommands: {type: Array, value: []},
-          selectedItem: {type: Object, value: undefined, observer: 'selectedItemChanged' },
+          prests: {type: Array, value: []},
+          selectedPreset: {type: Object, value: -1, observer: 'selectedPresetChanged'},
+          presetLoaded: {type: Boolean, value: false},
+          selectedItem: {type: Object, value: undefined, observer: '' },
           keyboardDuplicates: {type: Array, value: []},
           gamepaddDuplicates: {type: Array, value: []},
           duplicates: {type: Boolean, computed: 'hasDuplicates(keyboardDuplicates.*, gamepaddDuplicates.*)'},
-          successfullySaved: {type: Boolean, value: false}
+          successfullySaved: {type: Boolean, value: false},
+          saveNewPreset: {type: Boolean, value: false}
         },
         behaviors: [namespace('behaviors').oROVStandard],
     
@@ -229,6 +279,10 @@
                 self.updateCommands();
             });
 
+            emitter.withHistory.on('plugin.inputConfigurator.presets.update', function(presets) {
+                self.presets = presets;
+            });
+
             emitter.on('InputController.registeredCommand',function(command){
                 self.push('commands',command);
             });
@@ -259,6 +313,12 @@
             }
         },
 
+        selectedPresetChanged: function() {
+            if (this.selectedPreset >= 0) {
+                console.log(this.presets[this.selectedPreset].name);
+            }
+        },
+
         findChanged: function() {
             this.updateCommands();
         },
@@ -286,6 +346,29 @@
                 });
             }
         },
+
+        onLoadPreset: function(e) {
+            var self = this;
+            if (self.eventEmitter!==undefined) {
+                self.eventEmitter.emit('plugin.inputConfigurator.loadPreset', self.presets[self.selectedPreset], 
+                function(){
+                    self.set('presetLoaded', true);
+                    self.async(function() { self.set('presetLoaded', false); }, 2000);
+                });
+            }
+        },
+
+        onWantSavePreset: function() {
+            this.set('saveNewPreset', true);
+        },
+
+        onPresetSave: function() {
+            var self = this;
+            if (self.eventEmitter) {
+                self.eventEmitter.emit('plugin.inputConfigurator.saveNewPreset', self.newPresetName);
+            }
+        },
+
         getClass: function(duplicates, duplicateClass, nonDuplicateClass) {
             if (duplicates) {
               return duplicateClass;

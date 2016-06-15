@@ -194,14 +194,16 @@
     var controlsToDeactivate = [].concat(controlName);
     controlsToDeactivate.forEach(function(commandName) {
       var command = self.registerdCommands[commandName];
-      command.active = false;
-      self.unregister(command);
-      command.replaced.forEach(function(oldcommand){
-        self._register(oldcommand, false);
-        console.log('re-activated ' + oldcommand.name);
-      });
-      command.replaced = [];
-      console.log('Deactivated command ' + command.name);
+      if (command) {
+        command.active = false;
+        self.unregister(command);
+        command.replaced.forEach(function(oldcommand){
+          self._register(oldcommand, false);
+          console.log('re-activated ' + oldcommand.name);
+        });
+        command.replaced = [];
+        console.log('Deactivated command ' + command.name);
+      }
     });
   };
   
@@ -213,11 +215,13 @@
     controlsToUpdate.forEach(function(control) {
       self.deactivate(control.name);
       var command = self.registerdCommands[control.name];
-      for(var property in command.bindings) {
-          if (control.bindings[property] != undefined)
-          command.bindings[property] = control.bindings[property];
-      }
-      self.activate(control.name);      
+      if (command) {
+        for(var property in command.bindings) {
+            if (control.bindings[property] != undefined)
+            command.bindings[property] = control.bindings[property];
+        }
+        self.activate(control.name);
+      }      
     });
         
   };

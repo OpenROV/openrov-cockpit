@@ -171,7 +171,8 @@
                         </paper-listbox>
                     </paper-dropdown-menu>
                     <button on-tap="onLoadPreset" type="button" class$="button {{ getClass(selectedPreset,'secondary disabled') }}">Load</button>
-                    <button on-tap="onWantSavePreset" type="button" class$="button {{ getClass(saveNewPreset, 'secondary disabled') }}">Save preset</button>
+                    <button on-tap="onSavePreset" type="button" class$="button {{ getClass(canSavePreset, '', 'secondary disabled') }}">Save</button>
+                    <button on-tap="onWantSavePreset" type="button" class$="button {{ getClass(saveNewPreset, 'secondary disabled') }}">Save new preset</button>
 
                     <div class$="successfullySaved {{ getClass(presetLoaded, '', 'hide') }}">
                         <div data-alert class="alert-box success">
@@ -188,7 +189,7 @@
                     
                     <div class$="{{ getClass(saveNewPreset, '', 'hide' )}}">
                         <paper-input label="Save a new preset" floatingLabel value="{{newPresetName}}"></paper-input>
-                        <button on-tap="onPresetSave" type="button" class="button">Save</button>
+                        <button on-tap="onSaveNewPreset" type="button" class="button">Save</button>
                     </div>
 
                     <div class$="successfullySaved {{ getClass(presetLoaded, '', 'hide') }}">
@@ -221,7 +222,8 @@
           gamepaddDuplicates: {type: Array, value: []},
           duplicates: {type: Boolean, computed: 'hasDuplicates(keyboardDuplicates.*, gamepaddDuplicates.*)'},
           successfullySaved: {type: Boolean, value: false},
-          saveNewPreset: {type: Boolean, value: false}
+          saveNewPreset: {type: Boolean, value: false},
+          canSavePreset: {type: Boolean, computed: 'getCanSavePreset(selectedPreset)'}
         },
         behaviors: [namespace('behaviors').oROVStandard],
     
@@ -362,7 +364,7 @@
             this.set('saveNewPreset', true);
         },
 
-        onPresetSave: function() {
+        onSaveNewPreset: function() {
             var self = this;
             if (self.eventEmitter) {
                 self.eventEmitter.emit('plugin.inputConfigurator.saveNewPreset', self.newPresetName);
@@ -399,6 +401,14 @@
         },
         showEditor: function(selectedItem) {
           return selectedItem === null ? 'hidden' : '';  
+        },
+        getCanSavePreset: function(selectedPreset) {
+            var self = this;
+            if (selectedPreset >= 0) {
+                var preset = self.presets[selectedPreset];
+                return preset.default === undefined || preset.default === false;
+            }
+            return false;
         },
         updateCommands: function() {
             var self = this;

@@ -76,7 +76,8 @@
           currentMap: defaultMap, 
           maps: [
             { 
-              name: 'OpenROV Default', 
+              name: 'OpenROV Default',
+              default: true,
               map: JSON.parse(JSON.stringify(defaultMap)) 
             }
           ]

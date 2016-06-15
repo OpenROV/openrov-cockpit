@@ -17,6 +17,10 @@ inputConfigurator.prototype.getSettingSchema = function getSettingSchema(){
 								"name": {
 									"type": "string"
 								},
+								"default": {
+									"type" : "boolean",
+									"default": false
+								},
 								"bindings": {
 									"type": "array",
 									"uniqueItems": false,

@@ -54,114 +54,69 @@
   //have loaded.
   Video.prototype.listen = function listen() {
     var self=this;
-
-    this.cockpit.on("plugin.video.video-clicked",function(){
-      alert('Video plugin.\nThere will be a message sent to the ROV in 5 seconds.');
-      setTimeout(function() {
-        cockpit.rov.emit('plugin.video.foo');
-      }, 5000);
-    });
-
-    //If the data comes down the pre-existing rov channel, we just need to forward
-    //the traffic
-    var dataflowing = false;
-    this.rov.on('x-h264-video.data',function(data){
-      self.cockpit.emit('x-h264-video.data',data);
-      if (!dataflowing){
-        self.cockpit.on('request_Init_Segment',function(fn){
-          var handler = function(data){
-            fn(data);
-            self.rov.off('x-h264-video.init',handler);
-          };
-          self.rov.on('x-h264-video.init',handler);
-          self.rov.emit('request_Init_Segment');
-        });
-        dataflowing = true;
-      }
-
-    });
-
-
-
-    //If we get a CameraRegistration then we have to open a connection to the camera server
-    //so that we can forward traffic to the cockpit emitter.
-    //TODO: refactor like a crazy. This might only work with interent control because
-    //the code below will *never* connect and thus be idle.  We really need to make
-    //this more explicit behavior.
-    var lastCameraRegsitration = null;
+ 
+    var CameraRegsitrations = {};
     this.rov.withHistory.on('CameraRegistration',function(data){
       //TODO: More robust handling of duplicat CameraRegistration messages.  If the Camera
       //already is setup, we want to ignore.  But we also want to handle multiple Cameras
       //and camera's that change settings.
-      if ((lastCameraRegsitration !== null) &&(data.relativeServiceUrl == lastCameraRegsitration.relativeServiceUrl)){
+      data.sourceAddress = ResolveURL(data.relativeServiceUrl);
+      if (CameraRegsitrations[data.sourceAddress]){
         return;
       }
-      lastCameraRegsitration = data;
-      if (dataflowing){
+      CameraRegsitrations[data.sourceAddress] = true;
+
+      switch(data.connectionType){
+        case 'http': //pass on to MJPEG player that will connect over http
+          data.sourceAddress = ResolveURL(data.relativeServiceUrl);
           self.cockpit.emit('CameraRegistration',data);
-      }
-
-      if(data.connectionType=='http'){
-        data.sourceAddress = ResolveURL(data.relativeServiceUrl);
-      }
-
-      var connection;
-      if(data.connectionType=='socket.io'){
-        data.sourceAddress = ResolveURL(data.relativeServiceUrl);
-        connection = window.io.connect(data.sourceAddress,{path:data.wspath});
-
-        if (data.videoMimeType=='video/mp4'){
-            //We expect the mp4 data stream to be sent via a dedicated socket.io stream
-            connection.on("connect",function(){
-
-              //TODO: abstract the messages enough that we can have multiple cameras controls
-              self.cockpit.on('request_Init_Segment',function(fn){
-                connection.emit('request_Init_Segment',function(data){
-                  fn(data);
-                });
+          break;
+        case 'socket.io': //create the connection and pass data to the cocpkit bus for processing
+          var connection;
+          data.sourceAddress = ResolveURL(data.relativeServiceUrl);
+          connection = window.io.connect(data.sourceAddress ,{path:data.wspath} );
+          var handleInit=function(fn){
+              connection.emit('request_Init_Segment',function(data){
+                fn(data);
               });
-
-              connection.on('x-h264-video.data',function(data){
-                self.cockpit.emit('x-h264-video.data',data);
-              })
-
-            });
-
+          };
+          
+          var handleData=function(data){
+              self.cockpit.emit('x-h264-video.data',data);
+          }
+          
+          //TODO: abstract the messages enough that we can have multiple cameras controls
+          self.cockpit.on('request_Init_Segment',handleInit);
+          connection.on('x-h264-video.data',handleData);        
+          connection.on("connect",function(){
+            console.log("connected to socket.io video server end point");
+          });        
+          self.cockpit.emit('CameraRegistration',data);
+          break;
+        case 'rov': //data is comming over the rov bus, just pass it on to the cockpit bus
+          var dataflowing=false; //this wont work for multiple cameras.
+          self.rov.on('x-h264-video.data',function(data){
+            self.cockpit.emit('x-h264-video.data',data);
+            if (!dataflowing){
+              dataflowing=true; 
+              self.cockpit.on('request_Init_Segment',function(fn){
+                var handler = function(data){
+                  fn(data);
+                  self.rov.off('x-h264-video.init',handler);
+                };
+                self.rov.on('x-h264-video.init',handler);
+                self.rov.emit('request_Init_Segment');
+              });
+            }
+          });
+          self.cockpit.emit('CameraRegistration',data); 
+          break;          
+        default:
+          console.error('Unrecognized camera registration connectionType:',data.connectionType);
         }
-      }
-
-      self.cockpit.emit('CameraRegistration',data);
 
     });
 
-  };
-
-  Video.prototype.inputDefaults = function inputDefaults(){
-    var self = this;
-    return [{
-      name: 'video.keyBoardMapping',
-      description: 'Video for keymapping.',
-      defaults: { keyboard: 'alt+0', gamepad: 'X' },
-      down: function() { console.log('0 down'); },
-      up: function() { console.log('0 up'); },
-      secondary: [
-        {
-          name: 'video.keyBoardMappingDepdent',
-          dependency: 'video.keyBoardMapping',
-          defaults: { keyboard: '9', gamepad: 'RB' },
-          down: function() { console.log('####'); }
-        }
-      ]
-    },
-      {
-        name: 'video.testMessage',
-        description: 'another video',
-        defaults: { keyboard: 'alt+T' },
-        down: function() {
-          showMessageFoo = true;
-          showMessageBar = true;
-          self.cockpit.rov.emit('plugin.video.video_to_foo', 'abc'); }
-      }]
   };
 
   window.Cockpit.plugins.push(Video);

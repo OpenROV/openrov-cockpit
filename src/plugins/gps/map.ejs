@@ -1,0 +1,83 @@
+<link rel="import" href="components/polymer/polymer.html">
+
+<link rel="import" href="components/gps/orov-map.html">
+
+<div>
+  <orov-map id="map" latitude="39.0916667" longitude="-119.9542667" event-emitter="{{cockpitEventEmitter}}"></orov-map>
+</div>
+
+<!--
+
+<link rel="stylesheet" href="components/openlayers/ol.css" type="text/css">
+<script src="components/openlayers/ol.js"></script>
+
+<style>
+	a.skiplink {
+	position: absolute;
+	clip: rect(1px, 1px, 1px, 1px);
+	padding: 0;
+	border: 0;
+	height: 1px;
+	width: 1px;
+	overflow: hidden;
+	}
+	a.skiplink:focus {
+	clip: auto;
+	height: auto;
+	width: auto;
+	background-color: #fff;
+	padding: 0.3em;
+	}
+	#map
+	{
+		width:100%;
+		height: 100%;
+	}
+	
+	#map:focus {
+	outline: #4A74A8 solid 0.15em;
+	}
+</style>
+
+<a class="skiplink" href="#map">Go to map</a>
+<div id="map" class="map" tabindex="0"></div>
+<button id="zoom-out">Zoom out</button>
+<button id="zoom-in">Zoom in</button>
+<script>
+    loadScript("components/openlayers/ol.js").then(function(){
+	console.log( "heyyy" );
+	var map = new ol.Map({
+	layers: [
+		new ol.layer.Tile({
+		source: new ol.source.OSM()
+		})
+	],
+	target: 'map',
+	controls: ol.control.defaults({
+		attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
+		collapsible: false
+		})
+	}),
+	view: new ol.View({
+		center: [0, 0],
+		zoom: 2
+	})
+	});
+
+	document.getElementById('zoom-out').onclick = function() {
+	var view = map.getView();
+	var zoom = view.getZoom();
+	view.setZoom(zoom - 1);
+	};
+
+	document.getElementById('zoom-in').onclick = function() {
+	var view = map.getView();
+	var zoom = view.getZoom();
+	view.setZoom(zoom + 1);
+	};
+	
+	console.log( "3131321" );
+	});
+</script>
+
+-->

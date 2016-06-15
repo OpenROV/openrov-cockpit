@@ -1,0 +1,26 @@
+{
+  "name": "geomuxp",
+  "main": "index.js",
+  "version": "1.0",
+  "homepage": "https://github.com/OpenROV/openrov-cockpit",
+  "authors": [
+    "spiderkeys <charles@openrov.com>"
+  ],
+  "description": "Geomux interface for OpenROV",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "paper-toggle-button": "PolymerElements/paper-toggle-button#^1.0.0"
+  },
+  "resolutions": {
+    "polymer": "^1.2.0",
+    "webcomponentsjs": "^0.7.20"
+  }
+}

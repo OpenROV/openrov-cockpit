@@ -59,3 +59,34 @@ function generateUUID(){
     });
     return uuid;
 }
+
+//http://balpha.de/2011/10/jquery-script-insertion-and-its-consequences-for-debugging/
+var loadScript = function (path) {
+  var result = $.Deferred(),
+  script = document.createElement("script");
+  script.async = "async";
+  script.type = "text/javascript";
+  script.src = path;
+  script.onload = script.onreadystatechange = function (_, isAbort) {
+      if (!script.readyState || /loaded|complete/.test(script.readyState)) {
+         if (isAbort)
+             result.reject();
+         else
+            result.resolve();
+    }
+  };
+  script.onerror = function () { result.reject(); };
+  $("head")[0].appendChild(script);
+  return result.promise();
+};
+
+  //http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+  function getParameterByName(name, url) {
+      if (!url) url = window.location.href;
+      name = name.replace(/[\[\]]/g, "\\$&");
+      var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+          results = regex.exec(url);
+      if (!results) return null;
+      if (!results[2]) return '';
+      return decodeURIComponent(results[2].replace(/\+/g, " "));
+  }

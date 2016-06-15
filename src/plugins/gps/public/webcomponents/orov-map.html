@@ -1,0 +1,304 @@
+
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+
+<dom-module id="orov-map">
+	<style>	
+		:host 
+		{
+			display: block;
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100vh;;
+		}
+
+		#map
+		{
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100vh;
+		}  
+		
+		#marker {
+			width: 10px;
+			height: 10px;
+			border: 1px solid #B00;
+			border-radius: 10px;
+			background-color: #F00;
+			opacity: 0.5;
+		}
+	  
+		#ship {
+			width: 10px;
+			height: 10px;
+			border: 1px solid #0B0;
+			border-radius: 10px;
+			background-color: #0F0;
+			opacity: 0.5;
+		}
+	</style>
+
+	<template>
+		<link rel="stylesheet" type="text/css" href="../openlayers/ol.css" />
+		
+		<div id="map" class="map"></div>
+		
+		<div style="display: none;">
+			<div id="marker" title="Marker"></div>
+			<div id="ship" title="Ship"></div>
+		</div>
+	</template>
+
+	<script src="../openlayers/ol.js"></script>
+
+	<script>
+		//TODO: Add UI for uploading KML data... that zoomes to the location after the upload to make it easy to confirm the data in on the map.
+		//Perhaps, have the upload send to an OpenROV mapping service with the option for private/public to make it easy to share with the world?
+		Polymer(
+		{
+			is: 'orov-map',
+			
+			properties: 
+			{
+				currentCenter: Array,
+				currentView: ol.View,
+				olmap: ol.Map,
+				layer: Object,
+				marker: ol.Overlay,
+				ship: ol.Overlay,
+				
+				longitude:
+				{
+					type: Number,
+					value:-120.0,
+					notify: true,
+					observer: '_updateLongitude'
+				},
+				
+				latitude: 
+				{
+					type: Number,
+					value: 29.0,
+					notify: true,
+					observer: '_updateLatitude'
+				},
+			
+				elemReady: Boolean,
+			},
+			
+			listeners:
+			{
+				"gps": "UpdateMarker" 
+			},
+
+			behaviors: [namespace('behaviors').oROVStandard],
+			
+			ready: function()
+			{				
+			},
+
+			registerEmitterHanlders: function(emitter) 
+			{
+				var self = this;
+
+				emitter.withHistory.on( "plugin.gps.data", function(data) 
+				{
+					console.log( "Got boat position: " + data.lat + "," + data.lon );
+					self.fire( "gps", data );
+				});
+			},
+
+			attached: function()
+			{
+				this.async(function()
+				{
+					this.initialConfig(); // Create your ol.Map here
+					this.elemReady = true;
+					this.setCenter(this.latitude,this.longitude);
+					
+					this.olmap.updateSize();
+					
+					console.log('openlayer-map ready');
+					
+					setTimeout( function()
+					{
+						window.dispatchEvent( new Event( "resize" ) );
+					}, 1000 );
+				});
+			},
+			
+			initialConfig: function()
+			{
+				var self = this;
+				console.log('initial config for the map...');
+
+				this.currentView = new ol.View(
+				{
+					zoom: 14
+				});
+				
+				var pos = ol.proj.fromLonLat([-119.9542667, 39.0916667]);
+
+				// Vienna marker
+				this.marker = new ol.Overlay({
+					position: pos,
+					positioning: 'center-center',
+					element: this.$.marker,
+					stopEvent: false
+				});
+
+				var shipPos = ol.proj.fromLonLat([-119.9542667, 39.0916667]);
+
+				// Vienna marker
+				this.ship = new ol.Overlay({
+					position: shipPos,
+					positioning: 'center-center',
+					element: this.$.ship,
+					stopEvent: false
+				});
+
+				var source = new ol.source.OSM();
+				this.layer =  new ol.layer.Tile();
+				
+				this.layer.setSource(source); 
+				
+				this.olmap = new ol.Map(
+				{
+					layers: [this.layer],
+					target: this.$.map,
+					controls: ol.control.defaults(
+					{
+						attributionOptions: /** @type {olx.control.AttributionOptions} */ (
+						{
+							collapsible: false
+						})
+					}),
+					view: this.currentView
+				});
+				
+				this.historyLines = new ol.geom.LineString([]);
+
+
+				this.layerLines = new ol.layer.Vector({
+					source: new ol.source.Vector({
+						features: [new ol.Feature({
+							geometry: self.historyLines
+						})]
+					}),
+					style: new ol.style.Style({
+						stroke: new ol.style.Stroke({
+							width: 1,
+							color: '#000000',
+						})
+					})
+				});
+
+
+				var shipPolygon = new ol.geom.Polygon([[
+				  	[-119.954213, 39.091617],
+					[-119.954211, 39.091586],
+					[-119.954215, 39.091543],
+					[-119.954231, 39.091492],
+					[-119.954262, 39.091420],
+					[-119.954336, 39.091274],
+					[-119.954359, 39.091242],
+					[-119.954369, 39.091236],
+					[-119.954383, 39.091237],
+					[-119.954393, 39.091241],
+					[-119.954398, 39.091250],
+					[-119.954396, 39.091266],
+					[-119.954368, 39.091351],
+					[-119.954333, 39.091434],
+					[-119.954296, 39.091509],
+					[-119.954268, 39.091557],
+					[-119.954238, 39.091595]
+				]]);
+				shipPolygon.transform('EPSG:4326', 'EPSG:3857');
+
+
+				this.olmap.addLayer( this.layerLines );
+				this.olmap.addLayer( new ol.layer.Vector({
+					source: new ol.source.Vector({
+						features: [new ol.Feature({
+							geometry: new ol.geom.MultiPoint([
+								new ol.proj.fromLonLat([-119.954127937,39.09148231]),
+								new ol.proj.fromLonLat([-119.954248419,39.091445143]),
+								new ol.proj.fromLonLat([-119.954289654,39.091358763]),
+								new ol.proj.fromLonLat([-119.954351933,39.091585766]),
+								new ol.proj.fromLonLat([-119.954485988,39.091348604]),
+								new ol.proj.fromLonLat([-119.954237727,39.091251584]),
+								new ol.proj.fromLonLat([-119.954091792,39.091356248]),
+								new ol.proj.fromLonLat([-119.954141344,39.091606515]),
+								new ol.proj.fromLonLat([-119.954113176,39.091806267])
+							])
+						})]
+					})
+				}));
+
+				this.olmap.addLayer( new ol.layer.Vector({
+					source: new ol.source.Vector({
+						features: [new ol.Feature({
+							geometry: shipPolygon
+						})]
+					})
+				}));
+
+				this.olmap.addOverlay( this.marker );
+				this.olmap.addOverlay( this.ship );
+			},
+
+
+			_updateLatitude: function(newValue, oldValue)
+			{
+					if(this.elemReady)
+					{
+						console.log('update latitude from '+oldValue+' to '+newValue);
+						this.setCenter(newValue, this.longitude);
+					}
+					else
+					{
+						console.log('_updateLatitude: waiting element to be ready');
+					}
+			},
+
+			_updateLongitude: function(newValue, oldValue)
+			{
+				if(this.elemReady)
+				{
+					console.log('update longitude from '+oldValue+' to '+newValue);
+					this.setCenter(this.latitude, newValue);
+				}
+				else
+				{
+					console.log('_updateLatitude: waiting element to be ready');
+				}
+			},
+
+			setCenter: function(latitude, longitude)
+			{
+
+				var center = [longitude, latitude];
+				this.currentCenter = ol.proj.fromLonLat(center);
+				console.log('update center of the map with latitude = '+latitude+' and longitude = '+longitude);
+				this.currentView.centerOn(this.currentCenter,[400,400], [0,0]);
+			},
+			
+			UpdateMarker: function( data )
+			{
+				var pos = ol.proj.fromLonLat([ data.detail.lon, data.detail.lat ]);
+				
+				if( this.marker != undefined )
+				{
+					this.marker.setPosition( pos );
+					this.historyLines.appendCoordinate(pos);
+				}
+			}
+		} );
+	</script>
+</dom-module>
+

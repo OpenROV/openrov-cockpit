@@ -10,7 +10,12 @@ function Hardware( deps ) {
   hardware.depthHoldEnabled = false;
   hardware.targetHoldEnabled = false;
   hardware.laserEnabled = false;
-
+  hardware.watertype = 0;
+  var currentDepth = 1;
+  var currentHeading = 0;
+  var currentServo = 1500;
+  var current = 2;
+  
   reader.on('Arduino-settings-reported', function (settings) {
     hardware.emit('Arduino-settings-reported', settings);
   });
@@ -31,6 +36,13 @@ function Hardware( deps ) {
     if (commandText === 'rcap') {
       hardware.emitStatus('CAPA:255');
     }
+    if (commandText === 'dzer'){
+      currentDepth = 0;
+    }
+    if (commandText === 'dtwa'){
+        hardware.watertype = 1 - hardware.watertype;
+        hardware.emitStatus("dtwa:" + hardware.watertype);
+    }   
     if (commandText === 'ligt') {
       hardware.emitStatus('LIGP:' + commandParts[1]/100);
       debug('HARDWARE-MOCK return light status:'+  commandParts[1]/100);
@@ -138,11 +150,6 @@ function Hardware( deps ) {
     hardware.emit('status', status);
   }
 
-  var currentDepth = 1;
-  var currentHeading = 0;
-  var currentServo = 1500;
-  var current = 2;
-
   var interval = setInterval(function() {
     var result = "";
     var rnd = (Math.random() * 20 - 10)/100;
@@ -160,12 +167,12 @@ function Hardware( deps ) {
     rnd = (Math.random() * 20 - 10)/100;
     current += current*rnd;
     current = Math.min(Math.max(current, 1), 10);
-    result+='bt1i:' + current + ';'
+    result+='BT1I:' + current + ';'
 
     rnd = (Math.random() * 20 - 10)/100;
     current += current*rnd;
     current = Math.min(Math.max(current, 1), 10);
-    result+='bt2i:' + current + ';'
+    result+='BT2I:' + current + ';'
 
     currentServo +=50;
     result+='servo:' + currentServo + ';'

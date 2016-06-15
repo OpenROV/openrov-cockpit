@@ -52,6 +52,8 @@
   </template>
   <script>
     (function () {
+      var lastData = null;
+      var newData = null;
       Number.prototype.map = function (in_min, in_max, out_min, out_max) {
         return (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
       };
@@ -164,6 +166,13 @@
           var self = this;
 
           emitter.on('plugin.controllerboard2x.systemPower.update', function(data){
+            newData = data;
+
+          });
+          setInterval(function(){
+            if (newData==lastData) return;
+            lastData=newData;
+            var data=newData;
               if ('voltage' in data.board){
                 self.setVoltage(data.board.voltage);
               };
@@ -174,8 +183,9 @@
 
               if ('starboard' in data.battery.current){
                 self.setRightBattery(data.battery.current.starboard);
-              };
-          });
+              };            
+            
+          },500)
 
           emitter.withHistory.on('settings-change.batteryDefintions', function(settings){
             var selectedBattery = settings.batteryDefintions.selectedBattery;

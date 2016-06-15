@@ -27,7 +27,7 @@
         canvas='{{canvas}}'
         cors='false'
         showMenu='true'
-        showStats='true'>
+        show-stats='{{showStats}}'>
       <content></content>
     </packet-video>
     </template>
@@ -43,24 +43,32 @@
           framesPerSecond: {type:Number},
           canvas: {type:Object, observer: '_canvasChanged'},
           videoMimeType: {type:String},
-          location: {type:String}
+          location: {type:String},
+          showStats: {type:Boolean, value:function(){return false;}}
         },
         behaviors: [namespace('behaviors').oROVStandard],
+        detached: function(){
+          this.shortCircuit=true;
+        },
         packetVideo_initializationInProgress: false,
         registerEmitterHanlders: function(emitter){
           var self = this;
-
-          emitter.withHistory.on('settings-change.video',function(settings){
-            self.videoSource = settings.video.forward_camera_url;
+          this.shortCircuit=false;
+          emitter.withHistory.on('settings-change.videosettings',function(settings){
+            if (self.shortCircuit) {return;}
+            self.showStats = settings.videosettings['show-stats'];
+            
           });
 
           emitter.on('video.forward.get-canvas',function(callback){
+            if (self.shortCircuit) {return;}            
             if (typeof(callback)==='function'){
               callback({forwardCanvas:this.canvas});
             }
           });
 
           emitter.withHistory.on('CameraRegistration',function(data){
+            if (self.shortCircuit) {return;}            
             if (data.location!==self.location) return;
             //      self.rov.emit('CameraRegistration',{cameraLocation:'front', videoMimeType:'video/mp4', resolution:'1920x1080', framerate:30, sourcePort:service.port, sourceAddress:service.address});
             self.videoMimeType=data.videoMimeType;
@@ -73,6 +81,7 @@
           //init the camera before appending the raw data.
 
           emitter.on('x-h264-video.data',function(data){
+            if (self.shortCircuit) {return;}            
             if (self.$$('#camera1')===null){
               return;
             }

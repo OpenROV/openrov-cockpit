@@ -15,6 +15,11 @@
     "tests"
   ],
   "dependencies": {
-    "visionmedia-debug": "visionmedia/debug#~2.2.0"
+    "visionmedia-debug": "visionmedia/debug#~2.2.0",
+    "paper-card": "PolymerElements/paper-card#^1.1.1"
+  },
+  "resolutions": {
+    "webcomponentsjs": "^0.7.20",
+    "polymer": "^1.0.0"
   }
 }

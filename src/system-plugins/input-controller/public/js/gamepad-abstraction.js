@@ -76,7 +76,7 @@ inputController.GamepadAbstraction = function (cockpit) {
   if (gp.isAvailable()) {
     //send an initial is connected if already plugged in.
     setTimeout(function () {
-      gp.cockpit.rov.emit('gamepad.connected');
+      gp.cockpit.emit('gamepad.connected');
     }, 1000);
   }
   return gp;

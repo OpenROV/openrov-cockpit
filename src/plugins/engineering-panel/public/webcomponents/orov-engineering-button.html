@@ -1,0 +1,292 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<dom-module id="orov-engineering-button">
+  <style type="text/css">
+      #switchesContainer {
+        border-collapse: collapse;
+        height: 100%;
+        width: 100%;
+      }
+      .switchable .switches-switch-on,.switchable .switches-switch-off{
+        cursor: pointer;
+      }
+      .switches-row {
+       width: 100%;
+       height: 100%;
+        line-height: 1em;
+      }
+      .switches-switch-on,
+      .switches-switch-off {
+        display: none;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+      }
+      .switches-switch-on span,
+      .switches-switch-off span{
+         display: table-cell;
+        text-align: center;
+        vertical-align: middle;
+        font-size: 1.5vw;
+      }
+      .switch-on > .switches-switch-on { display: table;  background: rgba(28, 111, 28, 0.4); }
+      .switch-on > .switches-switch-off { display: none; }
+      .switch-off > .switches-switch-on { display: none; }
+      .switch-off > .switches-switch-off { display: table; }
+    
+
+    </style>
+  <template>
+    <div id="switchesContainer" class="center">
+    </div>
+  </template>
+  <script>
+    (function () {
+      Polymer({
+        is: 'orov-engineering-button',
+        properties: {
+          type:{
+            type: String,
+            default:''
+          },
+          lastPing: {
+            value: function () {
+              return new Date();
+            }
+          },
+          switches: {
+            type: Object,
+            value: function () {
+              var self = this;
+              return {
+                COM: {
+                  switchable: false,
+                  state: false,
+                  events: [
+                    {message:'plugin.connection-health.state',fn: function(state){return state.connected;}}
+                  ],
+                  description: 'Communication status'
+                },
+                GPD: {
+                  switchable: false,
+                  state: false,
+                  events: [
+                    {message:'plugin.input.gamepad.state', fn: function(state){return state.connected;}}
+                  ],
+                  description: 'Gamepad active/inactive'
+                },
+                TNK: {
+                  switchable: true,
+                  state: false,
+                  events: [
+                    {message:'plugin.tankControl.state', fn: function(state){return state.enabled;}}
+                  ],
+                  description: 'Tank control active/inactive',
+                  switch: function () {
+                    if (self.eventEmitter !== undefined){
+                      self.eventEmitter.emit('plugin.tankControl.toggle');
+                    }
+                  }
+                },
+                DLK: {
+                  switchable: true,
+                  state: false,
+                  events: [
+                    {message:'plugin.rovpilot.depthHold.state',fn: function(state){return state.enabled;}}
+                  ],
+                  description: 'Depthhold active/inactive',
+                  switch: function (state) {
+                    if (self.eventEmitter !== undefined){
+                      self.eventEmitter.emit('plugin.rovpilot.depthHold.set-enabled',!state);
+                    }
+                  }
+                },
+                HLK: {
+                  switchable: true,
+                  state: false,
+                  events: [
+                    {message:'plugin.rovpilot.headingHold.state',fn: function(state){return state.enabled;}}
+                  ],
+                  description: 'Heading lock active/inactive',
+                  switch: function (state) {
+                    if (self.eventEmitter !== undefined){
+                      self.eventEmitter.emit('plugin.rovpilot.headingHold.set-enabled',!state);
+                    }
+                  }
+                },
+                LSR: {
+                  switchable: true,
+                  state: false,
+                  events: [
+                    {message:'plugin.laser.state',fn: function(state){return state.enabled;}}
+                  ],
+                  description: 'Lasers on/off',
+                  switch: function (state) {
+                    if (self.eventEmitter !== undefined){
+                      self.eventEmitter.emit('plugin.laser.set',!state);
+                    }
+                  }
+                },
+                LED: {
+                  switchable: true,
+                  state: false,
+                  description: 'LED lights on/off',
+                  events: [
+                    {message:'plugin.lights.state',fn: function(state){return state.level>0;}}
+                  ],
+                  switch: function (state) {
+                    if (self.eventEmitter !== undefined){
+                      var level = 1;
+                      if (state==true) level = 0;
+                      self.eventEmitter.emit('plugin.lights.set',level);
+                    }
+                  }
+                },
+                XL0: {
+                  switchable: true,
+                  state: false,
+                  description: 'External LED lights on/off',
+                  events: [
+                    {message:'plugin.externalLights.level',fn: function(lightNum, level){ if( lightNum == 0){ return level > 0; } else{ return null; } }}
+                  ],
+                  switch: function (state) {
+                    if (self.eventEmitter !== undefined){
+                      var level = 1;
+                      if (state==true) level = 0;
+                      self.eventEmitter.emit('plugin.externalLights.set', 0, level);
+                    }
+                  }
+                },
+                XL1: {
+                  switchable: true,
+                  state: false,
+                  description: 'External LED lights on/off',
+                  events: [
+                    {message:'plugin.externalLights.level',fn: function(lightNum, level){if( lightNum == 1){ return level > 0; } else{ return null; } } }
+                  ],
+                  switch: function (state) {
+                    if (self.eventEmitter !== undefined){
+                      var level = 1;
+                      if (state==true) level = 0;
+                      self.eventEmitter.emit('plugin.externalLights.set', 1, level);
+                    }
+                  }
+                },
+                ESC: {
+                  switchable: true,
+                  state: false,
+                  events: [
+                    {message:'plugin.systemPower.state', fn: function(state){return state.escs_powered;}}
+                  ],
+                  description: 'ROV ESCs active/inactive',
+                  switch: function (state) {
+                    if (self.eventEmitter !== undefined){
+                      if (state) {
+                        self.eventEmitter.emit('plugin.systemPower.powerOffESCs');
+                      } else {
+                        self.eventEmitter.emit('plugin.systemPower.powerOnESCs');
+                      }
+                    }
+                  }
+                },
+                REC:{
+                  switchable: true,
+                  state: false,
+                  events: [
+                    {message:'plugin-blackbox-recording-status', fn: function(state){return state;}}
+                  ],
+                  description: 'ROV ESCs active/inactive',
+                  switch: function (state) {
+                    if (self.eventEmitter !== undefined){
+                      if (state) {
+                        self.eventEmitter.emit('plugin-blackbox-recording-stop');
+                      } else {
+                        self.eventEmitter.emit('plugin-blackbox-recording-start');
+                      }
+                    }
+                  }
+                },
+                STR:{
+                  switchable: true,
+                  state: false,
+                  events: [
+                    {message:'internet-stream-status', fn: function(state){return state.isStreaming;}}
+                  ],
+                  description: 'Internet stream video',
+                  switch: function (state) {
+                    if (self.eventEmitter !== undefined){
+                      if (state) {
+                        self.eventEmitter.emit('internet-stream-stop');
+                      } else {
+                        self.eventEmitter.emit('internet-stream-start');
+                      }
+                    }
+                  }
+                }
+              };
+            }
+          }
+        },
+        behaviors: [namespace('behaviors').oROVStandard],
+        registerEmitterHanlders: function(emitter) {
+          var self = this;
+          var container = $(this.$.switchesContainer);
+          this.$.switchesContainer.innerHTML='';
+
+          for (var aSwitch in self.switches) {
+            if(aSwitch == self.type){
+              container.append('<div class="switches-row ' + (self.switches[aSwitch].switchable ? 'switchable' : '') + '" id="' + aSwitch + '" title="' + self.switches[aSwitch].description + '">' + '<div class="switches-switch-on"><span>On</span></div>' + '<div class="switches-switch-off"><span>Off</span></div>' + '</div>');
+              if (self.switches[aSwitch].switchable) {
+                container.find('#' + aSwitch).click(function () {
+                  var property = $(this).attr('id');
+                  self.switch(property);
+                  self.onSwitch(property);
+                });
+              }
+              this.registerListeners(aSwitch,emitter);
+            }
+          }
+        },
+        update: function () {
+          for (var aSwitch in this.switches) {
+            var theSwitch = $(this.$.switchesContainer).find('#' + aSwitch);
+            var toRemove = this.switches[aSwitch].state ? 'switch-off' : 'switch-on';
+            var toAdd = this.switches[aSwitch].state ? 'switch-on' : 'switch-off';
+            theSwitch.removeClass(toRemove);
+            theSwitch.addClass(toAdd);
+          }
+        },
+        switch: function (aSwitch) {
+          var self = this;
+          self.switches[aSwitch].state = !self.switches[aSwitch].state;
+          self.update();
+        },
+        registerListeners: function (aSwitch,emitter) {
+          var self = this;
+          // register the enabled/disabled messages
+          if (self.switches[aSwitch].events !== undefined){
+            for(i in self.switches[aSwitch].events){
+              var e = self.switches[aSwitch].events[i];
+              console.log("Registering switch listener: " + e.message);
+              emitter.withHistory.on(e.message,function(){
+                var newState = e.fn.apply(this,arguments);
+                self.switches[aSwitch].state = ( newState !== null ? newState : self.switches[aSwitch].state );
+                self.update();
+              })// e.fn.bind(self.switches[aSwitch]));
+            }
+          }
+        },
+        attached: function () {
+          var self = this;
+          self.onSwitch = function (aSwitch) {
+            if (self.switches[aSwitch].switch) {
+              self.switches[aSwitch].state = !self.switches[aSwitch].state;
+              self.switches[aSwitch].switch(self.switches[aSwitch].state);
+            }
+          };
+
+        }
+      });
+    }());
+  </script>
+</dom-module>

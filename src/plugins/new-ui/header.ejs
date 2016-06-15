@@ -6,6 +6,7 @@
 
 <link rel="import" href="components/ui-manager/orov-appletswitcher.html">
 <link rel="import" href="components/cloud-profile/orov-login.html">
+<link rel="import" href="components/peer-view/orov-mc-status-indicator.html">
 
 <!--This example shows how to selectivly apply settings per applet that override the overall style sheet-->
 <template is="dom-if" restamp=true if="{{!displaySection(routedata.page,'cockpit')}}">
@@ -18,11 +19,21 @@ body {
 </style>
 
 </template>
+<style>
+.online-indicator, .user-role {
+  color: white;
+  font-size: 2vh;
+}
+</style>
 
 
 <div class="navbar navbar-inverse navbar-fixed-top navbar-collapse">
   <div id="newuiTopbar" class="container"><div class="navbar-header"><a class="navbar-brand" href="#"><img src="themes/OpenROV/img/openrov.png" class="logo"><span class="navbar-titel">{{__('Cockpit')}}</span></a></div>
-
+    <div class="online-indicator" hidden="{{rovOnline}}">ROV Offline</div>
+    <div class="user-role">{{userRole}}</div>
+    <div class="global-indicators">
+      <orov-mc-status-indicator event-emitter="{{cockpitEventEmitter}}" ></orov-mc-status-indicator>
+    </div>
     <div id="menu">
       <div id="menuitems" class="nav pull-right navbar-nav">
         <li><orov-login event-emitter="{{cockpitEventEmitter}}" /></li>

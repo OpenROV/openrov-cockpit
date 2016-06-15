@@ -16,5 +16,6 @@
   "Connection": "Connection",
   "Latency": "Latency",
   "CPU %": "CPU %",
-  "Board Current": "Board Current"
+  "Board Current": "Board Current",
+  "Geomux settings": "Geomux settings"
 }

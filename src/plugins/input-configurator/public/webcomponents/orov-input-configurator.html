@@ -170,7 +170,7 @@
                             </template>
                         </paper-listbox>
                     </paper-dropdown-menu>
-                    <button on-tap="onLoadPreset" type="button" class$="button {{ getClass(selectedPreset,'secondary disabled') }}">Load</button>
+                    <button on-tap="onLoadPreset" type="button" class$="button {{ getClass(canLoadPreset,'', 'secondary disabled') }}">Load</button>
                     <button on-tap="onSavePreset" type="button" class$="button {{ getClass(canSavePreset, '', 'secondary disabled') }}">Save</button>
                     <button on-tap="onWantSavePreset" type="button" class$="button {{ getClass(saveNewPreset, 'secondary disabled') }}">Save new preset</button>
 
@@ -192,11 +192,6 @@
                         <button on-tap="onSaveNewPreset" type="button" class="button">Save</button>
                     </div>
 
-                    <div class$="successfullySaved {{ getClass(presetLoaded, '', 'hide') }}">
-                        <div data-alert class="alert-box success">
-                            Loaded!
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -223,7 +218,8 @@
           duplicates: {type: Boolean, computed: 'hasDuplicates(keyboardDuplicates.*, gamepaddDuplicates.*)'},
           successfullySaved: {type: Boolean, value: false},
           saveNewPreset: {type: Boolean, value: false},
-          canSavePreset: {type: Boolean, computed: 'getCanSavePreset(selectedPreset)'}
+          canSavePreset: {type: Boolean, computed: 'getCanSavePreset(selectedPreset)'},
+          canLoadPreset: {type: Boolean, computed: 'getCanLoadPreset(selectedPreset)'}
         },
         behaviors: [namespace('behaviors').oROVStandard],
     
@@ -410,6 +406,10 @@
                 return preset.default === undefined || preset.default === false;
             }
             return false;
+        },
+        getCanLoadPreset: function(selectedPreset) {
+            var self = this;
+            return (selectedPreset >= 0);
         },
         updateCommands: function() {
             var self = this;

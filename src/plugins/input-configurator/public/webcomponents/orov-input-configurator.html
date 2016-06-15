@@ -368,6 +368,7 @@
             var self = this;
             if (self.eventEmitter) {
                 self.eventEmitter.emit('plugin.inputConfigurator.saveNewPreset', self.newPresetName);
+                self.set('saveNewPreset', false);
             }
         },
 

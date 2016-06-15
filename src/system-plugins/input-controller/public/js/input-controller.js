@@ -68,7 +68,9 @@
       if (fn!==undefined){
           // returning a clone of the commands so users can't just change things.
           // To update a command send a InputController.updateBinding(controls) message.
-          var commands = JSON.parse(JSON.stringify(self.model.commands));   
+          var commands = self.model.commands.map(function(command) {
+            return { name: command.name, description: command.description, bindings: command.bindings, defaults: command.defaults }
+          });
           fn(commands);
       }
     });
@@ -93,7 +95,9 @@
     });
     
     this.cockpit.on('InpitController.resumeAll', function(fn) {
-      self.model.commands.forEach(function(command) {
+      var commands = self.model.commands;
+      self.model.commands = [];
+      commands.forEach(function(command) {
         self.resume(command.name);  
       });
       if (fn) {fn();}

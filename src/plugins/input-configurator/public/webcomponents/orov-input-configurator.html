@@ -90,9 +90,9 @@
                             <label class="prefix" for="keyboard">{{__('Keyboard')}}:</label>
                         </div>
                         <div class="small-3 columns left">
-                            <input id="keyboard" type="text" class$="{{ getClassInCaseOfDupplicates(keyboardDuplicates.*, 'error') }}" value="{{selectedItem.bindings.keyboard}}"
+                            <input id="keyboard" type="text" class$="{{ getClassInCaseOfDuplicates(keyboardDuplicates.*, 'error') }}" value="{{selectedItem.bindings.keyboard}}"
                             />
-                            <small class$="[[ getClassInCaseOfDupplicates(keyboardDuplicates.*, 'error', 'hide') ]]">{{__('Duplicate!')}}</small>
+                            <small class$="[[ getClassInCaseOfDuplicates(keyboardDuplicates.*, 'error', 'hide') ]]">{{__('Duplicate!')}}</small>
                         </div>
                     </div>
 
@@ -101,8 +101,9 @@
                             <label class="prefix" for="gamepad">{{__('Gamepad')}}:</label>
                         </div>
                         <div class="small-3 columns left">
-                            <input id="gamepad" type="text" class$="{{ getClassInCaseOfDupplicates(gamepadDuplicates.*, 'error') }}" value="{{__(selectedItem.bindings.gamepad)}}" />
-                            <small class$="[[ getClassInCaseOfDupplicates(gamepadDuplicates.*, 'error', 'hide') ]]">{{__('Duplicate!')}}</small>
+                            <input id="gamepad" type="text" class$="{{ getClassInCaseOfDuplicates(gamepadDuplicates.*, 'error') }}" value="{{__(selectedItem.bindings.gamepad)}}"
+                            />
+                            <small class$="[[ getClassInCaseOfDuplicates(gamepadDuplicates.*, 'error', 'hide') ]]">{{__('Duplicate!')}}</small>
                         </div>
                     </div>
 
@@ -122,7 +123,7 @@
                                     </div>
                                 </template>
                             </iron-list>
-                           <iron-list id="gamepadList" items="[[gamepadDuplicates]]" as="item">
+                            <iron-list id="gamepadList" items="[[gamepadDuplicates]]" as="item">
                                 <template>
                                     <div class$="controlsRow [[getClassForItem(item, selected)]]">
                                         <div style="float:left; min-width:40%">{{__(item.name)}}</div>
@@ -178,8 +179,8 @@
         <div class="row full-width">
             <div class="small-12 columns">
                 <div class="small-4 columns">
-                    
-                    
+
+
                     <div class$="{{ getClass(saveNewPreset, '', 'hide' )}}">
                         <paper-input label="Save a new preset" floatingLabel value="{{newPresetName}}"></paper-input>
                         <button on-tap="onSaveNewPreset" type="button" class="button">{{__('Save')}}</button>
@@ -404,7 +405,7 @@
             }
         },
         
-        getClassInCaseOfDupplicates: function(list, duplicateClass, nonDuplicateClass) {
+        getClassInCaseOfDuplicates: function(list, duplicateClass, nonDuplicateClass) {
           if (list.base.length > 0) {
               return duplicateClass;
           }  

@@ -41,6 +41,10 @@
 			background-color: #0F0;
 			opacity: 0.5;
 		}
+
+		#info {
+			position: relative;
+		}
 	</style>
 
 	<template>
@@ -52,6 +56,7 @@
 			<div id="marker" title="Marker"></div>
 			<div id="ship" title="Ship"></div>
 		</div>
+		<div id="info"></div>
 	</template>
 
 	<script src="../openlayers/ol.js"></script>
@@ -250,6 +255,13 @@
 
 				this.olmap.addOverlay( this.marker );
 				this.olmap.addOverlay( this.ship );
+
+				this.olmap.on('pointermove', function (evt){
+					var lonlat = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
+					self.$.info.innerHTML="latitude : " + lonlat[0] + ", longitude : " + lonlat[1];				
+				});
+				
+			
 			},
 
 

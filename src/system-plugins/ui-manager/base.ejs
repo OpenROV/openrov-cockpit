@@ -12,7 +12,7 @@
     <%
       var head = scriplets.find(function(item){return item.name=='head'});
     %>
-    <%if (header !== undefined){ %>
+    <%if (head !== undefined){ %>
     <%- include(head.path,{
       title: title,
       scripts: scripts,

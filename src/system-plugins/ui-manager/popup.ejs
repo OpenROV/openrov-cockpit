@@ -9,6 +9,18 @@
     <script type='text/javascript' src="components/jquery/dist/jquery.js"></script>
     <!--script type='text/javascript' src="components/jquery-ui/jquery-ui.min.js"></script-->
     <title><%= title %></title>
+      <%
+      var head = scriplets.find(function(item){return item.name=='head'});
+    %>
+    <%if (head !== undefined){ %>
+    <%- include(head.path,{
+      title: title,
+      scripts: scripts,
+      styles: styles,
+      sysscripts: sysscripts,
+      config: config
+    })%>
+    <%}%>  
   </head>
 
   <script type='text/javascript' src="js/libs/eventemitter2.js"></script>

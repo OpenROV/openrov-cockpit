@@ -26,7 +26,7 @@ plugins.ExternalLights.prototype.inputDefaults = function ()
     {
       name: 'plugin.externalLights.0.adjust_increment',
       description: 'Makes the ROV lights brighter.',
-      defaults: { keyboard: '6'},
+      defaults: { keyboard: '6 ='},
       down: function () {
         cockpit.rov.emit('plugin.externalLights.set', 0, 0.1+ Number.parseFloat(self.state[0].level));
       }
@@ -34,7 +34,7 @@ plugins.ExternalLights.prototype.inputDefaults = function ()
     {
       name: 'plugin.externalLights.0.adjust_decrememt',
       description: 'Makes the ROV lights dimmer.',
-      defaults: { keyboard: '7'},
+      defaults: { keyboard: '6 -'},
       down: function () {
         cockpit.rov.emit('plugin.externalLights.set', 0, -0.1 + Number.parseFloat(self.state[0].level));
       }
@@ -42,7 +42,7 @@ plugins.ExternalLights.prototype.inputDefaults = function ()
     {
       name: 'plugin.externalLights.0.toggle',
       description: 'Toggles the ROV lights on/off.',
-      defaults: { keyboard: '8' },
+      defaults: { keyboard: '6 0' },
       down: function () {
         cockpit.rov.emit('plugin.externalLights.toggle', 0);
       }
@@ -52,7 +52,7 @@ plugins.ExternalLights.prototype.inputDefaults = function ()
     {
       name: 'plugin.externalLights.1.adjust_increment',
       description: 'Makes the ROV lights brighter.',
-      defaults: { keyboard: '9'},
+      defaults: { keyboard: '7 ='},
       down: function () {
         cockpit.rov.emit('plugin.externalLights.set', 1, 0.1+ Number.parseFloat(self.state[1].level));
       }
@@ -60,7 +60,7 @@ plugins.ExternalLights.prototype.inputDefaults = function ()
     {
       name: 'plugin.externalLights.1.adjust_decrememt',
       description: 'Makes the ROV lights dimmer.',
-      defaults: { keyboard: '0'},
+      defaults: { keyboard: '7 -'},
 
       down: function () {
         cockpit.rov.emit('plugin.externalLights.set', 1, -0.1 + Number.parseFloat(self.state[1].level));
@@ -69,7 +69,7 @@ plugins.ExternalLights.prototype.inputDefaults = function ()
     {
       name: 'plugin.externalLights.1.toggle',
       description: 'Toggles the ROV lights on/off.',
-      defaults: { keyboard: '-' },
+      defaults: { keyboard: '7 0' },
       down: function () {
         cockpit.rov.emit('plugin.externalLights.toggle', 1);
       }

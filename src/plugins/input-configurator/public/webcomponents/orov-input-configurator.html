@@ -55,12 +55,16 @@
             <div id="commandsList" class="table">
                 <div class="header">
                     <div style="float:left; min-width:40%">{{__('Command')}}</div>
+                    <div style="float:left; width:50px">{{__('KBD')}}&nbsp;</div>
+                    <div style="float:left; width:100px">{{__('GMP')}}&nbsp;</div>
                     <div style="">{{__('Description')}}</div>
                 </div>
                 <iron-list id="list" items="[[commands]]" as="item" selected-item="{{selectedItem}}" selection-enabled>
                     <template>
                         <div class$="controlsRow [[getClassForItem(item, selected)]]">
-                            <div style="float:left; min-width:40%">{{__(item.name)}}</div>
+                            <div style="float:left; min-width:44%">{{__(item.name)}}</div>
+                            <div style="float:left; width:50px">{{item.bindings.keyboard}}&nbsp;</div>
+                            <div style="float:left; width:100px">{{item.bindings.gamepad}}&nbsp;</div>
                             <div style="">{{__(item.description)}}</div>
                         </div>
                     </template>
@@ -90,9 +94,10 @@
                             <label class="prefix" for="keyboard">{{__('Keyboard')}}:</label>
                         </div>
                         <div class="small-3 columns left">
-                            <input id="keyboard" type="text" class$="{{ getClassInCaseOfDuplicates(keyboardDuplicates.*, 'error') }}" value="{{selectedItem.bindings.keyboard}}"
+                            <input id="keyboard" type="text" disabled class$="{{ getClassInCaseOfDuplicates(keyboardDuplicates.*, 'error') }}" value="{{selectedItem.bindings.keyboard}}"
                             />
                             <small class$="[[ getClassInCaseOfDuplicates(keyboardDuplicates.*, 'error', 'hide') ]]">{{__('Duplicate!')}}</small>
+                            <paper-button raised on-click="handleKeyBoardFocuse">{{__('change')}}</paper-button>
                         </div>
                     </div>
 
@@ -101,9 +106,10 @@
                             <label class="prefix" for="gamepad">{{__('Gamepad')}}:</label>
                         </div>
                         <div class="small-3 columns left">
-                            <input id="gamepad" type="text" class$="{{ getClassInCaseOfDuplicates(gamepadDuplicates.*, 'error') }}" value="{{__(selectedItem.bindings.gamepad)}}"
+                            <input id="gamepad" type="text" disabled class$="{{ getClassInCaseOfDuplicates(gamepadDuplicates.*, 'error') }}" value="{{__(selectedItem.bindings.gamepad)}}"
                             />
                             <small class$="[[ getClassInCaseOfDuplicates(gamepadDuplicates.*, 'error', 'hide') ]]">{{__('Duplicate!')}}</small>
+                            <paper-button raised on-click="handleGamePadFocuse">{{__('change')}}</paper-button>                            
                         </div>
                     </div>
 
@@ -193,6 +199,212 @@
 
     </template>
     <script>
+/**
+ * This extension allows you to record a sequence using Mousetrap.
+ *
+ * @author Dan Tao <daniel.tao@gmail.com>
+ */
+(function(Mousetrap) {
+    /**
+     * the sequence currently being recorded
+     *
+     * @type {Array}
+     */
+    var _recordedSequence = [],
+
+        /**
+         * a callback to invoke after recording a sequence
+         *
+         * @type {Function|null}
+         */
+        _recordedSequenceCallback = null,
+
+        /**
+         * a list of all of the keys currently held down
+         *
+         * @type {Array}
+         */
+        _currentRecordedKeys = [],
+
+        /**
+         * temporary state where we remember if we've already captured a
+         * character key in the current combo
+         *
+         * @type {boolean}
+         */
+        _recordedCharacterKey = false,
+
+        /**
+         * a handle for the timer of the current recording
+         *
+         * @type {null|number}
+         */
+        _recordTimer = null,
+
+        /**
+         * the original handleKey method to override when Mousetrap.record() is
+         * called
+         *
+         * @type {Function}
+         */
+        _origHandleKey = Mousetrap.prototype.handleKey;
+
+    /**
+     * handles a character key event
+     *
+     * @param {string} character
+     * @param {Array} modifiers
+     * @param {Event} e
+     * @returns void
+     */
+    function _handleKey(character, modifiers, e) {
+        var self = this;
+
+        if (!self.recording) {
+            _origHandleKey.apply(self, arguments);
+            return;
+        }
+
+        // remember this character if we're currently recording a sequence
+        if (e.type == 'keydown') {
+            if (character.length === 1 && _recordedCharacterKey) {
+                _recordCurrentCombo();
+            }
+
+            for (i = 0; i < modifiers.length; ++i) {
+                _recordKey(modifiers[i]);
+            }
+            _recordKey(character);
+
+        // once a key is released, all keys that were held down at the time
+        // count as a keypress
+        } else if (e.type == 'keyup' && _currentRecordedKeys.length > 0) {
+            _recordCurrentCombo();
+        }
+    }
+
+    /**
+     * marks a character key as held down while recording a sequence
+     *
+     * @param {string} key
+     * @returns void
+     */
+    function _recordKey(key) {
+        var i;
+
+        // one-off implementation of Array.indexOf, since IE6-9 don't support it
+        for (i = 0; i < _currentRecordedKeys.length; ++i) {
+            if (_currentRecordedKeys[i] === key) {
+                return;
+            }
+        }
+
+        _currentRecordedKeys.push(key);
+
+        if (key.length === 1) {
+            _recordedCharacterKey = true;
+        }
+    }
+
+    /**
+     * marks whatever key combination that's been recorded so far as finished
+     * and gets ready for the next combo
+     *
+     * @returns void
+     */
+    function _recordCurrentCombo() {
+        _recordedSequence.push(_currentRecordedKeys);
+        _currentRecordedKeys = [];
+        _recordedCharacterKey = false;
+        _restartRecordTimer();
+    }
+
+    /**
+     * ensures each combo in a sequence is in a predictable order and formats
+     * key combos to be '+'-delimited
+     *
+     * modifies the sequence in-place
+     *
+     * @param {Array} sequence
+     * @returns void
+     */
+    function _normalizeSequence(sequence) {
+        var i;
+
+        for (i = 0; i < sequence.length; ++i) {
+            sequence[i].sort(function(x, y) {
+                // modifier keys always come first, in alphabetical order
+                if (x.length > 1 && y.length === 1) {
+                    return -1;
+                } else if (x.length === 1 && y.length > 1) {
+                    return 1;
+                }
+
+                // character keys come next (list should contain no duplicates,
+                // so no need for equality check)
+                return x > y ? 1 : -1;
+            });
+
+            sequence[i] = sequence[i].join('+');
+        }
+    }
+
+    /**
+     * finishes the current recording, passes the recorded sequence to the stored
+     * callback, and sets Mousetrap.handleKey back to its original function
+     *
+     * @returns void
+     */
+    function _finishRecording() {
+        if (_recordedSequenceCallback) {
+            _normalizeSequence(_recordedSequence);
+            _recordedSequenceCallback(_recordedSequence);
+        }
+
+        // reset all recorded state
+        _recordedSequence = [];
+        _recordedSequenceCallback = null;
+        _currentRecordedKeys = [];
+    }
+
+    /**
+     * called to set a 1 second timeout on the current recording
+     *
+     * this is so after each key press in the sequence the recording will wait for
+     * 1 more second before executing the callback
+     *
+     * @returns void
+     */
+    function _restartRecordTimer() {
+        clearTimeout(_recordTimer);
+        _recordTimer = setTimeout(_finishRecording, 1000);
+    }
+
+    /**
+     * records the next sequence and passes it to a callback once it's
+     * completed
+     *
+     * @param {Function} callback
+     * @returns void
+     */
+    Mousetrap.prototype.record = function(callback) {
+        var self = this;
+        self.recording = true;
+        _recordedSequenceCallback = function() {
+            self.recording = false;
+            callback.apply(self, arguments);
+        };
+    };
+
+    Mousetrap.prototype.handleKey = function() {
+        var self = this;
+        _handleKey.apply(self, arguments);
+    };
+
+    Mousetrap.init();
+
+})(Mousetrap);
+
     (function() {
 
       var keyboardMap = ["","","","CANCEL","","","HELP","","BACK_SPACE","TAB","","","CLEAR","ENTER","RETURN","","SHIFT","CTRL","ALT","PAUSE","CAPSLOCK","KANA","EISU","JUNJA","FINAL","HANJA","","ESC","CONVERT","NONCONVERT","ACCEPT","MODECHANGE","SPACE","PAGE_UP","PAGE_DOWN","END","HOME","LEFT","UP","RIGHT","DOWN","SELECT","PRINT","EXECUTE","PRINTSCREEN","INSERT","DELETE","","0","1","2","3","4","5","6","7","8","9",":",";","LESS_THAN","=","GREATER_THAN","QUESTION_MARK","AT","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","WIN","","CONTEXT_MENU","","SLEEP","NUMPAD0","NUMPAD1","NUMPAD2","NUMPAD3","NUMPAD4","NUMPAD5","NUMPAD6","NUMPAD7","NUMPAD8","NUMPAD9","MULTIPLY","ADD","SEPARATOR","SUBTRACT","DECIMAL","DIVIDE","F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12","F13","F14","F15","F16","F17","F18","F19","F20","F21","F22","F23","F24","","","","","","","","","NUM_LOCK","SCROLL_LOCK","WIN_OEM_FJ_JISHO","WIN_OEM_FJ_MASSHOU","WIN_OEM_FJ_TOUROKU","WIN_OEM_FJ_LOYA","WIN_OEM_FJ_ROYA","","","","","","","","","","CIRCUMFLEX","EXCLAMATION","\"","#","$","%","&","_","(",")","*","+","|","HYPHEN_MINUS","{","}","~","","","","","VOLUME_MUTE","VOLUME_DOWN","VOLUME_UP","","",";","=",",","-",".","/","`","","","","","","","","","","","","","","","","","","","","","","","","","","","[","\\","]","'","","META","ALTGR","","WIN_ICO_HELP","WIN_ICO_00","","WIN_ICO_CLEAR","","","WIN_OEM_RESET","WIN_OEM_JUMP","WIN_OEM_PA1","WIN_OEM_PA2","WIN_OEM_PA3","WIN_OEM_WSCTRL","WIN_OEM_CUSEL","WIN_OEM_ATTN","WIN_OEM_FINISH","WIN_OEM_COPY","WIN_OEM_AUTO","WIN_OEM_ENLW","WIN_OEM_BACKTAB","ATTN","CRSEL","EXSEL","EREOF","PLAY","ZOOM","","PA1","WIN_OEM_CLEAR",""];
@@ -223,27 +435,6 @@
             this.eventEmitter.emit('InpitController.suspendAll')
               
             self.async(function() { self.$.list.dispatchEvent(new Event('iron-resize')); }, 500);
-
-            $(self.$.keyboard).keydown(function(event) {
-                var value = keyboardMap[event.which].toLowerCase();
-                        if (value !== 'alt' && event.altKey) {
-                        value = "alt+" + value;
-                        }
-                        if (value !== 'ctrl' && event.ctrlKey) {
-                        value = "ctrl+" + value;
-                        }
-                        if (value !== 'shift' && event.shiftKey) {
-                        value = "shift+" + value;
-                        }
-                $(self.$.keyboard).val(value);
-                self.keyboardDuplicates = [];
-                self.unfilteredCommands.forEach(function(command) {
-                    if (command.bindings.keyboard === value && command != self.selectedItem) {
-                        self.push('keyboardDuplicates', command);
-                    }
-                });
-                event.preventDefault();
-            });
 
           }
         },
@@ -292,14 +483,16 @@
             emitter.on('systemPlugin.inputController.gamepad.buttonDown', function(button) {
                 if (self.selectedItem) {
                     checkForGamepadDuplicate(button);
-                    $(self.$.gamepad).val(button);   
+                    self.set('selectedItem.bindings.gamepad',button);
+                   // $(self.$.gamepad).val(button);   
                 }
             });
             
             emitter.on('systemPlugin.inputController.gamepad.axisChanged', function(axis) {
                 if (self.selectedItem) {
-                    checkForGamepadDuplicate(button);
-                    $(self.$.gamepad).val(axis);   
+                    checkForGamepadDuplicate(axis);
+                    self.set('selectedItem.bindings.gamepad',axis);
+                    //$(self.$.gamepad).val(axis);   
                 }
             });         
         },
@@ -310,8 +503,8 @@
         
         selectedItemChanged: function() {
             if (this.selectedItem) {
-                $(this.$.keyboard).val(this.selectedItem.bindings.keyboard);
-                $(this.$.gamepad).val(this.selectedItem.bindings.gamepad);
+              //  $(this.$.keyboard).val(this.selectedItem.bindings.keyboard);
+              //  $(this.$.gamepad).val(this.selectedItem.bindings.gamepad);
                 this.keyboardDuplicates = [];
             }
         },
@@ -333,10 +526,11 @@
         
         onSave: function(e) {
             var self = this;
-            if (this.selectedItem) {
+/*            if (this.selectedItem) {
                 this.selectedItem.bindings.keyboard = $(this.$.keyboard).val();
                 this.selectedItem.bindings.gamepad = $(this.$.gamepad).val();
             }
+*/            
             if (this.eventEmitter!==undefined) {
                 var arg = { name: this.selectedItem.name, bindings: [
                     { name: 'keyboard', binding: this.selectedItem.bindings.keyboard },
@@ -398,8 +592,10 @@
 
         onReset: function() {
             if (this.selectedItem) {
-                $(this.$.keyboard).val(this.selectedItem.defaults.keyboard);
-                $(this.$.gamepad).val(this.selectedItem.defaults.gamepad);
+               // $(this.$.keyboard).val(this.selectedItem.defaults.keyboard);
+                this.set('selectedItem.bindings.keyboard',this.selectedItem.defaults.keyboard==undefined?null:this.selectedItem.defaults.keyboard);
+               // $(this.$.gamepad).val(this.selectedItem.defaults.gamepad);
+                this.set('selectedItem.bindings.gamepad',this.selectedItem.defaults.gamepad==undefined?null:this.selectedItem.defaults.gamepad);
                 this.keyboardDuplicates = [];
                 this.gamepadDuplicates = [];
             }
@@ -456,6 +652,26 @@
                 });        
             }
             self.commands = newCommands;
+        },
+        handleKeyBoardFocuse: function(e){
+            var self=this;
+            console.log('focus');
+            Mousetrap.record(function(sequence) {
+                // sequence is an array like ['ctrl+k', 'c']
+                console.log('You pressed: ' + sequence.join(' '));
+                self.set('selectedItem.bindings.keyboard',sequence.join(''));
+                self.keyboardDuplicates = [];
+                self.unfilteredCommands.forEach(function(command) {
+                    if (command.bindings.keyboard === sequence.join(' ') && command != self.selectedItem) {
+                        self.push('keyboardDuplicates', command);
+                    }
+                });
+
+            });
+            
+        },
+        handleGamePadFocuse: function(e){
+            this.$.gamepad.disabled=false;
         }
         
       })

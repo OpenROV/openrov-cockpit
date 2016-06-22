@@ -40,11 +40,11 @@ diveprofile.prototype.start = function start(){
   
   this.deps.cockpit.on('plugin.diveprofile.watertype.set', function (type) {
     var value = type=='salt'?1:0;
-    self.deps.globalEventLoop.emit( 'physicalInterface.send', 'dswa(' + value + ')');
+    self.deps.globalEventLoop.emit( 'mcu.SendCommand', 'dswa(' + value + ')');
   });  
   
   this.deps.cockpit.on('plugin.diveprofile.depth.zero', function () {
-    self.deps.globalEventLoop.emit( 'physicalInterface.send', 'dzer()');
+    self.deps.globalEventLoop.emit( 'mcu.SendCommand', 'dzer()');
   });    
 }
 

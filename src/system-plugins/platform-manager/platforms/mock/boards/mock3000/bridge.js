@@ -177,7 +177,7 @@ function Bridge()
     // Add status interval functions
     bridge.timeInterval    = setInterval( bridge.emitTime, 1000 );
     bridge.statsInterval   = setInterval( bridge.emitStats, 3000 );
-    bridge.navDataInterval = setInterval( bridge.emitNavData, 2000 );
+    bridge.navDataInterval = setInterval( bridge.emitNavData, 100 );
     
     // Emit serial port opened event
   };

@@ -12,7 +12,7 @@ function engineeringPanel(name, deps) {
 engineeringPanel.prototype.start = function start(){
   var self = this; 
 
-	self.deps.globalEventLoop.on( 'physicalInterface.status', function(data){
+	self.deps.globalEventLoop.on( 'mcu.status', function(data){
 	    for (var i in data) {
 			if (i === 'cmd'){
 				if (data[i].indexOf('ping')>=0) continue;

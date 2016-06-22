@@ -40,6 +40,10 @@
       deps.globalEventLoop.emit( 'mcu.SendCommand', 'ccal()');
     });
 
+    //TODO: Add API for switching compass to GYRO only mode for relative positioning if the compass is capable.
+    //This also implies the UI should be notified so that it can remove the N/S/E/W references.  Perhaps switch to
+    //a -180 + 180 coordinate system?
+
     setInterval(function () {
       deps.cockpit.emit('plugin.navigationData.data', navdata);
     }, 100);

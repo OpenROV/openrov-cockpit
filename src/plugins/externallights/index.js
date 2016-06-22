@@ -1,78 +1,100 @@
-
 (function() {
-  function ExternalLights(name, deps) {
-    var ArduinoHelper = require('../../lib/ArduinoHelper')();
+function ExternalLights(name, deps) 
+{
     console.log('ExternalLights plugin loaded');
-    this.lights = 0;
-    var self=this;
+
+    var self            = this;
+    var ArduinoHelper   = require('../../lib/ArduinoHelper')();
+     var lights         = [ 0, 0 ];
 
     // Cockpit
-    deps.cockpit.on('plugin.externalLights.toggle', function () {
-      toggleLights();
+    deps.cockpit.on('plugin.externalLights.toggle', function( lightNum ) 
+    {
+        toggleLights( lightNum );
     });
 
-    deps.cockpit.on('plugin.externalLights.adjust', function (value) {
-      adjustLights(value);
+    deps.cockpit.on('plugin.externalLights.adjust', function(lightNum, value) 
+    {
+        adjustLights(lightNum, value);
     });
 
-    deps.cockpit.on('plugin.externalLights.set', function (value) {
-      setLights(value);
+    deps.cockpit.on('plugin.externalLights.set', function (lightNum, value) 
+    {
+        setLights(lightNum, value);
     });
+
     // Arduino
     deps.globalEventLoop.on( 'mcu.status', function (data) {
-      if ('LIGPE' in data) {
-        //value of 0-1.0 representing percent
-        var level = data.LIGPE;
-        self.lights = level;
-        deps.cockpit.emit('plugin.externalLights.state', {level:level});
-      }
+        if ('LIGPE0' in data) 
+        {
+            //value of 0-1.0 representing percent
+            var level = data.LIGPE0;
+            lights[ 0 ] = Number.parseFloat(level);
+            deps.cockpit.emit('plugin.externalLights.state', 0, {level:level});
+        }
+        else if ('LIGPE1' in data) 
+        {
+            //value of 0-1.0 representing percent
+            var level = data.LIGPE1;
+            lights[ 1 ] = Number.parseFloat(level);
+            deps.cockpit.emit('plugin.externalLights.state', 1, {level:level});
+        }
     });
 
-      var adjustLights = function adjustLights(value) {
-      console.log("adjustLights:" + value);
-      if (this.lights === 0 && value < 0) {
-        //this code rounds the horn so to speak by jumping from zero to max and vise versa
-        this.lights = 0;  //disabled the round the horn feature
-      } else if (this.lights == 1 && value > 0) {
-        this.lights = 1;  //disabled the round the horn feature
-      } else {
-        this.lights = parseFloat(value) + parseFloat(this.lights);
-      }
-      setLights(this.lights);
+    var adjustLights = function adjustLights(lightNum, value) 
+    {
+        console.log("adjustLights[" + lightNum + "]: " + value);
+        
+        if (lights[ lightNum ] === 0 && value < 0) 
+        {
+            //this code rounds the horn so to speak by jumping from zero to max and vise versa
+            lights[ lightNum ] = 0;  //disabled the round the horn feature
+        } 
+        else if (lights[ lightNum ] == 1 && value > 0) 
+        {
+            lights[ lightNum ] = 1;  //disabled the round the horn feature
+        } 
+        else 
+        {
+            lights[ lightNum ] = parseFloat(value) + parseFloat(lights[ lightNum ]);
+        };
+
+        setLights(lightNum, lights[ lightNum ]);
     };
 
-    var toggleLights = function toggleLights() {
-      if (this.lights > 0) {
-        setLights(0);
-      } else {
-        setLights(1);
-      }
+    var toggleLights = function toggleLights( lightNum ) 
+    {
+        if (lights[ lightNum ] > 0) 
+        {
+            setLights(lightNum, 0);
+        } 
+        else 
+        {
+            setLights(lightNum, 1);
+        }
     };
 
-    var setLights = function setLights(value) {
-      
-      this.lights = value;
-      
-      if (this.lights >= 1)
-      {
-        this.lights = 1;
-      }
-      
-      if (this.lights <= 0)
-      {
-        this.lights = 0;
-      }
+    var setLights = function setLights( lightNum, value ) 
+    {
+        lights[ lightNum ] = value;
 
-      var command = 'eligt(' + ArduinoHelper.serial.packPercent(this.lights) + ')';
-      
-      deps.globalEventLoop.emit( 'mcu.SendCommand', command);
+        if (lights[ lightNum ] >= 1)
+        {
+            lights[ lightNum ] = 1;
+        }
+        else if (lights[ lightNum ] <= 0)
+        {
+            lights[ lightNum ] = 0;
+        }
 
+        var command = 'elight' + lightNum +'(' + ArduinoHelper.serial.packPercent(lights[ lightNum ]) + ')';
+
+        deps.globalEventLoop.emit( 'mcu.SendCommand', command);
     };
+};
 
-
-  }
-  module.exports = function (name, deps) {
+module.exports = function (name, deps) 
+{
     return new ExternalLights(name,deps);
-  };
-
+};
 })();

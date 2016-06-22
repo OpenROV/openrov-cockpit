@@ -705,21 +705,7 @@
                   up: function(){
                     self.visible=false;
                     self.executeMenuItem();
-                  },
-                  secondary: [
-                    {
-                      name: 'headsupMenu.next',
-                      description: 'select the next element of the heads up menu',
-                      defaults: { keyboard: 'c', gamepad: 'DPAD_DOWN' },
-                          down: function(){self.moveSelectionNext();}
-                    },
-                    {
-                      name: 'headsupMenu.prev',
-                      description: 'select the previous element of the heads up menu',
-                      defaults: { keyboard: 'd', gamepad: 'DPAD_UP' },
-                          down: function(){self.moveSelectionPrevious();}
-                    }
-                  ]
+                  }
                 }
               ]
             )

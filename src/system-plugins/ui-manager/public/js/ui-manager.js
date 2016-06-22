@@ -9,6 +9,7 @@
   };
 
   plugins.UIManager.prototype.listen = function listen(){
+    
     var template = $('#t')[0];
     template.addEventListener('dom-change', function() {
       console.log('boom');
@@ -24,15 +25,25 @@
     template.displaySection= function displaySection(item1,item2){
       return item1==item2;
     }
-    template.routedata = {page: 'cockpit'}
-//    if ((window.location.pathname=="/") && (window.location.hash=='')){
-//      window.location.replace ('#/cockpit');
-//    }
-
-
-    this.rov.withHistory.on('ui-manager-applets',function(applets){
-      self.cockpit.emit('ui-manager-applets',applets);
+//    template.routedata = {page: 'cockpit'}
+    if (window.location.hash==''){
+      window.location.replace ('#/cockpit');
+    } 
+   
+    this.registerEventListeners(this.cockpit,this.rov);
+  }
+  
+   var register = [];
+   plugins.UIManager.prototype.registerEventListeners = function registerEventListeners(cockpit,rov){
+    register.forEach(function(fn){
+      fn();
     });
+    register = [];
+    
+    var handleAppletMsg = function(applets){cockpit.emit('ui-manager-applets',applets);}
+    rov.withHistory.on('ui-manager-applets',handleAppletMsg);
+    register.push(rov.off.bind(this,'ui-manager-applets',handleAppletMsg));
+    
 
   }
 

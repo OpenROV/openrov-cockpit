@@ -131,6 +131,8 @@
   </template>
   <script>
     (function () {
+      var lastState = null;
+      var newState = null;
       Polymer({
         is: 'orov-newui-depth',
         properties: {
@@ -164,10 +166,16 @@
         registerEmitterHanlders: function(emitter) {
           var self = this;
           emitter.on('plugin.navigationData.data', function (data) {
-            if ('depth' in data) {
-              self.set('depth',Number(data.depth));//.toFixed(1);
-            }
+            newState = data;
           });
+          setInterval(function(){
+              if (newState == lastState){return;};
+              lastState = newState
+              var data = lastState;
+              if ('depth' in data) {
+                self.set('depth',Number(data.depth));//.toFixed(1);
+              }
+          },100);
           emitter.withHistory.on('plugin.rovpilot.depthHold.state', function (state) {
             if(state.enabled){
             self.target = Number(state.targetDepth).toFixed(1);
@@ -181,7 +189,7 @@
             $(self.$.depthLock).addClass('hidden');
 }
           });
-          emitter.on('plugin.diveprofile.watertype', function (data) {
+          emitter.withHistory.on('plugin.diveprofile.watertype', function (data) {
             self.waterType = data.watertype;
           });
         },

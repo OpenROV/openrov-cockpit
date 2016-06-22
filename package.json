@@ -40,7 +40,7 @@
     "request": "^2.69.0",
     "respawn": "^2.3.0",
     "rimraf": "^2.5.1",
-    "serialport": "^2.0.6",
+    "serialport": "git://github.com/EmergingTechnologyAdvisors/node-serialport.git",
     "serve-favicon": "^2.3.0",
     "serve-index": "^1.7.3",
     "socket.io": "~1.4.5",

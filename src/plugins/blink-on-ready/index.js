@@ -1,7 +1,8 @@
 function readyAyeReady(name, deps) {
   var done = false;
   var lastLightCmd = '';
-
+  this.deps = deps;
+  var self=this;
   //rovsys comes up when arduino starts
   deps.globalEventLoop.on('physicalInterface.rovsys', function(s)
   {
@@ -9,6 +10,10 @@ function readyAyeReady(name, deps) {
     {
       console.log('The ROV is ready!.');
       setLight('12.5');
+      deps.globalEventLoop.emit('plugin.systemPower.powerOffESCs');
+      setTimeout(function(){
+         self.deps.globalEventLoop.emit('plugin.systemPower.powerOnESCs');
+      },10);      
       done = true;
     }
   });

@@ -15,6 +15,7 @@
 			],
 			"env": {
 				"NODE_ENV": "development",
+				"DEV_MODE": "true",
 				"USE_MOCK": "true",
 				"CPU_MOCK": "123MOCK",
 				"GEO_MOCK": "true",

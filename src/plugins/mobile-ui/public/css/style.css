@@ -118,6 +118,18 @@ html, body
   padding-right: 2px;
 }
 
+.action-bar-container .user-role
+{
+	line-height: 24px;
+}
+
+.action-bar-container .leftend
+{
+	border-radius: 0 0 0 5px;
+  	padding-left: 6px;
+}
+
+
 .action-bar-container .rightend
 {
 	border-radius: 0 0 5px 0;
@@ -129,7 +141,6 @@ html, body
 	width: 70px;
 	color: white;
 	background-color: rgba(0,0,0,0.4);
-	border-radius: 0 0 0 5px;
 	vertical-align: top;
 	display: inline-block;
 }

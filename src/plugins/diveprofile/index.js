@@ -37,6 +37,15 @@ diveprofile.prototype.start = function start(){
     //TODO: Replumb the arduino APIs to explicilty set the water type
     //settings.['water-type']
   })
+  
+  this.deps.cockpit.on('plugin.diveprofile.watertype.set', function (type) {
+    var value = type=='salt'?1:0;
+    self.deps.globalEventLoop.emit( 'physicalInterface.send', 'dswa(' + value + ')');
+  });  
+  
+  this.deps.cockpit.on('plugin.diveprofile.depth.zero', function () {
+    self.deps.globalEventLoop.emit( 'physicalInterface.send', 'dzer()');
+  });    
 }
 
 diveprofile.prototype.getSettingSchema = function getSettingSchema(){

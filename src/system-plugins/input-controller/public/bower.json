@@ -1,0 +1,23 @@
+{
+  "name": "public",
+  "homepage": "https://github.com/BrianAdams/openrov-cockpit",
+  "authors": [
+    "BrianAdams <brian@babastik.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "mousetrap-js": "https://github.com/mousetrap-js/mousetrap.git#^1.6.0"
+  },
+  "resolutions": {
+    "webcomponentsjs": "^0.6.0"
+  }
+}

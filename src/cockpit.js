@@ -136,20 +136,71 @@ var deps = {
 };
 
 var numConnections = 0;
-
+var socketConnectToken = null;
 // Handle socket.io events
-deps.cockpit.on('connect', function () 
+io.on('connection', function (client) 
 {
-    numConnections++;
+    if (socketConnectToken == null){
+        socketConnectToken = client.id;
+    } 
+    
+        numConnections++;
+        console.log('HASTHEBALL:TRUE');
+        client.hastheball=true;
+        client.emit('hastheball',socketConnectToken);
+    
+    client.on('request-sessionToken',function(callback){
+        callback(socketConnectToken);
+        //TODO: On force, kill the other inbound connections
+    });
+    
     console.log('Connection detected');
     console.log('Current connections: ' + numConnections );
+    
+    client.on('disconnect',function(){
+    });
+    
+    
 });
+
+io.use(function(socket, next){
+    console.log("Auth expecting %s. got %s",socketConnectToken==null?'<NULL>':socketConnectToken,socket.handshake.query.token==undefined?'<UNDEFINED>':socket.handshake.query.token);
+    // return the result of next() to accept the connection.
+    if ((socketConnectToken == null) || (socketConnectToken == socket.handshake.query.token) || (socket.handshake.query.token == 'reset')){
+        if (socket.handshake.query.token == 'reset'){
+            socketConnectToken = null;
+            //And kick anyone already connected
+         //   if (typeof(io.sockets.server.eio.clients) == 'Array'){
+              var socketCollection = io.sockets.connected;
+                Object.keys(socketCollection).forEach(function(key){
+                    var client = socketCollection[key];
+                    
+                    if (client.id !== socket.id){
+                        console.log('kicking out:',client.id);
+                        setTimeout(function(){
+                            client.emit('forced-disconnect');
+                            client.disconnect();},1000);
+
+                    }
+                });
+          //  }
+        }
+        return next();
+    };
+    // call next() with an Error if you need to reject the connection.
+    next(new Error('Authentication error'));
+});  
 
 deps.cockpit.on('disconnect', function () 
 {
+    
     numConnections--;
+    if (numConnections==0){
+        socketConnectToken = null;
+    }
     console.log('Disconnect detected');
     console.log('Current connections: ' + numConnections );
+
 });
 
 // Handle global events

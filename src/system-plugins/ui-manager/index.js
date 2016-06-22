@@ -35,9 +35,28 @@ UIManager.prototype.start = function start(){
   });
 
   var pathInfo = this.deps.pathInfo();
+  
+  this.deps.app.get('/sw-import.js', function(req,res){
+      var data = "if('function' === typeof importScripts) {importScripts('components/platinum-sw/service-worker.js');}";
+      res.writeHead(200, {'Content-Type': 'application/javascript','Content-Length':data.length});
+      res.write(data);
+      res.end();
+  })
 
   this.deps.app.get('/', function (req, res) {
     var theme = self.deps.config.preferences.get("plugins:ui-manager").selectedUI;
+
+    var ua = req.header('user-agent');
+    // Check the user-agent string to identyfy the device. 
+    if(/mobile|iphone|ipod|android|blackberry|opera|mini|windows\sce|palm|smartphone|iemobile|ipad|android|android 3.0|xoom|sch-i800|playbook|tablet|kindle/i.test(ua)) {
+       theme='mobile-ui';
+    }
+ 
+    //You can override the theme by passing theme=<themename> in the query string
+    if (req.query && req.query.theme){
+      theme = req.query.theme; 
+    }
+
     theme = theme === undefined ? "new-ui" : theme;
     var scriplets = self.getAppletsByTheme(self.getApplets(),theme);
     //TODO: Add theme to the message so you can differentiate the applets by theme
@@ -53,9 +72,50 @@ UIManager.prototype.start = function start(){
       styles: pathInfo.styles,
       sysscripts: pathInfo.sysscripts,
       config: self.deps.config,
-      scriplets: scriplets
+      scriplets: scriplets,
+      theme:theme
     });
   });
+
+  this.deps.app.get('/popup', function (req, res) {
+    var theme = self.deps.config.preferences.get("plugins:ui-manager").selectedUI;
+
+    var ua = req.header('user-agent');
+    // Check the user-agent string to identyfy the device. 
+    if(/mobile|iphone|ipod|android|blackberry|opera|mini|windows\sce|palm|smartphone|iemobile|ipad|android|android 3.0|xoom|sch-i800|playbook|tablet|kindle/i.test(ua)) {
+       theme='mobile-ui';
+    }
+
+    //You can override the theme by passing theme=<themename> in the query string
+    if (req.query && req.query.theme){
+      theme = req.query.theme; 
+    }
+
+    var applet;
+    if (req.query && req.query.app){
+      applet = req.query.app; 
+    }
+    
+    
+    theme = theme === undefined ? "new-ui" : theme;
+    var scriplets = self.getAppletsByTheme(self.getApplets(),theme);
+    //TODO: Add theme to the message so you can differentiate the applets by theme
+    //and ignore if it is not the theme you are using.
+    //TODO: Look for applet.ejs.disable in a theme to remove the applet option.
+    self.deps.cockpit.emit('ui-manager-applets',scriplets.filter(function(item){
+      return ['footer','header','head'].indexOf(item.name)==-1;
+    }));
+
+    res.render(__dirname +'/popup.ejs', {
+      title: 'OpenROV ROV Cockpit',
+      scripts: pathInfo.scripts,
+      styles: pathInfo.styles,
+      sysscripts: pathInfo.sysscripts,
+      config: self.deps.config,
+      scriplet: scriplets.find(function(item){return item.name==applet}),
+      theme:theme
+    });
+  });  
 
 
 }

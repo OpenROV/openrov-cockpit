@@ -1,0 +1,21 @@
+<link rel="import" href="components/geomuxp/orov-geomux.html">
+<link rel="import" href="components/video/orov-video.html">
+<style>
+orov-video {
+    width: 20%;
+    height: 20%;
+    position: absolute;
+    display: block;
+    top: 0px;
+    right: 0px;
+}  
+</style>
+
+<div>
+  <h4>{{__('Geomux settings')}}</h4>
+</div>
+<div>
+  <orov-geomux event-emitter="{{cockpitEventEmitter}}"></orov-geomux>
+  <orov-video id="camera1" border='1' location='forward' event-emitter="{{cockpitEventEmitter}}">
+  </orov-video>
+</div>

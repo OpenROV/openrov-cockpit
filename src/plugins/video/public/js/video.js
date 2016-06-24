@@ -56,7 +56,11 @@
     var self=this;
  
     var CameraRegsitrations = {};
+    this.rov.on('CameraRegistration2',function(data){
+      console.log('@@@@@');
+    });
     this.rov.withHistory.on('CameraRegistration',function(data){
+      console.log('####');
       //TODO: More robust handling of duplicat CameraRegistration messages.  If the Camera
       //already is setup, we want to ignore.  But we also want to handle multiple Cameras
       //and camera's that change settings.
@@ -85,9 +89,18 @@
               self.cockpit.emit('x-h264-video.data',data);
           }
           
+          
+          var handleMjpegData=function(data){
+              self.cockpit.emit('x-motion-jpeg.data',data);
+          }
+          
           //TODO: abstract the messages enough that we can have multiple cameras controls
           self.cockpit.on('request_Init_Segment',handleInit);
           connection.on('x-h264-video.data',handleData);        
+          
+          connection.on('x-motion-jpeg.data',handleMjpegData);        
+
+
           connection.on("connect",function(){
             console.log("connected to socket.io video server end point");
           });        

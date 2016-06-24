@@ -131,7 +131,7 @@
                   description: 'Lasers on/off',
                   switch: function (state) {
                     if (self.eventEmitter !== undefined){
-                      self.eventEmitter.emit('plugin.laser.set',!state);
+                      self.eventEmitter.emit('plugin.laser.set',state?0:1);
                     }
                   }
                 },

@@ -27,7 +27,7 @@
         canvas='{{canvas}}'
         cors='false'
         showMenu='true'
-        show-stats='true'>
+        show-stats='{{showStats}}'>
       <content></content>
     </packet-video>
     </template>
@@ -43,7 +43,8 @@
           framesPerSecond: {type:Number},
           canvas: {type:Object, observer: '_canvasChanged'},
           videoMimeType: {type:String},
-          location: {type:String}
+          location: {type:String},
+          showStats: {type:Boolean, value:function(){return false;}}
         },
         behaviors: [namespace('behaviors').oROVStandard],
         detached: function(){
@@ -53,9 +54,10 @@
         registerEmitterHanlders: function(emitter){
           var self = this;
           this.shortCircuit=false;
-          emitter.withHistory.on('settings-change.video',function(settings){
+          emitter.withHistory.on('settings-change.videosettings',function(settings){
             if (self.shortCircuit) {return;}
-            self.videoSource = settings.video.forward_camera_url;
+            self.showStats = settings.videosettings['show-stats'];
+            
           });
 
           emitter.on('video.forward.get-canvas',function(callback){

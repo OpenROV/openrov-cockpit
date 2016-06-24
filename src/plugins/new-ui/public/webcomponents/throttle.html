@@ -1,3 +1,6 @@
+<!--
+TODO:  Change the interface for motors to -1/1 with deadzone accounted for to true up the indicators to the actual ranges
+-->
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../orov-behaviors/orov-behavior.html">
 <dom-module id="orov-newui-throttle">
@@ -257,11 +260,10 @@
       behaviors: [namespace('behaviors').oROVStandard],
       registerEmitterHanlders: function(emitter) {
         var self = this;
-        emitter.on('plugin.rovpilot.setPowerLevel', function (level) {
+        emitter.withHistory.on('plugin.rovpilot.setPowerLevel', function (level) {
           self.setPowerLevel(level);
         });
-        emitter.on('plugin.rovpilot.controls', function (data) {
-          console.log(data);
+        emitter.withHistory.on('plugin.rovpilot.controls', function (data) {
           self.setVertical(Number(data.vertical));
           self.setPort(Number(data.port));
           self.setStarboard(Number(data.starbord));
@@ -290,7 +292,7 @@
         var verticalMaxElement = $(this.$.vertical).find('#maxThrottle rect');
         var starboardMaxElement = $(this.$.starboard).find('#maxThrottle rect');
         //815 is the design height of the throttle SVG element, 200 the min height of the throttle display at power level 1
-        var height = level.map(1, 5, 0, 815) + 200;
+        var height = level.map(0, 5, 0, 815);
         var y = 815 / 2 - height / 2;
         portMaxElement.animate({
           svgHeight: height,
@@ -323,7 +325,6 @@
         // the min throttle height is 200, therefore we substract 100 px
         var maxheight = 815;
         var height = value.map(1000, 2000, 0 - maxheight, maxheight);
-        console.log('level height: ' + this.height / 2 + ' height: ' + height);
         y = 815 / 2 - height;
         if (height < 0) {
           height = -1 * height;

@@ -26,6 +26,8 @@
       self.settings=settings.rovpilot;
     })
 
+    this.cockpit.emit('plugin.rovpilot.setPowerLevel',2);
+
   };
 
 

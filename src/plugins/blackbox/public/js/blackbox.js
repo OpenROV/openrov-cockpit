@@ -25,7 +25,8 @@
     this.mp4Buffer = [];
     this.statusBuffer = [];
     this.navBuffer = [];
-
+    this.otherBuffer = [];
+  
   };
 
   plugins.Blackbox = Blackbox;
@@ -53,7 +54,7 @@
       setTimeout(function(){self.listen()},1000);
       return;
     }
-    this.idb = this.defineDB(); //Readies the DB, ensures schema is consistent
+    this.idb = this.defineDB(function(idb){self.cockpit.emit('blackbox-dixie-object',idb)}); //Readies the DB, ensures schema is consistent
     this.idb.on('error', function (err) {
         // Catch all uncatched DB-related errors and exceptions
         console.error(err.message);
@@ -61,18 +62,47 @@
         self.stopRecording();
     });
 
+    var OnAnyBlacklist = [
+      'plugin.navigationData.data',
+      'plugin.gps.data',
+      'status',
+      'x-h264-video.data',
+      'x-h264-video.init',
+      'plugin-blackbox-export',
+      'plugin-blackbox-recording-start',
+      'plugin-blackbox-recording-stop',
+      'plugin-blackbox-get-sessions',
+      'plugin-blackbox-sessions',
+    ]
+    this.cockpit.onAny(function(){
+      if(OnAnyBlacklist.includes(this.event)){return;}
+      if (this.event !== 'newListener') {
+        var args = new Array(arguments.length);
+        for(var i = 0; i < args.length; ++i) {
+                    //i is always valid index in the arguments object
+            args[i] = arguments[i];
+        }      
+        self.logOtherData(this.event,args);
+      }
+    });
+
     this.cockpit.rov.on('plugin.navigationData.data', function (data) {
       if (!jQuery.isEmptyObject(data)) {
         self.logNavData(data);
       }
     });
+    this.cockpit.on('plugin.gps.data', function (data) {
+      if (!jQuery.isEmptyObject(data)) {
+        self.logNavData(data);
+      }
+    });    
     this.cockpit.withHistory.on('status', function (data) {
       if (!jQuery.isEmptyObject(data)) {
         self.logStatusData(data);
       }
     });
     this.cockpit.on('x-h264-video.data', function (data) {
-        self.logMP4Video(data);
+       self.logMP4Video(data);
     });
     this.cockpit.on('plugin-blackbox-export', function(options){
       self.exportData(options);
@@ -175,7 +205,7 @@
     this.cockpit.emit('plugin-blackbox-recording-status',true);
 
     var commitBuffers= function(){
-         self.idb.transaction("rw", self.idb.mp4, self.idb.navdata,self.idb.telemetry,function() {
+         self.idb.transaction("rw", self.idb.mp4, self.idb.navdata,self.idb.telemetry,self.idb.otherdata,function() {
           while(self.mp4Buffer.length>0){
             self.idb.mp4.add(self.mp4Buffer.shift());
           }
@@ -183,8 +213,11 @@
             self.idb.navdata.add(self.navBuffer.shift());
           }
           while(self.statusBuffer.length>0){
-            self.idb.mp4.add(self.statusBuffer.shift());
+            self.idb.telemetry.add(self.statusBuffer.shift());
           }
+          while(self.otherBuffer.length>0){
+            self.idb.otherdata.add(self.otherBuffer.shift());
+          }          
         })
         .then(function () {
           // Transaction complete.
@@ -277,9 +310,36 @@
 */
   };
 
+  Blackbox.prototype.logOtherData = function logOtherData(event,data) {
+    var self=this;
+    if (!this.recording) {
+      return;
+    }
+    var otherdata={event:event,data:JSON.stringify(data)};
+    otherdata.timestamp = Date.now();
+    otherdata.sessionID= this.sessionID;
+    this.otherBuffer.push(otherdata);
+
+  };  
+
   Blackbox.prototype.defineDB = function defineDB(callback){
     //Instructions to upgrade: https://github.com/dfahlander/Dexie.js/wiki/Design
     var idb = new Dexie("openrov-blackbox2");
+    idb.version(4).stores({
+        navdata: 'id++,timestamp,sessionID',
+        telemetry: 'id++,timestamp,sessionID',
+        mp4: 'id++,timestamp,sessionID',
+        sessions: 'timestamp,sessionID',
+        otherdata: 'id++,timestamp,sessionID,event',  
+    }).upgrade(function(trans){
+      trans.mp4.each(function(data,cursor){
+        if (data.time!==undefined){
+          delete data.id;
+          trans.telemetry.add(data);
+          cursor.delete(data);
+        }
+      });
+    });
     idb.version(3).stores({
         navdata: 'id++,timestamp,sessionID',
         telemetry: 'id++,timestamp,sessionID',
@@ -295,6 +355,9 @@
         cursor.update(data);
       });
     });
+    if(typeof(callback)=='function'){
+      callback(idb);
+    }
     return idb;
   }
 

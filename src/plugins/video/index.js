@@ -63,6 +63,11 @@ video.prototype.getSettingSchema = function getSettingSchema(){
 	"id" :"videosettings",
   "type" : "object",
   "properties": {
+    "show-stats":{
+      "id":"show-stats",
+      "type":"boolean",
+      "default":false
+    },
     "cameras":{
     "id": "cameras",
     "type": "array",

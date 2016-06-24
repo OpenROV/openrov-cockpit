@@ -28,6 +28,12 @@
 
 (function() {
   var editor;
+  var lastMouseEvent;
+  window.onmousemove = function (e) {
+    if (!e) e = window.event;
+    lastMouseEvent=e;
+  }
+
   Polymer({
     is:'orov-appletswitcher',
     properties: {
@@ -53,7 +59,12 @@
       console.log( "Clicked App Menu Button: " + e.detail.label );
       console.log( "Action: " + e.detail.action );
       console.log( "Target: " + e.detail.target );
-      this.set('selection',e.detail.target);
+      if (lastMouseEvent.shiftKey){
+        window.open('popup?app='+e.detail.target);
+      } else {
+        this.set('selection',e.detail.target);
+      }
+
 //      document.location.href = "mobile-ui?page=" + e.detail.target;
     },
   })

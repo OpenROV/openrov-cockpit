@@ -56,11 +56,7 @@
     var self=this;
  
     var CameraRegsitrations = {};
-    this.rov.on('CameraRegistration2',function(data){
-      console.log('@@@@@');
-    });
     this.rov.withHistory.on('CameraRegistration',function(data){
-      console.log('####');
       //TODO: More robust handling of duplicat CameraRegistration messages.  If the Camera
       //already is setup, we want to ignore.  But we also want to handle multiple Cameras
       //and camera's that change settings.

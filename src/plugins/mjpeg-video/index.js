@@ -48,7 +48,6 @@ mjpegvideo.prototype.enumerateDevices = function enumerateDevices(){
 
 mjpegvideo.prototype.start = function start(){
   var self = this;
-  self.deps.cockpit.emit('aaa','bbb');
   //if (config.preferences.video)
   if (process.env.MJPG_MOCK === 'true'){
       self.startCamera('/dev/video0');

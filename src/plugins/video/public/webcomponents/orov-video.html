@@ -151,7 +151,6 @@
             var u8 = new Uint8Array(data);
             var b64encoded = btoa(Uint8ToString(u8));
             self.$$('#camera1').src = 'data:image/jpeg;base64,' + b64encoded;
-            img.src = 'data:image/jpeg;base64,' + b64encoded;
             
             // if(self.$$('#camera1').initialized){
             //   self.$$('#camera1').append(new Uint8Array(data));

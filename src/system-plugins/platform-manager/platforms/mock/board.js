@@ -1,21 +1,6 @@
-var Q 		= require("q");
-var fs 		= require("fs");
+var Promise = require( "bluebird" );
+var fs 		= Promise.promisifyAll( require("fs") );
 var path	= require('path');
-var Parser 	= require("binary-parser").Parser;
-
-var fopen		= Q.denodeify( fs.open );
-var read 		= Q.denodeify( fs.read );
-var readFile	= Q.denodeify( fs.readFile );
-
-// Define a parser for the board information stored on the controller board's eeprom
-var eepromParser = Parser.start()
-					.endianess( "little" )
-					.uint32( "length" )
-					.string( "data",
-					{
-						encoding: "utf8",
-        				length: "length"
-					} );
 
 var ComposeInterface = function( platform )
 {	
@@ -38,11 +23,12 @@ var ComposeInterface = function( platform )
 
 var LoadBoardInfo = function( board ) 
 {
-	return readFile( path.resolve(__dirname, "mock_eeprom/eepromMock.bin" ) )
-			.then( function( data )
-			{
-				return eepromParser.parse( data ).data;
-			} )
+	if( process.env.BOARD == "" )
+	{
+		throw "No board specified!";
+	}
+	
+	return fs.readFileAsync( path.resolve(__dirname, "boards/" + process.env.BOARD + "/eepromMock.json" ) )
 			.then( JSON.parse )
 			.then( function( info )
 			{
@@ -53,7 +39,7 @@ var LoadBoardInfo = function( board )
 
 var LoadPinMap = function( board )
 {
-	return readFile( path.resolve(__dirname, "boards/" + board.info.productId + "/pinmap.json" ) )
+	return fs.readFileAsync( path.resolve( __dirname, "boards/" + board.info.productId + "/pinmap.json" ) )
 			.then( JSON.parse )
 			.then( function( json )
 			{

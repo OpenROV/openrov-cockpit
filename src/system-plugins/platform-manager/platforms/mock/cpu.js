@@ -1,8 +1,6 @@
-var Q 			= require( "q" );
-var fs 			= require( "fs" );
-var path		= require( "path" );
-
-var readFile 	= Q.denodeify( fs.readFile );
+var Promise			= require( "bluebird" );
+var readFileAsync	= Promise.promisify( require( "fs" ).readFile );
+var path			= require( "path" );
 
 var ComposeInterface = function( platform )
 {
@@ -26,23 +24,14 @@ var ComposeInterface = function( platform )
 
 var LookupCpuInfo = function( cpu )
 {
-	return Q.fcall( function()
+	return Promise.try( function()
 			{
-				if( process.env.CPU_MOCK !== undefined )
+				var info = 
 				{
-					return {
-						revision: "123MOCK",
-						serial: "1234567890"
-					}
+					revision: "123MOCK",
+					serial: "1234567890"
 				}
-				else
-				{
-					console.log( "No mock cpu defined" );
-					throw "No mock cpu defined";
-				}
-			} )
-			.then( function( info )
-			{
+				
 				// Add revision and serial details to the interface object
 				cpu.info.revision 	= info.revision;
 				cpu.info.serial 	= info.serial;
@@ -57,7 +46,7 @@ var LookupCpuInfo = function( cpu )
 
 var CheckSupport = function( cpu )
 {
-	return readFile( path.resolve( __dirname, "cpu/revisionInfo.json" ) )
+	return readFileAsync( path.resolve( __dirname, "cpu/revisionInfo.json" ) )
 			.then( JSON.parse )
 			.then( function( json )
 			{

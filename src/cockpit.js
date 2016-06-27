@@ -61,248 +61,282 @@ var errorHandler        = require('errorhandler');
 
 var pluginFolder        = CONFIG.preferences.get('pluginsDownloadDirectory');
 
-// Setup required directories
-mkdirp(CONFIG.preferences.get('photoDirectory'));
-process.env.NODE_ENV    = true;
-var globalEventLoop     = require('./static/js/eventEmitterStoreAndForward.js')(new EventEmitter2());
-var DELAY               = Math.round(1000 / CONFIG.video_frame_rate);
-io                      = require('./static/js/socketIOStoreAndForward.js')(io);
-var client              = new CockpitMessaging(io);
-client                  = require('./static/js/eventEmitterStoreAndForward.js')(client);
+var Promise             = require( "bluebird" );
+var rimrafAsync         = Promise.promisify( require("rimraf") );
+var mkdirpAsync         = Promise.promisify( require("mkdirp") );
 
 
-// ---------------------------------------------------------------
-// Setup Express App
-// ---------------------------------------------------------------
-app.use(express.static(__dirname + '/static/'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.set('port', process.env.LISTEN_FDS > 0 ? 'systemd' : CONFIG.port);
-app.set('views', __dirname + '/views');
-app.set('view engine', 'ejs', { pretty: true });
-app.use(favicon(__dirname + '/static/favicon.ico'));
-app.use(logger('dev'));
-app.use('/components', express.static(path.join(__dirname, 'static/bower_components')));
-app.use('/components', express.static(pluginFolder));
-app.use('/components', express.static(path.join(__dirname, 'static/webcomponents')));
-app.use('/components', express.static(path.join(__dirname,'plugins/telemetry/public/bower_components')));
-app.use('/components/telemetry', express.static(path.join(__dirname,'plugins/telemetry/public/webcomponents')));
-app.use('/components/telemetry', serveIndex(path.join(__dirname,'plugins/telemetry/public/webcomponents')));
-
-console.log("!!!"+ path.join(__dirname, 'src/static/bower_components'));
-
-app.get('/config.js', function (req, res) 
+Promise.try(function()
 {
-    res.type('application/javascript');
-    res.send('var CONFIG = ' + JSON.stringify(CONFIG));
-});
-
-//socket.io cross domain access
-app.use(function (req, res, next) 
-{
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'X-Requested-With');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
-    res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
-    next();
-});
-// ---------------------------------------------------------------
-
-// Keep track of plugins js and css to load them in the view
-var scripts = [],
-    styles = [],
-    applets = [],
-    sysscripts = [];
-    
-var pathInfo = function()
-{
-    return {
-        scripts: scripts,
-        styles: styles,
-        sysscripts: sysscripts,
-        applets: applets
+    // Handle Mock Directory
+    if( process.env.USE_MOCK )
+    {
+        var mockPath = path.join( __dirname,  "/../mock/" );
+        
+        return rimrafAsync( mockPath )
+        .then( function()
+        {
+            return mkdirpAsync( mockPath );
+        })
+        .then( function()
+        {
+            // Install mock files
+            console.log( "installing" );
+        })
+        .catch( function( err )
+        {
+            console.log( "err: " + err );
+        });
     }
-}
-
-// Prepare dependency map for plugins
-var deps = {
-    server: server,
-    app: app,
-    cockpit: client,
-    config: CONFIG,
-    globalEventLoop: globalEventLoop,
-    loadedPlugins: [],
-    pathInfo: pathInfo
-};
-
-var numConnections = 0;
-var socketConnectToken = null;
-// Handle socket.io events
-io.on('connection', function (client) 
+} )
+.then( function()
 {
-    if (socketConnectToken == null){
-        socketConnectToken = client.id;
-    } 
-    
-        numConnections++;
-        console.log('HASTHEBALL:TRUE');
-        client.hastheball=true;
-        client.emit('hastheball',socketConnectToken);
-    
-    client.on('request-sessionToken',function(callback){
-        callback(socketConnectToken);
-        //TODO: On force, kill the other inbound connections
-    });
-    
-    console.log('Connection detected');
-    console.log('Current connections: ' + numConnections );
-    
-    client.on('disconnect',function(){
-    });
-    
-    
-});
+    // Setup required directories
+    mkdirp(CONFIG.preferences.get('photoDirectory'));
+    process.env.NODE_ENV    = true;
+    var globalEventLoop     = require('./static/js/eventEmitterStoreAndForward.js')(new EventEmitter2());
+    var DELAY               = Math.round(1000 / CONFIG.video_frame_rate);
+    io                      = require('./static/js/socketIOStoreAndForward.js')(io);
+    var client              = new CockpitMessaging(io);
+    client                  = require('./static/js/eventEmitterStoreAndForward.js')(client);
 
-io.use(function(socket, next){
-    console.log("Auth expecting %s. got %s",socketConnectToken==null?'<NULL>':socketConnectToken,socket.handshake.query.token==undefined?'<UNDEFINED>':socket.handshake.query.token);
-    // return the result of next() to accept the connection.
-    if ((socketConnectToken == null) || (socketConnectToken == socket.handshake.query.token) || (socket.handshake.query.token == 'reset')){
-        if (socket.handshake.query.token == 'reset'){
-            socketConnectToken = null;
-            //And kick anyone already connected
-         //   if (typeof(io.sockets.server.eio.clients) == 'Array'){
-              var socketCollection = io.sockets.connected;
-                Object.keys(socketCollection).forEach(function(key){
-                    var client = socketCollection[key];
-                    
-                    if (client.id !== socket.id){
-                        console.log('kicking out:',client.id);
-                        setTimeout(function(){
-                            client.emit('forced-disconnect');
-                            client.disconnect();},1000);
 
-                    }
-                });
-          //  }
+    // ---------------------------------------------------------------
+    // Setup Express App
+    // ---------------------------------------------------------------
+    app.use(express.static(__dirname + '/static/'));
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({ extended: true }));
+    app.set('port', process.env.LISTEN_FDS > 0 ? 'systemd' : CONFIG.port);
+    app.set('views', __dirname + '/views');
+    app.set('view engine', 'ejs', { pretty: true });
+    app.use(favicon(__dirname + '/static/favicon.ico'));
+    app.use(logger('dev'));
+    app.use('/components', express.static(path.join(__dirname, 'static/bower_components')));
+    app.use('/components', express.static(pluginFolder));
+    app.use('/components', express.static(path.join(__dirname, 'static/webcomponents')));
+    app.use('/components', express.static(path.join(__dirname,'plugins/telemetry/public/bower_components')));
+    app.use('/components/telemetry', express.static(path.join(__dirname,'plugins/telemetry/public/webcomponents')));
+    app.use('/components/telemetry', serveIndex(path.join(__dirname,'plugins/telemetry/public/webcomponents')));
+
+    console.log("!!!"+ path.join(__dirname, 'src/static/bower_components'));
+
+    app.get('/config.js', function (req, res) 
+    {
+        res.type('application/javascript');
+        res.send('var CONFIG = ' + JSON.stringify(CONFIG));
+    });
+
+    //socket.io cross domain access
+    app.use(function (req, res, next) 
+    {
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+        res.header('Access-Control-Allow-Headers', 'Content-Type');
+        res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+        next();
+    });
+    // ---------------------------------------------------------------
+
+    // Keep track of plugins js and css to load them in the view
+    var scripts = [],
+        styles = [],
+        applets = [],
+        sysscripts = [];
+        
+    var pathInfo = function()
+    {
+        return {
+            scripts: scripts,
+            styles: styles,
+            sysscripts: sysscripts,
+            applets: applets
         }
-        return next();
+    }
+
+    // Prepare dependency map for plugins
+    var deps = {
+        server: server,
+        app: app,
+        cockpit: client,
+        config: CONFIG,
+        globalEventLoop: globalEventLoop,
+        loadedPlugins: [],
+        pathInfo: pathInfo
     };
-    // call next() with an Error if you need to reject the connection.
-    next(new Error('Authentication error'));
-});  
 
-deps.cockpit.on('disconnect', function () 
-{
-    
-    numConnections--;
-    if (numConnections==0){
-        socketConnectToken = null;
-    }
-    console.log('Disconnect detected');
-    console.log('Current connections: ' + numConnections );
-
-});
-
-// Handle global events
-deps.globalEventLoop.on( 'mcu.rovsys', function( data ) 
-{
-    deps.cockpit.emit( 'mcu.rovsys', data );
-} );
-
-
-// -----------------------------------------------------------------------
-// Load Plugins
-// -----------------------------------------------------------------------
-var loader = new PluginLoader();
-
-mkdirp.sync(pluginFolder);
-
-var funcs = [
- loader.loadPlugins(path.join(__dirname, 'system-plugins'), 'system-plugin', deps),
- loader.loadPlugins(path.join(__dirname, 'plugins'), 'plugin', deps),
- loader.loadPlugins(pluginFolder, 'community-plugin', deps, function (file) 
- {
-   return file.substring(0, 15) === 'openrov-plugin-';
- } )
-]
-
-Q.allSettled(funcs).then(function(results)
-{
-    // Get plugin assets
-    results.forEach(function (result) 
+    var numConnections = 0;
+    var socketConnectToken = null;
+    // Handle socket.io events
+    io.on('connection', function (client) 
     {
-        if (result.state === "fulfilled") 
-        {
-            var value = result.value;
-            addPluginAssets(value);
-        }
-        else 
-        {
-            var reason = result.reason;
-            console.error(reason);
-        }
+        if (socketConnectToken == null){
+            socketConnectToken = client.id;
+        } 
+        
+            numConnections++;
+            console.log('HASTHEBALL:TRUE');
+            client.hastheball=true;
+            client.emit('hastheball',socketConnectToken);
+        
+        client.on('request-sessionToken',function(callback){
+            callback(socketConnectToken);
+            //TODO: On force, kill the other inbound connections
+        });
+        
+        console.log('Connection detected');
+        console.log('Current connections: ' + numConnections );
+        
+        client.on('disconnect',function(){
+        });
+        
+        
     });
 
-    console.warn("Starting following plugins:");
-    console.dir(deps.loadedPlugins);
+    io.use(function(socket, next){
+        console.log("Auth expecting %s. got %s",socketConnectToken==null?'<NULL>':socketConnectToken,socket.handshake.query.token==undefined?'<UNDEFINED>':socket.handshake.query.token);
+        // return the result of next() to accept the connection.
+        if ((socketConnectToken == null) || (socketConnectToken == socket.handshake.query.token) || (socket.handshake.query.token == 'reset')){
+            if (socket.handshake.query.token == 'reset'){
+                socketConnectToken = null;
+                //And kick anyone already connected
+            //   if (typeof(io.sockets.server.eio.clients) == 'Array'){
+                var socketCollection = io.sockets.connected;
+                    Object.keys(socketCollection).forEach(function(key){
+                        var client = socketCollection[key];
+                        
+                        if (client.id !== socket.id){
+                            console.log('kicking out:',client.id);
+                            setTimeout(function(){
+                                client.emit('forced-disconnect');
+                                client.disconnect();},1000);
 
-    // Start each plugin
-    deps.loadedPlugins.forEach(function(plugin)
+                        }
+                    });
+            //  }
+            }
+            return next();
+        };
+        // call next() with an Error if you need to reject the connection.
+        next(new Error('Authentication error'));
+    });  
+
+    deps.cockpit.on('disconnect', function () 
     {
-        if (plugin.start !== undefined)
-        {
-            plugin.start();
+        
+        numConnections--;
+        if (numConnections==0){
+            socketConnectToken = null;
         }
+        console.log('Disconnect detected');
+        console.log('Current connections: ' + numConnections );
+
     });
 
-}).fail(function (error) 
-{
-    console.log("Error starting plugins:");
-    
-    if( error !== undefined )
+    // Handle global events
+    deps.globalEventLoop.on( 'mcu.rovsys', function( data ) 
     {
-        console.dir(error);
+        deps.cockpit.emit( 'mcu.rovsys', data );
+    } );
+
+
+    // -----------------------------------------------------------------------
+    // Load Plugins
+    // -----------------------------------------------------------------------
+    var loader = new PluginLoader();
+
+    mkdirp.sync(pluginFolder);
+
+    var funcs = [
+    loader.loadPlugins(path.join(__dirname, 'system-plugins'), 'system-plugin', deps),
+    loader.loadPlugins(path.join(__dirname, 'plugins'), 'plugin', deps),
+    loader.loadPlugins(pluginFolder, 'community-plugin', deps, function (file) 
+    {
+    return file.substring(0, 15) === 'openrov-plugin-';
+    } )
+    ]
+
+    Q.allSettled(funcs).then(function(results)
+    {
+        // Get plugin assets
+        results.forEach(function (result) 
+        {
+            if (result.state === "fulfilled") 
+            {
+                var value = result.value;
+                addPluginAssets(value);
+            }
+            else 
+            {
+                var reason = result.reason;
+                console.error(reason);
+            }
+        });
+
+        console.warn("Starting following plugins:");
+        console.dir(deps.loadedPlugins);
+
+        // Start each plugin
+        deps.loadedPlugins.forEach(function(plugin)
+        {
+            if (plugin.start !== undefined)
+            {
+                plugin.start();
+            }
+        });
+
+    }).fail(function (error) 
+    {
+        console.log("Error starting plugins:");
+        
+        if( error !== undefined )
+        {
+            console.dir(error);
+        }
+        
+        throw new Error("Error in loading plugins");
+    })
+
+    // Helper function
+    function addPluginAssets(result) 
+    {
+        scripts = scripts.concat(result.scripts);
+
+        console.log("====== Scripts ======")
+        console.dir(result.scripts);
+
+        result.scripts.forEach(function (asset) 
+        {
+            console.log("SCRIPT: " + asset);
+        });
+
+        styles = styles.concat(result.styles);
+
+        result.assets.forEach(function (asset) 
+        {
+            console.log("TEST: " + asset.path);
+            console.dir(asset);
+            app.use('/' + asset.path, express.static(asset.assets));
+        });
+
+        applets = applets.concat(result.applets)
+
+        if (result.plugins !== undefined)
+        {
+            deps.loadedPlugins=deps.loadedPlugins.concat(result.plugins);
+        }
     }
-    
-    throw new Error("Error in loading plugins");
+    // ------------------------------------------------------------------------
+
+    // Start the web server
+    server.listen( app.get('port'), function() 
+    {
+        console.log('Started listening on port: ' + app.get('port'));
+    });
+} )
+.catch( function( err ) 
+{
+    console.log( "Error starting cockpit" );
 })
-
-// Helper function
-function addPluginAssets(result) 
-{
-    scripts = scripts.concat(result.scripts);
-
-    console.log("====== Scripts ======")
-    console.dir(result.scripts);
-
-    result.scripts.forEach(function (asset) 
-    {
-        console.log("SCRIPT: " + asset);
-    });
-
-    styles = styles.concat(result.styles);
-
-    result.assets.forEach(function (asset) 
-    {
-        console.log("TEST: " + asset.path);
-        console.dir(asset);
-        app.use('/' + asset.path, express.static(asset.assets));
-    });
-
-    applets = applets.concat(result.applets)
-
-    if (result.plugins !== undefined)
-    {
-        deps.loadedPlugins=deps.loadedPlugins.concat(result.plugins);
-    }
-}
-// ------------------------------------------------------------------------
-
-// Start the web server
-server.listen( app.get('port'), function() 
-{
-    console.log('Started listening on port: ' + app.get('port'));
-});
-
 
 

@@ -59,13 +59,6 @@ function LoadBoardInterface( platform )
 	return Loader( platform );
 };
 
-// function getDirectories( srcpath ) 
-// {
-// 	return fs.readdirSync( srcpath ).filter( function( file ) {
-// 		return fs.statSync( path.join( srcpath, file ) ).isDirectory();
-// 	});
-// };
-
 // Export provides the public interface
 module.exports = function (name, deps) 
 {

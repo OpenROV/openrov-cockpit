@@ -2,7 +2,7 @@ var util 		= require( 'util' );
 var Interface 	= require( 'Interface.js' );
 var debug		= {};
 
-function MCUInterface( deps ) 
+function BoardInterface( deps ) 
 {
 	// Inherit from Interface module
 	Interface.call( this, "mcu", deps );
@@ -11,10 +11,10 @@ function MCUInterface( deps )
 
 	this.RegisterDefaultAPI();
 };
-util.inherits( MCUInterface, Interface );
+util.inherits( BoardInterface, Interface );
 
 // Useful for creating "required" functions
-MCUInterface.prototype.RegisterDefaultAPI = function()
+BoardInterface.prototype.RegisterDefaultAPI = function()
 {
 	this.AddMethod( "Initialize", function()
 	{
@@ -32,4 +32,4 @@ MCUInterface.prototype.RegisterDefaultAPI = function()
 	}, true );
 };
 
-module.exports = MCUInterface;
+module.exports = BoardInterface;

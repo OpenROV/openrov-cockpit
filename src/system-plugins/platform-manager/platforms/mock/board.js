@@ -2,33 +2,31 @@ var Promise = require( "bluebird" );
 var fs 		= Promise.promisifyAll( require("fs") );
 var path	= require('path');
 
-var ComposeInterface = function( platform )
-{	
-	return LoadBoardInfo( platform.mcu )
-			.then( LoadPinMap )
-			.then( LoadInterface )
-			.then( function( board )
-			{
-				// Success
-				return platform;
-			} )	
-			.catch( function( err )
-			{
-				console.log( "Err loading board info: " + err );
-				
-				// Fail, but return anyway
-				return platform;
-			} );
+var BoardInterface = function()
+{
+	
 };
 
-var LoadBoardInfo = function( board ) 
-{
-	if( process.env.BOARD == "" )
+BoardInterface.prototype.Compose = function( platform )
+{	
+	// Temporary container used for cpu detection and info loading
+	var board =
 	{
-		throw "No board specified!";
-	}
+		targetBoard: platform.board
+	};
 	
-	return fs.readFileAsync( path.resolve(__dirname, "boards/" + process.env.BOARD + "/eepromMock.json" ) )
+	var self = this;
+	
+	return self.LoadInfo( board )
+			.then( self.LoadPinMap )
+			.then( self.LoadInterface );
+};
+
+BoardInterface.prototype.LoadInfo = function( board ) 
+{
+	board.info = {};
+	
+	return fs.readFileAsync( path.resolve(__dirname, "boards/mock3000/eepromMock.json" ), "utf8" )
 			.then( JSON.parse )
 			.then( function( info )
 			{
@@ -37,7 +35,7 @@ var LoadBoardInfo = function( board )
 			} );
 }
 
-var LoadPinMap = function( board )
+BoardInterface.prototype.LoadPinMap = function( board )
 {
 	return fs.readFileAsync( path.resolve( __dirname, "boards/" + board.info.productId + "/pinmap.json" ) )
 			.then( JSON.parse )
@@ -53,10 +51,10 @@ var LoadPinMap = function( board )
 			} );
 }
 
-var LoadInterface = function( board )
+BoardInterface.prototype.LoadInterface = function( board )
 {
-	require( "./boards/" + board.info.productId + "/setup.js" )( board );
+	require( "./boards/" + board.info.productId + "/setup.js" )( board.targetBoard );
 	return board;
 };
 
-module.exports = ComposeInterface;
+module.exports = new BoardInterface();

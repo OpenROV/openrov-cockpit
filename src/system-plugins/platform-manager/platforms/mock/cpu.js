@@ -2,39 +2,36 @@ var Promise			= require( "bluebird" );
 var readFileAsync	= Promise.promisify( require( "fs" ).readFile );
 var path			= require( "path" );
 
-var ComposeInterface = function( platform )
+var CPUInterface = function()
+{
+	var self = this;
+};
+
+CPUInterface.prototype.Compose = function( platform )
 {
 	// Temporary container used for cpu detection and info loading
 	var cpu =
 	{
-		info: {},
 		targetCPU: platform.cpu
 	};
 	
+	var self = this;
+
 	// Compose the CPU interface object
-	return LookupCpuInfo( cpu )
-			.then( CheckSupport )
-			.then( LoadInterfaceImplementation )
-			.then( function( cpu )
-			{
-				// Success
-				return platform;
-			} );
+	return self.LoadInfo( cpu )
+			.then( self.CheckSupport )
+			.then( self.LoadInterfaceImplementation );
 };
 
-var LookupCpuInfo = function( cpu )
+CPUInterface.prototype.LoadInfo = function( cpu )
 {
 	return Promise.try( function()
 			{
-				var info = 
+				cpu.info = 
 				{
 					revision: "123MOCK",
 					serial: "1234567890"
 				}
-				
-				// Add revision and serial details to the interface object
-				cpu.info.revision 	= info.revision;
-				cpu.info.serial 	= info.serial;
 				
 				return cpu;
 			} )
@@ -44,7 +41,7 @@ var LookupCpuInfo = function( cpu )
 			} );
 }
 
-var CheckSupport = function( cpu )
+CPUInterface.prototype.CheckSupport = function( cpu )
 {
 	return readFileAsync( path.resolve( __dirname, "cpu/revisionInfo.json" ) )
 			.then( JSON.parse )
@@ -73,11 +70,11 @@ var CheckSupport = function( cpu )
 			} );
 };
 
-var LoadInterfaceImplementation = function( cpu )
+CPUInterface.prototype.LoadInterfaceImplementation = function( cpu )
 {
 	// Load and apply the interface implementation to the actual CPU interface
 	require( "./cpu/setup.js" )( cpu.targetCPU );	
 	return cpu;
 };
 
-module.exports = ComposeInterface;
+module.exports = new CPUInterface();

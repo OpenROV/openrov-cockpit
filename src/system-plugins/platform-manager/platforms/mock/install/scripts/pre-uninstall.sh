@@ -2,4 +2,4 @@
 set -x
 set -e
 
-echo "Test pre"
+echo "Test preuninstall"

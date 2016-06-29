@@ -2,4 +2,4 @@
 set -x
 set -e
 
-echo "Test post"
+echo "Test postinstall"

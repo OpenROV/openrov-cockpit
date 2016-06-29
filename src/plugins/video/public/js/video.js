@@ -109,34 +109,44 @@
           self.cockpit.emit('CameraRegistration',data);
           break;
         case 'binaryJS':
+
+          
+
           $.getScript('components/binaryjs/dist/binary.js',function(){
             var connection;
             data.sourceAddress = ResolveURL(data.relativeServiceUrl);
             var address = data.sourceAddress.replace('http', 'ws') + data.wspath;
             connection = BinaryClient(address); 
 
+            var fpsCounter = 0;
+            setInterval(function() {
+              console.log('stream fps ' + fpsCounter);
+              fpsCounter = 0;
+            }, 1000);
+
             var handle;
             handle = function() {
               connection.on('stream', function(stream, meta) {
                 // console.log('STREAM');
                 stream.on('data', function(data) {
-                  
+                  fpsCounter++;
+
                   var now = Date.now();
                   var dif = Number(now) - Number(data.timestamp);
                   //self.cockpit.emit('x-motion-jpeg.data',data.data);
-                  //var dif = 0;
+                  // var dif = 0;
                   self.cockpit.emit('x-motion-jpeg.data',data.data);
                   
                   
                   //console.log(data.timestamp + ' ' + now + ' ' +  dif );
                   // console.log(dif );
-                  if (dif >= 200) {
+                  if (dif >= 400) {
                     console.log('dropping connection and reconnect')
                     connection.close();
                     connection =    BinaryClient(address); 
                     connection.on('open', handle);
-
                   }
+
                 } )
               })
             };

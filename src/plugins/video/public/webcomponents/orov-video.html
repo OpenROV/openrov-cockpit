@@ -445,7 +445,7 @@ else global.CBuffer = CBuffer;
             return c.join("");
           };
 
-          var buffer = new CBuffer(10);
+          var buffer = new CBuffer(10000);
           var image = new Image();
           var imageSrc = '';
           var tick = 2;
@@ -472,7 +472,7 @@ else global.CBuffer = CBuffer;
 							var img = new Image;
 							// img.src = url;
 							img.onload = function() {
-									//URL.revokeObjectURL(url);
+									URL.revokeObjectURL(url);
 									//ctx.drawImage(img, 0, 0, canvas.width, proportionalHeight);
 									ctx.drawImage(img, 0, 0);
 									drawCounter++;
@@ -535,6 +535,8 @@ else global.CBuffer = CBuffer;
             // requestAnimationFrame(draw);
           }
 
+					var mjpegDrawIntervall;
+
           emitter.on('x-motion-jpeg.data',function(frame){
             //console.log(frame.timestamp);
             if (self.shortCircuit) {return;}            
@@ -555,7 +557,10 @@ else global.CBuffer = CBuffer;
               
               // imageSrc = 'data:image/jpeg;base64,' + frame;
               // requestAnimationFrame(draw);
-              setInterval(draw, 1000 /  self.framesPerSecond )
+              
+							if (!mjpegDrawIntervall) {
+								mjpegDrawIntervall = setInterval(draw, 1000 /  self.framesPerSecond );
+							}
 
             // }
           });

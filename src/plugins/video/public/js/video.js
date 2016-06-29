@@ -89,7 +89,12 @@
           
           
           var handleMjpegData=function(data){
-              self.cockpit.emit('x-motion-jpeg.data',data);
+            
+              self.cockpit.emit('x-motion-jpeg.data',data.data);
+              var now =Date.now();
+              var dif = Number(now) - Number(data.timestamp);
+              //console.log(data.timestamp + ' ' + now + ' ' +  dif );
+              //console.log(dif );
           }
           
           //TODO: abstract the messages enough that we can have multiple cameras controls
@@ -103,7 +108,7 @@
           });        
           self.cockpit.emit('CameraRegistration',data);
           break;
-        case 'binaryJs':
+        case 'socket.io-mjpeg':
           $.getScript('components/binaryjs/dist/binary.js',function(){
             var connection;
             data.sourceAddress = ResolveURL(data.relativeServiceUrl);

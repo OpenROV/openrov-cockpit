@@ -445,7 +445,7 @@ else global.CBuffer = CBuffer;
             return c.join("");
           };
 
-          var buffer = new CBuffer(100);
+          var buffer = new CBuffer(10);
           var image = new Image();
           var imageSrc = '';
           var tick = 2;
@@ -455,29 +455,65 @@ else global.CBuffer = CBuffer;
           var ctx;
           var proportionalHeight;
           var width;
-          var height
+          var height;
+
+					var drawCounter = 0;
+
+					setInterval(function(){
+						console.log('FPS: ' + drawCounter);
+						drawCounter = 0;
+					}, 1000);
+
+					var loadImage = function(frame, canvas, proportionalHeight) {
+							// var blob = new Blob([frame], {type: 'application/octet-binary'});
+							// var url = URL.createObjectURL(blob);
+							var url = 'data:image/jpeg;base64,' + frame;
+
+							var img = new Image;
+							img.onload = function() {
+									//URL.revokeObjectURL(url);
+									//ctx.drawImage(img, 0, 0, canvas.width, proportionalHeight);
+									ctx.drawImage(img, 0, 0);
+									drawCounter++;
+							};
+							img.src = url;
+
+
+              // var image = new Image();
+              // image.src = 'data:image/jpeg;base64,' + frame;
+
+					};
           draw = function() {
             var frame = buffer.pop();
             if (frame ) {
               //self.$$('#camera1').src = 'data:image/jpeg;base64,' + frame;
-              var image = new Image();
-              image.src = 'data:image/jpeg;base64,' + frame;
+
+							
 
               if (!canvas || !width > 0 || !height > 0) {
-                self.$$('#camera1').src = 'data:image/jpeg;base64,' + frame; // set first frame
-                canvas = self.$$('#camera1').videocanvas;
-                var style = window.getComputedStyle(canvas.parentElement, null);
-                width = parseInt(style.getPropertyValue('width'));
-                height = parseInt(style.getPropertyValue('height'));
-                proportionalHeight = width * image.height / image.width;
-                ctx = canvas.getContext('2d');
-                self.$$('#camera1').stop();
-                self.$$('#camera1').isHidden = true;
+								// var blob = new Blob([frame], {type: 'application/octet-binary'});
+								// var url = URL.createObjectURL(blob);
+								var url = 'data:image/jpeg;base64,' + frame;	
+								var image = new Image();
+								image.onload = function() {
+
+									self.$$('#camera1').src = url; // set first frame
+									canvas = self.$$('#camera1').videocanvas;
+									var style = window.getComputedStyle(canvas.parentElement, null);
+									width = parseInt(style.getPropertyValue('width'));
+									height = parseInt(style.getPropertyValue('height'));
+									proportionalHeight = width * image.height / image.width;
+									ctx = canvas.getContext('2d');
+									self.$$('#camera1').stop();
+									self.$$('#camera1').isHidden = true;
+								}
+								image.src = url;
+
                 
               }            
 //              proportionalHeight = width * image.height / image.width;
   //            if (proportionalHeight != 0 && self.$$('#camera1').isHidden !== true) {
-              if (canvas.width== 0 || canvas.height == 0) {
+              if (canvas && (canvas.width== 0 || canvas.height == 0)) {
                 canvas.width = width;
                 canvas.height = height;
                 // canvas.width = 
@@ -485,7 +521,8 @@ else global.CBuffer = CBuffer;
               // if (proportionalHeight == 0) proportionalHeight = canvas.width * image.height / image.width;
               
               // ctx.drawImage(image, 0, 0);
-              ctx.drawImage(image, 0, 0, canvas.width, proportionalHeight);
+              //ctx.drawImage(image, 0, 0, canvas.width, proportionalHeight);
+							if (canvas && canvas.width > 0 && canvas.height > 0 ) loadImage(frame, canvas, proportionalHeight);
             }
             // requestAnimationFrame(draw);
           }

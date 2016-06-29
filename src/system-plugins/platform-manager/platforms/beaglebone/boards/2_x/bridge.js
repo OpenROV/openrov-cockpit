@@ -4,7 +4,7 @@ var debug        = require('debug')( 'bridge' );
 function Bridge() 
 {
   var DISABLED      = 'DISABLED';
-  var bridge      = new EventEmitter();
+  var bridge        = new EventEmitter();
   var reader        = new StatusReader();
   var emitRawSerial = false;
 

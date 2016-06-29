@@ -48,7 +48,8 @@
     "sync": "",
     "systemd": "git://github.com/plietar/node-systemd.git",
     "bluebird": "^3.4.1",
-    "fs-extra": ""
+    "fs-extra": "",
+    "child-process-promise": ""
   },
   "bundleDependencies": [
     "express",

@@ -15,6 +15,7 @@
   ],
   "dependencies": {
     "mjpeg-video-webcomponents": "~2.0.1",
+    "binaryjs": "~0.2.1",
     "packet-video": "https://github.com/OpenROV-atoms/packet-video.git"
   },
   "resolutions": {

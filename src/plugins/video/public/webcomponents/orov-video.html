@@ -2,11 +2,11 @@
 <link rel="import" href="../mjpeg-video-webcomponents/mjpeg-video.html">
 <link rel="import" href="../packet-video/packet-video.html">
 <link rel="import" href="../orov-behaviors/orov-behavior.html">
+
 <dom-module name="orov-video">
   <style>
   </style>
   <template>
-
     <template is="dom-if" if="{{displayPlayer(videoMimeType,'video/x-motion-jpeg')}}" iff="{{videoMimeType == 'video/x-motion-jpeg'}}">
     <mjpeg-video id="camera1" border='1' style='width: 100%; height:100%'
       menuState='on'
@@ -114,64 +114,31 @@
             return c.join("");
           };
 
-          emitter.on('x-motion-jpeg.data',function(data){
-            // console.log('x-motion-jpeg.data received, size: ' + data.byteLength );
+          var image = new Image();
+          var imageSrc = '';
+          var tick = 2;
+          emitter.on('x-motion-jpeg.data',function(frame){
+            //console.log(frame.timestamp);
             if (self.shortCircuit) {return;}            
             if (self.$$('#camera1')===null){
               return;
             }
-            if(!self.$$('#camera1').initialized){
-              var u8 = new Uint8Array(data);
-              var b64encoded = btoa(Uint8ToString(u8));
-              var img = new Image();
-              img.src = 'data:image/jpeg;base64,' + b64encoded;
-              self.$$('#camera1')._imageData = { w: img.width, h: img.height};
-              self.$$('#camera1').initialized = true;              
-            }
-            var imgSize = self.$$('#camera1')._imageData;
-            var canvas = self.$$('#camera1').videocanvas;
-
-            var ctx = canvas.getContext('2d');
-            // var imageData = ctx.createImageData(imgSize.w, imgSize.h);
-
-            // for (var ii = 0; ii < imageData.length; ++ii) {
-            //   imageData.data[ii] = data[ii];
-            // }
-
-            // var blob = new Blob(new Uint8Array(data), {type: "image/jpeg"});
-            // createImageBitmap(blob).then(function(result) {cxt.drawImage(result, 0, 0, canvas.width, canvas.height);});
-
-            // var imgData = ctx.createImageData(new Uint8Array(data);
-            // cxt.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-
-            // var foo = new Uint8Array(data);
-            // var base64String = btoa(String.fromCharCode.apply(null, foo));
-            
-            
-
-            var u8 = new Uint8Array(data);
-            var b64encoded = btoa(Uint8ToString(u8));
-            self.$$('#camera1').src = 'data:image/jpeg;base64,' + b64encoded;
-            
-            // if(self.$$('#camera1').initialized){
-            //   self.$$('#camera1').append(new Uint8Array(data));
+            // if (tick == 2) {
+            //   tick = 0;
+            //   return;
             // } else {
-            //   if(!self.packetVideo_initializationInProgress){
-            //     self.packetVideo_initializationInProgress = true;
-            //     emitter.emit('request_Init_Segment',function(data){
-            //       self.$$('#camera1').init(new Uint8Array(data),function(){
-            //         packetVideo_initializationInProgress = false;
-            //         emitter.emit('video.videoElementAvailable',self.$$('#camera1').getVideoElement());
-            //       });
-            //     });
-            //     //timeout and try agian after 1 second
-            //     setTimeout(function(){
-            //       self.packetVideo_initializationInProgress = false;
-            //     },5000);
-            //   }
+            //   tick++;
+
+              // var diff = Date.now() - frame.timestamp;
+              // if ( diff > 10000 ) return;
+              // var u8 = new Uint8Array(frame);
+              // var b64encoded = btoa(Uint8ToString(u8));
+              
+              // imageSrc = 'data:image/jpeg;base64,' + frame;
+              self.$$('#camera1').src = 'data:image/jpeg;base64,' + frame;
             // }
-          })
+          });
+
 
         },
         _canvasChanged: function(){

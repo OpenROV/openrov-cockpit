@@ -27,6 +27,8 @@
 
   };
 
+
+
   var ResolveURL = function(canidateURL){
     var http = location.protocol;
     var slashes = http.concat("//");
@@ -96,12 +98,51 @@
           
           connection.on('x-motion-jpeg.data',handleMjpegData);        
 
-
           connection.on("connect",function(){
             console.log("connected to socket.io video server end point");
           });        
           self.cockpit.emit('CameraRegistration',data);
           break;
+        case 'binaryJs':
+          $.getScript('components/binaryjs/dist/binary.js',function(){
+            var connection;
+            data.sourceAddress = ResolveURL(data.relativeServiceUrl);
+            var address = data.sourceAddress.replace('http', 'ws') + data.wspath;
+            connection = BinaryClient(address); 
+
+            var handle;
+            handle = function() {
+              connection.on('stream', function(stream, meta) {
+                // console.log('STREAM');
+                stream.on('data', function(data) {
+                  
+                  var now =Date.now();
+                  var dif = Number(now) - Number(data.timestamp);
+                  self.cockpit.emit('x-motion-jpeg.data',data.data);
+                  //console.log(data.timestamp + ' ' + now + ' ' +  dif );
+                  // console.log(dif );
+                  if (dif >= 300) {
+                    console.log('dropping connection and reconnect')
+                    connection.close();
+                    connection =    BinaryClient(address); 
+                    connection.on('open', handle);
+
+                  }
+                } )
+              })
+            };
+
+            connection.on('open', handle);
+            data.sourceAddress = '';
+            self.cockpit.emit('CameraRegistration',data);
+
+          });
+          
+
+          // window.io.connect(data.sourceAddress ,{path:data.wspath} );
+          break;
+
+
         case 'rov': //data is comming over the rov bus, just pass it on to the cockpit bus
           var dataflowing=false; //this wont work for multiple cameras.
           self.rov.on('x-h264-video.data',function(data){

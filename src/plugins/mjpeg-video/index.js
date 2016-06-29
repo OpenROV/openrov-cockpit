@@ -86,7 +86,8 @@ mjpegvideo.prototype.start = function start(){
               relativeServiceUrl: info.txtRecord.relativeServiceUrl,
               sourcePort:         info.port,
               sourceAddress:      '',//info.addresses[0],
-              connectionType:     'socket.io'
+              //connectionType:     'socket.io'
+              connectionType:     'binaryJS'
             });
           });
 

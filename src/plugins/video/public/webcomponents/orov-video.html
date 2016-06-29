@@ -465,11 +465,12 @@ else global.CBuffer = CBuffer;
 					}, 1000);
 
 					var loadImage = function(frame, canvas, proportionalHeight) {
-							// var blob = new Blob([frame], {type: 'application/octet-binary'});
-							// var url = URL.createObjectURL(blob);
-							var url = 'data:image/jpeg;base64,' + frame;
+							var blob = new Blob([frame], {type: 'application/octet-binary'});
+							var url = URL.createObjectURL(blob);
+							// var url = 'data:image/jpeg;base64,' + frame;
 
 							var img = new Image;
+							// img.src = url;
 							img.onload = function() {
 									//URL.revokeObjectURL(url);
 									//ctx.drawImage(img, 0, 0, canvas.width, proportionalHeight);
@@ -488,13 +489,17 @@ else global.CBuffer = CBuffer;
             if (frame ) {
               //self.$$('#camera1').src = 'data:image/jpeg;base64,' + frame;
 
+              // var u8 = new Uint8Array(frame);
+              // var encoded = btoa(Uint8ToString(u8));
+							
 							
 
               if (!canvas || !width > 0 || !height > 0) {
-								// var blob = new Blob([frame], {type: 'application/octet-binary'});
-								// var url = URL.createObjectURL(blob);
-								var url = 'data:image/jpeg;base64,' + frame;	
-								var image = new Image();
+								var blob = new Blob([frame], {type: 'application/octet-binary'});
+								var url = URL.createObjectURL(blob);
+								// var url = 'data:image/jpeg;base64,' + encoded;	
+								// var image = new Image();
+								// image.src = url;
 								image.onload = function() {
 
 									self.$$('#camera1').src = url; // set first frame
@@ -506,6 +511,7 @@ else global.CBuffer = CBuffer;
 									ctx = canvas.getContext('2d');
 									self.$$('#camera1').stop();
 									self.$$('#camera1').isHidden = true;
+									URL.revokeObjectURL(url);
 								}
 								image.src = url;
 
@@ -522,7 +528,9 @@ else global.CBuffer = CBuffer;
               
               // ctx.drawImage(image, 0, 0);
               //ctx.drawImage(image, 0, 0, canvas.width, proportionalHeight);
-							if (canvas && canvas.width > 0 && canvas.height > 0 ) loadImage(frame, canvas, proportionalHeight);
+							if (canvas && canvas.width > 0 && canvas.height > 0 ) 
+								loadImage(frame, canvas, proportionalHeight);
+								// loadImage(encoded, canvas, proportionalHeight);
             }
             // requestAnimationFrame(draw);
           }

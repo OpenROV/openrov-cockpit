@@ -108,7 +108,7 @@
           });        
           self.cockpit.emit('CameraRegistration',data);
           break;
-        case 'socket.io-mjpeg':
+        case 'binaryJS':
           $.getScript('components/binaryjs/dist/binary.js',function(){
             var connection;
             data.sourceAddress = ResolveURL(data.relativeServiceUrl);
@@ -121,9 +121,13 @@
                 // console.log('STREAM');
                 stream.on('data', function(data) {
                   
-                  var now =Date.now();
+                  var now = Date.now();
                   var dif = Number(now) - Number(data.timestamp);
+                  //self.cockpit.emit('x-motion-jpeg.data',data.data);
+                  //var dif = 0;
                   self.cockpit.emit('x-motion-jpeg.data',data.data);
+                  
+                  
                   //console.log(data.timestamp + ' ' + now + ' ' +  dif );
                   // console.log(dif );
                   if (dif >= 200) {

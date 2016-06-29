@@ -1,30 +1,27 @@
 {
 	"files":
-	{
-		"dt-overlays/OPENROV-RESET-00A0.dtb": "/lib/firmware",
-		"dt-overlays/OROV-CB25-00A0.dtb": "/lib/firmware"
-	},
+	[
+		{ "src": "dt-overlays/OPENROV-RESET-00A0.dtbo", "dest": "/lib/firmware" },
+		{ "src": "dt-overlays/OROV-CB25-00A0.dtbo", 	"dest": "/lib/firmware" }
+	],
 	
-	"scripts":
-	{
-		"pre-install": 
-		[ 
-			{ "name": "compile-dt-overlays.sh", "type": "bash" }
-		],
+	"preinstall": 
+	[ 
+		{ "name": "compile-dt-overlays.sh", "type": "bash" }
+	],
+	
+	"postinstall":
+	[
 		
-		"post-install":
-		[
-			
-		],
+	],
+	
+	"preuninstall":
+	[
 		
-		"pre-uninstall":
-		[
-			
-		],
+	],
+	
+	"postuninstall":
+	[
 		
-		"post-uninstall":
-		[
-			
-		]
-	}
+	]
 }

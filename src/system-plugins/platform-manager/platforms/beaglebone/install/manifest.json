@@ -1,0 +1,28 @@
+{
+	"files":
+	[
+		{ "src": "knight-rider.js", "dest": "/opt/openrov/system/scripts" },
+		{ "src": "rc.local", 		"dest": "/opt/openrov/system/scripts" },
+		{ "src": "nginx.location", 	"dest": "/opt/openrov/system/scripts" }
+	],
+	
+	"preinstall": 
+	[ 
+		{ "name": "pre-install.sh", "type": "bash" }
+	],
+	
+	"postinstall":
+	[
+		{ "name": "post-install.sh", "type": "bash" }
+	],
+	
+	"preuninstall":
+	[
+		
+	],
+	
+	"postuninstall":
+	[
+		
+	]
+}

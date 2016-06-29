@@ -121,7 +121,7 @@
                   self.cockpit.emit('x-motion-jpeg.data',data.data);
                   //console.log(data.timestamp + ' ' + now + ' ' +  dif );
                   // console.log(dif );
-                  if (dif >= 300) {
+                  if (dif >= 200) {
                     console.log('dropping connection and reconnect')
                     connection.close();
                     connection =    BinaryClient(address); 

@@ -106,10 +106,13 @@ mjpegvideo.prototype.start = function start(){
 mjpegvideo.prototype.startCamera = function startCamera(device){
   // var launch_options = ['node', '--debug-brk', require.resolve('mjpeg-video-server')];
   var launch_options = ['node', require.resolve('mjpeg-video-server')];
-  launch_options.push('-f');
-  launch_options.push('15');
+  launch_options.push('/dev/video0');
+  // launch_options.push('-f');
+  // launch_options.push('15');
   // launch_options.push('-u');
   // launch_options.push(':8090/?action=stream');
+  // launch_options.push('-d');
+  // launch_options.push('/dev/video1');
   var mock=false;
   if (process.env.MJPG_MOCK === 'true'){
     launch_options.push('-m');

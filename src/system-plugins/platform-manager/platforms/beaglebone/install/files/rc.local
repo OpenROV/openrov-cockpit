@@ -46,16 +46,17 @@ if [ ! -f /var/swapfile ]; then
   echo 255 > ${led2}//brightness || true
   echo none > ${led3}/trigger || true
 
-  bash /opt/openrov/cockpit/linux/addswapfile.sh
+  bash /opt/openrov/system/scripts/addswapfile.sh
 fi
 
-nice -n 19 /opt/openrov/cockpit/linux/knight-rider.js &
+nice -n 19 /opt/openrov/system/scripts/knight-rider.js &
 
+# Note: This shouldn't need to be done since the DTB files are installed
 # load the device tree overlay for pin 25 (RESET) and SPI
-CAPEMGR=$( find /sys/devices/ -name bone_capemgr* | head -n 1 )
-echo OPENROV-RESET > $CAPEMGR/slots
+#CAPEMGR=$( find /sys/devices/ -name bone_capemgr* | head -n 1 )
+#echo OPENROV-RESET > $CAPEMGR/slots
 #echo BB-SPI0DEV > $CAPEMGR/slots
-echo BB-UART1 > $CAPEMGR/slots
+#echo BB-UART1 > $CAPEMGR/slots
 
 #To deal with flaky avahi behavior
 #http://forums.fedoraforum.org/showthread.php?t=266511

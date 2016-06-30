@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 var path 			= require( "path" );
 var Promise			= require( "bluebird" );
 var fs				= Promise.promisifyAll( require( "fs-extra" ) );

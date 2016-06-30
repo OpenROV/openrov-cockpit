@@ -1,5 +1,5 @@
-#include "../AConfig.h"
-#if(HAS_STD_LIGHTS)
+#include "../SysConfig.h"
+#if(HAS_EXAMPLE_PLUGIN)
 
 // Includes
 #include <Arduino.h>

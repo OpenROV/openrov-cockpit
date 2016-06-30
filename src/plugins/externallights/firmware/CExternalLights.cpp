@@ -1,26 +1,29 @@
-#include "../AConfig.h"
+#include "../SysConfig.h"
 #if(HAS_EXT_LIGHTS)
 
 // Includes
 #include <Arduino.h>
 #include "CExternalLights.h"
 #include "../CPin.h"
-#include "../NConfigManager.h"
+#include "../NVehicleManager.h"
+#include "../PinDefinitions.h"
 
-// One of these will have the correct pin defined for the lights
-#if(HAS_STD_CAPE)
-    #include "CCape.h"
-#endif
 
-#if(HAS_OROV_CONTROLLERBOARD_25)
-    #include "../CControllerBoard.h"
-    
-    #ifndef ELIGHTS0_PIN
-        #define ELIGHTS0_PIN 46
-    #endif
-    #ifndef ELIGHTS1_PIN
-        #define ELIGHTS1_PIN 12
-    #endif
+#if CONTROLLERBOARD == CONTROLLERBOARD_CAPE
+	#error "External lights not supported on cape"
+	
+#elif CONTROLLERBOARD == CONTROLLERBOARD_CB25
+
+	// Set pin definitions
+	#ifndef ELIGHTS0_PIN
+		#define ELIGHTS0_PIN PIN_PWM_3
+	#endif
+	#ifndef ELIGHTS1_PIN
+		#define ELIGHTS1_PIN PIN_PWM_4
+	#endif
+	
+#elif CONTROLLERBOARD == CONTROLLERBOARD_TRIDENT
+	#error "External lights not supported on Trident board"
 #endif
 
 namespace
@@ -31,7 +34,7 @@ namespace
 
 void CExternalLights::Initialize()
 {
-    NConfigManager::m_capabilityBitmask |= ( 1 << LIGHTS_CAPABLE );
+    NVehicleManager::m_capabilityBitmask |= ( 1 << LIGHTS_CAPABLE );
     
     elight0.Reset();
     elight0.Write(0);

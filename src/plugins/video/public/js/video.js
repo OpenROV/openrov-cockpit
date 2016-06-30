@@ -110,52 +110,125 @@
           break;
         case 'binaryJS':
 
-          
-
-          $.getScript('components/binaryjs/dist/binary.js',function(){
-            var connection;
             data.sourceAddress = ResolveURL(data.relativeServiceUrl);
             var address = data.sourceAddress.replace('http', 'ws') + data.wspath;
-            connection = BinaryClient(address); 
 
-            var fpsCounter = 0;
-            setInterval(function() {
-              console.log('stream fps ' + fpsCounter);
-              fpsCounter = 0;
-            }, 1000);
-
-            var handle;
-            handle = function() {
-              connection.on('stream', function(stream, meta) {
-                // console.log('STREAM');
-                stream.on('data', function(data) {
-                  fpsCounter++;
-
-                  var now = Date.now();
-                  var dif = Number(now) - Number(data.timestamp);
-                  //self.cockpit.emit('x-motion-jpeg.data',data.data);
-                  // var dif = 0;
-                  self.cockpit.emit('x-motion-jpeg.data',data.data);
-                  
-                  
-                  //console.log(data.timestamp + ' ' + now + ' ' +  dif );
-                  // console.log(dif );
-                  if (dif >= 400) {
-                    console.log('dropping connection and reconnect')
-                    connection.close();
-                    connection =    BinaryClient(address); 
-                    connection.on('open', handle);
+            var workerFunction = function() { // will run in a Worker, only here to have code completition in the editor;
+              self.onmessage = function(message) {
+                var address = message.data.address;
+                debugger;
+                window = {};
+                
+                self._listeners = {};
+                self.postMessage_orig = self.postMessage;
+                self.addEventListener_orig = self.addEventListener;
+                self.addEventListener = function(type, clb) { 
+                  if(!(type in self._listeners)) {
+                    self._listeners[type] = [];
                   }
+                  self._listeners[type].push(clb);
+                   
+                };
+                
+                self.postMessage = function(messageName, arg) {
+                  var message = 'message';
+                  if(!(message in self._listeners)) {
+                    return;
+                  }
+                  var stack = self._listeners[message];
+                  var event = {source: self, data: messageName}
+                  for(var i = 0, l = stack.length; i < l; i++) {
+                      stack[i].call(self, event);
+                  }                  
+                };
+                importScripts(message.data.url + '/components/binaryjs/dist/binary.js');
+                var connection;
+                connection = BinaryClient(address);
 
-                } )
-              })
-            };
+                var handle;
+                handle = function() {
+                    connection.on('stream', function(stream, meta) {
+                      // console.log('STREAM');
+                      stream.on('data', function(data) {
+//                        fpsCounter++;
 
-            connection.on('open', handle);
+                        var now = Date.now();
+                        var dif = Number(now) - Number(data.timestamp);
+                        //self.cockpit.emit('x-motion-jpeg.data',data.data);
+                        // var dif = 0;
+                        //self.cockpit.emit('x-motion-jpeg.data',data.data);
+
+                        self.postMessage_orig(data.data, [data.data])
+                        
+                        //console.log(data.timestamp + ' ' + now + ' ' +  dif );
+                        // console.log(dif );
+                        if (dif >= 400) {
+                          console.log('dropping connection and reconnect')
+                          connection.close();
+                          connection =    BinaryClient(address); 
+                          connection.on('open', handle);
+                        }
+
+                      } )
+                    })
+                  };
+
+                  connection.on('open', handle);
+
+              };
+            } // workerFunction
+
+            var lines = workerFunction.toString().split('\n');
+            lines.splice(0,1);
+            lines.splice(lines.length-1, 1);
+            var worker =lines.join('\n');
+
+            var blob = new Blob([worker]);
+            var blobURL = window.URL.createObjectURL(blob);
+
+            var worker = new Worker(blobURL);
+            window.URL.revokeObjectURL(blobURL);
+
+            var url = document.location.origin;
+
+            $.getScript(url + '/components/binaryjs/dist/binary.js_', function() {
+              debugger;
+                var connection;
+                connection = BinaryClient(address);
+
+                connection.on('stream', function(stream, meta) {
+                   
+                      // console.log('STREAM');
+                      stream.on('data', function(data) {
+                      })
+                });
+                connection.on('open', function(){
+                  debugger;
+                })
+            });
+
+            var index = url.indexOf('index.html');
+            if (index != -1) {
+              url = url.substring(0, index);
+            }
+            worker.postMessage({ address: address, url: url});            
+            worker.onmessage = function(message) {
+    
+              self.cockpit.emit('x-motion-jpeg.data',message.data);
+            }
+
+          // $.getScript('components/binaryjs/dist/binary.js',function(){
+
+          //   // var fpsCounter = 0;
+          //   // setInterval(function() {
+          //   //   console.log('stream fps ' + fpsCounter);
+          //   //   fpsCounter = 0;
+          //   // }, 1000);
+
+
+          // });
             data.sourceAddress = '';
             self.cockpit.emit('CameraRegistration',data);
-
-          });
           
 
           // window.io.connect(data.sourceAddress ,{path:data.wspath} );

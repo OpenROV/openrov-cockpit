@@ -114,7 +114,7 @@
             var address = data.sourceAddress.replace('http', 'ws') + data.wspath;
 
             var workerFunction = function() { // will run in a Worker, only here to have code completition in the editor;
-              self.onmessage = function(message) {
+              onmessage = function(message) {
                 var address = message.data.address;
                 debugger;
                 window = {};
@@ -153,17 +153,19 @@
 //                        fpsCounter++;
 
                         var now = Date.now();
-                        var dif = Number(now) - Number(data.timestamp);
+                        var dif = Number(now) - Number(meta);
+                        // var dif = Number(now) - Number(data.timestamp);
                         //self.cockpit.emit('x-motion-jpeg.data',data.data);
                         // var dif = 0;
                         //self.cockpit.emit('x-motion-jpeg.data',data.data);
 
-                        self.postMessage_orig(data.data, [data.data])
+                        // self.postMessage_orig(data.data, [data.data])
+                        self.postMessage_orig(data, [data])
                         
                         //console.log(data.timestamp + ' ' + now + ' ' +  dif );
                         // console.log(dif );
                         if (dif >= 400) {
-                          console.log('dropping connection and reconnect')
+                          //console.log('dropping connection and reconnect')
                           connection.close();
                           connection =    BinaryClient(address); 
                           connection.on('open', handle);
@@ -176,11 +178,12 @@
                   connection.on('open', handle);
 
               };
+              return onmessage;
             } // workerFunction
 
             var lines = workerFunction.toString().split('\n');
             lines.splice(0,1);
-            lines.splice(lines.length-1, 1);
+            lines.splice(lines.length-2, 2);
             var worker =lines.join('\n');
 
             var blob = new Blob([worker]);
@@ -196,8 +199,7 @@
               url = url.substring(0, index);
             }
             worker.postMessage({ address: address, url: url});            
-            worker.onmessage = function(message) {
-    
+            worker.onmessage = function(message) {    
               self.cockpit.emit('x-motion-jpeg.data',message.data);
             }
 

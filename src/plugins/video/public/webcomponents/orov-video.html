@@ -445,12 +445,13 @@ else global.CBuffer = CBuffer;
             return c.join("");
           };
 
-          var buffer = new CBuffer(10000);
+          var buffer = new CBuffer(2);
           var image = new Image();
           var imageSrc = '';
           var tick = 2;
 
           var draw;
+          var drawFrame;
           var canvas;
           var ctx;
           var proportionalHeight;
@@ -487,6 +488,9 @@ else global.CBuffer = CBuffer;
           draw = function() {
             var frame = buffer.pop();
             if (frame ) {
+							drawFrame(frame);
+					}};
+					drawFrame = function(frame) {
               //self.$$('#camera1').src = 'data:image/jpeg;base64,' + frame;
 
               // var u8 = new Uint8Array(frame);
@@ -533,7 +537,7 @@ else global.CBuffer = CBuffer;
 								// loadImage(encoded, canvas, proportionalHeight);
             }
             // requestAnimationFrame(draw);
-          }
+          // }
 
 					var mjpegDrawIntervall;
 
@@ -544,22 +548,12 @@ else global.CBuffer = CBuffer;
               return;
             }
             buffer.push(frame);
-            // if (tick == 2) {
-            //   tick = 0;
-            //   return;
-            // } else {
-            //   tick++;
-
-              // var diff = Date.now() - frame.timestamp;
-              // if ( diff > 10000 ) return;
-              // var u8 = new Uint8Array(frame);
-              // var b64encoded = btoa(Uint8ToString(u8));
-              
-              // imageSrc = 'data:image/jpeg;base64,' + frame;
-              // requestAnimationFrame(draw);
+//						drawFrame(frame);
+            
               
 							if (!mjpegDrawIntervall) {
-								mjpegDrawIntervall = setInterval(draw, 1000 /  self.framesPerSecond );
+								// mjpegDrawIntervall = setInterval(draw, 1000 /  self.framesPerSecond );
+								mjpegDrawIntervall = setInterval(draw, 10);
 							}
 
             // }

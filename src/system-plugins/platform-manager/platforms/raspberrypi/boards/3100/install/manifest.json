@@ -1,0 +1,24 @@
+{
+	"files":
+	[
+	],
+	
+	"preinstall": 
+	[ 
+	],
+	
+	"postinstall":
+	[
+		
+	],
+	
+	"preuninstall":
+	[
+		
+	],
+	
+	"postuninstall":
+	[
+		
+	]
+}

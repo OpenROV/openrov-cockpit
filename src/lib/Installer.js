@@ -91,12 +91,12 @@ function InstallFile( baseDir, file )
 {
 	var src = path.resolve( path.join( baseDir, "files", file.src ) );
 	
-	return fs.copyAsync( src, file.dest );
+	return fs.copyAsync( src, path.join( file.dest, path.basename( file.src ) ) );
 }
 
 function UninstallFile( file )
 {
-	return fs.removeAsync( file.dest );
+	return fs.removeAsync( path.join( file.dest, path.basename( file.src ) ) );
 }
 
 function ExecuteScript( baseDir, script )

@@ -191,22 +191,6 @@
 
             var url = document.location.origin;
 
-            $.getScript(url + '/components/binaryjs/dist/binary.js_', function() {
-              debugger;
-                var connection;
-                connection = BinaryClient(address);
-
-                connection.on('stream', function(stream, meta) {
-                   
-                      // console.log('STREAM');
-                      stream.on('data', function(data) {
-                      })
-                });
-                connection.on('open', function(){
-                  debugger;
-                })
-            });
-
             var index = url.indexOf('index.html');
             if (index != -1) {
               url = url.substring(0, index);

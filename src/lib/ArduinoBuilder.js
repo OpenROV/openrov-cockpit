@@ -7,23 +7,21 @@ var ArduinoBuilder 	= function()
 {
 };
 
-var AllOptions = 
-{
-
-};
-
 ArduinoBuilder.prototype.BuildSketch = function( options, onStdout, onStderr )
 {
 	var buildOpts 		= [];
 	var sketchName		= "";
 	var stagedSketchDir	= "";
+	var installDir 		= "";
 	
 	return Promise.try( function()
 	{
 		// Process the options passed in
 		buildOpts = ProcessOptions( options );
 		
-		sketchName = path.basename( options.sketchPath );
+		sketchName = path.basename( options.sketchDir );
+		
+		console.log( "Processed options" );
 	})
 	.then( function()
 	{
@@ -32,6 +30,14 @@ ArduinoBuilder.prototype.BuildSketch = function( options, onStdout, onStderr )
 	})
 	.then( function()
 	{
+		installDir = path.join( options.installBaseDir, options.productID );
+		
+		return fs.mkdirsAsync( installDir );
+	})
+	.then( function()
+	{
+		console.log( "Made dirs" );
+		
 		stagedSketchDir = path.join( options.buildDir, sketchName );
 		
 		// Remove existing sketch folder if it exists
@@ -39,11 +45,13 @@ ArduinoBuilder.prototype.BuildSketch = function( options, onStdout, onStderr )
 				.then( function()
 				{
 					// Copy the sketch folder to the staging sketch dir
-					return fs.copyAsync( options.sketchPath, stagedSketchDir );
+					return fs.copyAsync( options.sketchDir, stagedSketchDir );
 				})
 	})
 	.then( function()
 	{
+		console.log( "Removed old sketch" );
+		
 		// Generate preproc header file
 		var output = "#pragma once\n\n";
 		
@@ -52,21 +60,49 @@ ArduinoBuilder.prototype.BuildSketch = function( options, onStdout, onStderr )
 			output += "#define " + options.preproc[ i ].split( "=" ).toString().replace( ",", " " ) + "\n";
 		}
 		
-		return fs.writeFileAsync( path.join( stagedSketchDir, "compile_options.h" ), output );
+		return fs.writeFileAsync( path.join( stagedSketchDir, "CompileOptions.h" ), output );
 		
 	})
 	.then( function()
 	{
-		// Find all plugins
+		console.log( "Made compileoptions" );
 		
-		
-		// Generate plugin include file
-		// Copy plugin folders into temp directory
+		var pluginDirs = GetDirectories( "/opt/openrov/cockpit/src/plugins" );
+	
+		var pluginString = "#pragma once\n\n";
+	
+		return Promise.map( pluginDirs, function( pluginName )
+		{
+			var pluginDir = path.join( "/opt/openrov/cockpit/src/plugins", pluginName );
+			
+			// Check for a firmware folder
+			return fs.statAsync( path.join( pluginDir, "firmware" ) )
+			.then( function()
+			{
+				// Copy firmware folder to PluginName dir in staged folder
+				return fs.copyAsync( path.join( pluginDir, "firmware" ), path.join( stagedSketchDir, pluginName ) );
+			})
+			.then( function()
+			{
+				// Add include for plugin to Plugins.h 
+				pluginString += "#include \"" + pluginName + "\\Instance.h\"\n";
+			})
+			.catch( function( err )
+			{
+				// Do nothing, we expect this to fail for all plugins that don't have firmware folders
+			})
+		} )
+		.then( function()
+		{
+			return fs.writeFileAsync( path.join( stagedSketchDir, "Plugins.h" ), pluginString );
+		} );
 	})
 	.then( function()
 	{
+		console.log( "Made plugins.h" );
+		
 		// Create promise
-		var promise 		= spawn( 'arduino-builder', buildOpts );
+		var promise 		= spawnAsync( 'arduino-builder', buildOpts );
 		var childProcess 	= promise.childProcess;
 
 		// Attach listeners
@@ -76,11 +112,18 @@ ArduinoBuilder.prototype.BuildSketch = function( options, onStdout, onStderr )
 		return promise;
 	})
 	.then( function()
-	{
-		// Copy bin and elf into destination dir
+	{		
+		// Copy bin into install dir
+		return fs.copyAsync( path.join( options.buildDir, sketchName + ".ino.bin" ), path.join( installDir, sketchName + ".bin" ) );
+	})
+	.then( function()
+	{		
+		// Copy elf into install dir
+		return fs.copyAsync( path.join( options.buildDir, sketchName + ".ino.elf" ), path.join( installDir, sketchName + ".elf" ) );
 	})
 	.then( function()
 	{
+		console.log( "SUCCESS" );
 		if( options.cleanAfterBuild )
 		{
 			// Clean up temp dir
@@ -108,14 +151,14 @@ ArduinoBuilder.prototype.BuildSketch = function( options, onStdout, onStderr )
 	
 };
 
-function ProcessOptions( opts )
+function ProcessOptions( options )
 {
 	// First, validate required options
 	ValidateOptions( options );
 
 	var defaults = 
 	{
-		sketchPath: 		"",
+		sketchDir: 			"",
 		productID:			"",
 		buildDir:			"/opt/openrov/firmware/build",
 		installBaseDir:		"/opt/openrov/firmware/bin",
@@ -141,9 +184,6 @@ function ProcessOptions( opts )
 		}
 	}
 	
-	// Update installBaseDir
-	options.installBaseDir = path.join( options.installBaseDir, options.productID );
-	
 	// Create optArray
 	var optArray = [];
 	
@@ -157,13 +197,13 @@ function ProcessOptions( opts )
 	optArray.push( "-hardware", options.hardware );
 	optArray.push( "-tools", options.tools );
 	
-	for( i =0; i < option.libs.length; ++i )
+	for( i =0; i < options.libs.length; ++i )
 	{
-		optArray.push( "-libraries", options.option.libs[ i ] );
+		optArray.push( "-libraries", options.libs[ i ] );
 	};
 	
 	optArray.push( "-fqbn", options.fqbn );
-	optArray.push( options.sketchPath );
+	optArray.push( options.sketchDir );
 	
 	return optArray;
 };
@@ -171,9 +211,9 @@ function ProcessOptions( opts )
 function ValidateOptions( options )
 {	
 	// Required parameters
-	if( IsBlank( options.sketchPath ) )
+	if( IsBlank( options.sketchDir ) )
 	{
-		throw new Error( "Missing required option: sketchPath" );
+		throw new Error( "Missing required option: sketchDir" );
 	}
 	
 	if( IsBlank( options.productID ) )
@@ -196,3 +236,13 @@ function IsBlank( str )
 {
     return ( !str || /^\s*$/.test(str) );
 };
+
+function GetDirectories( dir ) 
+{
+  return fs.readdirSync(dir).filter( function( file ) 
+  {
+    return fs.statSync( path.join( dir, file ) ).isDirectory();
+  });
+}
+
+module.exports = new ArduinoBuilder();

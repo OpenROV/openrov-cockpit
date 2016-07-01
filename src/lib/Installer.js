@@ -105,12 +105,17 @@ function ExecuteScript( baseDir, script )
 	{
 		var src = path.resolve( path.join( baseDir, "scripts", script.name ) );
 		
+		var opts =
+		{
+			cwd: path.resolve( baseDir )
+		}
+		
 		switch( script.type )
 		{
 			case "bash":
 			{
 				// Execute bash script
-				return execAsync( "bash " + src )
+				return execAsync( "bash " + src, opts )
 						.then( function( result )
 						{
 							console.log( 'stdout: ', result.stdout );
@@ -121,7 +126,7 @@ function ExecuteScript( baseDir, script )
 			case "node":
 			{
 				// Execute node script
-				return execAsync( "node " + src )
+				return execAsync( "node " + src, opts )
 						.then( function( result )
 						{
 							console.log( 'stdout: ', result.stdout );

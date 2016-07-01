@@ -1,10 +1,11 @@
 {
 	"files":
 	[
-		{ "src": "addswapfile.sh", 	"dest": "/opt/openrov/system/scripts" },
-		{ "src": "knight-rider.js", "dest": "/opt/openrov/system/scripts" },
-		{ "src": "rc.local", 		"dest": "/opt/openrov/system/scripts" },
-		{ "src": "nginx.location", 	"dest": "/opt/openrov/system/scripts" }
+		{ "src": "2xBoardInfo.json", 	"dest": "/opt/openrov/system/etc" },
+		{ "src": "addswapfile.sh", 		"dest": "/opt/openrov/system/scripts" },
+		{ "src": "knight-rider.js", 	"dest": "/opt/openrov/system/scripts" },
+		{ "src": "rc.local", 			"dest": "/opt/openrov/system/scripts" },
+		{ "src": "nginx.location", 		"dest": "/opt/openrov/system/etc" }
 	],
 	
 	"preinstall": 

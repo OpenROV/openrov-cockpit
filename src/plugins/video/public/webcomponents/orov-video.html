@@ -491,19 +491,12 @@ else global.CBuffer = CBuffer;
 							drawFrame(frame);
 					}};
 					drawFrame = function(frame) {
-              //self.$$('#camera1').src = 'data:image/jpeg;base64,' + frame;
-
-              // var u8 = new Uint8Array(frame);
-              // var encoded = btoa(Uint8ToString(u8));
-							
-							
+						if (frame.isDrawn == true) return;
+						frame.isDrawn = true;
 
               if (!canvas || !width > 0 || !height > 0) {
-								var blob = new Blob([frame], {type: 'application/octet-binary'});
+								var blob = new Blob([frame.data], {type: 'application/octet-binary'});
 								var url = URL.createObjectURL(blob);
-								// var url = 'data:image/jpeg;base64,' + encoded;	
-								// var image = new Image();
-								// image.src = url;
 								image.onload = function() {
 
 									self.$$('#camera1').src = url; // set first frame
@@ -521,23 +514,13 @@ else global.CBuffer = CBuffer;
 
                 
               }            
-//              proportionalHeight = width * image.height / image.width;
-  //            if (proportionalHeight != 0 && self.$$('#camera1').isHidden !== true) {
               if (canvas && (canvas.width== 0 || canvas.height == 0)) {
                 canvas.width = width;
                 canvas.height = height;
-                // canvas.width = 
               }
-              // if (proportionalHeight == 0) proportionalHeight = canvas.width * image.height / image.width;
-              
-              // ctx.drawImage(image, 0, 0);
-              //ctx.drawImage(image, 0, 0, canvas.width, proportionalHeight);
 							if (canvas && canvas.width > 0 && canvas.height > 0 ) 
-								loadImage(frame, canvas, proportionalHeight);
-								// loadImage(encoded, canvas, proportionalHeight);
+								loadImage(frame.data, canvas, proportionalHeight);
             }
-            // requestAnimationFrame(draw);
-          // }
 
 					var mjpegDrawIntervall;
 
@@ -547,7 +530,7 @@ else global.CBuffer = CBuffer;
             if (self.$$('#camera1')===null){
               return;
             }
-            buffer.push(frame);
+            buffer.push({data: frame, isDrawn: false});
 //						drawFrame(frame);
             
               

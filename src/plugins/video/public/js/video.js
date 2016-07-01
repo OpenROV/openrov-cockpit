@@ -145,32 +145,17 @@
                 var connection;
                 connection = BinaryClient(address);
 
+                var streamNumber = 0;
                 var handle;
                 handle = function() {
                     connection.on('stream', function(stream, meta) {
-                      // console.log('STREAM');
+                      // console.log('New Stream #' + streamNumber++);
+                      if (self.lastFrameTime !== undefined && self.lastFrameTime > meta) return;
+                      self.lastFrameTime = meta; 
                       stream.on('data', function(data) {
-//                        fpsCounter++;
 
                         var now = Date.now();
-                        var dif = Number(now) - Number(meta);
-                        // var dif = Number(now) - Number(data.timestamp);
-                        //self.cockpit.emit('x-motion-jpeg.data',data.data);
-                        // var dif = 0;
-                        //self.cockpit.emit('x-motion-jpeg.data',data.data);
-
-                        // self.postMessage_orig(data.data, [data.data])
                         self.postMessage_orig(data, [data])
-                        
-                        //console.log(data.timestamp + ' ' + now + ' ' +  dif );
-                        // console.log(dif );
-                        if (dif >= 400) {
-                          //console.log('dropping connection and reconnect')
-                          connection.close();
-                          connection =    BinaryClient(address); 
-                          connection.on('open', handle);
-                        }
-
                       } )
                     })
                   };
@@ -203,21 +188,8 @@
               self.cockpit.emit('x-motion-jpeg.data',message.data);
             }
 
-          // $.getScript('components/binaryjs/dist/binary.js',function(){
-
-          //   // var fpsCounter = 0;
-          //   // setInterval(function() {
-          //   //   console.log('stream fps ' + fpsCounter);
-          //   //   fpsCounter = 0;
-          //   // }, 1000);
-
-
-          // });
             data.sourceAddress = '';
             self.cockpit.emit('CameraRegistration',data);
-          
-
-          // window.io.connect(data.sourceAddress ,{path:data.wspath} );
           break;
 
 

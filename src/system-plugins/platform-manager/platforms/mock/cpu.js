@@ -34,10 +34,6 @@ CPUInterface.prototype.LoadInfo = function( cpu )
 				}
 				
 				return cpu;
-			} )
-			.catch( function( error )
-			{
-				console.log( error );
 			} );
 }
 

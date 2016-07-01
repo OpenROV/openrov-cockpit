@@ -1,36 +1,33 @@
-var Q 			= require( "q" );
-var fs 			= require( "fs" );
-var path		= require( "path" );
+var Promise			= require( "bluebird" );
+var fs				= Promise.promisifyAll( require( "fs" ) );
+var path			= require( "path" );
 
-var fopen		= Q.denodeify( fs.open );
-var read 		= Q.denodeify( fs.read );
-var readFile	= Q.denodeify( fs.readFile );
+var CPUInterface = function()
+{
+	var self = this;
+};
 
-var ComposeInterface = function( platform )
+CPUInterface.prototype.Compose = function( platform )
 {
 	// Temporary container used for cpu detection and info loading
 	var cpu =
 	{
-		info: {},
 		targetCPU: platform.cpu
 	};
 	
+	var self = this;
+	
 	// Compose the CPU interface object
-	return LookupCpuInfo( cpu )
-			.then( CheckSupport )
-			.then( LoadInterfaceImplementation )
-			.then( function( cpu )
-			{
-				// Success
-				return platform;
-			} );
+	return  self.LoadInfo( cpu )( cpu )
+			.then( self.CheckSupport )
+			.then( self.LoadInterfaceImplementation );
 };
 
-var LookupCpuInfo = function( cpu )
+CPUInterface.prototype.LoadInfo = function( cpu )
 {
 	cpu.info = {};
 	
-	var p = FindBeagleboneEEPROM()
+	return FindBeagleboneEEPROM()
 			.then( ReadEEPROM )
 			.then( ParseInfo )
 			.then( function( info )
@@ -45,38 +42,35 @@ var LookupCpuInfo = function( cpu )
 	// Helper functions		
 	function FindBeagleboneEEPROM()
 	{
-		return Q.any([ OpenFile( "/sys/bus/nvmem/devices/at24-0/nvmem" ),
-						OpenFile( "/sys/class/nvmem/at24-0/nvmem" ),
-						OpenFile( "/sys/bus/i2c/devices/0-0050/eeprom" ) ] );
+		return Promise.any([ fs.openAsync( "/sys/bus/nvmem/devices/at24-0/nvmem" ),
+						fs.openAsync( "/sys/class/nvmem/at24-0/nvmem" ),
+						fs.openAsync( "/sys/bus/i2c/devices/0-0050/eeprom" ) ] );
 	}
 	
-	function OpenFile( filename )
-	{
-		return fopen( filename, 'r' );
-	};
-
 	function ReadEEPROM( fd )
 	{
-		return read( fd, new Buffer(244), 0, 244, 0 )
-			.then(function (result) {
+		return fs.readAsync( fd, new Buffer(244), 0, 244, 0 )
+				.then( function (result) 
+				{
 					return result[1];
 				});
 	};
 
 	function ParseInfo( data )
 	{
-		var revision = data.slice( 0, 16 );
-		var serial = data.slice( 16, 28 );
+		return Promise.try( function()
+		{
+			var revision = data.slice( 0, 16 );
+			var serial = data.slice( 16, 28 );
 
-		return new Q( { "revision": revision, "serial": serial } );
+			return { "revision": revision, "serial": serial };
+		} );
 	};
-	
-	return p;
 }
 
-var CheckSupport = function( cpu )
+CPUInterface.prototype.CheckSupport = function( cpu )
 {
-	return readFile( path.resolve( __dirname, "cpu/revisionInfo.json" ) )
+	return fs.readFileAsync( path.resolve( __dirname, "cpu/revisionInfo.json" ) )
 			.then( JSON.parse )
 			.then( function( json )
 			{
@@ -103,12 +97,11 @@ var CheckSupport = function( cpu )
 			} );
 };
 
-var LoadInterfaceImplementation = function( cpu )
+CPUInterface.prototype.LoadInterfaceImplementation = function( cpu )
 {
 	// Load and apply the interface implementation to the actual CPU interface
 	require( "./cpu/setup.js" )( cpu.targetCPU );		
 	return cpu;
 };
 
-
-module.exports = ComposeInterface;
+module.exports = new CPUInterface();

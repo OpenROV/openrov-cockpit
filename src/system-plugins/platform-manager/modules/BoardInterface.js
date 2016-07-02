@@ -20,16 +20,6 @@ BoardInterface.prototype.RegisterDefaultAPI = function()
 	{
 		debug( this.oName + " not yet implemented!" );
 	}, true );
-	
-	this.AddMethod( "SendCommand", function( command )
-	{
-		debug( this.oName + " not yet implemented!" );
-	}, true );
-	
-	this.AddMethod( "SendMotorTest", function( port, starboard, vertical )
-	{
-		debug( this.oName + " not yet implemented!" );
-	}, true );
 };
 
 module.exports = BoardInterface;

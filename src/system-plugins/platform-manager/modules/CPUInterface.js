@@ -20,13 +20,7 @@ CPUInterface.prototype.RegisterDefaultAPI = function()
 	{
 		debug( this.oName + " not yet implemented!" );
 	}, true );
-	
-	this.AddMethod( "SetGovernor", function( governorName )
-	{
-		debug( this.oName + " not yet implemented!" );
-	}, true );
 };
-
 
 module.exports = CPUInterface;
 

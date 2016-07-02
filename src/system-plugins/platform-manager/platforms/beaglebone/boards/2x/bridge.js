@@ -1,270 +1,119 @@
-var EventEmitter = require('events').EventEmitter;
-var debug        = require('debug')( 'bridge' );
+var crc             = require( 'crc' );
+var SerialPort      = require( 'serialport' );
+var EventEmitter    = require( 'events' ).EventEmitter;
 
 function Bridge() 
 {
-  var DISABLED      = 'DISABLED';
-  var bridge        = new EventEmitter();
-  var reader        = new StatusReader();
-  var emitRawSerial = false;
-
-  // Initial values
-  var time            = 1000;
-  var currentDepth    = 1;
-  var currentHeading  = 0;
-  var currentPitch    = 0;
-  var currentRoll     = 0;
-  var currentServo    = 1500;
-  var current         = 2;
-
-  bridge.depthHoldEnabled   = false;
-  bridge.targetHoldEnabled  = false;
-  bridge.laserEnabled       = false;
+  var self            = this;
+  var bridge          = new EventEmitter();
+  var reader          = new StatusReader();
   
-  // -----------------------------------------
-  // Methods
- 
-  bridge.write = function( command ) 
-  {
-    var commandParts = command.split(/\(|\)/);
-    var commandText = commandParts[0];
-    
-    switch( commandText ) 
-    {
-      case "rcap":
-      {
-        bridge.emitStatus('CAPA:255');
-        debug( "CAPA:255")
-        break;
-      }
-        
-      case "ligt":
-      {
-        bridge.emitStatus('LIGP:' + commandParts[1]/100);
-        debug('Light status: '+  commandParts[1]/100);
-        break;
-      }
-      
-      case "eligt":
-      {
-        bridge.emitStatus('LIGPE:' + commandParts[1]/100);
-        debug('External light status: '+  commandParts[1]/100);
-        break;
-      }
-      
-      case "escp":
-      {
-        bridge.emitStatus('ESCP:' + commandParts[1]);
-        debug('ESC status: ' + commandParts[1]);
-        break;
-      }
-      
-      case "tilt":
-      {
-        bridge.emitStatus('servo:' + commandParts[1]);
-        debug('Tilt status: ' + commandParts[1]/100);
-        break;
-      }
-      
-      case "claser":
-      {
-        if (bridge.laserEnabled) 
-        {
-          bridge.laserEnabled = false;
-          bridge.emitStatus('claser:0');
-          debug('Laser status: 0');
-        }
-        else 
-        {
-          bridge.laserEnabled = true;
-          bridge.emitStatus('claser:255');
-          debug('Laser status: 255');
-        }
-        
-        break;
-      }
-      
-      case "holdDepth_on":
-      {
-        var targetDepth = 0;
-        
-        if (!bridge.depthHoldEnabled) 
-        {
-            targetDepth = currentDepth;
-            bridge.depthHoldEnabled = true;
-        }
-        
-        bridge.emitStatus('targetDepth:' + (bridge.depthHoldEnabled ? targetDepth.toString() : DISABLED) );
-        
-        debug('Depth hold enabled');
-        
-        break;
-      }
-      
-      case "holdDepth_off":
-      {
-        targetDepth = -500;
-        bridge.depthHoldEnabled = false;
-
-        bridge.emitStatus( 'targetDepth:' + (bridge.depthHoldEnabled ? targetDepth.toString() : DISABLED) );
-        debug('Depth hold disabled');
-        
-        break;
-      }
-      
-      case "holdHeading_on":
-      {
-        var targetHeading = 0;
-        targetHeading = currentHeading;
-        bridge.targetHoldEnabled= true;
-
-        bridge.emitStatus( 'targetHeading:' + (bridge.targetHoldEnabled ? targetHeading.toString() : DISABLED) );
-        debug('Heading hold enabled');
-        
-        break;
-      }
-      
-      case "holdHeading_off":
-      {
-        var targetHeading = 0;
-            targetHeading = -500;
-            bridge.targetHoldEnabled = false;
-            
-        bridge.emitStatus( 'targetHeading:' + (bridge.targetHoldEnabled ? targetHeading.toString() : DISABLED) );
-        debug('Heading hold disabled');
-        
-        break;
-      }
-      
-      // Passthrough tests
-      case "example_to_foo":
-      {
-        bridge.emitStatus('example_foo:' + commandParts[1]);
-        break;
-      }
-      
-      case "example_to_bar":
-      {
-        bridge.emitStatus('example_bar:' + commandParts[1]);
-        break;
-      }
-      
-      default:
-      {
-        debug( "Unsupported command: " + commandText );
-      }
-    }
-    
-    // Echo this command back to the MCU
-    bridge.emitStatus('cmd:' + command);
-  };
-  
-  bridge.emitStatus = function(status) 
-  {
-    var txtStatus = reader.parseStatus(status);
-    bridge.emit('status', txtStatus);
-    
-    if (emitRawSerial) 
-    {
-      bridge.emit('serial-recieved', status);
-    }
-  };
+  var emitRawSerial   = false;
+  var serialConnected = false;
+  var uartPath        = "/dev/ttyO1";
+  var uartBaud        = 115200;
+  var serialPort      = {};
+  var lastWriteTime   = new Date();
   
   bridge.connect = function () 
   {
-    debug('!Serial port opened');
+    serialPort = new SerialPort.SerialPort( uartPath,
+    {
+      baudrate: uartBaud,
+      parser: SerialPort.parsers.readline( '\r\n' )
+    } );
+
+    serialPort.on( 'open', function() 
+    {
+      serialConnected = true;
+      console.log( 'Serial port opened!' );
+    } );
+
+    serialPort.on( 'close', function( data ) 
+    {
+      console.log( 'Serial port closed!' );
+      serialConnected = false;
+    } );
+
+    serialPort.on( 'data', function( data ) 
+    {
+      var status = reader.parseStatus( data );
+      
+      bridge.emit( 'status', status );
+      
+      if( emitRawSerial )
+      {
+        bridge.emit( 'serial-recieved', data + '\n' );
+      }
+    } );
+
+  };
+
+
+  // This code intentionally spaces out the serial commands so that the buffer does not overflow
+  bridge.write = function( command ) 
+  {
+    var crc8          = crc.crc81wire( command );
+    var commandBuffer = new Buffer( command, 'utf8' );
+    var crcBuffer     = new Buffer( 1 );
     
-    // Add status interval functions
-    bridge.timeInterval    = setInterval( bridge.emitTime, 1000 );
-    bridge.statsInterval   = setInterval( bridge.emitStats, 3000 );
-    bridge.navDataInterval = setInterval( bridge.emitNavData, 2000 );
+    crcBuffer[0] = crc8;
+
+    var messagebuffer = Buffer.concat([crcBuffer,commandBuffer]);
     
-    // Emit serial port opened event
+    if( serialConnected ) 
+    {
+      var now   = new Date();
+      var delay = 3 - ( ( now.getTime() - lastWriteTime.getTime() ) );
+      
+      if (delay < 0)
+      {
+        delay = 0;
+      }
+      
+      lastWriteTime = now;
+      lastWriteTime.setMilliseconds( lastWriteTime.getMilliseconds + delay );
+      
+      setTimeout( function()
+      {
+        serialPort.write( messagebuffer );
+        
+        if( emitRawSerial )
+        {
+          bridge.emit('serial-sent', command);
+        }
+      }, delay );
+      
+    } 
+    else 
+    {
+      console.log( 'DID NOT SEND' );
+    }
   };
   
-  bridge.close = function () 
-  {
-    debug('!Serial port closed');
-    
-    // Remove status interval functions
-    clearInterval( bridge.timeInterval );
-    clearInterval( bridge.statsInterval );
-    clearInterval( bridge.navDataInterval );
-    
-    // Emit serial port closed event
-  };
   
   bridge.startRawSerialData = function startRawSerialData() 
   {
     emitRawSerial = true;
   };
-  
+
   bridge.stopRawSerialData = function stopRawSerialData() 
   {
     emitRawSerial = false;
   };
-  
-  // Set up intervals to emit mocked 
-  bridge.emitTime = function () 
-  {
-    bridge.emit('status', reader.parseStatus('time:' + time));
-    time += 1000;
-  };
-  
-  bridge.emitStats = function() 
-  {
-    var data = 'vout:9.9;iout:0.2;BT.1.I:0.3;BT.2.I:0.5;BNO055.enabled:true;BNO055.test1.pid:passed;BNO055.test2.zzz:passed;';
-    var status = reader.parseStatus(data);
-    bridge.emit('status', status);
-  };
 
-  bridge.emitNavData = function() 
+  bridge.close = function () 
   {
-    var result = "";
-    
-    // Generate depth
-    var rnd = (Math.random() * 20 - 10)/100;
-    currentDepth += currentDepth*rnd;
-    currentDepth = Math.min(Math.max(currentDepth, 1), 100);
-    result+='deep:' + currentDepth + ';'
-
-    // Generate heading
-    currentHeading += 5;
-    result+='hdgd:' + currentHeading + ';'
-    if (currentHeading >= 360) 
+    serialConnected = false;
+    //This code is a work around for a race condition in the serial port code https://github.com/voodootikigod/node-serialport/issues/241#issuecomment-43058353
+    var sp = serialPort;
+    serialPort.flush(function(err)
     {
-      currentHeading = 0;
-    }
-    
-    // Generate pitch
-    currentPitch = ( 0.01 * ( Math.floor(Math.random() * 201) - 100 ) );
-    result+='pitc:' + currentPitch + ';'
-    
-    // Generate roll
-    currentRoll = ( 0.03 * ( Math.floor(Math.random() * 201) - 100 ) );
-    result+='roll:' + currentRoll + ';'
-
-    // Generate battery tube 1 current
-    rnd = (Math.random() * 20 - 10)/100;
-    current += current*rnd;
-    current = Math.min(Math.max(current, 1), 10);
-    result+='bt1i:' + current + ';'
-
-    // Generate battery tube 2 current
-    rnd = (Math.random() * 20 - 10)/100;
-    current += current*rnd;
-    current = Math.min(Math.max(current, 1), 10);
-    result+='bt2i:' + current + ';'
-
-    // Generate servo command
-    currentServo +=50;
-    result+='servo:' + currentServo + ';'
-    if (currentServo >= 2000) {
-      currentServo = 1000;
-    }
-
-    // Emit status update
-    bridge.emit('status', reader.parseStatus(result));
+      setTimeout(function() 
+      {
+        sp.close( function(err){} );
+      }, 10);
+    });
   };
   
   // Listen for firmware settings updates

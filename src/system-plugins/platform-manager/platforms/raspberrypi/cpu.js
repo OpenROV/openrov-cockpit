@@ -1,51 +1,48 @@
-var Q 			= require( "q" );
-var fs 			= require( "fs" );
-var path		= require( "path" );
+var Promise			= require( "bluebird" );
+var readFileAsync	= Promise.promisify( require( "fs" ).readFile );
+var path			= require( "path" );
+var execFileAsync	= require('child-process-promise').execFile;
 
-var fopen		= Q.denodeify( fs.open );
-var read 		= Q.denodeify( fs.read );
-var readFile	= Q.denodeify( fs.readFile );
+var CPUInterface = function()
+{
+	var self = this;
+};
 
-var ComposeInterface = function( platform )
+CPUInterface.prototype.Compose = function( platform )
 {
 	// Temporary container used for cpu detection and info loading
 	var cpu =
 	{
-		info: {},
 		targetCPU: platform.cpu
 	};
 	
+	var self = this;
+
 	// Compose the CPU interface object
-	return LookupCpuInfo( cpu )
-			.then( CheckSupport )
-			.then( LoadInterfaceImplementation )
-			.then( function( cpu )
-			{
-				// Success
-				return platform;
-			} );
+	return self.LoadInfo( cpu )
+			.then( self.CheckSupport )
+			.then( self.LoadInterfaceImplementation );
 };
 
-var LookupCpuInfo = function( cpu )
-{
-	cpu.info = {};
-	
-	var GetCpuInfo = require( "./lib/cpuinfo.js" );
-	
+CPUInterface.prototype.LoadInfo = function( cpu )
+{	
 	return GetCpuInfo()
 			.then( function( info )
 			{
 				// Add revision and serial details to the interface object
-				cpu.info.revision 	= info.Revision;
-				cpu.info.serial 	= info.Serial;
+				cpu.info = 
+				{
+					revision: 	info.Revision,
+					serial:		info.Serial
+				}
 				
 				return cpu;
 			} );
 }
 
-var CheckSupport = function( cpu )
+CPUInterface.prototype.CheckSupport = function( cpu )
 {
-	return readFile( path.resolve( __dirname, "cpu/revisionInfo.json" ) )
+	return readFileAsync( path.resolve( __dirname, "cpu/revisionInfo.json" ) )
 			.then( JSON.parse )
 			.then( function( json )
 			{
@@ -72,12 +69,43 @@ var CheckSupport = function( cpu )
 			} );
 };
 
-var LoadInterfaceImplementation = function( cpu )
+CPUInterface.prototype.LoadInterfaceImplementation = function( cpu )
 {
 	// Load and apply the interface implementation to the actual CPU interface
-	require( "./cpu/setup.js" )( cpu.targetCPU );
+	require( "./cpu/setup.js" )( cpu.targetCPU );	
 	return cpu;
 };
 
+// Helper function to parse /proc/cpuinfo
+function GetCpuInfo()
+{
+	return spawnAsync( "cat", ["/proc/cpuinfo"] )
+	.then( function( data ) 
+	{
+		var result = {};
+		
+		// Loop through each line in the output
+		data.toString().split('\n').forEach(function (line) 
+		{
+			// Remove tabs from line
+			line = line.replace( /\t/g, '' );
 
-module.exports = ComposeInterface;
+			// Split into field:value parts
+			var parts = line.split(':');
+			
+			// If there are two parts, it has valid data
+			if (parts.length === 2) 
+			{
+				// Replace spaces with underscore
+				var fieldName 	= parts[0].replace( /\s/g, '_' );
+				var value 		= parts[1].trim();
+				
+				result[ fieldName ] = value;
+			}
+		});
+		
+		return result;
+	} );  
+};
+
+module.exports = new CPUInterface();

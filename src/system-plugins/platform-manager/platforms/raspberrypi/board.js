@@ -1,13 +1,8 @@
-var Q 		= require("q");
-var fs 		= require("fs");
+var Promise = require( "bluebird" );
+var fs 		= Promise.promisifyAll( require("fs") );
 var path	= require('path');
+
 var Parser 	= require("binary-parser").Parser;
-
-var EventEmitter = require("events").EventEmitter;
-
-var fopen		= Q.denodeify( fs.open );
-var read 		= Q.denodeify( fs.read );
-var readFile	= Q.denodeify( fs.readFile );
 
 // Define a parser for the board information stored on the controller board's eeprom
 var eepromParser = Parser.start()
@@ -19,34 +14,34 @@ var eepromParser = Parser.start()
         				length: "length"
 					} );
 
-var loadBoardConfig = function( platform )
+var BoardInterface = function()
 {
-	// Create the CPU object
-	var board = platform.mcu;
 	
-	return getBoardInfo( board )
-			.then( loadPinMap )
-			.then( loadHardwareInterface )
-			.then( function( board )
-			{
-				// Success
-				return platform;
-			} )	
-			.catch( function( err )
-			{
-				console.log( "Err loading board info: " + err );
-				
-				// Fail, but return anyway
-				return platform;
-			} );
 };
 
-var getBoardInfo = function( board ) 
+BoardInterface.prototype.Compose = function( platform )
+{	
+	// Temporary container used for cpu detection and info loading
+	var board =
+	{
+		targetBoard: platform.board
+	};
+	
+	var self = this;
+	
+	return self.LoadInfo( board )
+			.then( self.LoadPinMap )
+			.then( self.LoadInterface );
+};
+			
+BoardInterface.prototype.LoadInfo = function( board ) 
 {
-	return readFile( "/sys/class/i2c-adapter/i2c-1/1-0054/eeprom" )
+	board.info = {};
+	
+	return fs.readFileAsync( path.resolve( "/sys/class/i2c-adapter/i2c-1/1-0054/eeprom" ) )
 			.then( function( data )
 			{
-				return eepromParser.parse( data ).data; ;
+				return eepromParser.parse( data ).data;
 			} )
 			.then( JSON.parse )
 			.then( function( info )
@@ -56,9 +51,9 @@ var getBoardInfo = function( board )
 			} );
 }
 
-var loadPinMap = function( board )
+BoardInterface.prototype.LoadPinMap = function( board )
 {
-	return readFile( path.resolve(__dirname, "boards/" + board.info.productId + "/pinmap.json" ) )
+	return fs.readFileAsync( path.resolve( __dirname, "boards/" + board.info.productId + "/pinmap.json" ) )
 			.then( JSON.parse )
 			.then( function( json )
 			{
@@ -72,12 +67,10 @@ var loadPinMap = function( board )
 			} );
 }
 
-var loadHardwareInterface = function( board )
+BoardInterface.prototype.LoadInterface = function( board )
 {
-	// Load functions for the board interface
-	require( "./boards/" + board.info.productId + "/setup.js" )( board );
-	
+	require( "./boards/" + board.info.productId + "/setup.js" )( board.targetBoard );
 	return board;
 };
 
-module.exports = loadBoardConfig;
+module.exports = new BoardInterface();

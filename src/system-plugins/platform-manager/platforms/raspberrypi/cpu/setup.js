@@ -1,8 +1,6 @@
 var fs 				= require('fs');
 var path 			= require('path');
-var spawn 			= require('child_process').spawn;
 var debug			= {};
-
 
 var SetupCPUInterface = function( cpu )
 {
@@ -51,16 +49,6 @@ var RegisterFunctions = function( cpu )
 {
 	cpu.AddMethod( "Initialize", function()
 	{
-	}, false );
-	
-	cpu.AddMethod( "SetGovernor", function( governorName )
-	{
-
-	}, false );
-	
-	cpu.AddMethod( "BuildFirmware", function( firmwarePath, buildConfig )
-	{
-
 	}, false );
 }
 

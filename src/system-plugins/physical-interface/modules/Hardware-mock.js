@@ -47,10 +47,14 @@ function Hardware( deps ) {
       hardware.emitStatus('LIGP:' + commandParts[1]/100);
       debug('HARDWARE-MOCK return light status:'+  commandParts[1]/100);
     }
-    if (commandText === 'eligt') {
-      hardware.emitStatus('LIGPE:' + commandParts[1]/100);
+    if (commandText === 'elight0') {
+      hardware.emitStatus('LIGPE0:' + commandParts[1]/100);
       debug('HARDWARE-MOCK return elight status:'+  commandParts[1]/100);
     }
+    if (commandText === 'elight1') {
+      hardware.emitStatus('LIGPE1:' + commandParts[1]/100);
+      debug('HARDWARE-MOCK return elight status:'+  commandParts[1]/100);
+    }    
     if (commandText === 'escp') {
       hardware.emitStatus('ESCP:' + commandParts[1]);
       debug('HARDWARE-MOCK return ESC status:'+commandParts[1]);

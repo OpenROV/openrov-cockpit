@@ -127,7 +127,7 @@ ArduinoBuilder.prototype.BuildSketch = function( options, onStdout, onStderr )
 		if( options.cleanAfterBuild )
 		{
 			// Clean up temp dir
-			return fs.removeAsync( self.buildDir );
+			return fs.removeAsync( options.buildDir );
 		}
 	})
 	.catch( function( err )
@@ -135,7 +135,7 @@ ArduinoBuilder.prototype.BuildSketch = function( options, onStdout, onStderr )
 		if( options.cleanAfterBuild )
 		{
 			// Clean up temp dir first
-			return fs.removeAsync( self.buildDir )
+			return fs.removeAsync( options.buildDir )
 					.then( function()
 					{
 						// Rethrow error

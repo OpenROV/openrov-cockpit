@@ -11,12 +11,12 @@ var SetupBoardInterface = function( board )
 	debug = board.debug;
 	
 	// Decorate the MCU interface with board specific properties
-	board.physics            = new ArduinoHelper().physics;
-    board.bridge           = new Hardware();
+	board.physics           = new ArduinoHelper().physics;
+    board.bridge           	= new Hardware();
      
-    board.firmwareVersion    = 0;
-    board.Capabilities       = 0;
-    board.statusdata         = {};
+    board.firmwareVersion   = 0;
+    board.Capabilities      = 0;
+    board.statusdata        = {};
     
     board.settingsCollection = 
     {
@@ -184,8 +184,6 @@ var RegisterFunctions = function( board )
 		
 		board.global.emit( "mcu.StartSerial" );
 	}, false );
-	
-	// TODO: Build: arduino:avr:mega:cpu=atmega2560
 	
 	board.AddMethod( "FlashFirmware", function( file )
 	{

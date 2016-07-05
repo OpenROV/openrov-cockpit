@@ -1,7 +1,7 @@
 var Promise			= require( "bluebird" );
 var readFileAsync	= Promise.promisify( require( "fs" ).readFile );
-var path			= require( "path" );
 var execFileAsync	= require('child-process-promise').execFile;
+var path			= require( "path" );
 
 var CPUInterface = function()
 {
@@ -79,7 +79,7 @@ CPUInterface.prototype.LoadInterfaceImplementation = function( cpu )
 // Helper function to parse /proc/cpuinfo
 function GetCpuInfo()
 {
-	return spawnAsync( "cat", ["/proc/cpuinfo"] )
+	return execFileAsync( "cat", ["/proc/cpuinfo"] )
 	.then( function( data ) 
 	{
 		var result = {};

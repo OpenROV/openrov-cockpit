@@ -1,11 +1,11 @@
 {
-	"productId": "3000",
+	"productId": "trident_alpha",
 	"rev": "0001",
 	"vendor": "OpenROV",
 	
 	"pinmap":
 	{
-		"P1": "CPU_3V3/3.5E",
+		"P1": "CPU_3V3_OUT",
 		"P3": "CPU_I2C_SDA",
 		"P5": "CPU_I2C_SCL",
 		"P7": "NC",
@@ -47,5 +47,4 @@
 		"P38": "NC",
 		"P40": "PWR_FAIL"
 	}
-	
 }

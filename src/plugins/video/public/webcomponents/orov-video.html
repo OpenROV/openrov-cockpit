@@ -445,7 +445,7 @@ else global.CBuffer = CBuffer;
             return c.join("");
           };
 
-          var buffer = new CBuffer(2);
+          //var buffer = new CBuffer(2);
           var image = new Image();
           var imageSrc = '';
           var tick = 2;
@@ -465,25 +465,17 @@ else global.CBuffer = CBuffer;
 						drawCounter = 0;
 					}, 1000);
 
+					var img = new Image;
+					img.onload = function() {
+							URL.revokeObjectURL(this.src);
+							ctx.drawImage(img, 0, 0, canvas.width, proportionalHeight);
+							drawCounter++;
+					};
+
 					var loadImage = function(frame, canvas, proportionalHeight) {
 							var blob = new Blob([frame], {type: 'application/octet-binary'});
 							var url = URL.createObjectURL(blob);
-							// var url = 'data:image/jpeg;base64,' + frame;
-
-							var img = new Image;
-							// img.src = url;
-							img.onload = function() {
-									URL.revokeObjectURL(url);
-									//ctx.drawImage(img, 0, 0, canvas.width, proportionalHeight);
-									ctx.drawImage(img, 0, 0);
-									drawCounter++;
-							};
 							img.src = url;
-
-
-              // var image = new Image();
-              // image.src = 'data:image/jpeg;base64,' + frame;
-
 					};
           draw = function() {
             var frame = buffer.pop();
@@ -530,17 +522,23 @@ else global.CBuffer = CBuffer;
             if (self.$$('#camera1')===null){
               return;
             }
-            buffer.push({data: frame, isDrawn: false});
-//						drawFrame(frame);
+//            buffer.push({data: frame, isDrawn: false});
+						//drawFrame({data: frame, isDrawn: false});
+						window.postMessage({type: 'draw', data: frame, isDrawn: false}, '*', [frame]);
             
               
-							if (!mjpegDrawIntervall) {
-								// mjpegDrawIntervall = setInterval(draw, 1000 /  self.framesPerSecond );
-								mjpegDrawIntervall = setInterval(draw, 10);
-							}
+							// if (!mjpegDrawIntervall) {
+							// 	// mjpegDrawIntervall = setInterval(draw, 1000 /  self.framesPerSecond );
+							// 	mjpegDrawIntervall = setInterval(draw, 10);
+							// }
 
             // }
           });
+					window.onmessage = function(message) {
+						if (message.data.type == 'draw') {
+							drawFrame(message.data);
+						}
+					}
 
 
         },

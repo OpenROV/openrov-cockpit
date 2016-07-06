@@ -28,6 +28,19 @@
   };
 
 
+  var StartWorker = function(code) {
+    var lines = code.split('\n');
+    lines.splice(0,1);
+    lines.splice(lines.length-2, 2);
+    var worker =lines.join('\n');
+
+    var blob = new Blob([worker]);
+    var blobURL = window.URL.createObjectURL(blob);
+
+    var worker = new Worker(blobURL);
+    window.URL.revokeObjectURL(blobURL);
+    return worker;    
+  }
 
   var ResolveURL = function(canidateURL){
     var http = location.protocol;
@@ -108,6 +121,76 @@
           });        
           self.cockpit.emit('CameraRegistration',data);
           break;
+
+        case 'socket.io_2':
+          data.sourceAddress = ResolveURL(data.relativeServiceUrl);
+
+          var workerFunction = function() {
+            importScripts(this.location.origin + '/components/socket.io-client/socket.io.js');
+            importScripts(this.location.origin + '/plugin/video/js/socket.io-stream.js');
+            onmessage = function(message) {
+              var fps = 0;
+              
+              var fpss = [];
+              setInterval(function() {
+                //console.log('FPS socket: ' + fps);
+                fpss.push(fps);
+                fps = 0;
+              }, 1000);
+
+              setInterval(function() {
+                fpss.forEach(function(fps) {
+                  console.log('FPS socket: ' + fps)
+                });
+                fpss = [];
+              }, 30 * 1000)
+
+              var videoChannels;
+              var clientId = message.data.clientId;
+              if (videoChannels == undefined) {
+                videoChannels = [];
+                for (var i = 0; i< 1; i++) {
+                  var channel = io.connect(message.data.sourceAddress ,{path:message.data.wspath, reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 10} );
+                  channel.on('connect', function(_socket) {
+                    var _socket = this;
+                    videoChannels[i] = _socket;
+                    _socket.emit('register', clientId, function() {
+                      var _ss = ss(_socket);
+                      _ss.on('x-motion-jpeg.data', function(stream, data) {
+                        console.log('got stream ');
+                        var _stream = stream;
+                        _stream.on('data', function(streamData) {
+                          var dst = new ArrayBuffer(streamData.byteLength);
+                          new Uint8Array(dst).set(streamData);
+                          self.postMessage(dst, [dst])
+                        })
+                      });
+                    })
+                  })
+
+                }
+              }
+
+
+            }
+
+            return onmessage;
+          }
+
+
+          data.clientId = Date.now();
+          for (var i = 0; i<2; i++)
+          {
+            var worker = StartWorker(workerFunction.toString());
+            worker.postMessage(data);
+            worker.onmessage = function(message) {    
+              self.cockpit.emit('x-motion-jpeg.data',message.data);
+            }
+          }
+          
+
+          self.cockpit.emit('CameraRegistration',data);
+          break;
         case 'binaryJS':
 
             data.sourceAddress = ResolveURL(data.relativeServiceUrl);
@@ -166,16 +249,7 @@
               return onmessage;
             } // workerFunction
 
-            var lines = workerFunction.toString().split('\n');
-            lines.splice(0,1);
-            lines.splice(lines.length-2, 2);
-            var worker =lines.join('\n');
-
-            var blob = new Blob([worker]);
-            var blobURL = window.URL.createObjectURL(blob);
-
-            var worker = new Worker(blobURL);
-            window.URL.revokeObjectURL(blobURL);
+            var worker = StartWorker(workerFunction.toString());
 
             var url = document.location.origin;
 

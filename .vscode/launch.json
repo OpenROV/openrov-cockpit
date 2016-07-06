@@ -18,7 +18,7 @@
 				"DEV_MODE": "true",
 				"USE_MOCK": "true",
 				"HARDWARE_MOCK": "true",
-				"GEO_MOCK": "true",
+				"GEO_MOCK": "false",
 				"DEBUG": "hardware, physical-interface",
 				"configfile": "/tmp/rovconfig.json",
 				"plugins__ui-manager__selectedUI": "new-ui",

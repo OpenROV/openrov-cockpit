@@ -87,7 +87,8 @@ mjpegvideo.prototype.start = function start(){
               sourcePort:         info.port,
               sourceAddress:      '',//info.addresses[0],
               //connectionType:     'socket.io'
-              connectionType:     'binaryJS'
+              // connectionType:     'binaryJS'
+              connectionType:     'socket.io_2'
             });
           });
 
@@ -107,7 +108,7 @@ mjpegvideo.prototype.start = function start(){
 mjpegvideo.prototype.startCamera = function startCamera(device){
   // var launch_options = ['node', '--debug-brk', require.resolve('mjpeg-video-server')];
   var launch_options = ['node', require.resolve('mjpeg-video-server')];
-  launch_options.push('/dev/video1');
+  launch_options.push('/dev/video0');
   // launch_options.push('-f');
   // launch_options.push('15');
   // launch_options.push('-u');

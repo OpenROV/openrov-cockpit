@@ -27,7 +27,7 @@
     };
 
     function lastTelemetryItem(sessionID) {
-      return idb.telemetry
+      return idb.telemetry_events
         .where('sessionID')
         .equals(sessionID)
         .last()
@@ -35,7 +35,7 @@
     }
 
     function firstTelemetryItem(sessionID) {
-      return idb.telemetry
+      return idb.telemetry_events
         .where('sessionID')
         .equals(sessionID)
         .first()
@@ -44,52 +44,25 @@
 
     function nextTelemetryItems(lowerIdLimit, limit) {
 
-      return idb.telemetry
-        .where('sessionID')
-        .equals(sessionID)
-        .and(function(x) {
-          return x.id > lowerIdLimit
+        // .equals(sessionID)
+        // .and(function(x) {
+        //   return x.id > lowerIdLimit
+        // })
+
+
+      return idb.telemetry_events
+        .get(lowerIdLimit)
+        .then(function(lastItem){
+            return idb.telemetry_events
+            .where('[sessionID+timestamp]')
+            .between([sessionID,lastItem.timestamp],[sessionID,Infinity],false,true) //exclude begining of range, include end of range
+            .limit(limit)
+            .toArray()
         })
-        .limit(limit)
-        .toArray()
+      
+
     }
 
-    var listNavData = function(offset, limit) {
-
-      return idb.navdata
-        .where('sessionID')
-        .equals(session)
-        .offset(offset)
-        .limit(limit)
-        .toArray()
-    }
-    var listMP4Data = function(offset, limit) {
-
-      return idb.mp4
-        .where('sessionID')
-        .equals(session)
-        .offset(offset)
-        .limit(limit)
-        .toArray()
-    }
-    var listTelemetryData = function(offset, limit) {
-
-      return idb.telemetry
-        .where('sessionID')
-        .equals(session)
-        .offset(offset)
-        .limit(limit)
-        .toArray()
-    }
-
-    var listOtherData = function(offset, limit) {
-      return idb.otherdata
-        .where('sessionID')
-        .equals(session)
-        .offset(offset)
-        .limit(limit)
-        .toArray()
-    }
     var heartbeatTimer = null;    
     var dbconn = null;
     var uniqueID = 100000000 * Math.random();
@@ -123,15 +96,6 @@
           return;
         }
         log_trace('Registered as running Sync process');
-        
-        heartbeatTimer = setInterval(function() {
-           dbconn.set('syncReservation',{uuid:uniqueID,lastUpdate:Date.now()})
-           .catch(function(err){
-             log_trace('Err in heartbeat interval, clearing timer.');
-             clearInterval(heartbeatTimer);
-             throw new Error(err);
-           })
-        }, 10 * 1000);
         return Promise.resolve(null)
           .then(lastTelemetryItem.bind(this, sessionID))
           .then(function(result) {
@@ -166,21 +130,36 @@
                   });
 
                   socket.on('close', function() {
-                    log_trace('sync socket.io closed');
+                    if (isSyncing){
+                      log_trace('sync socket.io closed');
+                      isSyncing=false;
+                      reject();
+                    }
                   });
                   socket.on('connect', function() {
                     //Note this triggers on reconnects as well.
                     if (isSyncing) return;
 
-                    socket.emit('save-telemetry', rov_session_meta);
-                    ifSyncing = true;
+                    dbconn.get('syncReservation')
+                    .then(function(result) {
+                        if (result.uuid !== uniqueID) {
+                          reject();
+                        } else {
+                          socket.emit('save-telemetry', rov_session_meta);
+                          isSyncing = true;
+                        }
+                    });
                   });
 
                   //From here we need to return a promise for the sync complete to keep the background process
                   //running
 
                   socket.on('send-data', function(last_id_acked, callback) {
-                    nextTelemetryItems(last_id_acked || rov_session_meta.firstid-1, 1)
+                    dbconn.set('syncReservation',{uuid:uniqueID,lastUpdate:Date.now()})
+                    .catch(function(err){
+                      throw new Error(err);
+                    })                    
+                    nextTelemetryItems(last_id_acked || rov_session_meta.firstid-1, 20)
                       .then(function(nextItemsToSync) {
                         //if done, syncPromise.resolve();
                         if (nextItemsToSync.length == 0) {
@@ -189,18 +168,17 @@
                         callback(nextItemsToSync);
                       })
                       .catch(function(err){
-                        reject(err);
+                        console.log(err);
+                        reject();
                       })
                   });
 
                 })
                 .then(function() {
                   self.registration.showNotification("Background sync complete for:" + sessionID);
-                  clearInterval(heartbeatTimer);
                 })
                 .catch(function() { 
                   self.registration.showNotification("Background sync errored for:" + sessionID);
-                  clearInterval(heartbeatTimer);
                   throw new Error(err);                  
                 });
             }
@@ -210,10 +188,10 @@
           })          
       })
       .then(function(){
-        clearInterval(heartbeatTimer);
+        isSyncing=false;
       })
       .catch(function(err){
-        clearInterval(heartbeatTimer);
+        isSyncing=false;
         throw new Error(err);
       })      
     )

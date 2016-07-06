@@ -1,6 +1,22 @@
 function defineBlackBoxDB(callback){
     //Instructions to upgrade: https://github.com/dfahlander/Dexie.js/wiki/Design
     var idb = new Dexie("openrov-blackbox2");
+
+    idb.version(10).stores({
+        telemetry_events: 'id++,timestamp,sessionID,event,[sessionID+timestamp],[sessionID+id]',
+        sessions: 'timestamp,sessionID',
+        otherdata: 'id++,timestamp,sessionID,event,[sessionID+id]'
+    });
+    idb.version(9).stores({
+        telemetry_events: 'id++,timestamp,sessionID,event,[sessionID+timestamp]',
+        sessions: 'timestamp,sessionID',
+        otherdata: 'id++,timestamp,sessionID,event,[sessionID+id]'
+    });
+    idb.version(8).stores({
+        telemetry_events: 'id++,timestamp,sessionID,event,[sessionID+timestamp]',
+        sessions: 'timestamp,sessionID',
+        otherdata: 'id++,timestamp,sessionID,event'
+    });
     idb.version(7).stores({
         telemetry_events: 'id++,timestamp,sessionID,event',
         sessions: 'timestamp,sessionID',

@@ -13,30 +13,23 @@
 
          var spawn = Dexie.spawn;
 
-         var listNavData = function (offset,limit){
-
-            return idb.navdata
-            .where('sessionID')
-            .equals(session)
-            .offset(offset)
-            .limit(limit)
-            .toArray()    
-         }
          var listMP4Data = function (offset,limit){
 
             return idb.mp4
             .where('sessionID')
             .equals(session)
             .offset(offset)
+            .filter(function(item){return item.event=='x-h264-video.data'})            
             .limit(limit)
             .toArray()    
          }
           var listTelemetryData = function (offset,limit){
 
-            return idb.telemetry
+            return idb.telemetry_events
             .where('sessionID')
             .equals(session)
             .offset(offset)
+            .filter(function(item){return item.event!=='x-h264-video.data'})            
             .limit(limit)
             .toArray()    
          }                 
@@ -92,9 +85,10 @@
              setTimeout(timedDataGenerator.bind(this,dataRefillFunction,callback,state),nextCheck);
          }
 
-         idb.mp4
+         idb.telemetry_events
             .where('sessionID')          
-            .equals(session)      
+            .equals(session)
+            .filter(function(item){return item.event=='x-h264-video.data'})     
             .first()
             .then(function(initFrame){
 
@@ -113,9 +107,6 @@
                     emitter.emit('CameraRegistration',{connectionType:'rov',location:'forward',videoMimeType:'video/mp4',relativeServiceUrl:'localhost'});
                 
                 }
-                timedDataGenerator(listNavData,function(item){
-                    emitter.emit('plugin.navigationData.data',item);
-                });
 
                 timedDataGenerator(listOtherData,function(item){
                     emitter.emit.apply(emitter,[item.event].concat(JSON.parse(item.data)));

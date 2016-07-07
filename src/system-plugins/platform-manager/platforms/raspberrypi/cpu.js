@@ -85,7 +85,7 @@ function GetCpuInfo()
 		var result = {};
 		
 		// Loop through each line in the output
-		data.toString().split('\n').forEach(function (line) 
+		data.stdout.toString().split('\n').forEach(function (line) 
 		{
 			// Remove tabs from line
 			line = line.replace( /\t/g, '' );

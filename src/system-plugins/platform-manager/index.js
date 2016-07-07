@@ -47,7 +47,7 @@ var PlatformManager = function( name, deps )
 
 function LoadPlatformName( platform )
 { 
-	if( process.env.PLATFORM != "" )
+	if( process.env.PLATFORM !== undefined )
 	{
 		// Allow shortcut
 		platform.name = process.env.PLATFORM;
@@ -78,7 +78,7 @@ function LoadCPUInterface( platform )
 { 
 	var CPUInterfaceLoader = require( "./platforms/" + platform.name + "/cpu.js" );
 	
-	return CPUInterfaceLoader.Compose( platform ).bind( CPUInterfaceLoader )
+	return CPUInterfaceLoader.Compose( platform )
 			.catch( function( err )
 			{
 				throw "Failed to load CPU interface: " + JSON.stringify( err );
@@ -93,7 +93,7 @@ function LoadBoardInterface( platform )
 { 
 	var BoardInterfaceLoader = require( "./platforms/" + platform.name + "/board.js" );
 	
-	return BoardInterfaceLoader.Compose( platform ).bind( BoardInterfaceLoader )
+	return BoardInterfaceLoader.Compose( platform )
 			.catch( function( err )
 			{
 				console.error( "Failed to load board interface: " + JSON.stringify( err ) );

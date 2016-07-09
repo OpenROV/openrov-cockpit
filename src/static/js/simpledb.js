@@ -122,11 +122,12 @@
       return new Promise(function(resolve, reject) {
         var tx = that._db.transaction(STORE, 'readwrite');
         var store = tx.objectStore(STORE);
-        var results = [];
+        var results = {};
         keys.forEach(function(key) {
-          store.get(key).onsuccess(function(result) {
-            results.push(result);
-          });
+          var request=store.get(key);
+          request.onsuccess=function(event) {
+            results[key]=request.result;
+          };
         });
         tx.oncomplete = function() { resolve(results); };
         tx.onabort = function() { reject(tx.error); };

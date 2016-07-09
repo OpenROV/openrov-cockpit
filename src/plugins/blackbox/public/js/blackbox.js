@@ -34,6 +34,7 @@
     this.sessionID = this.newSession();
     this.eventBuffer = [];
     this.otherBuffer = [];
+    this.sessions_cache = [];
   
   };
 
@@ -132,6 +133,10 @@
       self.syncSession(sessionID);
     });
 
+    this.cockpit.on('plugin-blackbox-delete-session', function(sessionID){
+      self.deleteSession(sessionID);
+    });    
+
     this.cockpit.on('plugin-blackbox-recording-stop', function(){
       self.stopRecording();
     });
@@ -150,6 +155,19 @@
         self.cockpit.emit('plugin-blackbox-sessions',sessions)
     });
 
+    setInterval(function(){
+        var sessions=self.sessions_cache;
+        //plugin-blackbox-sync-sessions
+        var session_ids = sessions.map(function(item){return item.sessionID})
+        simpleDB.open('sync')
+        .then(function(db){
+          return db.getMany(session_ids);
+        })                   
+        .then(function(syncSessions){
+          self.cockpit.emit('plugin-blackbox-sync-sessions',syncSessions);
+        })        
+    },15000)
+
   };
 
   var sessionIDRecorded = false;
@@ -160,7 +178,7 @@
   //TODO: Add sessions collection that each unique session is placed
   var _recordedSessions = function recordedSessions(idb,callback){
       idb.sessions.toArray(function(data){
-        for(var i=0;i<=data.length;i++){
+        for(var i=0;i<data.length;i++){
           if(data[i].sessionID==null){
             data[i].sessionID='';
           }
@@ -182,7 +200,11 @@
   };
 
   Blackbox.prototype.recordedSessions = function recordedSessions(callback){
-      _recordedSessions(this.idb,callback);
+    var self = this;
+      _recordedSessions(this.idb,function(data){
+        self.sessions_cache=data;
+        callback(data);
+      });
   }
 
   Blackbox.prototype.toggleRecording = function toggleRecording() {
@@ -315,6 +337,17 @@
     return defineBlackBoxDB(callback);
   }
 
+  Blackbox.prototype.deleteSession = function deleteSession(sessionID){
+    var self=this;
+    this.idb.telemetry_events.where("sessionID").equalsIgnoreCase(sessionID).delete()
+    .then(function(){
+      return self.idb.sessions.where("sessionID").equalsIgnoreCase(sessionID).delete()
+    })
+    .then(function(){
+       self.recordedSessions();
+    })
+  }  
+
   Blackbox.prototype.syncSession = function syncSession(sessionID){
     function log(msg) {
       console.log(msg);
@@ -342,7 +375,7 @@
     }).then(function(reg) {
       return simpleDB.open('sync')
       .then(function(db){
-        db.set(sessionID,localStorage.getItem('id_token'));
+        db.set(sessionID,{id_token:localStorage.getItem('id_token')});
         reg.sync.register('syncTest:'+tendig_random()+sessionID);
       })       
     }).then(function() {

@@ -2,18 +2,21 @@
 <link rel="import" href="../paper-card/paper-card.html">
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../orov-behaviors/orov-behavior.html">
+<link rel="import" href="../paper-progress/paper-progress.html">
 <dom-module name="orov-blackbox-downloader">
   <style>
   </style>
   <template>
-    <template is="dom-repeat" items="{{sessions}}">
+    <template id="cards" is="dom-repeat" items="{{compositSessions}}">
       <paper-card heading="{{item.sessionID}}">
         <div class="card-content">
           Time details go here.  We can also grab a preview image.
+          <paper-progress value="{{item.syncStatus.percentComplete}}"></paper-progress><span>{{item.syncStatus.percentComplete}}% {{__('synced to cloud backup.')}}</span>
         </div>
         <div class="card-actions">
           <paper-button on-click='replay'>{{__('Replay Dive')}}</paper-button>
-          <paper-button on-click='sync'>{{__('Sync')}}</paper-button>          
+          <paper-button on-click='sync'>{{__('Sync')}}</paper-button>
+          <paper-button on-click='delete'>{{__('Delete')}}</paper-button>
           <paper-button on-click='export_json'>{{__('Export JSON')}}</paper-button>
           <paper-button on-click='export_xml'>{{__('Export XML')}}</paper-button>
           <paper-button on-click='export_csv'>{{__('Export CSV')}}</paper-button>
@@ -32,15 +35,61 @@
         properties: {
           format: {type: String, value: 'csv'},
           sessions: {type: Array},
-          session: {type: String}
+          syncsessions: {type: Object},
+          session: {type: String},
+          compositSessions: {type: Array, value:function(){return []}}
         },
         behaviors: [namespace('behaviors').oROVStandard],
         registerEmitterHanlders: function(emitter){
           var self=this;
+
+          function mixSessions(){
+            var na=self.sessions.map(function(item){
+              if (self.syncsessions){
+                item.syncStatus=self.syncsessions[item.sessionID];
+              }
+              
+              if (item.syncStatus!==undefined){
+                if (item.syncStatus.status=='complete'){
+                  item.syncStatus.percentComplete=100;
+                } else if (item.syncStatus.status=='syncing'){
+                  item.syncStatus.percentComplete=(item.syncStatus.lastIDSynced-item.syncStatus.firstID)/(item.syncStatus.lastID - item.syncStatus.firstID)*100;
+                } else {
+                  item.syncStatus.percentComplete = 0; //TODO: Do I need to calculate this?
+                }
+              } else {
+              //  item.syncStatus={percentComplete: 0};
+              }
+              return item;
+            })
+
+            //TODO: File bug, check for update - Using mutation aware functions should work without having to call
+            //render. 
+            self.splice.apply(self,['compositSessions',0, self.compositSessions.length]);
+            self.$.cards.render();
+            self.splice.apply(self,['compositSessions',0,0].concat(na));
+      //      self.cards.render();
+     //       while(self.compositSessions.length>0){
+      //        self.shift('compositSessions');
+      //      }
+      //      na.forEach(function(item){
+       //       self.push('compositSessions',item);
+       //     })
+            
+  
+         }
+
           emitter.withHistory.on('plugin-blackbox-sessions',function(sessions){
             self.sessions = sessions;
             self.session = sessions.length>0?sessions[sessions.length-1].sessionID:'';
+            mixSessions();
           });
+
+          emitter.withHistory.on('plugin-blackbox-sync-sessions',function(syncsessions){
+            self.syncsessions = syncsessions;
+            mixSessions();
+          });
+
         },
         start: function(){
           if(this.eventEmitter !== undefined){
@@ -66,7 +115,15 @@
            if(this.eventEmitter !== undefined){
              this.eventEmitter.emit('plugin-blackbox-sync-session',e.model.item.sessionID);
            }                    
-        },      
+        },  
+        delete: function(e){
+           var model = e.model;
+           if(this.eventEmitter !== undefined){
+             if(confirm("Pressing OK will permanetly delete the selected dive data from your computer/device.")){
+              this.eventEmitter.emit('plugin-blackbox-delete-session',e.model.item.sessionID);
+             }
+           }                    
+        },             
         export_csv: function(e){
           var model = e.model;
           var options = {collection: '*', format: 'csv', sessionID: e.model.item.sessionID};

@@ -49,13 +49,13 @@
         //   return x.id > lowerIdLimit
         // })
 
-
       return idb.telemetry_events
         .get(lowerIdLimit)
         .then(function(lastItem){
+            var lowerbounds = lastItem!==undefined?lastItem.timestamp:0;
             return idb.telemetry_events
             .where('[sessionID+timestamp]')
-            .between([sessionID,lastItem.timestamp],[sessionID,Infinity],false,true) //exclude begining of range, include end of range
+            .between([sessionID,lowerbounds],[sessionID,Infinity],false,true) //exclude begining of range, include end of range
             .limit(limit)
             .toArray()
         })
@@ -112,12 +112,12 @@
                 return db.get(sessionID);
               })
           })
-          .then(function(id_token) {
+          .then(function(sessionDetails) {
               return new Promise(function(resolve, reject) {
                   var socket = io('http://localhost:3000', {
                     path: '/dataapi_10',
                     'multiplex': false,
-                    query: 'token=' + id_token,
+                    query: 'token=' + sessionDetails.id_token,
                     transports: ['websocket']
                   });
 
@@ -126,7 +126,7 @@
                       // redirect user to login page perhaps?
                       log("User's token has expired");
                     }
-                    reject(error);
+                    reject(error.message);
                   });
 
                   socket.on('close', function() {
@@ -158,7 +158,18 @@
                     dbconn.set('syncReservation',{uuid:uniqueID,lastUpdate:Date.now()})
                     .catch(function(err){
                       throw new Error(err);
-                    })                    
+                    })
+
+                    dbconn.get(sessionID)
+                    .then(function(sessionState){
+                      sessionState.lastIDSynced=last_id_acked;
+                      sessionState.lastID=rov_session_meta.lastid;
+                      sessionState.firstID=rov_session_meta.firstid;
+                      sessionState.status='syncing';
+                      dbconn.set(sessionID,sessionState);
+                    }) 
+
+
                     nextTelemetryItems(last_id_acked || rov_session_meta.firstid-1, 20)
                       .then(function(nextItemsToSync) {
                         //if done, syncPromise.resolve();
@@ -169,17 +180,27 @@
                       })
                       .catch(function(err){
                         console.log(err);
-                        reject();
+                        reject(err.toString());
                       })
                   });
 
                 })
                 .then(function() {
+                  var db = null;
                   self.registration.showNotification("Background sync complete for:" + sessionID);
+                  return simpleDB.open('sync')
+                  .then(function(dbconn){
+                    db=dbconn;
+                    return db.get(sessionID);
+                  })                   
+                  .then(function(sessionState){
+                    sessionState.status="complete"
+                    db.set(sessionID,sessionState);
+                  })   
                 })
-                .catch(function() { 
+                .catch(function(err) { 
                   self.registration.showNotification("Background sync errored for:" + sessionID);
-                  throw new Error(err);                  
+                  throw err;                  
                 });
             }
           )

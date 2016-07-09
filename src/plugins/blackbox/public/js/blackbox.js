@@ -164,7 +164,9 @@
           return db.getMany(session_ids);
         })                   
         .then(function(syncSessions){
-          self.cockpit.emit('plugin-blackbox-sync-sessions',syncSessions);
+          if(Object.keys(syncSessions).length > 0){
+            self.cockpit.emit('plugin-blackbox-sync-sessions',syncSessions);
+          }
         })        
     },15000)
 
@@ -176,34 +178,88 @@
   }
 
   //TODO: Add sessions collection that each unique session is placed
-  var _recordedSessions = function recordedSessions(idb,callback){
+  var _recordedSessions = function _recordedSessions(idb,callback){
       idb.sessions.toArray(function(data){
-        for(var i=0;i<data.length;i++){
-          if(data[i].sessionID==null){
-            data[i].sessionID='';
-          }
-          idb.telemetry_events.where("sessionID").equalsIgnoreCase(data[i].sessionID).filter(function(item){return item.event=="x-h264-video.data"}).toArray(function(j,dump){
-            var sizeofData = 0
-            var arrayOfData = dump.map(function(item){
-              var converted = new Uint8Array(item.data);
-              sizeofData+=converted.length;
-              return converted;
-            });
-            var segments = Math.ceil(sizeofData/maxVideoSegmentSize);
-            data[j].VideoSegments = new Array(segments);
-            if (j==data.length-1){
-              callback(data);
-            }
-          }.bind(this,i));
-        }
+        callback(data);
       });
   };
 
+  //Assume recording sessions end with browsers closing, when returning the sessions, check if there is cleanup work that needs to be performed
+  //since the recording is complete.
   Blackbox.prototype.recordedSessions = function recordedSessions(callback){
     var self = this;
       _recordedSessions(this.idb,function(data){
-        self.sessions_cache=data;
-        callback(data);
+        var sessionsTofix = [];
+        data.forEach(function(session){
+          if (self.sessionID==session.sessionID){
+            return;
+          }
+            var fixes = [];
+
+            //fix for data from before sessions
+            if(session.sessionID==null){
+              session.sessionID='';
+            }
+
+            if (session.duration==undefined){
+              fixes.push(
+                  firstTelemetryItem(self.idb,session.sessionID)
+                  .then(function(firstItem){
+                    return lastTelemetryItem(self.idb,session.sessionID)
+                      .then(function(lastItem){
+                        session.duration=lastItem.timestamp-firstItem.timestamp;
+                        return;
+                      })
+                  })
+              )
+            }
+
+            if (session.VideoSegments==undefined){
+              fixes.push(new Promise(function(resolve,reject){
+                self.idb.telemetry_events.where("sessionID").equalsIgnoreCase(session.sessionID).filter(function(item){return item.event=="x-h264-video.data"}).toArray(function(dump){
+                  var sizeofData = 0
+                  var arrayOfData = dump.map(function(item){
+                    var converted = new Uint8Array(item.data);
+                    sizeofData+=converted.length;
+                    return converted;
+                  });
+                  var segments = Math.ceil(sizeofData/maxVideoSegmentSize);
+                  session.VideoSegments = new Array(segments);
+                  session.videoSize = sizeofData;
+                  resolve();
+                })
+              }))            
+            }
+
+            if (fixes.length>0){
+                var result = Promise.resolve();
+                fixes.forEach(task => {
+                    result = result.then(function(){return task});
+                })
+                result.then(function(){
+                  self.idb.sessions.put(session);
+                })
+                sessionsTofix.push(result);               
+            }
+
+        });
+        
+        if(sessionsTofix.length>0){
+            var result = Promise.resolve();
+            sessionsTofix.forEach(task => {
+                result = result.then(function(){return task});
+            })
+            result.then(function(){
+              console.log('Cleaned up data session information');
+              self.sessions_cache=data;
+              callback(data);              
+            })
+        } else {
+          self.sessions_cache=data;
+          callback(data);
+        }
+
+
       });
   }
 

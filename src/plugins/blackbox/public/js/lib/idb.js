@@ -107,3 +107,17 @@ function defineBlackBoxDB(callback){
     }
     return idb;
   }
+
+  function lastTelemetryItem(idb,sessionID) {
+    return idb.telemetry_events
+      .where('sessionID')
+      .equals(sessionID)
+      .last()
+  }
+
+  function firstTelemetryItem(idb,sessionID) {
+    return idb.telemetry_events
+      .where('sessionID')
+      .equals(sessionID)
+      .first()
+    }

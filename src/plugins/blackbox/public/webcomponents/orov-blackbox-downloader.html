@@ -8,8 +8,10 @@
   </style>
   <template>
     <template id="cards" is="dom-repeat" items="{{compositSessions}}">
-      <paper-card heading="{{item.sessionID}}">
+      <paper-card heading="{{toDate(item.timestamp)}}">
         <div class="card-content">
+          <div><span>{{__('Session ID')}}: </span><span>{{item.sessionID}}</span></div>
+          <div><span>{{__('Duration')}}: </span><span>{{millisecondsToStr(item.duration)}}</span></div>
           Time details go here.  We can also grab a preview image.
           <paper-progress value="{{item.syncStatus.percentComplete}}"></paper-progress><span>{{item.syncStatus.percentComplete}}% {{__('synced to cloud backup.')}}</span>
         </div>
@@ -144,9 +146,32 @@
           if(this.eventEmitter !== undefined){
             this.eventEmitter.emit('plugin-blackbox-export',options);
           }
-        }
+        },
+        toDate: function(timestamp){
+          return new Date(timestamp);
+        },
+        millisecondsToStr: function(milliseconds){
+          var __ = this.__;
+          var seconds=milliseconds/1000;
+          var levels = [
+              [Math.floor(seconds / 31536000), __('years'), __('year')],
+              [Math.floor((seconds % 31536000) / 86400), __('days'),__('day')],
+              [Math.floor(((seconds % 31536000) % 86400) / 3600), __('hours'),__('hour') ],
+              [Math.floor((((seconds % 31536000) % 86400) % 3600) / 60), __('minutes'),__('minute')],
+              [(((seconds % 31536000) % 86400) % 3600) % 60, __('seconds'),__('second')],
+          ];
+          var returntext = '';
+
+          for (var i = 0, max = levels.length; i < max; i++) {
+              if ( levels[i][0] === 0 ) continue;
+              returntext += ' ' + levels[i][0] + ' ' + (levels[i][0] === 1 ? levels[i][2]: levels[i][1]);
+          };
+          return returntext.trim();          
+        }     
 
       })
+
+ 
     })();
   </script>
 

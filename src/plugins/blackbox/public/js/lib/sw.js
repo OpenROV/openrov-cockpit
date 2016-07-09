@@ -26,22 +26,6 @@
       length: null
     };
 
-    function lastTelemetryItem(sessionID) {
-      return idb.telemetry_events
-        .where('sessionID')
-        .equals(sessionID)
-        .last()
-        //      .toArray();
-    }
-
-    function firstTelemetryItem(sessionID) {
-      return idb.telemetry_events
-        .where('sessionID')
-        .equals(sessionID)
-        .first()
-        //     .toArray();
-    }
-
     function nextTelemetryItems(lowerIdLimit, limit) {
 
         // .equals(sessionID)
@@ -97,11 +81,11 @@
         }
         log_trace('Registered as running Sync process');
         return Promise.resolve(null)
-          .then(lastTelemetryItem.bind(this, sessionID))
+          .then(lastTelemetryItem.bind(this, idb,sessionID))
           .then(function(result) {
             rov_session_meta.lastid = result.id;
           })
-          .then(firstTelemetryItem.bind(this, sessionID))
+          .then(firstTelemetryItem.bind(this, idb,sessionID))
           .then(function(result) {
             rov_session_meta.firstid = result.id;
             rov_session_meta.length = rov_session_meta.lastid - rov_session_meta.firstid + 1;

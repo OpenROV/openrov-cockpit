@@ -5,14 +5,50 @@
 <link rel="import" href="../paper-progress/paper-progress.html">
 <dom-module name="orov-blackbox-downloader">
   <style>
+.demo-snippet-0 {
+  display: block;box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+                  0 1px 5px 0 rgba(0, 0, 0, 0.12),
+                  0 3px 1px -2px rgba(0, 0, 0, 0.2);;
+}
+
+.demo-snippet-0 .demo.demo-snippet {
+  border-bottom: 1px solid #e0e0e0;
+        background-color: white;
+        margin: 0;
+        padding: 20px;background: #eeeeee;
+        padding: 8px;
+}
+
+.demo-snippet-0 .code.demo-snippet {
+  padding: 20px;
+        margin: 0;
+        background-color: #f5f5f5;
+        font-size: 13px;
+        overflow: auto;max-height: 300px;
+}
+
+.demo-snippet-0 .code.demo-snippet > pre.demo-snippet {
+  margin: 0;
+        padding: 0 0 10px 0;
+}
+
+.demo-snippet-0 .code-container.demo-snippet {
+  position: relative;
+}
+
+.demo-snippet-0 paper-icon-button.demo-snippet {
+  position: absolute;
+        top: 0;
+        right: 0px;
+}    
   </style>
   <template>
     <template id="cards" is="dom-repeat" items="{{compositSessions}}">
-      <paper-card heading="{{toDate(item.timestamp)}}">
+      <paper-card class="demo-snippet-0 demo.demo-snippet" heading="{{toDate(item.timestamp)}}">
         <div class="card-content">
           <div><span>{{__('Session ID')}}: </span><span>{{item.sessionID}}</span></div>
           <div><span>{{__('Duration')}}: </span><span>{{millisecondsToStr(item.duration)}}</span></div>
-          Time details go here.  We can also grab a preview image.
+          <br>
           <paper-progress value="{{item.syncStatus.percentComplete}}"></paper-progress><span>{{item.syncStatus.percentComplete}}% {{__('synced to cloud backup.')}}</span>
         </div>
         <div class="card-actions">

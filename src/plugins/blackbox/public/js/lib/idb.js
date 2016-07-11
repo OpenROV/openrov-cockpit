@@ -1,21 +1,24 @@
 function defineBlackBoxDB(callback){
     //Instructions to upgrade: https://github.com/dfahlander/Dexie.js/wiki/Design
     var idb = new Dexie("openrov-blackbox2");
+    idb.on('error', function (err) {
+        // Catch all uncatched DB-related errors and exceptions
+        console.error(err.message);
+        console.dir(err);
+    });
+    idb.on('ready', function () {
+      if(typeof(callback)=='function'){
+        callback(idb);
+      }
+    });     
 
-    idb.version(10).stores({
-        telemetry_events: 'id++,timestamp,sessionID,event,[sessionID+timestamp],[sessionID+id]',
-        sessions: 'timestamp,sessionID',
-        otherdata: 'id++,timestamp,sessionID,event,[sessionID+id]'
-    });
-    idb.version(9).stores({
-        telemetry_events: 'id++,timestamp,sessionID,event,[sessionID+timestamp]',
-        sessions: 'timestamp,sessionID',
-        otherdata: 'id++,timestamp,sessionID,event,[sessionID+id]'
-    });
     idb.version(8).stores({
         telemetry_events: 'id++,timestamp,sessionID,event,[sessionID+timestamp]',
         sessions: 'timestamp,sessionID',
-        otherdata: 'id++,timestamp,sessionID,event'
+        otherdata: 'id++,timestamp,sessionID,event,[sessionID+timestamp]'
+    })
+    .upgrade(function(){
+      console.log("updating to 8");
     });
     idb.version(7).stores({
         telemetry_events: 'id++,timestamp,sessionID,event',
@@ -102,9 +105,7 @@ function defineBlackBoxDB(callback){
         cursor.update(data);
       });
     });
-    if(typeof(callback)=='function'){
-      callback(idb);
-    }
+
     return idb;
   }
 

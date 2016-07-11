@@ -15,7 +15,7 @@
 
          var listMP4Data = function (offset,limit){
 
-            return idb.mp4
+            return idb.telemetry_events
             .where('sessionID')
             .equals(session)
             .offset(offset)
@@ -23,6 +23,21 @@
             .limit(limit)
             .toArray()    
          }
+
+         var listMP4Data = function (lowerIdLimit,limit){
+            return idb.telemetry_events
+            .get(lowerIdLimit)
+            .then(function(lastItem){
+                var lowerbounds = lastItem!==undefined?lastItem.timestamp:0;
+                return idb.telemetry_events
+                .where('[sessionID+timestamp]')
+                .between([session,lowerbounds],[session,Infinity],false,true) //exclude begining of range, include end of range
+                .filter(function(item){return item.event=='x-h264-video.data'})      
+                .limit(limit)
+                .toArray()
+            });             
+         }
+
           var listTelemetryData = function (offset,limit){
 
             return idb.telemetry_events
@@ -32,7 +47,21 @@
             .filter(function(item){return item.event!=='x-h264-video.data'})            
             .limit(limit)
             .toArray()    
-         }                 
+         }        
+
+         var listTelemetryData = function (lowerIdLimit,limit){
+            return idb.telemetry_events
+            .get(lowerIdLimit)
+            .then(function(lastItem){
+                var lowerbounds = lastItem!==undefined?lastItem.timestamp:0;
+                return idb.telemetry_events
+                .where('[sessionID+timestamp]')
+                .between([session,lowerbounds],[session,Infinity],false,true) //exclude begining of range, include end of range
+                .filter(function(item){return item.event!=='x-h264-video.data'})      
+                .limit(limit)
+                .toArray()
+            });             
+         }                  
 
           var listOtherData = function (offset,limit){
 
@@ -43,6 +72,20 @@
             .limit(limit)
             .toArray()    
          }
+
+         var listOtherData = function (lowerIdLimit,limit){
+            return idb.otherdata
+            .get(lowerIdLimit)
+            .then(function(lastItem){
+                var lowerbounds = lastItem!==undefined?lastItem.timestamp:0;
+                return idb.otherdata
+                .where('[sessionID+timestamp]')
+                .between([session,lowerbounds],[session,Infinity],false,true) //exclude begining of range, include end of range  
+                .limit(limit)
+                .toArray()
+            });             
+         }     
+
          var timedDataGenerator = function(dataRefillFunction,callback,state){
              if (state==null){
                  state = {buffer:[],dataoffset:0,timeoffset:null,loadingdata:false};
@@ -63,7 +106,7 @@
                  dataRefillFunction(state.dataoffset,limit)
                  .then(function(newdata){
                     state.buffer=state.buffer.concat(newdata);
-                    state.dataoffset+=limit;
+                    state.dataoffset=newdata[newdata.length-1].id;
                     state.loadingdata=false;  
                     if (state.buffer.length==0){
                         return false; //end generator, no more data
@@ -113,7 +156,7 @@
                 });
 
                 timedDataGenerator(listTelemetryData,function(item){
-                    emitter.emit('status',item);
+                    emitter.emit.apply(emitter,[item.event].concat([item.data]));
                 });   
    
                               

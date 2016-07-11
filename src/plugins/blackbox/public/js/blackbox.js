@@ -1,7 +1,8 @@
 (function (window, document, jQuery) {
   'use strict';
   var plugins = namespace('plugins');
-  const maxVideoSegmentSize = 200000000;
+//  const maxVideoSegmentSize = 200000000;
+  const maxVideoSegmentSize = 5000000;
 
   //jQuery.getScript('/components/dexie/dist/latest/Dexie.js');
 
@@ -221,10 +222,26 @@
                   var arrayOfData = dump.map(function(item){
                     var converted = new Uint8Array(item.data);
                     sizeofData+=converted.length;
-                    return converted;
+                    return {length:converted.length,id:item.id,timestamp:item.timestamp};
                   });
-                  var segments = Math.ceil(sizeofData/maxVideoSegmentSize);
-                  session.VideoSegments = new Array(segments);
+                  var VideoSegments=[];
+                  var initFrame=arrayOfData.shift();
+                  var segmentsize = initFrame.length;
+                  var framecount = 0;
+                  var startFrame=arrayOfData[0];
+
+                  while(arrayOfData.length>0){
+                    var item = arrayOfData.shift();
+                    segmentsize+=item.length;
+                    if ((arrayOfData.length==0)||(segmentsize+arrayOfData[0].length>maxVideoSegmentSize)){
+                      VideoSegments.push({start_id:startFrame.id,stop_id:item.id,length:segmentsize,frames:framecount,start_time:startFrame.timestamp,stop_time:item.timestamp})
+                      segmentsize = initFrame.length;
+                      startFrame=arrayOfData[0];
+                      framecount = 0;
+                    }
+                  };
+
+                  session.VideoSegments = VideoSegments;
                   session.videoSize = sizeofData;
                   resolve();
                 })
@@ -370,10 +387,12 @@
     if (!this.recording) {
       return;
     }
-    data.timestamp = Date.now();
-    data.sessionID= this.sessionID;
-    data.event=event;
-    this.eventBuffer.push(data);
+    var eventData = {
+      timestamp : Date.now(),
+      sessionID :this.sessionID,
+      event:event,
+      data:data}
+    this.eventBuffer.push(eventData);
 
   };
 
@@ -400,7 +419,9 @@
       return self.idb.sessions.where("sessionID").equalsIgnoreCase(sessionID).delete()
     })
     .then(function(){
-       self.recordedSessions();
+       self.recordedSessions(function(sessions){
+        self.cockpit.emit('plugin-blackbox-sessions',sessions)
+       });
     })
   }  
 
@@ -520,7 +541,7 @@
   //TODO: Track this issue preventing easy download of large amounts of data.
   //https://bugs.chromium.org/p/chromium/issues/detail?id=375297
   Blackbox.prototype._exportVideo = function _exportVideo(options,callback){
-
+    var self=this;
     var fakeClick = function fakeClick(anchorObj) {
       if (anchorObj.click) {
         anchorObj.click();
@@ -549,8 +570,55 @@
       fakeClick(link);
     };
 
+    var initFrame;
+    var session_record;
+    this.idb.telemetry_events
+            .where('sessionID')
+            .equals(options.sessionID)
+            .filter(function(item){return item.event=='x-h264-video.data'})
+            .first()
+    .then(function(init_frame){
+      initFrame=init_frame;
+      return self.idb.sessions.where("sessionID").equals(options.sessionID).first()
+    })
+    .then(function(session){
+      session_record=session;  
+      var sort=0;       
+      return self.idb.telemetry_events
+            .where('id')
+            .between(session.VideoSegments[options.segment-1].start_id,session.VideoSegments[options.segment-1].stop_id,true,true)
+            .filter(function(item){
+              if (sort>item.id){
+                console.log("OUT OF ORDER MP4 FRAMES")
+              }
+              sort=item.id;
+              return ((item.event=='x-h264-video.data') && (item.sessionID==session.sessionID))
+            })            
+            .toArray()  
+    }).then(function(result){
+       result.unshift(initFrame);
+       var segmentSize=session_record.VideoSegments[options.segment-1].length;
+       var videoSegmenent = new Uint8Array(segmentSize);
+       var tail=0;
+       result.forEach(function(item){
+         var uint8data=new Uint8Array(item.data);
+         if ((uint8data.byteLength + tail) >= segmentSize){
+           console.log('cannot get here');
+           //assert.false('woops');
 
-    this.idb[options.collection].where("sessionID").equalsIgnoreCase(options.sessionID).filter(function(item){return item.event=='x-h264-video.data'}).toArray(function(name,dump){
+         }
+         videoSegmenent.set(uint8data,tail);
+         tail+=uint8data.byteLength;
+       });
+
+       downloadInBrowser(videoSegmenent,'mp4-'+options.sessionID+'-'+options.segment+'.'+'mp4');
+    })
+    .catch(function(err){
+      throw err;
+    })
+
+
+/*    this.idb[options.collection].where("sessionID").equalsIgnoreCase(options.sessionID).filter(function(item){return item.event=='x-h264-video.data'}).toArray(function(name,dump){
         var sizeofData = 0
         var arrayOfData = dump.map(function(item){
           var converted = new Uint8Array(item.data);
@@ -573,7 +641,7 @@
 
         downloadInBrowser(result.subarray(0,tail),name+'-'+options.sessionID+'-'+options.segment+'.'+'mp4');
       }.bind(null,options.collection));
-
+*/
   };
 
 

@@ -9,7 +9,6 @@
   });
 
   self.addEventListener('sync', function(event) {
-
     var log = function(str){
       console.log(str);
     }
@@ -18,7 +17,7 @@
     }
     var isSyncing = false;
     var idb = defineBlackBoxDB();
-    var sessionID = event.tag.substring('syncTest:XXXXXXXXX:'.length);
+    var sessionID = event.tag.substring('sync-session:XXXXXXXXXX:'.length);
 
     var rov_session_meta = {
       sessionID: sessionID,
@@ -47,7 +46,7 @@
 
     }
 
-    var heartbeatTimer = null;    
+   //var heartbeatTimer = null;    
     var dbconn = null;
     var uniqueID = 100000000 * Math.random();
     event.waitUntil(
@@ -144,6 +143,9 @@
                       throw new Error(err);
                     })
 
+                    //TODO: Investigate having the client open up a socket.io conenction
+                    //to the sync server to check for realtime sync updates instead
+                    //of using the sync table.
                     dbconn.get(sessionID)
                     .then(function(sessionState){
                       sessionState.lastIDSynced=last_id_acked;
@@ -154,6 +156,7 @@
                     }) 
 
 
+                    
                     nextTelemetryItems(last_id_acked || rov_session_meta.firstid-1, 20)
                       .then(function(nextItemsToSync) {
                         //if done, syncPromise.resolve();

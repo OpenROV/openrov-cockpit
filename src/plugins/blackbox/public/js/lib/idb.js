@@ -48,16 +48,30 @@ function defineBlackBoxDB(callback){
       trans.navdata.each(function(data,cursor){
         cursor.delete(data);
         delete data.id;
-        data.event='plugin.navigationData.data'
-        trans.db.telemetry_events.add(data);
+
+        var new_record = {
+          timestamp : data.timestamp,
+          sessionID : data.sessionID,
+          event:'plugin.navigationData.data',
+          data:data      
+        }
+        
+        trans.db.telemetry_events.add(new_record);
       });
       //intentionally not handling gps data since it has
       //not been rolled out yet.
       trans.telemetry.each(function(data,cursor){
         cursor.delete(data);
         delete data.id;
-        data.event='status'
-        trans.db.telemetry_events.add(data);
+
+        var new_record = {
+          timestamp : data.timestamp,
+          sessionID : data.sessionID,
+          event:'status',
+          data:data      
+        }
+        
+        trans.db.telemetry_events.add(new_record);
 
       });      
 

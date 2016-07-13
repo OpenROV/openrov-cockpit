@@ -1,8 +1,7 @@
 (function (window, document, jQuery) {
   'use strict';
   var plugins = namespace('plugins');
-//  const maxVideoSegmentSize = 200000000;
-  const maxVideoSegmentSize = 5000000;
+  const maxVideoSegmentSize = 200000000;
 
   //jQuery.getScript('/components/dexie/dist/latest/Dexie.js');
 
@@ -453,7 +452,7 @@
       return simpleDB.open('sync')
       .then(function(db){
         db.set(sessionID,{id_token:localStorage.getItem('id_token')});
-        reg.sync.register('syncTest:'+tendig_random()+sessionID);
+        reg.sync.register('sync-session:'+tendig_random()+':'+sessionID);
       })       
     }).then(function() {
       log('Sync registered');

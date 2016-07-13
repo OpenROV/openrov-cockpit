@@ -49,11 +49,23 @@
           <div><span>{{__('Session ID')}}: </span><span>{{item.sessionID}}</span></div>
           <div><span>{{__('Duration')}}: </span><span>{{millisecondsToStr(item.duration)}}</span></div>
           <br>
-          <paper-progress value="{{item.syncStatus.percentComplete}}"></paper-progress><span>{{item.syncStatus.percentComplete}}% {{__('synced to cloud backup.')}}</span>
+          <div hidden$="{{!isEqual(item.syncStatus.status,'syncing')}}">
+            <paper-progress value="{{item.syncStatus.percentComplete}}"></paper-progress><span>{{item.syncStatus.percentComplete}}% {{__('synced to cloud backup.')}}</span>
+          </div>
+          <div hidden$="{{!isEqual(item.syncStatus.status,'complete')}}">
+            <paper-progress value="{{item.syncStatus.percentComplete}}"></paper-progress><span>{{item.syncStatus.percentComplete}}% {{__('synced to cloud backup.')}}</span>
+          </div>
+          <div hidden$="{{!isEqual(item.syncStatus.status,'new')}}">
+            <span>{{__('Syncing your data to the cloud will provide a backup and make it easy to share.  You can then safely delete the data from your local device to make room for future recordings.  The sync button will be disabled if you are not logged in.')}}</span>
+          </div>
+          <div hidden$="{{!isEqual(item.syncStatus.status,'fetching')}}">
+            <span>{{__('Updating sync status...')}}</span>
+          </div>          
+
         </div>
         <div class="card-actions">
           <paper-button on-click='replay'>{{__('Replay Dive')}}</paper-button>
-          <paper-button on-click='sync'>{{__('Sync')}}</paper-button>
+          <paper-button on-click='sync' disabled="{{!canSync}}">{{__('Sync')}}</paper-button>
           <paper-button on-click='delete'>{{__('Delete')}}</paper-button>
           <paper-button on-click='export_json'>{{__('Export JSON')}}</paper-button>
           <paper-button on-click='export_xml'>{{__('Export XML')}}</paper-button>
@@ -75,9 +87,13 @@
           sessions: {type: Array},
           syncsessions: {type: Object},
           session: {type: String},
-          compositSessions: {type: Array, value:function(){return []}}
+          compositSessions: {type: Array, value:function(){return []}},
+          canSync: {type:Boolean, value:false}
         },
         behaviors: [namespace('behaviors').oROVStandard],
+        ready: function(){
+          this.loggedin=false;
+        },
         registerEmitterHanlders: function(emitter){
           var self=this;
 
@@ -85,6 +101,8 @@
             var na=self.sessions.map(function(item){
               if (self.syncsessions){
                 item.syncStatus=self.syncsessions[item.sessionID];
+              } else {
+                item.syncStatus={status:'fetching'};
               }
               
               if (item.syncStatus!==undefined){
@@ -96,7 +114,7 @@
                   item.syncStatus.percentComplete = 0; //TODO: Do I need to calculate this?
                 }
               } else {
-              //  item.syncStatus={percentComplete: 0};
+                item.syncStatus={status:'new'};
               }
               return item;
             })
@@ -128,6 +146,11 @@
             mixSessions();
           });
 
+          emitter.withHistory.on('cloudprofile-status',function(status){
+            self.loggedin=status.loggedIn;
+            self.set('canSync',status.loggedIn);
+          });
+
         },
         start: function(){
           if(this.eventEmitter !== undefined){
@@ -157,7 +180,7 @@
         delete: function(e){
            var model = e.model;
            if(this.eventEmitter !== undefined){
-             if(confirm("Pressing OK will permanetly delete the selected dive data from your computer/device.")){
+             if(confirm(__("Pressing OK will permanetly delete the selected dive data from your computer/device."))){
               this.eventEmitter.emit('plugin-blackbox-delete-session',e.model.item.sessionID);
              }
            }                    
@@ -194,7 +217,7 @@
               [Math.floor((seconds % 31536000) / 86400), __('days'),__('day')],
               [Math.floor(((seconds % 31536000) % 86400) / 3600), __('hours'),__('hour') ],
               [Math.floor((((seconds % 31536000) % 86400) % 3600) / 60), __('minutes'),__('minute')],
-              [(((seconds % 31536000) % 86400) % 3600) % 60, __('seconds'),__('second')],
+              [Math.round((((seconds % 31536000) % 86400) % 3600) % 60), __('seconds'),__('second')],
           ];
           var returntext = '';
 
@@ -203,6 +226,12 @@
               returntext += ' ' + levels[i][0] + ' ' + (levels[i][0] === 1 ? levels[i][2]: levels[i][1]);
           };
           return returntext.trim();          
+        },
+        isEqual: function(strA,strB){
+          return strA==strB;
+        },
+        isUndefined: function(item){
+          return item==undefined;
         }     
 
       })

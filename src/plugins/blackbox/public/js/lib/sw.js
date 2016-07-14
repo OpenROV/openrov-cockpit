@@ -66,7 +66,10 @@
             }
           })
           .catch(function(err) {
-            throw new Error(err);
+            if (!err instanceof Error){
+              err = new Error(err);
+            }
+            throw err;
           })
       })
       .then(function() {
@@ -94,14 +97,29 @@
               .then(function(db) {
                 return db.get(sessionID);
               })
+              .catch(function(err){
+                if (!err instanceof Error){
+                  err = new Error(err);
+                }
+                throw err;
+              })
           })
           .then(function(sessionDetails) {
               return new Promise(function(resolve, reject) {
-                  var socket = io('http://localhost:3000', {
+                  var profile =JSON.parse(sessionDetails.profile);
+                  if ((profile.dataOpenROVcom==undefined) 
+                      ||(profile.dataOpenROVcom.service_url==undefined)){
+                        resolve(new Error('Account settings missing the service_url'));
+                      }
+                  var socket = io(JSON.parse(sessionDetails.profile).dataOpenROVcom.service_url, {
                     path: '/dataapi_10',
                     'multiplex': false,
                     query: 'token=' + sessionDetails.id_token,
-                    transports: ['websocket']
+                    transports: ['websocket'],
+                    reconnection:false,
+                    timeout:30000,
+                    "force new connection": true,
+                    "connect timeout" : 5000                    
                   });
 
                   socket.on("error", function(error) {
@@ -109,16 +127,26 @@
                       // redirect user to login page perhaps?
                       log("User's token has expired");
                     }
-                    reject(error.message);
+                    resolve(new Error(error.message));
                   });
 
                   socket.on('close', function() {
                     if (isSyncing){
                       log_trace('sync socket.io closed');
                       isSyncing=false;
-                      reject();
+                      reject(new Error('socket.io connection closed'));
                     }
                   });
+
+                  socket.on('connect_timeout',function(){
+                    reject(new Error('Connection timed out'));
+                  })
+
+                  socket.on('connect_error',function(err){
+                    socket.destroy();
+                    reject(new Error('Unable to connect to server'));
+                  })
+
                   socket.on('connect', function() {
                     //Note this triggers on reconnects as well.
                     if (isSyncing) return;
@@ -126,7 +154,7 @@
                     dbconn.get('syncReservation')
                     .then(function(result) {
                         if (result.uuid !== uniqueID) {
-                          reject();
+                          resolve(new Error('Another process has the sync lock'));
                         } else {
                           socket.emit('save-telemetry', rov_session_meta);
                           isSyncing = true;
@@ -140,7 +168,10 @@
                   socket.on('send-data', function(last_id_acked, callback) {
                     dbconn.set('syncReservation',{uuid:uniqueID,lastUpdate:Date.now()})
                     .catch(function(err){
-                      throw new Error(err);
+                      if (!err instanceof Error){
+                        err = new Error(err);
+                      }
+                      throw err;
                     })
 
                     //TODO: Investigate having the client open up a socket.io conenction
@@ -166,13 +197,24 @@
                         callback(nextItemsToSync);
                       })
                       .catch(function(err){
-                        console.log(err);
-                        reject(err.toString());
+                        if (!err instanceof Error){
+                          err = new Error(err);
+                        }
+                        throw err;
                       })
                   });
 
                 })
-                .then(function() {
+                .then(function(err) {
+                  //It is possible that there is a non-recoverable error and thus the flow was resolved instead of rejected.  In that case
+                  //record the error but don't throw it.
+                  if (err instanceof Error){
+                    simpleDB.open('ERRORS')
+                    .then(function(db) {
+                      db.set(Date.now(),{message:err.message,stack:err.stack});
+                    })
+                    return;                    
+                  }
                   var db = null;
                   self.registration.showNotification("Background sync complete for:" + sessionID);
                   return simpleDB.open('sync')
@@ -187,20 +229,33 @@
                 })
                 .catch(function(err) { 
                   self.registration.showNotification("Background sync errored for:" + sessionID);
-                  throw err;                  
+                  if (!err instanceof Error){
+                    err = new Error(err);
+                  }
+                  throw err;               
                 });
             }
           )
           .catch(function(err){
-            throw new Error(err);
+              if (!err instanceof Error){
+                err = new Error(err);
+              }
+              throw err;
           })          
       })
       .then(function(){
         isSyncing=false;
       })
       .catch(function(err){
+        if (!err instanceof Error){
+          err = new Error(err);
+        }
         isSyncing=false;
-        throw new Error(err);
+        simpleDB.open('ERRORS')
+        .then(function(db) {
+          db.set(Date.now(),{message:err.message,stack:err.stack});
+        })
+        throw err;
       })      
     )
 

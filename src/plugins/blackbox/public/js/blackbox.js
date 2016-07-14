@@ -451,7 +451,7 @@
     }).then(function(reg) {
       return simpleDB.open('sync')
       .then(function(db){
-        db.set(sessionID,{id_token:localStorage.getItem('id_token')});
+        db.set(sessionID,{id_token:localStorage.getItem('id_token'),profile:localStorage.getItem('id_profile')});
         reg.sync.register('sync-session:'+tendig_random()+':'+sessionID);
       })       
     }).then(function() {

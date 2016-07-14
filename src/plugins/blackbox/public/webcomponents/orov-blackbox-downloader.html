@@ -111,6 +111,7 @@
                 } else if (item.syncStatus.status=='syncing'){
                   item.syncStatus.percentComplete=(item.syncStatus.lastIDSynced-item.syncStatus.firstID)/(item.syncStatus.lastID - item.syncStatus.firstID)*100;
                 } else {
+                  item.syncStatus.status='syncing';
                   item.syncStatus.percentComplete = 0; //TODO: Do I need to calculate this?
                 }
               } else {
@@ -148,7 +149,11 @@
 
           emitter.withHistory.on('cloudprofile-status',function(status){
             self.loggedin=status.loggedIn;
-            self.set('canSync',status.loggedIn);
+            var isProvisioned = false;
+            if ((status.profile.dataOpenROVcom) && (status.profile.dataOpenROVcom.service_url)){
+              isProvisioned=true;
+            }
+            self.set('canSync',status.loggedIn && isProvisioned);
           });
 
         },

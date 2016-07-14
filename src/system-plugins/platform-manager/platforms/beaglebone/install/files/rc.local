@@ -51,13 +51,6 @@ fi
 
 nice -n 19 /opt/openrov/system/scripts/knight-rider.js &
 
-# Note: This shouldn't need to be done since the DTB files are installed
-# load the device tree overlay for pin 25 (RESET) and SPI
-#CAPEMGR=$( find /sys/devices/ -name bone_capemgr* | head -n 1 )
-#echo OPENROV-RESET > $CAPEMGR/slots
-#echo BB-SPI0DEV > $CAPEMGR/slots
-#echo BB-UART1 > $CAPEMGR/slots
-
 #To deal with flaky avahi behavior
 #http://forums.fedoraforum.org/showthread.php?t=266511
 sleep 15

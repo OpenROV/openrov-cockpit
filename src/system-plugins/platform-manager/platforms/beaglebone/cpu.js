@@ -18,24 +18,25 @@ CPUInterface.prototype.Compose = function( platform )
 	var self = this;
 	
 	// Compose the CPU interface object
-	return  self.LoadInfo( cpu )( cpu )
+	return  self.LoadInfo( cpu )
 			.then( self.CheckSupport )
 			.then( self.LoadInterfaceImplementation );
 };
 
 CPUInterface.prototype.LoadInfo = function( cpu )
 {
-	cpu.info = {};
-	
 	return FindBeagleboneEEPROM()
 			.then( ReadEEPROM )
 			.then( ParseInfo )
 			.then( function( info )
 			{
 				// Add revision and serial details to the interface object
-				cpu.info.revision 	= info.revision;
-				cpu.info.serial 	= info.serial;
-				
+				cpu.info = 
+				{
+					revision: 	info.revision,
+					serial:		info.serial
+				}
+
 				return cpu;
 			} );
 			

@@ -12,7 +12,7 @@ var SetupBoardInterface = function( board )
 	
 	// Decorate the MCU interface with board specific properties
 	board.physics            = new ArduinoHelper().physics;
-    board.bridge           = new Hardware();
+    board.bridge             = new Hardware();
      
     board.firmwareVersion    = 0;
     board.Capabilities       = 0;

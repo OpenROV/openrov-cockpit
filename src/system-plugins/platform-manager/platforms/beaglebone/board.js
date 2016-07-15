@@ -30,6 +30,7 @@ BoardInterface.prototype.LoadInfo = function( board )
 			.then( JSON.parse )
 			.then( function( info )
 			{
+				console.log( "Board info: " + JSON.stringify( info ) );
 				board.info = info;
 				return board;
 			} );

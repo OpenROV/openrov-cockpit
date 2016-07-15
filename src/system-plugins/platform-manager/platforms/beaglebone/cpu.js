@@ -37,6 +37,8 @@ CPUInterface.prototype.LoadInfo = function( cpu )
 					serial:		info.serial
 				}
 
+				console.log( "CPU Info: " + JSON.stringify( cpu.info ) );
+
 				return cpu;
 			} );
 			

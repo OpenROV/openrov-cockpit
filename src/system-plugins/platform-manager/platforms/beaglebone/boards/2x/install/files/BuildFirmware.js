@@ -6,11 +6,11 @@ var ArduinoBuilder	= require( "/opt/openrov/cockpit/src/lib/ArduinoBuilder.js" )
 
 var opts = 
 {
-	sketchDir: 			"/opt/openrov/firmware/sketches/OpenROV2X",
+	sketchDir: 			"/opt/openrov/firmware/sketches/OpenROV2x",
 	installBaseDir:		"/opt/openrov/firmware/bin",
 	productID:			"2x",
 	cleanAfterBuild: 	true,
-	fqbn:				"arduino:avr:mega:cpu=atmega2560",
+	fqbn:				"openrov:avr:mega:cpu=atmega2560",
 	hardware: 			"/opt/openrov/arduino/hardware",
 	tools: 				"/opt/openrov/arduino/hardware/tools",
 	warnings: 			"none",

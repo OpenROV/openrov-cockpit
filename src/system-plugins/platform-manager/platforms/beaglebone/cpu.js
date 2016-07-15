@@ -75,7 +75,7 @@ CPUInterface.prototype.CheckSupport = function( cpu )
 			.then( JSON.parse )
 			.then( function( json )
 			{
-				// Lookup cpu details in the raspi json file, based on revision
+				// Lookup cpu details in the json file, based on revision
 				var details = json[ cpu.info.revision ];
 				
 				if( details !== undefined )
@@ -93,7 +93,7 @@ CPUInterface.prototype.CheckSupport = function( cpu )
 				}
 				else
 				{
-					throw new Error( "Board doesn't exist in database." );
+					throw new Error( "CPU doesn't exist in database." );
 				}
 			} );
 };

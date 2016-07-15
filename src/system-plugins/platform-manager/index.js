@@ -41,6 +41,7 @@ var PlatformManager = function( name, deps )
 	.catch( function( error )
 	{
 		deps.globalEventLoop.emit( "platform.unsupported", error );
+		console.error( "Failed to load platform details for this system: " + error );
 		throw new Error( "Failed to load platform details for this system: " + error );
 	} );
 }

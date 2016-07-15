@@ -21,12 +21,8 @@
 				"USE_MOCK": "true",
 				"CPU_MOCK": "123MOCK",
 				"GEO_MOCK": "true",
-<<<<<<< HEAD
 				"DEBUG": "bridge, mcu, cpu",
-=======
 				"port": 8080,
-				"DEBUG": "hardware, physical-interface",
->>>>>>> master
 				"configfile": "/tmp/rovconfig.json",
 				"plugins__ui-manager__selectedUI": "new-ui",
 				"pluginsDownloadDirectory": "/tmp/plugins"

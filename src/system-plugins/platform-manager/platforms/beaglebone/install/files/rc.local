@@ -51,9 +51,4 @@ fi
 
 nice -n 19 /opt/openrov/system/scripts/knight-rider.js &
 
-#To deal with flaky avahi behavior
-#http://forums.fedoraforum.org/showthread.php?t=266511
-sleep 15
-systemctl restart avahi-daemon.service
-
 exit 0

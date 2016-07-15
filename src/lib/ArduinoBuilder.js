@@ -113,13 +113,12 @@ ArduinoBuilder.prototype.BuildSketch = function( options, onStdout, onStderr )
 	})
 	.then( function()
 	{		
-		// Copy bin into install dir
-		return fs.copyAsync( path.join( options.buildDir, sketchName + ".ino.bin" ), path.join( installDir, sketchName + ".bin" ) );
-	})
-	.then( function()
-	{		
-		// Copy elf into install dir
-		return fs.copyAsync( path.join( options.buildDir, sketchName + ".ino.elf" ), path.join( installDir, sketchName + ".elf" ) );
+		// Copy final binaries into install dir, whatever type they may be
+		return Promise.any( [ 
+								fs.copyAsync( path.join( options.buildDir, sketchName + ".ino.bin" ), path.join( installDir, sketchName + ".bin" ) ),
+								fs.copyAsync( path.join( options.buildDir, sketchName + ".ino.elf" ), path.join( installDir, sketchName + ".elf" ) ),
+								fs.copyAsync( path.join( options.buildDir, sketchName + ".ino.hex" ), path.join( installDir, sketchName + ".hex" ) )
+							] );
 	})
 	.then( function()
 	{

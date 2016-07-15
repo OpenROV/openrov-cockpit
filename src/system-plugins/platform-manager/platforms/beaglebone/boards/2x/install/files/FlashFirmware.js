@@ -3,20 +3,23 @@ var Promise                     = require( "bluebird" );
 var fs                          = Promise.promisifyAll( require( "fs-extra" ) );
 var execFileAsync               = require('child-process-promise').execFile;
 
-var command = "program /opt/openrov/firmware/bin/trident/OpenROV.bin; reset; exit"; 
-
 var args = 
 [
-        "-f",
-        "/opt/openrov/system/etc/openocd.cfg",
+        "-P",
+        "/dev/spidev1.0",
         "-c",
-        command
+        "linuxspi",
+        "-vvv",
+        "-p",
+        "m2560",
+        "-U",
+        "flash:w:/opt/openrov/firmware/bin/2x/OpenROV2x.hex"
 ];
 
 console.log( "Flashing MCU firmware..." );
 
 // Create promise
-var promise             = execFileAsync( 'openocd', args );
+var promise             = execFileAsync( 'avrdude', args );
 var childProcess        = promise.childProcess;
 
 // Attach listeners

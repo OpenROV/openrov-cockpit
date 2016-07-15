@@ -19,8 +19,7 @@ var opts =
 	debug: 				5,
 	libs:
 	[
-		"/opt/openrov/arduino/hardware/openrov/avr/libraries",
-		"/opt/openrov/firmware/libraries"
+		"/opt/openrov/arduino/hardware/openrov/avr/libraries"
 	],
 	preproc:
 	[

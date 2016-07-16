@@ -24,7 +24,7 @@ var PlatformManager = function( name, deps )
 
 	console.log( "PLATFORM" );
 
-	fs.readFile( "/opt/openrov/system/config/platform.conf", 'utf8', function( data )
+	fs.readFile( "/opt/openrov/system/config/platform.conf", 'utf8', function( err, data )
 	{
 			console.log( "hey" );
 			console.log( data );

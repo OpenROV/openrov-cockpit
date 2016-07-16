@@ -62,21 +62,21 @@ function LoadPlatformName( platform )
 { 
 	console.log( "PLATFORM: Fetching platform name..." );
 
-	if( process.env.PLATFORM !== undefined )
-	{
-		// Allow shortcut
-		platform.name = process.env.PLATFORM;
-		console.log( "PLATFORM: Platform shortcut set to: " + platform.name );
+	// if( process.env.PLATFORM !== undefined )
+	// {
+	// 	// Allow shortcut
+	// 	platform.name = process.env.PLATFORM;
+	// 	console.log( "PLATFORM: Platform shortcut set to: " + platform.name );
 
-		return platform;
-	}
-	else
-	{
+	// 	return platform;
+	// }
+	// else
+	// {
 		var platConfPath = path.resolve( platform.systemDirectory + "/config/platform.conf" );
 		
 		console.log( "PLATFORM: Opening platform conf file: " + platConfPath );
 
-		return fs.readFileAsync( platConfPath, 'utf8' )
+		fs.readFileAsync( platConfPath, 'utf8' )
 		.then( function( data )
 		{
 			console.log( "PLATFORM: YES" );
@@ -107,8 +107,8 @@ function LoadPlatformName( platform )
 
 		// 	// Can't proceed if we can't determine the platform
 		// 	throw new Error( "Failed to load platform name: " );
-		// });
-	}
+	// 	// });
+	// }
 };
 
 // function LoadCPUInterface( platform )

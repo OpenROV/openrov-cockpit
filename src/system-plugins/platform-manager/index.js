@@ -27,32 +27,35 @@ var PlatformManager = function( name, deps )
 	this.platform.cpu 	= new CPUInterface( deps );
 
 	console.log( "PLATFORM: Loading platform interfaces..." );
+	console.log( "PLATFORM: " + JSON.stringify( self.platform ) );
 
-	Promise.try( function()
-	{
-		// Load interfaces
-		return Promise.try( function()
-		{
-			return LoadPlatformName( self.platform );
-		} )
-		// .then( LoadCPUInterface )
-		// .then( LoadBoardInterface )
-		// .then( function( platform )
-		// {
-		// 	console.log( "PLATFORM: Successfully loaded configuration for a supported platform." );
-		// 	deps.globalEventLoop.emit( "platform.supported" );
-		// })
-		.catch( function( error )
-		{
-			//deps.globalEventLoop.emit( "platform.unsupported", error );
-			console.error( "PLATFORM: Failed to load platform details for this system: " + error );
-			throw new Error( "Failed to load platform details for this system: " + error );
-		} );
-	} )
-	.catch(  function( error )
-	{
-		console.error( "What: " + JSON.stringify( err ) );
-	} );
+	LoadPlatformName( self.platform );
+
+	// Promise.try( function()
+	// {
+	// 	// Load interfaces
+	// 	return Promise.try( function()
+	// 	{
+	// 		return LoadPlatformName( self.platform );
+	// 	} )
+	// 	// .then( LoadCPUInterface )
+	// 	// .then( LoadBoardInterface )
+	// 	// .then( function( platform )
+	// 	// {
+	// 	// 	console.log( "PLATFORM: Successfully loaded configuration for a supported platform." );
+	// 	// 	deps.globalEventLoop.emit( "platform.supported" );
+	// 	// })
+	// 	.catch( function( error )
+	// 	{
+	// 		//deps.globalEventLoop.emit( "platform.unsupported", error );
+	// 		console.error( "PLATFORM: Failed to load platform details for this system: " + error );
+	// 		throw new Error( "Failed to load platform details for this system: " + error );
+	// 	} );
+	// } )
+	// .catch(  function( error )
+	// {
+	// 	console.error( "What: " + JSON.stringify( err ) );
+	// } );
 }
 
 function LoadPlatformName( platform )

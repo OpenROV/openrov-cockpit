@@ -16,6 +16,9 @@ BoardInterface.prototype.Compose = function( platform )
 	};
 	
 	var self = this;
+
+	console.log( "BOARD: Composing BBB interface..." );
+	console.log( "BOARD: platform obj: " + JSON.stringify( platform ) );
 	
 	return self.LoadInfo( board )
 			.then( self.LoadPinMap )
@@ -26,6 +29,8 @@ BoardInterface.prototype.LoadInfo = function( board )
 {
 	board.info = {};
 	
+	console.log( "BOARD: Loading board info..." );
+
 	return fs.readFileAsync( path.resolve( "/opt/openrov/system/etc/2xBoardInfo.json" ) )
 			.then( JSON.parse )
 			.then( function( info )
@@ -38,6 +43,8 @@ BoardInterface.prototype.LoadInfo = function( board )
 
 BoardInterface.prototype.LoadPinMap = function( board )
 {
+	console.log( "BOARD: Loading pinmap..." );
+
 	return fs.readFileAsync( path.resolve( __dirname, "boards/" + board.info.productId + "/pinmap.json" ) )
 			.then( JSON.parse )
 			.then( function( json )

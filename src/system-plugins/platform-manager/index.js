@@ -26,6 +26,8 @@ var PlatformManager = function( name, deps )
 	this.platform.board = new BoardInterface( deps );
 	this.platform.cpu 	= new CPUInterface( deps );
 
+	console.log( "PLATFORM: Loading platform interfaces..." );
+
 	// Load interfaces
 	Promise.try( function()
 	{
@@ -35,54 +37,69 @@ var PlatformManager = function( name, deps )
 	.then( LoadBoardInterface )
 	.then( function( platform )
 	{
-		console.log( "Successfully loaded configuration for a supported platform." );
+		console.log( "PLATFORM: Successfully loaded configuration for a supported platform." );
 		deps.globalEventLoop.emit( "platform.supported" );
 	})
 	.catch( function( error )
 	{
 		deps.globalEventLoop.emit( "platform.unsupported", error );
-		console.error( "Failed to load platform details for this system: " + error );
+		console.error( "PLATFORM: Failed to load platform details for this system: " + error );
 		throw new Error( "Failed to load platform details for this system: " + error );
 	} );
 }
 
 function LoadPlatformName( platform )
 { 
+	console.log( "PLATFORM: Fetching platform name..." );
+
 	if( process.env.PLATFORM !== undefined )
 	{
 		// Allow shortcut
 		platform.name = process.env.PLATFORM;
+		console.log( "PLATFORM: Platform shortcut set to: " + platform.name );
+
 		return platform;
 	}
 	else
 	{
 		var platConfPath = path.resolve( platform.systemDirectory + "/config/platform.conf" );
 		
-		return fs.readFileAsync( platConfPath, "utf8" )
+		console.log( "PLATFORM: Opening platform conf file: " + platConfPath );
+
+		return fs.readFileAsync( platConfPath )
 		.then( function( data )
 		{
+			console.log( "PLATFORM: Parsing platform conf" );
+
 			// Parse platform info from configuration file
 			var platInfo 	= JSON.parse( data );
 			platform.name 	= platInfo.platform;
 			
+			console.log( "PLATFORM: Platform name: " + platform.name );
+
 			return platform;
 		} )
 		.catch( function( err ) 
 		{
+			console.error( "Failed to load platform name: " + JSON.stringify( err ) );
+
 			// Can't proceed if we can't determine the platform
-			throw "Failed to load platform name: " + JSON.stringify( err );
+			throw new Error( "Failed to load platform name: " + JSON.stringify( err ) );
 		})
 	}
 };
 
 function LoadCPUInterface( platform )
 { 
+	console.log( "PLATFORM: Loading CPU interface..." );
+	
 	var CPUInterfaceLoader = require( "./platforms/" + platform.name + "/cpu.js" );
 	
 	return CPUInterfaceLoader.Compose( platform )
 			.catch( function( err )
 			{
-				throw "Failed to load CPU interface: " + JSON.stringify( err );
+				console.error( "Failed to load CPU interface: " + JSON.stringify( err ) );
+				throw new Error( "Failed to load CPU interface: " + JSON.stringify( err ) );
 			})
 			.then( function()
 			{
@@ -92,6 +109,8 @@ function LoadCPUInterface( platform )
 
 function LoadBoardInterface( platform )
 { 
+	console.log( "PLATFORM: Loading Board interface..." );
+
 	var BoardInterfaceLoader = require( "./platforms/" + platform.name + "/board.js" );
 	
 	return BoardInterfaceLoader.Compose( platform )

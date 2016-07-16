@@ -9,6 +9,8 @@ var CPUInterface = function()
 
 CPUInterface.prototype.Compose = function( platform )
 {
+	console.log( "CPU: Composing BBB cpu interface..." );
+
 	// Temporary container used for cpu detection and info loading
 	var cpu =
 	{
@@ -25,6 +27,8 @@ CPUInterface.prototype.Compose = function( platform )
 
 CPUInterface.prototype.LoadInfo = function( cpu )
 {
+	console.log( "CPU: Loading BBB cpu info..." );
+
 	return FindBeagleboneEEPROM()
 			.then( ReadEEPROM )
 			.then( ParseInfo )
@@ -45,6 +49,8 @@ CPUInterface.prototype.LoadInfo = function( cpu )
 	// Helper functions		
 	function FindBeagleboneEEPROM()
 	{
+		console.log( "CPU: Looking for BBB eeprom..." );
+
 		return Promise.any([ fs.openAsync( "/sys/bus/nvmem/devices/at24-0/nvmem" ),
 						fs.openAsync( "/sys/class/nvmem/at24-0/nvmem" ),
 						fs.openAsync( "/sys/bus/i2c/devices/0-0050/eeprom" ) ] );
@@ -52,19 +58,26 @@ CPUInterface.prototype.LoadInfo = function( cpu )
 	
 	function ReadEEPROM( fd )
 	{
+		console.log( "CPU: Opening bbb eeprom..." );
+
 		return fs.readAsync( fd, new Buffer(244), 0, 244, 0 )
 				.then( function (result) 
 				{
+					console.log( "CPU: Got bbb eeprom data" );
 					return result[1];
 				});
 	};
 
 	function ParseInfo( data )
 	{
+		console.log( "CPU: parsing BBB eeprom.." );
+
 		return Promise.try( function()
 		{
 			var revision = data.slice( 0, 16 );
 			var serial = data.slice( 16, 28 );
+
+			console.log( "CPU: Parsed BBB eeprom." );
 
 			return { "revision": revision, "serial": serial };
 		} );
@@ -73,10 +86,14 @@ CPUInterface.prototype.LoadInfo = function( cpu )
 
 CPUInterface.prototype.CheckSupport = function( cpu )
 {
+	console.log( "CPU: Checking BBB support..." );
+
 	return fs.readFileAsync( path.resolve( __dirname, "cpu/revisionInfo.json" ) )
 			.then( JSON.parse )
 			.then( function( json )
 			{
+				console.log( "CPU: Checking details against revision file..." );
+
 				// Lookup cpu details in the json file, based on revision
 				var details = json[ cpu.info.revision ];
 				
@@ -95,6 +112,7 @@ CPUInterface.prototype.CheckSupport = function( cpu )
 				}
 				else
 				{
+					console.error( "CPU: Wasn't supported" );
 					throw new Error( "CPU doesn't exist in database." );
 				}
 			} );
@@ -102,8 +120,12 @@ CPUInterface.prototype.CheckSupport = function( cpu )
 
 CPUInterface.prototype.LoadInterfaceImplementation = function( cpu )
 {
+	console.log( "CPU: Loading CPU interface implementation" );
+
 	// Load and apply the interface implementation to the actual CPU interface
 	require( "./cpu/setup.js" )( cpu.targetCPU );		
+
+	console.log( "CPU: Loaded CPU interface implementation" );
 	return cpu;
 };
 

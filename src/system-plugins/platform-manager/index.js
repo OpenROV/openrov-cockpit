@@ -86,7 +86,6 @@ function LoadPlatformName( platform )
 		{
 			console.log( "PLATFORM: NO" );
 			console.log( err );
-			throw new Error( "ya" );
 		});
 
 		// .then( function( data )

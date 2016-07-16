@@ -73,26 +73,33 @@ function LoadPlatformName( platform )
 		
 		console.log( "PLATFORM: Opening platform conf file: " + platConfPath );
 
-		return fs.readFileAsync( platConfPath, 'utf8' )
-		.then( function( data )
+		return fs.readFileAsync( platConfPath )
+		.then( console.log )
+		.catch( function( err )
 		{
-			console.log( "PLATFORM: Parsing platform conf" );
-
-			// Parse platform info from configuration file
-			var platInfo 	= JSON.parse( data );
-			platform.name 	= platInfo.platform;
-			
-			console.log( "PLATFORM: Platform name: " + platform.name );
-
-			return platform;
-		} )
-		.catch( function( err ) 
-		{
-			console.error( "Failed to load platform name: " );
-
-			// Can't proceed if we can't determine the platform
-			throw new Error( "Failed to load platform name: " );
+			console.err( err );
+			throw new Error( "ya" );
 		});
+
+		// .then( function( data )
+		// {
+		// 	console.log( "PLATFORM: Parsing platform conf" );
+
+		// 	// Parse platform info from configuration file
+		// 	var platInfo 	= JSON.parse( data );
+		// 	platform.name 	= platInfo.platform;
+			
+		// 	console.log( "PLATFORM: Platform name: " + platform.name );
+
+		// 	return platform;
+		// } )
+		// .catch( function( err ) 
+		// {
+		// 	console.error( "Failed to load platform name: " );
+
+		// 	// Can't proceed if we can't determine the platform
+		// 	throw new Error( "Failed to load platform name: " );
+		// });
 	}
 };
 

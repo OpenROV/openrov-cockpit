@@ -28,10 +28,10 @@ var PlatformManager = function( name, deps )
 
 	console.log( "PLATFORM: Loading platform interfaces..." );
 
-	try
+	Promise.try( function()
 	{
 		// Load interfaces
-		Promise.try( function()
+		return Promise.try( function()
 		{
 			return LoadPlatformName( self.platform );
 		} )
@@ -44,15 +44,15 @@ var PlatformManager = function( name, deps )
 		// })
 		.catch( function( error )
 		{
-			deps.globalEventLoop.emit( "platform.unsupported", error );
+			//deps.globalEventLoop.emit( "platform.unsupported", error );
 			console.error( "PLATFORM: Failed to load platform details for this system: " + error );
 			throw new Error( "Failed to load platform details for this system: " + error );
 		} );
-	}
-	catch( err )
+	} )
+	.catch(  function( error )
 	{
 		console.error( "What: " + JSON.stringify( err ) );
-	}
+	} );
 }
 
 function LoadPlatformName( platform )

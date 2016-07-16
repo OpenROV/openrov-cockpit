@@ -221,32 +221,35 @@ var loader = new PluginLoader();
 
 mkdirp.sync(pluginFolder);
 
-var funcs = [
-loader.loadPlugins(path.join(__dirname, 'system-plugins'), 'system-plugin', deps),
-loader.loadPlugins(path.join(__dirname, 'plugins'), 'plugin', deps),
-loader.loadPlugins(pluginFolder, 'community-plugin', deps, function (file) 
-{
-return file.substring(0, 15) === 'openrov-plugin-';
-} )
+var promises = 
+[
+    loader.loadPlugins(path.join(__dirname, 'system-plugins'), 'system-plugin', deps),
+    loader.loadPlugins(path.join(__dirname, 'plugins'), 'plugin', deps),
+    loader.loadPlugins( pluginFolder, 'community-plugin', deps, function (file) 
+    {
+        return file.substring(0, 15) === 'openrov-plugin-';
+    } )
 ]
 
-Q.allSettled(funcs).then(function(results)
+Promise.all( promises.map( function( promise ) 
 {
-    // Get plugin assets
-    results.forEach(function (result) 
+    return promise.reflect();
+} ) )
+.each( function(inspection) 
+{
+    if ( inspection.isFulfilled() ) 
     {
-        if (result.state === "fulfilled") 
-        {
-            var value = result.value;
-            addPluginAssets(value);
-        }
-        else 
-        {
-            var reason = result.reason;
-            console.error(reason);
-        }
-    });
-
+        var value = inspection.value();
+        addPluginAssets( value );
+    } 
+    else 
+    {
+        var reason = inspection.reason();
+        console.log( "ERROR plugins: " + reason );
+    }
+} )
+.then( function()
+{
     console.warn("Starting following plugins:");
     console.dir(deps.loadedPlugins);
 
@@ -258,8 +261,8 @@ Q.allSettled(funcs).then(function(results)
             plugin.start();
         }
     });
-
-}).fail(function (error) 
+})
+.catch( function( err )
 {
     console.log("Error starting plugins:");
     
@@ -269,7 +272,7 @@ Q.allSettled(funcs).then(function(results)
     }
     
     throw new Error("Error in loading plugins");
-})
+});
 
 // Helper function
 function addPluginAssets(result) 

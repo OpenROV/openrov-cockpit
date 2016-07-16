@@ -13,8 +13,8 @@ var path 			= require( "path" );
 var Promise			= require( "bluebird" );
 var fs				= Promise.promisifyAll( require( "fs" ) );
 
-var BoardInterface 	= require( "BoardInterface.js" );
-var CPUInterface 	= require( "CPUInterface.js" );
+// var BoardInterface 	= require( "BoardInterface.js" );
+// var CPUInterface 	= require( "CPUInterface.js" );
 
 var PlatformManager = function( name, deps )
 {	
@@ -23,8 +23,8 @@ var PlatformManager = function( name, deps )
 	this.platform = {};
 	this.platform.systemDirectory = deps.config.systemDirectory;
 	
-	this.platform.board = new BoardInterface( deps );
-	this.platform.cpu 	= new CPUInterface( deps );
+	// this.platform.board = new BoardInterface( deps );
+	// this.platform.cpu 	= new CPUInterface( deps );
 
 	console.log( "PLATFORM: Loading platform interfaces..." );
 	console.log( "PLATFORM: " + JSON.stringify( self.platform ) );

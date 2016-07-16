@@ -35,13 +35,13 @@ var PlatformManager = function( name, deps )
 		{
 			return LoadPlatformName( self.platform );
 		} )
-		.then( LoadCPUInterface )
-		.then( LoadBoardInterface )
-		.then( function( platform )
-		{
-			console.log( "PLATFORM: Successfully loaded configuration for a supported platform." );
-			deps.globalEventLoop.emit( "platform.supported" );
-		})
+		// .then( LoadCPUInterface )
+		// .then( LoadBoardInterface )
+		// .then( function( platform )
+		// {
+		// 	console.log( "PLATFORM: Successfully loaded configuration for a supported platform." );
+		// 	deps.globalEventLoop.emit( "platform.supported" );
+		// })
 		.catch( function( error )
 		{
 			deps.globalEventLoop.emit( "platform.unsupported", error );
@@ -96,42 +96,42 @@ function LoadPlatformName( platform )
 	}
 };
 
-function LoadCPUInterface( platform )
-{ 
-	console.log( "PLATFORM: Loading CPU interface..." );
+// function LoadCPUInterface( platform )
+// { 
+// 	console.log( "PLATFORM: Loading CPU interface..." );
 	
-	var CPUInterfaceLoader = require( "./platforms/" + platform.name + "/cpu.js" );
+// 	var CPUInterfaceLoader = require( "./platforms/" + platform.name + "/cpu.js" );
 	
-	return CPUInterfaceLoader.Compose( platform )
-			.catch( function( err )
-			{
-				console.error( "Failed to load CPU interface: " + JSON.stringify( err ) );
-				throw new Error( "Failed to load CPU interface: " + JSON.stringify( err ) );
-			})
-			.then( function()
-			{
-				return platform;
-			})
-};
+// 	return CPUInterfaceLoader.Compose( platform )
+// 			.catch( function( err )
+// 			{
+// 				console.error( "Failed to load CPU interface: " + JSON.stringify( err ) );
+// 				throw new Error( "Failed to load CPU interface: " + JSON.stringify( err ) );
+// 			})
+// 			.then( function()
+// 			{
+// 				return platform;
+// 			})
+// };
 
-function LoadBoardInterface( platform )
-{ 
-	console.log( "PLATFORM: Loading Board interface..." );
+// function LoadBoardInterface( platform )
+// { 
+// 	console.log( "PLATFORM: Loading Board interface..." );
 
-	var BoardInterfaceLoader = require( "./platforms/" + platform.name + "/board.js" );
+// 	var BoardInterfaceLoader = require( "./platforms/" + platform.name + "/board.js" );
 	
-	return BoardInterfaceLoader.Compose( platform )
-			.catch( function( err )
-			{
-				console.error( "Failed to load board interface: " + JSON.stringify( err ) );
+// 	return BoardInterfaceLoader.Compose( platform )
+// 			.catch( function( err )
+// 			{
+// 				console.error( "Failed to load board interface: " + JSON.stringify( err ) );
 				
-				// Continue anyway. Board is optional to operation of cockpit
-			} )
-			.then( function()
-			{
-				return platform;
-			});
-};
+// 				// Continue anyway. Board is optional to operation of cockpit
+// 			} )
+// 			.then( function()
+// 			{
+// 				return platform;
+// 			});
+// };
 
 // Export provides the public interface
 module.exports = function (name, deps) 

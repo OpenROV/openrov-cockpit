@@ -28,24 +28,31 @@ var PlatformManager = function( name, deps )
 
 	console.log( "PLATFORM: Loading platform interfaces..." );
 
-	// Load interfaces
-	Promise.try( function()
+	try
 	{
-		return LoadPlatformName( self.platform );
-	} )
-	.then( LoadCPUInterface )
-	.then( LoadBoardInterface )
-	.then( function( platform )
+		// Load interfaces
+		Promise.try( function()
+		{
+			return LoadPlatformName( self.platform );
+		} )
+		.then( LoadCPUInterface )
+		.then( LoadBoardInterface )
+		.then( function( platform )
+		{
+			console.log( "PLATFORM: Successfully loaded configuration for a supported platform." );
+			deps.globalEventLoop.emit( "platform.supported" );
+		})
+		.catch( function( error )
+		{
+			deps.globalEventLoop.emit( "platform.unsupported", error );
+			console.error( "PLATFORM: Failed to load platform details for this system: " + error );
+			throw new Error( "Failed to load platform details for this system: " + error );
+		} );
+	}
+	catch( err )
 	{
-		console.log( "PLATFORM: Successfully loaded configuration for a supported platform." );
-		deps.globalEventLoop.emit( "platform.supported" );
-	})
-	.catch( function( error )
-	{
-		deps.globalEventLoop.emit( "platform.unsupported", error );
-		console.error( "PLATFORM: Failed to load platform details for this system: " + error );
-		throw new Error( "Failed to load platform details for this system: " + error );
-	} );
+		console.error( "What: " + JSON.stringify( err ) );
+	}
 }
 
 function LoadPlatformName( platform )
@@ -66,7 +73,7 @@ function LoadPlatformName( platform )
 		
 		console.log( "PLATFORM: Opening platform conf file: " + platConfPath );
 
-		return fs.readFileAsync( platConfPath )
+		return fs.readFileAsync( platConfPath, 'utf8' )
 		.then( function( data )
 		{
 			console.log( "PLATFORM: Parsing platform conf" );

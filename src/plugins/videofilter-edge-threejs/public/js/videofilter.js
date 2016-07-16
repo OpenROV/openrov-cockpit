@@ -19,10 +19,9 @@
     this.removeCanvas = null;
 
     // for plugin management:
-    this.pluginDefaults = {
+    this.Plugin_Meta = {
       name : 'videofilter-edge-threejs',   // for the settings
       viewName: 'Video Filter: Edge Detection 3js',
-      canBeDisabled : true, //allow enable/disable
       defaultEnabled: false
    };
 

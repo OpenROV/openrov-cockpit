@@ -15,10 +15,13 @@
     var disablePlugin = function() {
     };
 
-    // for plugin management:
-    this.name = 'headsup-menu'; // for the settings
-    this.viewName = 'Heads up menu'; // for the UI
-    this.canBeDisabled = true;
+		this.Plugin_Meta = 
+		{
+			name : 'headsup-menu',
+			viewName : 'Heads up menu',
+			defaultEnabled: false
+		};
+
     this.enable = function() { enablePlugin(); };
     this.disable = function() { disablePlugin(); };
 

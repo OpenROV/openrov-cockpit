@@ -88,11 +88,11 @@ function LoadPlatformName( platform )
 		} )
 		.catch( function( err ) 
 		{
-			console.error( "Failed to load platform name: " + JSON.stringify( err ) );
+			console.error( "Failed to load platform name: " );
 
 			// Can't proceed if we can't determine the platform
-			throw new Error( "Failed to load platform name: " + JSON.stringify( err ) );
-		})
+			throw new Error( "Failed to load platform name: " );
+		});
 	}
 };
 

@@ -83,7 +83,7 @@ function LoadPlatformName( platform )
 		} )
 		.catch( function( err )
 		{
-			console.err( err );
+			console.log( err );
 			throw new Error( "ya" );
 		});
 

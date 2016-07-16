@@ -1,5 +1,7 @@
 var fs = require('fs');
 var path = require('path');
+
+var Promise = require( "bluebird" );
 var Q =require('q');
 
 if (typeof path.existsSync === 'undefined'){

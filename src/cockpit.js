@@ -250,7 +250,7 @@ Promise.all( promises.map( function( promise )
 } )
 .then( function()
 {
-    console.warn("Starting following plugins:");
+    console.log("Starting following plugins:");
     console.dir(deps.loadedPlugins);
 
     // Start each plugin

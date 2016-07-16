@@ -22,9 +22,12 @@ var PlatformManager = function( name, deps )
 
 	var platformName        = "";
 
+	console.log( "PLATFORM" );
+
 	fs.readFileAsync( "/opt/openrov/system/config/platform.conf", 'utf8' )
 	.then( function( data )
 	{
+			console.log( "hey" );
 			console.log( data );
 			// Parse platform info from configuration file
 			var platInfo    = JSON.parse( data );
@@ -41,6 +44,8 @@ var PlatformManager = function( name, deps )
 	{
 			console.log( "Err: " + err.message );
 	} );
+
+	console.log( "END PLATFORM" );
 
 
 	// this.platform = {};

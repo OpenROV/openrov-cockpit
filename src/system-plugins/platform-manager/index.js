@@ -13,23 +13,46 @@ var path 			= require( "path" );
 var Promise			= require( "bluebird" );
 var fs				= Promise.promisifyAll( require( "fs" ) );
 
-var BoardInterface 	= require( "BoardInterface.js" );
-var CPUInterface 	= require( "CPUInterface.js" );
+// var BoardInterface 	= require( "BoardInterface.js" );
+// var CPUInterface 	= require( "CPUInterface.js" );
 
 var PlatformManager = function( name, deps )
 {	
 	var self = this;
 
-	this.platform = {};
-	this.platform.systemDirectory = deps.config.systemDirectory;
+	var platformName        = "";
+
+	fs.readFileAsync( "/opt/openrov/system/config/platform.conf", 'utf8' )
+	.then( function( data )
+	{
+			console.log( data );
+			// Parse platform info from configuration file
+			var platInfo    = JSON.parse( data );
+			platformName    = platInfo.platform;
+
+			if( platformName == "" )
+			{
+					throw "No platform specified";
+			}
+
+			console.log( platformName );
+	} )
+	.catch( function( err )
+	{
+			console.log( "Err: " + err.message );
+	} );
+
+
+	// this.platform = {};
+	// this.platform.systemDirectory = deps.config.systemDirectory;
 	
-	this.platform.board = new BoardInterface( deps );
-	this.platform.cpu 	= new CPUInterface( deps );
+	// this.platform.board = new BoardInterface( deps );
+	// this.platform.cpu 	= new CPUInterface( deps );
 
-	console.log( "PLATFORM: Loading platform interfaces..." );
-	console.log( "PLATFORM: " + JSON.stringify( self.platform ) );
+	// console.log( "PLATFORM: Loading platform interfaces..." );
+	// console.log( "PLATFORM: " + JSON.stringify( self.platform ) );
 
-	LoadPlatformName( self.platform );
+	// LoadPlatformName( self.platform );
 
 	// Promise.try( function()
 	// {
@@ -58,9 +81,9 @@ var PlatformManager = function( name, deps )
 	// } );
 }
 
-function LoadPlatformName( platform )
-{ 
-	console.log( "PLATFORM: Fetching platform name..." );
+// function LoadPlatformName( platform )
+// { 
+// 	console.log( "PLATFORM: Fetching platform name..." );
 
 	// if( process.env.PLATFORM !== undefined )
 	// {
@@ -72,21 +95,21 @@ function LoadPlatformName( platform )
 	// }
 	// else
 	// {
-		var platConfPath = path.resolve( platform.systemDirectory + "/config/platform.conf" );
+		// var platConfPath = path.resolve( platform.systemDirectory + "/config/platform.conf" );
 		
-		console.log( "PLATFORM: Opening platform conf file: " + platConfPath );
+		// console.log( "PLATFORM: Opening platform conf file: " + platConfPath );
 
-		fs.readFileAsync( platConfPath, 'utf8' )
-		.then( function( data )
-		{
-			console.log( "PLATFORM: YES" );
-			console.log( data); 
-		} )
-		.catch( function( err )
-		{
-			console.log( "PLATFORM: NO" );
-			console.log( err );
-		});
+		// fs.readFileAsync( platConfPath, 'utf8' )
+		// .then( function( data )
+		// {
+		// 	console.log( "PLATFORM: YES" );
+		// 	console.log( data); 
+		// } )
+		// .catch( function( err )
+		// {
+		// 	console.log( "PLATFORM: NO" );
+		// 	console.log( err );
+		// });
 
 		// .then( function( data )
 		// {
@@ -108,7 +131,7 @@ function LoadPlatformName( platform )
 		// 	throw new Error( "Failed to load platform name: " );
 	// 	// });
 	// }
-};
+// };
 
 // function LoadCPUInterface( platform )
 // { 

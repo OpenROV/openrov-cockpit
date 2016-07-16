@@ -79,10 +79,12 @@ function LoadPlatformName( platform )
 		return fs.readFileAsync( platConfPath, 'utf8' )
 		.then( function( data )
 		{
+			console.log( "PLATFORM: YES" );
 			console.log( data); 
 		} )
 		.catch( function( err )
 		{
+			console.log( "PLATFORM: NO" );
 			console.log( err );
 			throw new Error( "ya" );
 		});

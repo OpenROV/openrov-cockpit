@@ -19,10 +19,9 @@
     this.settings = {};
 
     // for plugin management:
-    this.pluginDefaults = {
+    this.Plugin_Meta = {
       name: 'Peer View', // for the settings
       viewName: 'Peer Connect plugin', // for the UI
-      canBeDisabled: true, //allow enable/disable
       defaultEnabled: true
     };
     this.enabled = false;

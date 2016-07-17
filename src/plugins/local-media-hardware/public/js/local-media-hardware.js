@@ -40,10 +40,9 @@
     this.settings = {};
 
     // for plugin management:
-    this.pluginDefaults = {
+    this.Plugin_Meta = {
       name: 'LocalMedia Control', // for the settings
       viewName: 'LocalMedia Control plugin', // for the UI
-      canBeDisabled: true, //allow enable/disable
       defaultEnabled: true
     };
 

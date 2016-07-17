@@ -65,12 +65,16 @@
         if(p.isEnabled === true){
           p.isEnabled = true;
           p.rawPlugin.isEnabled = true;
-          p.rawPlugin.enable();
+          if (p.canBeEnabled){
+            p.rawPlugin.enable();
+          }
 
         } else {
           p.isEnabled = false;
           p.rawPlugin.isEnabled = false;
-          p.rawPlugin.disable();
+          if (p.canBeDisabled){
+            p.rawPlugin.disable();
+          }
 
         }
       });
@@ -84,7 +88,7 @@
   PluginManager.prototype.enablePlugin = function enablePlugin(plugin,fn){
     this.EnumerateControllablePlugins(function(items){
       items.forEach(function(p){
-        if(p.name === plugin){
+        if((p.name === plugin) && p.canBeEnabled){
           if(p.isEnabled === false){
             p.isEnabled = true;
             p.rawPlugin.isEnabled = true;
@@ -103,7 +107,7 @@
   PluginManager.prototype.disablePlugin = function disablePlugin(plugin){
     this.EnumerateControllablePlugins(function(items){
       items.forEach(function(p){
-        if(p.name === plugin){
+        if((p.name === plugin) && p.canBeDisabled){
           if(p.isEnabled === true){
             p.isEnabled=false;
             p.rawPlugin.isEnabled = false;
@@ -139,29 +143,24 @@
     _plugins= this.cockpit.loadedPlugins
       .filter(function (plugin) {
         console.log('evaluating plugin for pluginmanager');
-        if ((plugin.pluginDefaults !== undefined && plugin.pluginDefaults.canBeDisabled)||(plugin.canBeDisabled)) {
+        if (plugin.Plugin_Meta !== undefined) {
           return true;
       }}).map(function(plugin){
-        var p = {};
-        if (plugin.pluginDefaults!==undefined){
-          p = {
+        var plugin_metadata = {};
+        if (plugin.Plugin_Meta!==undefined){
+          plugin_metadata = {
               rawPlugin: plugin,
               config: {},
-              isEnabled: plugin.pluginDefaults.defaultEnabled !== 'undefined' ? plugin.pluginDefaults.defaultEnabled : true,
-              name: plugin.pluginDefaults.name,
-              viewName: plugin.pluginDefaults.viewName
-          };
-        }else{ //support backwards compatibility pre plugin object
-          p = {
-              rawPlugin: plugin,
-              config: {},
-              isEnabled: plugin.defaultEnabled !== 'undefined' ? plugin.defaultEnabled : true,
-              name: plugin.name,
-              viewName: plugin.viewName
+              isEnabled: plugin.Plugin_Meta.defaultEnabled !== 'undefined' ? plugin.Plugin_Meta.defaultEnabled : true,
+              canBeEnabled: typeof(plugin.enable) == 'function',
+              canBeDisabled: typeof(plugin.disable) == 'function',
+              isTheme: plugin.isTheme==undefined ? false : plugin.isTheme,
+              name: plugin.Plugin_Meta.name,
+              viewName: plugin.Plugin_Meta.viewName
           };
         }
         //option to async get additional properies from config here.
-        return p;
+        return plugin_metadata;
       });
       callback(_plugins);
   };

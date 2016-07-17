@@ -18,11 +18,10 @@
     this.rov = cockpit.rov;
 
     // for plugin management:
-    this.pluginDefaults = {
+    this.Plugin_Meta = {
       name : 'diveprofile',   // for the settings
       viewName : 'DiveProfile plugin', // for the UI
-      canBeDisabled : false, //allow enable/disable
-      defaultEnabled: true
+      defaultEnabled: false
    };
 
   };

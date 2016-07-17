@@ -17,10 +17,9 @@
       this.settings = {};
 
       // for plugin management:
-      this.pluginDefaults = {
+      this.Plugin_Meta = {
         name: 'Internet Control', // for the settings
         viewName: 'Internet Control plugin', // for the UI
-        canBeDisabled: true, //allow enable/disable
         defaultEnabled: false
       };
       this.enabled=false;

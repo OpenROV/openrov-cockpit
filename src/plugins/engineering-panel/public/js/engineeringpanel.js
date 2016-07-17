@@ -12,11 +12,10 @@
     this.cockpit = cockpit;
     this.rov = cockpit.rov;
 
-    this.pluginDefaults = {
+    this.Plugin_Meta = {
       name : 'engineering',   
       viewName : 'engineering plugin',
-      canBeDisabled : false,
-      defaultEnabled: true
+      defaultEnabled: false
    };
   };
   

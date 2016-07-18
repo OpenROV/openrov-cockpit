@@ -3,18 +3,26 @@ function telemetry(name, deps) {
 
   var statusdata = {};
 
-  deps.globalEventLoop.on( 'mcu.status', function(data){
-    for (var i in data) {
-      if (i === 'cmd'){
+  deps.globalEventLoop.on( 'mcu.status', function(data)
+  {
+    for (var i in data) 
+    {
+      if (i === 'cmd')
+      {
         //filter out ping command echos
-        if (data[i].indexOf('ping')>=0) continue;
+        if (data[i].indexOf('ping')>=0) 
+        {
+          continue;
+        }
       }
+
       statusdata[i] = data[i];
     }
   });
 
 
-  setInterval(function () {
+  setInterval(function () 
+  {
     deps.cockpit.emit('plugin.telemetry.logData', statusdata);
   }, 1000);
 

@@ -68,7 +68,11 @@ var mkdirpAsync         = Promise.promisify( require("mkdirp") );
 // Setup required directories
 mkdirp(CONFIG.preferences.get('photoDirectory'));
 process.env.NODE_ENV    = true;
+
+// NOTE: If you don't increase the default max listeners, you can get a potential memory leak warning
 var globalEventLoop     = require('./static/js/eventEmitterStoreAndForward.js')(new EventEmitter2());
+globalEventLoop.setMaxListeners( 20 );
+
 var DELAY               = Math.round(1000 / CONFIG.video_frame_rate);
 io                      = require('./static/js/socketIOStoreAndForward.js')(io);
 var client              = new CockpitMessaging(io);
@@ -223,14 +227,15 @@ mkdirp.sync(pluginFolder);
 
 var promises = 
 [
-    loader.loadPlugins(path.join(__dirname, 'system-plugins'), 'system-plugin', deps),
-    loader.loadPlugins(path.join(__dirname, 'plugins'), 'plugin', deps),
-    loader.loadPlugins( pluginFolder, 'community-plugin', deps, function (file) 
+    loader.loadPlugins(path.join(__dirname, 'system-plugins'), 'system-plugin', true, deps),
+    loader.loadPlugins(path.join(__dirname, 'plugins'), 'plugin', true, deps),
+    loader.loadPlugins( pluginFolder, 'community-plugin', false, deps, function (file) 
     {
         return file.substring(0, 15) === 'openrov-plugin-';
     } )
 ]
 
+// If a required plugin fails to load, cockpit will terminate. Otherwise, the plugin will be skipped.
 Promise.all( promises.map( function( promise ) 
 {
     return promise.reflect();
@@ -250,28 +255,33 @@ Promise.all( promises.map( function( promise )
 } )
 .then( function()
 {
-    console.log("Starting following plugins:");
-    console.dir(deps.loadedPlugins);
+    console.log( "Starting following plugins:" );
+    //console.dir( deps.loadedPlugins );
 
     // Start each plugin
-    deps.loadedPlugins.forEach(function(plugin)
+    deps.loadedPlugins.forEach( function( plugin )
     {
-        if (plugin.start !== undefined)
+        if( plugin.start !== undefined )
         {
             plugin.start();
         }
+    } );
+})
+.then( function()
+{
+    console.log( "Plugin loading successful!" );
+
+    // Start the web server
+    server.listen( app.get('port'), function() 
+    {
+        console.log('Started listening on port: ' + app.get('port'));
     });
+
 })
 .catch( function( err )
 {
-    console.log("Error starting plugins:");
-    
-    if( error !== undefined )
-    {
-        console.dir(error);
-    }
-    
-    throw new Error("Error in loading plugins");
+    console.log( "Error starting plugins: " + err.message );
+    throw err;
 });
 
 // Helper function
@@ -305,10 +315,5 @@ function addPluginAssets(result)
 }
 // ------------------------------------------------------------------------
 
-// Start the web server
-server.listen( app.get('port'), function() 
-{
-    console.log('Started listening on port: ' + app.get('port'));
-});
 
 

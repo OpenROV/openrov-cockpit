@@ -70,7 +70,7 @@ CPUInterface.prototype.LoadInfo = function( cpu )
 				.spread( function (bytesRead, buffer) 
 				{
 					console.log( "CPU: Got bbb eeprom data" );
-					return buffer.data;
+					return buffer;
 				});
 	};
 
@@ -80,8 +80,8 @@ CPUInterface.prototype.LoadInfo = function( cpu )
 
 		return Promise.try( function()
 		{
-			var revision = data.slice( 0, 16 );
-			var serial = data.slice( 16, 28 );
+			var revision = data.slice( 0, 16 ).data;
+			var serial = data.slice( 16, 28 ).data;
 
 			console.log( "CPU: Parsed BBB eeprom." );
 

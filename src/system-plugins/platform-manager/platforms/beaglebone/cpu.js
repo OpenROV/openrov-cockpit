@@ -2,6 +2,8 @@ var Promise			= require( "bluebird" );
 var fs				= Promise.promisifyAll( require( "fs" ) );
 var path			= require( "path" );
 
+var readAsync 		= Promise.promisify(fs.read, {multiArgs:true});
+
 var CPUInterface = function()
 {
 	var self = this;
@@ -64,8 +66,8 @@ CPUInterface.prototype.LoadInfo = function( cpu )
 	{
 		console.log( "CPU: Opening bbb eeprom..." );
 
-		return fs.readAsync( fd, new Buffer(244), 0, 244, 0 )
-				.then( function (bytesRead, buffer) 
+		return readAsync( fd, new Buffer(244), 0, 244, 0 )
+				.spread( function (bytesRead, buffer) 
 				{
 					console.log( buffer );
 					console.log( "CPU: Got bbb eeprom data" );

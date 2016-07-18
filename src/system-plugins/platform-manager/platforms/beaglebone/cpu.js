@@ -51,9 +51,9 @@ CPUInterface.prototype.LoadInfo = function( cpu )
 	{
 		console.log( "CPU: Looking for BBB eeprom..." );
 
-		return Promise.any([ fs.openAsync( "/sys/bus/nvmem/devices/at24-0/nvmem" ),
-						fs.openAsync( "/sys/class/nvmem/at24-0/nvmem" ),
-						fs.openAsync( "/sys/bus/i2c/devices/0-0050/eeprom" ) ] )
+		return Promise.any([ fs.openAsync( "/sys/bus/nvmem/devices/at24-0/nvmem", "r" ),
+						fs.openAsync( "/sys/class/nvmem/at24-0/nvmem", "r" ),
+						fs.openAsync( "/sys/bus/i2c/devices/0-0050/eeprom", "r" ) ] )
 						.catch( function( err )
 						{
 							throw new Error( "Failed to find BBB eeprom" );

@@ -13,167 +13,117 @@ var path 			= require( "path" );
 var Promise			= require( "bluebird" );
 var fs				= Promise.promisifyAll( require( "fs" ) );
 
-// var BoardInterface 	= require( "BoardInterface.js" );
-// var CPUInterface 	= require( "CPUInterface.js" );
+var BoardInterface 	= require( "BoardInterface.js" );
+var CPUInterface 	= require( "CPUInterface.js" );
 
-var PlatformManager = function( name, deps )
+function PlatformManager( name, deps )
 {	
 	var self = this;
 
-	var platformName        = "";
+	var platformName = "";
 
-	console.log( "PLATFORM" );
-
-	fs.readFileAsync( "/opt/openrov/system/config/platform.conf", 'utf8' )
-	.then( function( data )
-	{
-			console.log( "hey" );
-			console.log( data );
-			// Parse platform info from configuration file
-			var platInfo    = JSON.parse( data );
-			platformName    = platInfo.platform;
-
-			if( platformName == "" )
-			{
-					throw "No platform specified";
-			}
-
-			console.log( platformName );
-	} );
-	// .catch( function( err )
-	// {
-	// 		console.log( "Err: " + err.message );
-	// } );
-
-	console.log( "END PLATFORM" );
-
-
-	// this.platform = {};
-	// this.platform.systemDirectory = deps.config.systemDirectory;
+	this.platform = {};
+	this.platform.systemDirectory = deps.config.systemDirectory;
 	
-	// this.platform.board = new BoardInterface( deps );
-	// this.platform.cpu 	= new CPUInterface( deps );
+	this.platform.board = new BoardInterface( deps );
+	this.platform.cpu 	= new CPUInterface( deps );
 
-	// console.log( "PLATFORM: Loading platform interfaces..." );
-	// console.log( "PLATFORM: " + JSON.stringify( self.platform ) );
+	console.log( "PLATFORM: Loading platform interfaces..." );
 
-	// LoadPlatformName( self.platform );
-
-	// Promise.try( function()
-	// {
-	// 	// Load interfaces
-	// 	return Promise.try( function()
-	// 	{
-	// 		return LoadPlatformName( self.platform );
-	// 	} )
-	// 	// .then( LoadCPUInterface )
-	// 	// .then( LoadBoardInterface )
-	// 	// .then( function( platform )
-	// 	// {
-	// 	// 	console.log( "PLATFORM: Successfully loaded configuration for a supported platform." );
-	// 	// 	deps.globalEventLoop.emit( "platform.supported" );
-	// 	// })
-	// 	.catch( function( error )
-	// 	{
-	// 		//deps.globalEventLoop.emit( "platform.unsupported", error );
-	// 		console.error( "PLATFORM: Failed to load platform details for this system: " + error );
-	// 		throw new Error( "Failed to load platform details for this system: " + error );
-	// 	} );
-	// } )
-	// .catch(  function( error )
-	// {
-	// 	console.error( "What: " + JSON.stringify( err ) );
-	// } );
+	Promise.try( function()
+	{
+		// Load interfaces
+		return Promise.try( function()
+		{
+			return LoadPlatformName( self.platform );
+		} )
+		.then( LoadCPUInterface )
+		.then( LoadBoardInterface )
+		.then( function( platform )
+		{
+			console.log( "PLATFORM: Successfully loaded configuration for a supported platform." );
+			deps.globalEventLoop.emit( "platform.supported" );
+		})
+		.catch( function( error )
+		{
+			//deps.globalEventLoop.emit( "platform.unsupported", error );
+			console.error( "PLATFORM: Failed to load platform details for this system: " + error );
+			throw new Error( "Failed to load platform details for this system: " + error );
+		} );
+	} )
+	.catch(  function( error )
+	{
+		console.error( "What: " + JSON.stringify( err ) );
+	} );
 }
 
-// function LoadPlatformName( platform )
-// { 
-// 	console.log( "PLATFORM: Fetching platform name..." );
+function LoadPlatformName( platform )
+{ 
+	if( process.env.PLATFORM !== undefined )
+	{
+		// Allow shortcut
+		platform.name = process.env.PLATFORM;
+		console.log( "PLATFORM: Platform shortcut set to: " + platform.name );
 
-	// if( process.env.PLATFORM !== undefined )
-	// {
-	// 	// Allow shortcut
-	// 	platform.name = process.env.PLATFORM;
-	// 	console.log( "PLATFORM: Platform shortcut set to: " + platform.name );
-
-	// 	return platform;
-	// }
-	// else
-	// {
-		// var platConfPath = path.resolve( platform.systemDirectory + "/config/platform.conf" );
+		return platform;
+	}
+	else
+	{
+		var platConfPath = path.resolve( platform.systemDirectory + "/config/platform.conf" );
 		
-		// console.log( "PLATFORM: Opening platform conf file: " + platConfPath );
+		return fs.readFileAsync( platConfPath, 'utf8' )
+		.then( function( data )
+		{
+			// Parse platform info from configuration file
+			var platInfo 	= JSON.parse( data );
+			platform.name 	= platInfo.platform;
 
-		// fs.readFileAsync( platConfPath, 'utf8' )
-		// .then( function( data )
-		// {
-		// 	console.log( "PLATFORM: YES" );
-		// 	console.log( data); 
-		// } )
-		// .catch( function( err )
-		// {
-		// 	console.log( "PLATFORM: NO" );
-		// 	console.log( err );
-		// });
+			return platform;
+		} )
+		.catch( function( err ) 
+		{
+			// Can't proceed if we can't determine the platform
+			throw new Error( "Failed to load platform name: " );
+		} );
+	}
+};
 
-		// .then( function( data )
-		// {
-		// 	console.log( "PLATFORM: Parsing platform conf" );
-
-		// 	// Parse platform info from configuration file
-		// 	var platInfo 	= JSON.parse( data );
-		// 	platform.name 	= platInfo.platform;
-			
-		// 	console.log( "PLATFORM: Platform name: " + platform.name );
-
-		// 	return platform;
-		// } )
-		// .catch( function( err ) 
-		// {
-		// 	console.error( "Failed to load platform name: " );
-
-		// 	// Can't proceed if we can't determine the platform
-		// 	throw new Error( "Failed to load platform name: " );
-	// 	// });
-	// }
-// };
-
-// function LoadCPUInterface( platform )
-// { 
-// 	console.log( "PLATFORM: Loading CPU interface..." );
+function LoadCPUInterface( platform )
+{ 
+	console.log( "PLATFORM: Loading CPU interface..." );
 	
-// 	var CPUInterfaceLoader = require( "./platforms/" + platform.name + "/cpu.js" );
+	var CPUInterfaceLoader = require( "./platforms/" + platform.name + "/cpu.js" );
 	
-// 	return CPUInterfaceLoader.Compose( platform )
-// 			.catch( function( err )
-// 			{
-// 				console.error( "Failed to load CPU interface: " + JSON.stringify( err ) );
-// 				throw new Error( "Failed to load CPU interface: " + JSON.stringify( err ) );
-// 			})
-// 			.then( function()
-// 			{
-// 				return platform;
-// 			})
-// };
+	return CPUInterfaceLoader.Compose( platform )
+			.catch( function( err )
+			{
+				console.log( "Failed to load CPU interface: " + err.message );
+				throw err;
+			})
+			.then( function()
+			{
+				return platform;
+			})
+};
 
-// function LoadBoardInterface( platform )
-// { 
-// 	console.log( "PLATFORM: Loading Board interface..." );
+function LoadBoardInterface( platform )
+{ 
+	console.log( "PLATFORM: Loading Board interface..." );
 
-// 	var BoardInterfaceLoader = require( "./platforms/" + platform.name + "/board.js" );
+	var BoardInterfaceLoader = require( "./platforms/" + platform.name + "/board.js" );
 	
-// 	return BoardInterfaceLoader.Compose( platform )
-// 			.catch( function( err )
-// 			{
-// 				console.error( "Failed to load board interface: " + JSON.stringify( err ) );
+	return BoardInterfaceLoader.Compose( platform )
+			.catch( function( err )
+			{
+				console.log( "Failed to load board interface: " + err.message );
 				
-// 				// Continue anyway. Board is optional to operation of cockpit
-// 			} )
-// 			.then( function()
-// 			{
-// 				return platform;
-// 			});
-// };
+				// Continue anyway. Board is optional to operation of cockpit
+			} )
+			.then( function()
+			{
+				return platform;
+			});
+};
 
 // Export provides the public interface
 module.exports = function (name, deps) 

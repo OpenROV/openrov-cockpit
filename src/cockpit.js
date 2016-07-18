@@ -236,27 +236,15 @@ var promises =
 ]
 
 // If a required plugin fails to load, cockpit will terminate. Otherwise, the plugin will be skipped.
-Promise.all( promises.map( function( promise ) 
+Promise.all( promises )
+.each( function( results )
 {
-    return promise.reflect();
-} ) )
-.each( function(inspection) 
-{
-    if ( inspection.isFulfilled() ) 
-    {
-        var value = inspection.value();
-        addPluginAssets( value );
-    } 
-    else 
-    {
-        var reason = inspection.reason();
-        console.log( "ERROR plugins: " + reason );
-    }
-} )
+    addPluginAssets( results );
+})
 .then( function()
 {
     console.log( "Starting following plugins:" );
-    //console.dir( deps.loadedPlugins );
+    console.dir( deps.loadedPlugins );
 
     // Start each plugin
     deps.loadedPlugins.forEach( function( plugin )
@@ -281,7 +269,8 @@ Promise.all( promises.map( function( promise )
 .catch( function( err )
 {
     console.log( "Error starting plugins: " + err.message );
-    throw err;
+    console.log( "Stack trace: " + err.stack );
+    process.abort();
 });
 
 // Helper function

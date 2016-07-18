@@ -53,10 +53,16 @@ var PluginLoader = function()
     {
       console.log( 'Loading ' + plugin + ' plugin.' );
 
+      var pluginInstance = null;
+
       return Promise.try( function()
       {
-        var pluginInstance = require( path.join( dir, plugin) )( plugin, deps );
-
+          return require( path.join( dir, plugin) )( plugin, deps );
+      } )
+      .then( function( inst )
+      {
+        pluginInstance = inst;
+        
         // Check to see if plugin's index.js was loaded
         if( pluginInstance == undefined )
         {
@@ -194,7 +200,7 @@ var PluginLoader = function()
                   wcPromise,
                   bowerPromise
                 ] );
-      } )
+      })
       .catch( function( err )
       {
         // If plugin belongs to a required subsection, rethrow error
@@ -206,7 +212,7 @@ var PluginLoader = function()
         {
           console.log( "Error loading plugin: " + err.message );
         }
-      });
+      } );
     })
     .catch( function( err )
     {

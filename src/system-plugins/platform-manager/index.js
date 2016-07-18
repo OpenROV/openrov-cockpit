@@ -41,12 +41,14 @@ function PlatformManager( name, deps )
 	{
 		console.log( "PLATFORM: Successfully loaded configuration for a supported platform." );
 		deps.globalEventLoop.emit( "platform.supported" );
+
+		return self;
 	})
 	.catch( function( err )
 	{
 		//deps.globalEventLoop.emit( "platform.unsupported", error );
 		console.log( "PLATFORM: Failed to load platform details for this system: " + err.message );
-		throw err;
+		return null;
 	} );
 }
 

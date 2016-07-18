@@ -65,10 +65,11 @@ CPUInterface.prototype.LoadInfo = function( cpu )
 		console.log( "CPU: Opening bbb eeprom..." );
 
 		return fs.readAsync( fd, new Buffer(244), 0, 244, 0 )
-				.then( function (result) 
+				.then( function (bytesRead, buffer) 
 				{
+					console.log( buffer );
 					console.log( "CPU: Got bbb eeprom data" );
-					return result[1];
+					return buffer;
 				});
 	};
 

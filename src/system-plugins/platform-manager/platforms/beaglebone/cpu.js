@@ -53,7 +53,11 @@ CPUInterface.prototype.LoadInfo = function( cpu )
 
 		return Promise.any([ fs.openAsync( "/sys/bus/nvmem/devices/at24-0/nvmem" ),
 						fs.openAsync( "/sys/class/nvmem/at24-0/nvmem" ),
-						fs.openAsync( "/sys/bus/i2c/devices/0-0050/eeprom" ) ] );
+						fs.openAsync( "/sys/bus/i2c/devices/0-0050/eeprom" ) ] )
+						.catch( function( err )
+						{
+							throw new Error( "Failed to find BBB eeprom" );
+						} );
 	}
 	
 	function ReadEEPROM( fd )

@@ -87,8 +87,6 @@ var PluginLoader = function()
 
                                 var ejsicon = path.join( dir, plugin, ejs + '.icon' );
 
-                                console.log( "added applet for " + plugin );
-
                                 // Handle ejs files, with and without icons
                                 return fs.statAsync( ejsicon )
                                         .then( function()
@@ -115,7 +113,6 @@ var PluginLoader = function()
                             .then( function()
                             {
                               // Add public assets to a static route
-                              console.log( "added public for " + plugin );
                               result.assets.push({ path: shareDir + '/' + plugin, assets: publicAssets});
                               pluginInstance._raw.assets.push({ path: shareDir + '/' + plugin, assets: publicAssets});
                             })
@@ -134,7 +131,6 @@ var PluginLoader = function()
                                   .each( function( script )
                                   {
                                     // Add js assets
-                                    console.log( "added js for " + plugin + ": script: " + script );
                                     result.scripts.push( shareDir + '/' + plugin + '/js/' + script );
                                     pluginInstance._raw.scripts.push( shareDir + '/' + plugin + '/js/' + script );
                                   } );
@@ -154,7 +150,6 @@ var PluginLoader = function()
                                   .each( function( style )
                                   {
                                     // Add css assets
-                                    console.log( "added css for " + plugin + ": script: " + style );
                                     result.styles.push(shareDir + '/' + plugin + '/css/' + style);
                                     pluginInstance._raw.styles.push(shareDir + '/' + plugin + '/css/' + style);
                                   } );
@@ -169,7 +164,6 @@ var PluginLoader = function()
         var wcPromise = fs.statAsync( wcAssets )
                     .then( function()
                     {
-                      console.log( "added wc for " + plugin );
                       result.assets.push({ path: 'components' + '/' + plugin, assets: wcAssets});
                       pluginInstance._raw.assets.push({ path: 'components' + '/' + plugin, assets: wcAssets});
                     })
@@ -183,7 +177,6 @@ var PluginLoader = function()
         var bowerPromise = fs.statAsync( bowerAssets )
                   .then( function()
                   {
-                    console.log( "added bower for " + plugin );
                     result.assets.push({ path: 'components' , assets: bowerAssets});
                     pluginInstance._raw.assets.push({ path: 'components' , assets: bowerAssets});
                   })

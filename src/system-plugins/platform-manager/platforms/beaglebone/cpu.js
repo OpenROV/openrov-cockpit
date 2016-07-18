@@ -69,9 +69,8 @@ CPUInterface.prototype.LoadInfo = function( cpu )
 		return readAsync( fd, new Buffer(244), 0, 244, 0 )
 				.spread( function (bytesRead, buffer) 
 				{
-					console.log( buffer );
 					console.log( "CPU: Got bbb eeprom data" );
-					return buffer;
+					return buffer.data;
 				});
 	};
 

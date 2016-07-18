@@ -112,8 +112,7 @@ CPUInterface.prototype.CheckSupport = function( cpu )
 				}
 				else
 				{
-					console.error( "CPU: Wasn't supported" );
-					throw new Error( "CPU doesn't exist in database." );
+					throw new Error( "Detected CPU was not in list of supported models." );
 				}
 			} );
 };

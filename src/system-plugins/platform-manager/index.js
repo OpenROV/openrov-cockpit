@@ -30,30 +30,23 @@ function PlatformManager( name, deps )
 
 	console.log( "PLATFORM: Loading platform interfaces..." );
 
-	Promise.try( function()
+	// Load interfaces
+	return Promise.try( function()
 	{
-		// Load interfaces
-		return Promise.try( function()
-		{
-			return LoadPlatformName( self.platform );
-		} )
-		.then( LoadCPUInterface )
-		.then( LoadBoardInterface )
-		.then( function( platform )
-		{
-			console.log( "PLATFORM: Successfully loaded configuration for a supported platform." );
-			deps.globalEventLoop.emit( "platform.supported" );
-		})
-		.catch( function( error )
-		{
-			//deps.globalEventLoop.emit( "platform.unsupported", error );
-			console.error( "PLATFORM: Failed to load platform details for this system: " + error );
-			throw new Error( "Failed to load platform details for this system: " + error );
-		} );
+		return LoadPlatformName( self.platform );
 	} )
-	.catch(  function( error )
+	.then( LoadCPUInterface )
+	.then( LoadBoardInterface )
+	.then( function( platform )
 	{
-		console.error( "What: " + JSON.stringify( err ) );
+		console.log( "PLATFORM: Successfully loaded configuration for a supported platform." );
+		deps.globalEventLoop.emit( "platform.supported" );
+	})
+	.catch( function( err )
+	{
+		//deps.globalEventLoop.emit( "platform.unsupported", error );
+		console.log( "PLATFORM: Failed to load platform details for this system: " + err.message );
+		throw err;
 	} );
 }
 
@@ -83,7 +76,7 @@ function LoadPlatformName( platform )
 		.catch( function( err ) 
 		{
 			// Can't proceed if we can't determine the platform
-			throw new Error( "Failed to load platform name: " );
+			throw new Error( "Failed to load platform name" );
 		} );
 	}
 };

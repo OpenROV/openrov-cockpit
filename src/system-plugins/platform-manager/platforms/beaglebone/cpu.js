@@ -80,10 +80,12 @@ CPUInterface.prototype.LoadInfo = function( cpu )
 
 		return Promise.try( function()
 		{
-			var revision = data.slice( 0, 16 ).data;
-			var serial = data.slice( 16, 28 ).data;
+			var revision = data.slice( 0, 16 ).toString( 'hex' );
+			var serial = data.slice( 16, 28 ).toString( 'hex' );
 
 			console.log( "CPU: Parsed BBB eeprom." );
+
+			console.log( "CPU INFO: " + JSON.stringify( { "revision": revision, "serial": serial } ) );
 
 			return { "revision": revision, "serial": serial };
 		} );

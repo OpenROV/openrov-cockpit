@@ -14,12 +14,12 @@
 	
 	"postinstall":
 	[
-		
+		{ "name": "install-orov-cb25-overlay.py", "type": "python" }
 	],
 	
 	"preuninstall":
 	[
-		
+		{ "name": "uninstall-orov-cb25-overlay.py", "type": "python" }
 	],
 	
 	"postuninstall":

@@ -133,6 +133,17 @@ function ExecuteScript( baseDir, script )
 							console.log( 'stderr: ', result.stderr );
 						});
 			}
+
+			case "python":
+			{
+				// Execute python script
+				return execAsync( "python " + src, opts )
+						.then( function( result )
+						{
+							console.log( 'stdout: ', result.stdout );
+							console.log( 'stderr: ', result.stderr );
+						});
+			}
 			
 			default:
 			{

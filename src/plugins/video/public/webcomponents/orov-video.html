@@ -381,9 +381,15 @@ else global.CBuffer = CBuffer;
         detached: function(){
           this.shortCircuit=true;
         },
+				attached : function() {
+					if (this.emitter) {
+						this.emitter.emit('video.ready');
+					}
+				},
         packetVideo_initializationInProgress: false,
         registerEmitterHanlders: function(emitter){
           var self = this;
+					self.emitter = emitter;
           this.shortCircuit=false;
           emitter.withHistory.on('settings-change.videosettings',function(settings){
             if (self.shortCircuit) {return;}

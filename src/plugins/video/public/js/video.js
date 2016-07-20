@@ -71,6 +71,11 @@
     var self=this;
  
     var CameraRegsitrations = {};
+
+    this.cockpit.withHistory.on('video.ready' {
+      self.rov.emit('video.ready');
+    });
+
     this.rov.withHistory.on('CameraRegistration',function(data){
       //TODO: More robust handling of duplicat CameraRegistration messages.  If the Camera
       //already is setup, we want to ignore.  But we also want to handle multiple Cameras
@@ -134,82 +139,7 @@
 
           self.cockpit.emit('CameraRegistration',data);
           break;
-        case 'binaryJS':
-
-            data.sourceAddress = ResolveURL(data.relativeServiceUrl);
-            var address = data.sourceAddress.replace('http', 'ws') + data.wspath;
-
-            var workerFunction = function() { // will run in a Worker, only here to have code completition in the editor;
-              onmessage = function(message) {
-                var address = message.data.address;
-                debugger;
-                window = {};
-                
-                self._listeners = {};
-                self.postMessage_orig = self.postMessage;
-                self.addEventListener_orig = self.addEventListener;
-                self.addEventListener = function(type, clb) { 
-                  if(!(type in self._listeners)) {
-                    self._listeners[type] = [];
-                  }
-                  self._listeners[type].push(clb);
-                   
-                };
-                
-                self.postMessage = function(messageName, arg) {
-                  var message = 'message';
-                  if(!(message in self._listeners)) {
-                    return;
-                  }
-                  var stack = self._listeners[message];
-                  var event = {source: self, data: messageName}
-                  for(var i = 0, l = stack.length; i < l; i++) {
-                      stack[i].call(self, event);
-                  }                  
-                };
-                importScripts(message.data.url + '/components/binaryjs/dist/binary.js');
-                var connection;
-                connection = BinaryClient(address);
-
-                var streamNumber = 0;
-                var handle;
-                handle = function() {
-                    connection.on('stream', function(stream, meta) {
-                      // console.log('New Stream #' + streamNumber++);
-                      if (self.lastFrameTime !== undefined && self.lastFrameTime > meta) return;
-                      self.lastFrameTime = meta; 
-                      stream.on('data', function(data) {
-
-                        var now = Date.now();
-                        self.postMessage_orig(data, [data])
-                      } )
-                    })
-                  };
-
-                  connection.on('open', handle);
-
-              };
-              return onmessage;
-            } // workerFunction
-
-            var worker = StartWorker(workerFunction.toString());
-
-            var url = document.location.origin;
-
-            var index = url.indexOf('index.html');
-            if (index != -1) {
-              url = url.substring(0, index);
-            }
-            worker.postMessage({ address: address, url: url});            
-            worker.onmessage = function(message) {    
-              self.cockpit.emit('x-motion-jpeg.data',message.data);
-            }
-
-            data.sourceAddress = '';
-            self.cockpit.emit('CameraRegistration',data);
-          break;
-
-
+        
         case 'rov': //data is comming over the rov bus, just pass it on to the cockpit bus
           var dataflowing=false; //this wont work for multiple cameras.
           self.rov.on('x-h264-video.data',function(data){

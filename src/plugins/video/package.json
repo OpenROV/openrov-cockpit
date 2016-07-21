@@ -11,6 +11,5 @@
   "license": "ISC",
   "dependencies": {
     "socket.io-client": "^1.4.8",
-    "socket.io-stream": "^0.9.0"
   }
 }

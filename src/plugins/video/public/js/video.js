@@ -72,10 +72,6 @@
  
     var CameraRegsitrations = {};
 
-    this.cockpit.withHistory.on('video.ready' {
-      self.rov.emit('video.ready');
-    });
-
     this.rov.withHistory.on('CameraRegistration',function(data){
       //TODO: More robust handling of duplicat CameraRegistration messages.  If the Camera
       //already is setup, we want to ignore.  But we also want to handle multiple Cameras
@@ -105,14 +101,8 @@
               self.cockpit.emit('x-h264-video.data',data);
           }
           
-          
           var handleMjpegData=function(data){
-            
-              self.cockpit.emit('x-motion-jpeg.data',data.data);
-              var now =Date.now();
-              var dif = Number(now) - Number(data.timestamp);
-              //console.log(data.timestamp + ' ' + now + ' ' +  dif );
-              //console.log(dif );
+              self.cockpit.emit('x-motion-jpeg.data',data);
           }
           
           //TODO: abstract the messages enough that we can have multiple cameras controls
@@ -127,19 +117,6 @@
           self.cockpit.emit('CameraRegistration',data);
           break;
 
-        case 'socket.io_2':
-          data.sourceAddress = ResolveURL(data.relativeServiceUrl);
-          var channel = io.connect(data.sourceAddress ,{path:data.wspath, reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 10} );          
-          channel.on('connect', function(_socket) {
-              // console.log('connected');
-              this.on('x-motion-jpeg.data', function(data) {
-                self.cockpit.emit('x-motion-jpeg.data',data);                
-              })
-          });
-
-          self.cockpit.emit('CameraRegistration',data);
-          break;
-        
         case 'rov': //data is comming over the rov bus, just pass it on to the cockpit bus
           var dataflowing=false; //this wont work for multiple cameras.
           self.rov.on('x-h264-video.data',function(data){

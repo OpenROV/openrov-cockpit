@@ -56,50 +56,70 @@ mjpegvideo.prototype.start = function start(){
   if (process.env.MJPG_MOCK === 'true'){
       self.startCamera('/dev/video0');
   } else {
-    this.enumerateDevices()
+
+    // self.deps.cockpit.on('plugin.mjpeg-video.start', function(device) {
+    //   self.startCamera('/dev/' + device);
+    //   self.connectVideoServer();
+    // });
+
+    self.enumerateDevices()
       .then(function(cameras) {
-        if (cameras.length > 0) {
+        if (cameras && cameras.length > 0) {
+          self.startVideoServer()
+          self.connectVideoServer();
+          // log('Found cameras ' + JSON.stringify(cameras));
+          // self.deps.cockpit.emit("plugin.mjpeg-video.cameraInfo", cameras);
 
-          var videoServer = io.connect( 'http://localhost:' + defaults.port, 
-            { 
-              path: defaults.wspath, 
-              reconnection: true, 
-              reconnectionAttempts: Infinity, 
-              reconnectionDelay: 10 
-            } );
-
-          videoServer.on('video-deviceRegistration', function(result) {
-            self.deps.globalEventLoop.emit('video-deviceRegistration',result);
-            log('mjpeg-video got device registration: ' + JSON.stringify(result));
-          });
-
-          // Video endpoint announcement
-          videoServer.on( "mjpeg-video.channel.announcement", function( camera, info )
-          {
-            log( "Announcement info: " + JSON.stringify( info ) );
-            
-            // Emit message on global event loop to register with the Video plugin
-            self.deps.globalEventLoop.emit('CameraRegistration',
-            { 
-              location:           info.txtRecord.cameraLocation,
-              videoMimeType:      info.txtRecord.videoMimeType,
-              resolution:         info.txtRecord.resolution,
-              framerate:          info.txtRecord.framerate,
-              wspath:             info.txtRecord.wspath,
-              relativeServiceUrl: info.txtRecord.relativeServiceUrl,
-              sourcePort:         info.port,
-              sourceAddress:      '',
-              connectionType:     'socket.io'
-            });
-          });
-          self.startCamera('/dev/video0');
         }
       });
-    }
-  
+  }
 };
 
-mjpegvideo.prototype.startCamera = function startCamera(device){
+
+mjpegvideo.prototype.connectVideoServer = function() {
+  var self = this;
+  log('Connecting to video server');
+
+  var videoServer = io.connect( 'http://localhost:' + defaults.port, 
+    { 
+      path: defaults.wspath, 
+      reconnection: true, 
+      reconnectionAttempts: Infinity, 
+      reconnectionDelay: 10 
+    } );
+
+  self.deps.cockpit.on('plugin.mjpeg-video.start', function(device) {
+    videoServer.emit('video.start', device);
+  });
+
+  videoServer.on('video-deviceRegistration', function(result) {
+    self.deps.cockpit.emit('plugin.mjpeg-video.deviceRegistration',result);
+    log('mjpeg-video got device registration: ' + JSON.stringify(result));
+  });
+
+  // Video endpoint announcement
+  videoServer.on( "mjpeg-video.channel.announcement", function( camera, info )
+  {
+    log( "Announcement info: " + JSON.stringify( info ) );
+    
+    // Emit message on global event loop to register with the Video plugin
+    self.deps.globalEventLoop.emit('CameraRegistration',
+    { 
+      location:           info.txtRecord.cameraLocation,
+      videoMimeType:      info.txtRecord.videoMimeType,
+      resolution:         info.txtRecord.resolution,
+      framerate:          info.txtRecord.framerate,
+      wspath:             info.txtRecord.wspath,
+      relativeServiceUrl: info.txtRecord.relativeServiceUrl,
+      sourcePort:         info.port,
+      sourceAddress:      '',
+      connectionType:     'socket.io'
+    });
+  });
+}
+
+
+mjpegvideo.prototype.startVideoServer = function startCamera(device){
   var launch_options = ['node', require.resolve('mjpeg-video-server')];
 
   var mock=false;
@@ -110,7 +130,6 @@ mjpegvideo.prototype.startCamera = function startCamera(device){
     launch_options.push(':8090/?action=stream');
   }
 
-  launch_options.push(device);
 
   const infinite=-1;
   log('Starting mjpeg-video-server ' + launch_options);
@@ -144,6 +163,8 @@ mjpegvideo.prototype.startCamera = function startCamera(device){
   monitor.start();
 
 }
+
+
 
 //Export provides the public interface
 module.exports = function (name, deps) {

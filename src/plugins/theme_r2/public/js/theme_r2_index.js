@@ -1,3 +1,4 @@
+//TODO: Move this to a community plugin
 (function (window, $, undefined) {
   if (window.openrovtheme!=='theme_r2') return;
 
@@ -9,9 +10,12 @@
     this.cockpit = cockpit;
 
     // for plugin management:
-    this.name = 'ThemeR2';   // for the settings
-    this.viewName = 'Theme-R2'; // for the UI
-    this.canBeDisabled = true; //allow enable/disable
+    this.Plugin_Meta = {
+      name: 'ThemeR2', // for the settings
+      viewName: 'Theme-R2', // for the UI
+      defaultEnabled: false
+    };
+
     this.isTheme =true;
     this.enable = function () {
       alert('theme_r2 enabled');

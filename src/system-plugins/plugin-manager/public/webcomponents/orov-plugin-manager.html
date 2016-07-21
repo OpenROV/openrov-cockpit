@@ -10,9 +10,9 @@
 
                         <li>
                             <div>
-                                <span>{{__(item.viewName)}}</span><span>{{__('Enabled:')}}</span><span>{{item.isEnabled}}</span>
-                                <button type="button" class="btn btn-xs btn-default" hidden="{{item.isEnabled}}" on-click="enable" >{{__('Enable')}}</button>
-                                <button type="button" class="btn btn-xs btn-default" hidden="{{!item.isEnabled}}" on-click="disable">{{__('Disable')}}</button>
+                                <button type="button" class="btn btn-xs btn-default" hidden="{{item.isEnabled}}" disabled="{{!item.canBeEnabled}}" on-click="enable" >{{__('Enable')}}</button>
+                                <button type="button" class="btn btn-xs btn-default" hidden="{{!item.isEnabled}}" disabled="{{!item.canBeDisabled}}" on-click="disable">{{__('Disable')}}</button>
+                                <span>{{__(item.viewName)}}</span>
                             </div>
                         </li>
                       </template>
@@ -53,7 +53,13 @@
           if (this.eventEmitter!==undefined){
             this.eventEmitter.emit('plugin-manager.disablePlugin',e.model.item.name);
           }
-        }
+        },
+        canBeEnabled: function(item){
+          return !item.isEnabled && item.canBeEnabled
+        },
+        canBeDisabled: function(item){
+          return item.isEnabled && item.canBeDisabled
+        },
       })
     })();
   </script>

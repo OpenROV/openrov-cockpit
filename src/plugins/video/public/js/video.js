@@ -18,10 +18,9 @@
     this.rov = cockpit.rov;
 
     // for plugin management:
-    this.pluginDefaults = {
+    this.Plugin_Meta = {
       name : 'video',   // for the settings
       viewName : 'Video plugin', // for the UI
-      canBeDisabled : false, //allow enable/disable
       defaultEnabled: true
    };
 

@@ -113,6 +113,7 @@ UIManager.prototype.start = function start(){
       sysscripts: pathInfo.sysscripts,
       config: self.deps.config,
       scriplet: scriplets.find(function(item){return item.name==applet}),
+      scriplets: scriplets,
       theme:theme
     });
   });  

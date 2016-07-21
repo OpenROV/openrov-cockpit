@@ -1,3 +1,6 @@
+//TODO: Replace the URL with the value returned in the profile
+//TODO: Disable sreaming if not logged in with streaming enabled in the profile
+//TODO: Change the API to request a streaming server from the request API via the URL in the profile
 (function(window, document, $) { //The function wrapper prevents leaking variables to global space
   'use strict';
 
@@ -28,10 +31,9 @@
     this.settings = {};
 
     // for plugin management:
-    this.pluginDefaults = {
+    this.Plugin_Meta = {
       name: 'Internet Streaming', // for the settings
       viewName: 'Internet Streaming plugin', // for the UI
-      canBeDisabled: true, //allow enable/disable
       defaultEnabled: true
     };
     this.connected = false;

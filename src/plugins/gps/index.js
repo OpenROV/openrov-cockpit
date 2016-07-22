@@ -13,52 +13,52 @@ function GPS(name, deps)
 	this.automaticallyReconnect 	= true;
 	this.reconnectTimer           = {};
   
-  if( process.env.USE_MOCK_GPS == "true" )
-  {
-    setInterval( function()
-    {
-      var tpv =
-      {
+  // if( process.env.USE_MOCK_GPS == "true" )
+  // {
+  //   setInterval( function()
+  //   {
+  //     var tpv =
+  //     {
      
-        lat: 39.0916667 + (Math.random() * 0.0050 ),
-        lon: -119.9542667 + (Math.random() * 0.0050 ),
-        speed: 0.1,
-        alt: 6000
-      };
+  //       lat: 39.0916667 + (Math.random() * 0.0050 ),
+  //       lon: -119.9542667 + (Math.random() * 0.0050 ),
+  //       speed: 0.1,
+  //       alt: 6000
+  //     };
         
-      self.cockpit.emit( 'plugin.gps.TPV', tpv );
-    }, 1000 );
-  }
-  else
-  {
-    this.global.withHistory.on('settings-change.gps',function( data )
-    {
-      self.listener = new gpsd.Listener(
-      {
-        port: 2947,
-        hostname: data.gps.server,
-        logger: 
-        {
-          info: function() {},
-          warn: console.warn,
-          error: console.error
-        },
-        parse: true
-      } );
+  //     self.cockpit.emit( 'plugin.gps.TPV', tpv );
+  //   }, 1000 );
+  // }
+  // else
+  // {
+  //   this.global.withHistory.on('settings-change.gps',function( data )
+  //   {
+  //     self.listener = new gpsd.Listener(
+  //     {
+  //       port: 2947,
+  //       hostname: data.gps.server,
+  //       logger: 
+  //       {
+  //         info: function() {},
+  //         warn: console.warn,
+  //         error: console.error
+  //       },
+  //       parse: true
+  //     } );
       
-      // Register callbacks for events emitted by the listener
-      self.registerListenerEvents();
+  //     // Register callbacks for events emitted by the listener
+  //     self.registerListenerEvents();
 
-      // Start attempts to connect to gpsd
-      self.connectToGpsd();
-    });
-  }
+  //     // Start attempts to connect to gpsd
+  //     self.connectToGpsd();
+  //   });
+  // }
   
 }
 
 GPS.prototype.start = function start()
 {
-  console.log( "GPS plugin started" );
+  // console.log( "GPS plugin started" );
 }
 
 GPS.prototype.registerListenerEvents = function()

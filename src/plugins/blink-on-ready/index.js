@@ -4,7 +4,7 @@ function readyAyeReady(name, deps) {
   this.deps = deps;
   var self=this;
   //rovsys comes up when arduino starts
-  deps.globalEventLoop.on('physicalInterface.rovsys', function(s)
+  deps.globalEventLoop.on('mcu.rovsys', function(s)
   {
     if (! done) 
     {
@@ -22,30 +22,30 @@ function readyAyeReady(name, deps) {
   var setLight = function(light) {
       var cmd = 'ligt(' + light + ')';
       
-      deps.globalEventLoop.emit( 'physicalInterface.send', cmd );
+      deps.globalEventLoop.emit( 'mcu.SendCommand', cmd );
       
       var chk = setInterval(function() {
        if (lastLightCmd != cmd) 
        {
-         deps.globalEventLoop.emit( 'physicalInterface.send', cmd);
+         deps.globalEventLoop.emit( 'mcu.SendCommand', cmd);
        }
        else {
          clearInterval(chk);
          //TODO: Add motor chirp by cycling ESCs
-         setTimeout(function() { deps.globalEventLoop.emit( 'physicalInterface.send', 'ligt(24.5)');}, 500);
-         setTimeout(function() { deps.globalEventLoop.emit( 'physicalInterface.send', 'ligt(40.5)');}, 1000);
-         setTimeout(function() { deps.globalEventLoop.emit( 'physicalInterface.send', 'ligt(24.5)');}, 1500);
-         setTimeout(function() { deps.globalEventLoop.emit( 'physicalInterface.send', 'ligt(12.5)');}, 2000);
-         setTimeout(function() { deps.globalEventLoop.emit( 'physicalInterface.send', 'ligt(0)');}, 2500);
-         setTimeout(function() { deps.globalEventLoop.emit( 'physicalInterface.send', 'ligt(50)');}, 3500);
-         setTimeout(function() { deps.globalEventLoop.emit( 'physicalInterface.send', 'ligt(0)');}, 4000);
-         setTimeout(function() { deps.globalEventLoop.emit( 'physicalInterface.send', 'ligt(50)');}, 4500);
-         setTimeout(function() { deps.globalEventLoop.emit( 'physicalInterface.send', 'ligt(0)');}, 5000);
+         setTimeout(function() { deps.globalEventLoop.emit( 'mcu.SendCommand', 'ligt(24.5)');}, 500);
+         setTimeout(function() { deps.globalEventLoop.emit( 'mcu.SendCommand', 'ligt(40.5)');}, 1000);
+         setTimeout(function() { deps.globalEventLoop.emit( 'mcu.SendCommand', 'ligt(24.5)');}, 1500);
+         setTimeout(function() { deps.globalEventLoop.emit( 'mcu.SendCommand', 'ligt(12.5)');}, 2000);
+         setTimeout(function() { deps.globalEventLoop.emit( 'mcu.SendCommand', 'ligt(0)');}, 2500);
+         setTimeout(function() { deps.globalEventLoop.emit( 'mcu.SendCommand', 'ligt(50)');}, 3500);
+         setTimeout(function() { deps.globalEventLoop.emit( 'mcu.SendCommand', 'ligt(0)');}, 4000);
+         setTimeout(function() { deps.globalEventLoop.emit( 'mcu.SendCommand', 'ligt(50)');}, 4500);
+         setTimeout(function() { deps.globalEventLoop.emit( 'mcu.SendCommand', 'ligt(0)');}, 5000);
         }}, 400);
   };
 
 
-  deps.globalEventLoop.on( 'physicalInterface.command', function(command) {
+  deps.globalEventLoop.on( 'mcu.command', function(command) {
    lastLightCmd = command;
   });
 

@@ -40,7 +40,7 @@
 
   Cockpit.prototype.listen = function listen() {
     var cockpit = this;
-    cockpit.rov.on('physicalInterface.rovsys', function (data) {
+    cockpit.rov.on('mcu.rovsys', function (data) {
       console.log('got RovSys update from Arduino');
       if ('capabilities' in data) {
         cockpit.capabilities = data.capabilities;

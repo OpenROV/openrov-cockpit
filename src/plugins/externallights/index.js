@@ -24,8 +24,7 @@ function ExternalLights(name, deps)
     });
 
     // Arduino
-    deps.globalEventLoop.on( 'physicalInterface.status', function (data) 
-    {
+    deps.globalEventLoop.on( 'mcu.status', function (data) {
         if ('LIGPE0' in data) 
         {
             //value of 0-1.0 representing percent
@@ -83,15 +82,14 @@ function ExternalLights(name, deps)
         {
             lights[ lightNum ] = 1;
         }
-
-        if (lights[ lightNum ] <= 0)
+        else if (lights[ lightNum ] <= 0)
         {
             lights[ lightNum ] = 0;
         }
 
         var command = 'elight' + lightNum +'(' + ArduinoHelper.serial.packPercent(lights[ lightNum ]) + ')';
 
-        deps.globalEventLoop.emit( 'physicalInterface.send', command);
+        deps.globalEventLoop.emit( 'mcu.SendCommand', command);
     };
 };
 

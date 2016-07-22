@@ -12,7 +12,7 @@
     };
 
     // Arduino
-    deps.globalEventLoop.on( 'physicalInterface.status', function (status) {
+    deps.globalEventLoop.on( 'mcu.status', function (status) {
       if ('hdgd' in status) {
         navdata.heading = status.hdgd;
       }
@@ -34,10 +34,10 @@
     });
 
     deps.cockpit.on('plugin.navigationData.zeroDepth', function () {
-      deps.globalEventLoop.emit( 'physicalInterface.send', 'dzer()');
+      deps.globalEventLoop.emit( 'mcu.SendCommand', 'dzer()');
     });
     deps.cockpit.on('plugin.navigationData.calibrateCompass', function () {
-      deps.globalEventLoop.emit( 'physicalInterface.send', 'ccal()');
+      deps.globalEventLoop.emit( 'mcu.SendCommand', 'ccal()');
     });
 
     //TODO: Add API for switching compass to GYRO only mode for relative positioning if the compass is capable.

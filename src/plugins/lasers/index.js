@@ -9,7 +9,7 @@
     });
 
     // Arduino
-    deps.globalEventLoop.on( 'physicalInterface.status', function (data) {
+    deps.globalEventLoop.on( 'mcu.status', function (data) {
       if ('claser' in data) {
         var enabled = data.claser == 255;
         deps.cockpit.emit('plugin.laser.state', {enabled:(enabled ? true : false)});
@@ -23,7 +23,7 @@
       } else {
         claserstate = 0;
       }
-      deps.globalEventLoop.emit( 'physicalInterface.send', 'claser(' + claserstate + ')');
+      deps.globalEventLoop.emit( 'mcu.SendCommand', 'claser(' + claserstate + ')');
     };
 
   }

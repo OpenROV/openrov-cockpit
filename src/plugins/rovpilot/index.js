@@ -168,7 +168,7 @@
         for(var control in controls){
           if(controls[control] != this.priorControls[control]){
             var command = control + '(' + controls[control] * 100+ ')';
-            self.globalEventLoop.emit( 'physicalInterface.send', command);
+            self.globalEventLoop.emit( 'mcu.SendCommand', command);
           //  console.log(command);
           }
         }

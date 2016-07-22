@@ -6,20 +6,20 @@ SerialMonitor = function SerialMonitor(name, deps) {
   this.listen(deps);
 };
 SerialMonitor.prototype.listen = function listen(deps) {
-  deps.globalEventLoop.on('physicalInterface.serialRecieved', function (data) {
+  deps.globalEventLoop.on('mcu.serialRecieved', function (data) {
     deps.cockpit.emit('plugin.serial-monitor.serial-received', data);
   });
   
   deps.cockpit.on('plugin.serial-monitor.start', function () {
-    deps.globalEventLoop.emit('physicalInterface.startRawSerial');
+    deps.globalEventLoop.emit('mcu.StartRawSerial');
   });
 
   deps.cockpit.on('plugin.serial-monitor.stop', function () {
-    deps.globalEventLoop.emit('physicalInterface.stopRawSerial');
+    deps.globalEventLoop.emit('mcu.StopRawSerial');
   });
 
   deps.cockpit.on('plugin.serial-monitor.serial-sent', function (data) {
-    deps.globalEventLoop.emit('physicalInterface.send', data );
+    deps.globalEventLoop.emit('mcu.SendCommand', data );
   });
 
 };

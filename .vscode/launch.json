@@ -15,12 +15,14 @@
 			],
 			"env": {
 				"NODE_ENV": "development",
+				"PLATFORM": "mock",
+				"BOARD":	"mock3000",
 				"DEV_MODE": "true",
 				"USE_MOCK": "true",
-				"HARDWARE_MOCK": "true",
+				"CPU_MOCK": "123MOCK",
 				"GEO_MOCK": "true",
+				"DEBUG": "bridge, mcu, cpu",
 				"port": 8080,
-				"DEBUG": "hardware, physical-interface",
 				"configfile": "/tmp/rovconfig.json",
 				"plugins__ui-manager__selectedUI": "new-ui",
 				"pluginsDownloadDirectory": "/tmp/plugins"

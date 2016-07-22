@@ -23,7 +23,7 @@
     });
 
     // Arduino
-    deps.globalEventLoop.on( 'physicalInterface.status', function (data) {
+    deps.globalEventLoop.on( 'mcu.status', function (data) {
       if ('servo' in data) {
         var angle = 90 / 500 * data.servo * -1 - 90;
         deps.cockpit.emit('plugin.cameraTilt.angle', angle);
@@ -47,7 +47,7 @@
 
       console.log( "tilt:" + servoTilt );
 
-      deps.globalEventLoop.emit( 'physicalInterface.send', command);
+      deps.globalEventLoop.emit( 'mcu.SendCommand', command);
     };
 
     var adjustCameraTilt = function(value) {

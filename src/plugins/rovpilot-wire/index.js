@@ -14,13 +14,13 @@
       //TODO: Tunnel the off/on up through the arduino code
       if ('enabled' in value){
         if (value.enabled===true){
-          deps.globalEventLoop.emit( 'physicalInterface.send', 'holdDepth_on()');
+          deps.globalEventLoop.emit( 'mcu.SendCommand', 'holdDepth_on()');
         } else {
-          deps.globalEventLoop.emit( 'physicalInterface.send', 'holdDepth_off()');
+          deps.globalEventLoop.emit( 'mcu.SendCommand', 'holdDepth_off()');
         }
       }
       if ('targetDepth' in value){
-        deps.globalEventLoop.emit( 'physicalInterface.send', 'holdDepth('+value.targetDepth+')')
+        deps.globalEventLoop.emit( 'mcu.SendCommand', 'holdDepth('+value.targetDepth+')')
       }
     });
 
@@ -28,18 +28,18 @@
       //TODO: Tunnel the off/on up through the arduino code
       if ('enabled' in value){
         if (value.enabled===true){
-          deps.globalEventLoop.emit( 'physicalInterface.send', 'holdHeading_on()');
+          deps.globalEventLoop.emit( 'mcu.SendCommand', 'holdHeading_on()');
         } else {
-          deps.globalEventLoop.emit( 'physicalInterface.send', 'holdHeading_off()');
+          deps.globalEventLoop.emit( 'mcu.SendCommand', 'holdHeading_off()');
         }
       }
       if ('targetHeading' in value){
-        deps.globalEventLoop.emit( 'physicalInterface.send', 'holdHeading('+value.targetHeading+')')
+        deps.globalEventLoop.emit( 'mcu.SendCommand', 'holdHeading('+value.targetHeading+')')
       }
     });
 
     // Arduino
-    deps.globalEventLoop.on( 'physicalInterface.status', function (status) {
+    deps.globalEventLoop.on( 'mcu.status', function (status) {
       if ('targetDepth' in status) {
         self.state.depth.enabled = status.targetDepth != DISABLED;
         self.state.depth.targetDepth = Number(status.targetDepth)/100;

@@ -12,7 +12,7 @@ function diveprofile(name, deps) {
 diveprofile.prototype.start = function start(){
   var self=this;
 
-  this.deps.globalEventLoop.on( 'physicalInterface.status', function(data) {
+  this.deps.globalEventLoop.on( 'mcu.status', function(data) {
     var watertype = undefined;
     if ('dtwa' in data) {
       watertype = {raw: data.dtwa, watertype: data.dtwa.toString() == '1' ? 'salt' : 'fresh' };
@@ -29,7 +29,7 @@ diveprofile.prototype.start = function start(){
   });
 
   this.deps.cockpit.on('plugin.diveprofile.watertype.toggle', function () {
-    self.deps.globalEventLoop.emit( 'physicalInterface.send', 'dtwa()');
+    self.deps.globalEventLoop.emit( 'mcu.SendCommand', 'dtwa()');
   });
 
   self.global.withHistory.on('settings-change.diveprofile',function(data){
@@ -40,11 +40,11 @@ diveprofile.prototype.start = function start(){
   
   this.deps.cockpit.on('plugin.diveprofile.watertype.set', function (type) {
     var value = type=='salt'?1:0;
-    self.deps.globalEventLoop.emit( 'physicalInterface.send', 'dswa(' + value + ')');
+    self.deps.globalEventLoop.emit( 'mcu.SendCommand', 'dswa(' + value + ')');
   });  
   
   this.deps.cockpit.on('plugin.diveprofile.depth.zero', function () {
-    self.deps.globalEventLoop.emit( 'physicalInterface.send', 'dzer()');
+    self.deps.globalEventLoop.emit( 'mcu.SendCommand', 'dzer()');
   });    
 }
 

@@ -1,3 +1,4 @@
 {
-	"a02082"	:{ "model": "3ModelB", 			"pcbRev": "1.2", "ram": 1024 }
+	"a02082"	:{ "model": "3ModelB", 			"pcbRev": "1.2", "ram": 1024 },
+	"a22082"	:{ "model": "3ModelB", 			"pcbRev": "1.2", "ram": 1024 }
 }

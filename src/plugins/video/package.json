@@ -1,0 +1,15 @@
+{
+  "name": "orov-video-plugin",
+  "version": "0.1.0",
+  "description": "Video Plugin",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "cp node_modules/socket.io-stream/socket.io-stream.js public/js/"
+  },
+  "author": "OpenROV Inc",
+  "license": "ISC",
+  "dependencies": {
+    "socket.io-client": "^1.4.8"
+  }
+}

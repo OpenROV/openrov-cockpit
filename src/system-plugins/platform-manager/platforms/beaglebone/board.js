@@ -18,7 +18,6 @@ BoardInterface.prototype.Compose = function( platform )
 	var self = this;
 
 	console.log( "BOARD: Composing BBB interface..." );
-	console.log( "BOARD: platform obj: " + JSON.stringify( platform ) );
 	
 	return self.LoadInfo( board )
 			.then( self.LoadPinMap )
@@ -61,6 +60,8 @@ BoardInterface.prototype.LoadPinMap = function( board )
 
 BoardInterface.prototype.LoadInterface = function( board )
 {
+	console.log( "BOARD: Loading board interface..." );
+	
 	require( "./boards/" + board.info.productId + "/setup.js" )( board.targetBoard );
 	return board;
 };

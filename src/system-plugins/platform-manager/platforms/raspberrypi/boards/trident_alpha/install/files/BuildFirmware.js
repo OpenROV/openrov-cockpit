@@ -8,9 +8,9 @@ var opts =
 {
 	sketchDir: 			"/opt/openrov/firmware/sketches/OpenROV",
 	installBaseDir:		"/opt/openrov/firmware/bin",
-	productID:			"trident",
+	productID:			"trident_alpha",
 	cleanAfterBuild: 	true,
-	fqbn:				"openrov:samd:trident",
+	fqbn:				"openrov:samd:trident_alpha",
 	hardware: 			"/opt/openrov/arduino/hardware",
 	tools: 				"/opt/openrov/arduino/hardware/tools",
 	warnings: 			"all",

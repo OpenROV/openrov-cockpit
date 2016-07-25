@@ -28,6 +28,8 @@ BoardInterface.prototype.Compose = function( platform )
 	};
 	
 	var self = this;
+
+	console.log( "BOARD: Composing RPI board interface..." );
 	
 	return self.LoadInfo( board )
 			.then( self.LoadPinMap )
@@ -37,6 +39,8 @@ BoardInterface.prototype.Compose = function( platform )
 BoardInterface.prototype.LoadInfo = function( board ) 
 {
 	board.info = {};
+
+	console.log( "BOARD: Loading board info..." );
 	
 	return fs.readFileAsync( path.resolve( "/sys/class/i2c-adapter/i2c-1/1-0054/eeprom" ) )
 			.then( function( data )
@@ -46,6 +50,8 @@ BoardInterface.prototype.LoadInfo = function( board )
 			.then( JSON.parse )
 			.then( function( info )
 			{
+				console.log( "Board info: " + JSON.stringify( info ) );
+
 				board.info = info;
 				return board;
 			} );
@@ -53,6 +59,8 @@ BoardInterface.prototype.LoadInfo = function( board )
 
 BoardInterface.prototype.LoadPinMap = function( board )
 {
+	console.log( "BOARD: Loading pinmap..." );
+
 	return fs.readFileAsync( path.resolve( __dirname, "boards/" + board.info.productId + "/pinmap.json" ) )
 			.then( JSON.parse )
 			.then( function( json )
@@ -69,6 +77,8 @@ BoardInterface.prototype.LoadPinMap = function( board )
 
 BoardInterface.prototype.LoadInterface = function( board )
 {
+	console.log( "BOARD: Loading board interface..." );
+
 	require( "./boards/" + board.info.productId + "/setup.js" )( board.targetBoard );
 	return board;
 };

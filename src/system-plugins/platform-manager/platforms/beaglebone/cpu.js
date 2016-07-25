@@ -127,7 +127,7 @@ CPUInterface.prototype.CheckSupport = function( cpu )
 
 CPUInterface.prototype.LoadInterfaceImplementation = function( cpu )
 {
-	console.log( "CPU: Loading CPU interface implementation" );
+	console.log( "CPU: Loading BBB CPU interface implementation" );
 
 	// Load and apply the interface implementation to the actual CPU interface
 	require( "./cpu/setup.js" )( cpu.targetCPU );		

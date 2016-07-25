@@ -10,6 +10,8 @@ var CPUInterface = function()
 
 CPUInterface.prototype.Compose = function( platform )
 {
+	console.log( "CPU: Composing RPI cpu interface..." );
+
 	// Temporary container used for cpu detection and info loading
 	var cpu =
 	{
@@ -26,6 +28,8 @@ CPUInterface.prototype.Compose = function( platform )
 
 CPUInterface.prototype.LoadInfo = function( cpu )
 {	
+	console.log( "CPU: Loading RPI cpu info..." );
+	
 	return GetCpuInfo()
 			.then( function( info )
 			{
@@ -36,6 +40,8 @@ CPUInterface.prototype.LoadInfo = function( cpu )
 					serial:		info.Serial
 				}
 				
+				console.log( "CPU Info: " + JSON.stringify( cpu.info ) );
+
 				return cpu;
 			} );
 }
@@ -46,6 +52,8 @@ CPUInterface.prototype.CheckSupport = function( cpu )
 			.then( JSON.parse )
 			.then( function( json )
 			{
+				console.log( "CPU: Checking details against revision file..." );
+
 				// Lookup cpu details in the raspi json file, based on revision
 				var details = json[ cpu.info.revision ];
 				
@@ -71,6 +79,8 @@ CPUInterface.prototype.CheckSupport = function( cpu )
 
 CPUInterface.prototype.LoadInterfaceImplementation = function( cpu )
 {
+	console.log( "CPU: Loading RPI CPU interface implementation" );
+
 	// Load and apply the interface implementation to the actual CPU interface
 	require( "./cpu/setup.js" )( cpu.targetCPU );	
 	return cpu;

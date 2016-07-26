@@ -6,12 +6,8 @@
         part-number     = "OROV-CB25";
         version         = "00A0";
 
-        exclusive-use =
-                /* Pins used by this overlay */
-                /* "P9.11", */               /* ATMEGA RESET */
-
-                /* Hardware IP used */
-                /* "gpio0_30", */
+        /* Pins used by this overlay */
+        /* "P9.11", */               /* ATMEGA RESET */
 
         fragment@0 {
                 target = <&am33xx_pinmux>;

@@ -1,29 +1,14 @@
 #include "../SysConfig.h"
-#if(HAS_EXT_LIGHTS)
+#if(HAS_EXT_LIGHTS && CONTROLLERBOARD == CONTROLLERBOARD_CB25 )
 
 // Includes
 #include <Arduino.h>
 #include "CExternalLights.h"
 #include "../CPin.h"
-#include "../PinDefinitions.h"
 
-
-#if CONTROLLERBOARD == CONTROLLERBOARD_CAPE
-	#error "External lights not supported on cape"
-	
-#elif CONTROLLERBOARD == CONTROLLERBOARD_CB25
-
-	// Set pin definitions
-	#ifndef ELIGHTS0_PIN
-		#define ELIGHTS0_PIN PIN_PWM_3
-	#endif
-	#ifndef ELIGHTS1_PIN
-		#define ELIGHTS1_PIN PIN_PWM_4
-	#endif
-	
-#elif CONTROLLERBOARD == CONTROLLERBOARD_TRIDENT
-	#error "External lights not supported on Trident board"
-#endif
+// Set pin definitions
+#define ELIGHTS0_PIN 46
+#define ELIGHTS1_PIN 12
 
 namespace
 {

@@ -5,7 +5,6 @@
 #include <Arduino.h>
 #include "CExternalLights.h"
 #include "../CPin.h"
-#include "../NVehicleManager.h"
 #include "../PinDefinitions.h"
 
 
@@ -34,8 +33,6 @@ namespace
 
 void CExternalLights::Initialize()
 {
-    NVehicleManager::m_capabilityBitmask |= ( 1 << LIGHTS_CAPABLE );
-    
     elight0.Reset();
     elight0.Write(0);
     

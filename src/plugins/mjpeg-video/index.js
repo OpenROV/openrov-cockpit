@@ -35,7 +35,13 @@ mjpegvideo.prototype.enumerateDevices = function enumerateDevices(){
     if (error) {
       deferred.reject(error);
     }
-    var cameras = JSON.parse(stdout);
+    var cameras=[];
+    try {
+        cameras = JSON.parse(stdout);
+    } catch (e) {
+      //eat the error
+    }
+
     if (cameras && util.isArray(cameras) && cameras.length > 0)
     {
       deferred.resolve(cameras);

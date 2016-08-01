@@ -223,6 +223,14 @@
                     sizeofData+=converted.length;
                     return {length:converted.length,id:item.id,timestamp:item.timestamp};
                   });
+
+                  if (arrayOfData.length==0){
+                    session.VideoSegments = [];
+                    session.videoSize = 0;
+                    resolve();
+                    return;                    
+                  }
+
                   var VideoSegments=[];
                   var initFrame=arrayOfData.shift();
                   var segmentsize = initFrame.length;

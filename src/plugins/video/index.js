@@ -7,6 +7,8 @@ function video(name, deps) {
   var self=this;
   this.deps.globalEventLoop.on('CameraRegistration',function(data){
   	self.cockpit.emit('CameraRegistration',data);
+  	self.cockpit.emit('CameraRegistration2',{});
+    console.log("### CameraRegistration");
   });
   this.cameras={};
 
@@ -61,6 +63,11 @@ video.prototype.getSettingSchema = function getSettingSchema(){
 	"id" :"videosettings",
   "type" : "object",
   "properties": {
+    "show-stats":{
+      "id":"show-stats",
+      "type":"boolean",
+      "default":false
+    },
     "cameras":{
     "id": "cameras",
     "type": "array",

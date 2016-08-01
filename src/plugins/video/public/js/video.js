@@ -18,14 +18,28 @@
     this.rov = cockpit.rov;
 
     // for plugin management:
-    this.pluginDefaults = {
+    this.Plugin_Meta = {
       name : 'video',   // for the settings
       viewName : 'Video plugin', // for the UI
-      canBeDisabled : false, //allow enable/disable
       defaultEnabled: true
    };
 
   };
+
+
+  var StartWorker = function(code) {
+    var lines = code.split('\n');
+    lines.splice(0,1);
+    lines.splice(lines.length-2, 2);
+    var worker =lines.join('\n');
+
+    var blob = new Blob([worker]);
+    var blobURL = window.URL.createObjectURL(blob);
+
+    var worker = new Worker(blobURL);
+    window.URL.revokeObjectURL(blobURL);
+    return worker;    
+  }
 
   var ResolveURL = function(canidateURL){
     var http = location.protocol;
@@ -56,6 +70,7 @@
     var self=this;
  
     var CameraRegsitrations = {};
+
     this.rov.withHistory.on('CameraRegistration',function(data){
       //TODO: More robust handling of duplicat CameraRegistration messages.  If the Camera
       //already is setup, we want to ignore.  But we also want to handle multiple Cameras
@@ -85,14 +100,22 @@
               self.cockpit.emit('x-h264-video.data',data);
           }
           
+          var handleMjpegData=function(data){
+              self.cockpit.emit('x-motion-jpeg.data',data);
+          }
+          
           //TODO: abstract the messages enough that we can have multiple cameras controls
           self.cockpit.on('request_Init_Segment',handleInit);
           connection.on('x-h264-video.data',handleData);        
+          
+          connection.on('x-motion-jpeg.data',handleMjpegData);        
+
           connection.on("connect",function(){
             console.log("connected to socket.io video server end point");
           });        
           self.cockpit.emit('CameraRegistration',data);
           break;
+
         case 'rov': //data is comming over the rov bus, just pass it on to the cockpit bus
           var dataflowing=false; //this wont work for multiple cameras.
           self.rov.on('x-h264-video.data',function(data){

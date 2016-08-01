@@ -3,24 +3,10 @@
   
   var plugins = namespace('plugins');
   
-  plugins.GPS = function(cockpit) {
+  plugins.GPS = function(cockpit) 
+  {
     var self = this;
     self.cockpit = cockpit;
-
-  };
-
-  plugins.GPS.prototype.inputDefaults = function inputDefaults() {
-    return [
-    //   // lights increment
-    //   {
-    //     name: 'plugin.lights.adjust_increment',
-    //     description: 'Makes the ROV lights brighter.',
-    //     defaults: { keyboard: 'p', gamepad: 'DPAD_UP' },
-    //     down: function () {
-    //       cockpit.rov.emit('plugin.lights.adjust', 0.1);
-    //     }
-    //   }
-    ]
 
   };
 
@@ -29,11 +15,23 @@
   plugins.GPS.prototype.listen = function listen() {
     var self = this;
 
-    self.cockpit.rov.on('plugin.gps.TPV', function(data) {
-		console.log( data );
-      self.cockpit.emit('plugin.gps.TPV',data);
+    self.cockpit.rov.on('plugin.gps.TPV', function(data) 
+    {
+      if('lat' in data && 'lon' in data )
+      {
+        var gpsData = 
+        {
+          lat: data.lat,
+          lon: data.lon,
+          speed: data.speed,
+          alt: data.alt
+        }
+        
+        self.cockpit.emit( "plugin.gps.data", gpsData );
+        
+        console.log( "GPS Fix: [lat,lon]: [" + data.lat + "," + data.lon + "]" );
+      }
     });
-
   };
 
   window.Cockpit.plugins.push(plugins.GPS);

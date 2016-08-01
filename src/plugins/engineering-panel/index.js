@@ -12,16 +12,19 @@ function engineeringPanel(name, deps) {
 engineeringPanel.prototype.start = function start(){
   var self = this; 
 
-	self.deps.globalEventLoop.on( 'physicalInterface.status', function(data){
+	self.deps.globalEventLoop.on( 'mcu.status', function(data){
 	    for (var i in data) {
 			if (i === 'cmd'){
 				if (data[i].indexOf('ping')>=0) continue;
 			}
 			self.statusdata[i] = data[i];
 		}
-		self.deps.cockpit.emit('plugin.engineering.data', self.statusdata);
+
 	});
 
+	setInterval(function () {
+		self.deps.cockpit.emit('plugin.engineering.data', self.statusdata);
+	}, 1000);
 }
 
 module.exports = function (name, deps) {

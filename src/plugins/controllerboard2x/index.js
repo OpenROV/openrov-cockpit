@@ -5,7 +5,7 @@
   var SystemEnvionment = function SystemEnvironment(name, deps) {
     console.log('Controllerboard2x:SystemEnvironment plugin loaded');
 
-    deps.globalEventLoop.on( 'physicalInterface.status', function(data) {
+    deps.globalEventLoop.on( 'mcu.status', function(data) {
       //Humidity Sensor
       //Temperature
       //cpu
@@ -23,19 +23,19 @@
     this.cockpit = deps.cockpit;
     var self = this;
 
-    deps.globalEventLoop.on( 'physicalInterface.status', function(data) 
+    deps.globalEventLoop.on( 'mcu.status', function(data) 
     {
       var mappedPowerObject = sharedFunctions.telemetryToSystemPower(data);
     });
 
     deps.cockpit.on('plugin.systemPower.powerOnESCs', function () 
     {
-      deps.globalEventLoop.emit( 'physicalInterface.send', 'escp(1)');
+      deps.globalEventLoop.emit( 'mcu.SendCommand', 'escp(1)');
     });
 
     deps.cockpit.on('plugin.systemPower.powerOffESCs', function () 
     {
-      deps.globalEventLoop.emit( 'physicalInterface.send', 'escp(0)');
+      deps.globalEventLoop.emit( 'mcu.SendCommand', 'escp(0)');
     });
   };
 
@@ -137,7 +137,7 @@
   var Controllerboard2x=function Controllerboard2x(name, deps) {
     console.log('Controllerboard2x plugin loaded');
 
-    deps.globalEventLoop.on( 'physicalInterface.status', function(data) {
+    deps.globalEventLoop.on( 'mcu.status', function(data) {
       //time, cpu
 
     });

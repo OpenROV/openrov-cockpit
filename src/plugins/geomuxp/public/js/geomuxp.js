@@ -15,11 +15,10 @@
 		this.cockpit 	= cockpit;
 		this.rov 		= cockpit.rov;		
 
-		this.pluginDefaults = 
+		this.Plugin_Meta = 
 		{
 			name : 'geomuxp',
 			viewName : 'Geomuxp plugin',
-			canBeDisabled : false,
 			defaultEnabled: true
 		};
 		

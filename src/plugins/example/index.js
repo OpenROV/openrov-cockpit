@@ -24,7 +24,7 @@ example.prototype.start = function start(){
 
   //For messages that are destined for the MCU, a helper function to simply
   //wire the browser cockpit messages directly to and from the MCU.
-  this.globalEventLoop.emit( 'physicalInterface.registerPassthrough', {
+  this.globalEventLoop.emit( 'mcu.RegisterPassthrough', {
     messagePrefix: 'plugin.example',
     fromROV: [
       'example_foo',

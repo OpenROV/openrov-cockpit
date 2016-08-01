@@ -47,6 +47,7 @@ nconf.defaults({
   'port': 8080,
   'serial': '/dev/ttyO1',
   'serial_baud': 115200,
+  'systemDirectory': '/opt/openrov/system',
   'dashboardURL': '',
   'USE_MOCK' : false,
   'video_url' : '/rov/forward-camera'
@@ -87,6 +88,7 @@ module.exports = {
   serial_baud: nconf.get('serial_baud'),
   dashboardURL: nconf.get('dashboardURL'),
   preferences: nconf,
-  savePreferences: savePreferences
+  savePreferences: savePreferences,
+  systemDirectory: nconf.get( 'systemDirectory' )
 };
 console.log('config', module.exports);

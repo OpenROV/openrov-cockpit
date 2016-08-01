@@ -1,3 +1,5 @@
+//TODO: Make sure the tank mode indicator in swithes does not show if this plugin is disabled
+//TODO: Move this plugin to a community plugin
 (function (window, $, undefined) {
   'use strict';
   var TankControl;
@@ -21,10 +23,14 @@
       starboardThrottle: 'tankControl.starboardThrottle'
     };
 
+
     // for plugin management:
-    this.name = 'TankControl';   // for the settings
-    this.viewName = 'Tank GamePad Controls'; // for the UI
-    this.canBeDisabled = true; //allow enable/disable
+    this.Plugin_Meta = {
+      name: 'TankControl', // for the settings
+      viewName: 'Tank GamePad Controls', // for the UI
+      defaultEnabled: false
+    };
+    // for plugin management:
     var self = this;
     this.enable = function () {
       if (!self.tankControlActive){

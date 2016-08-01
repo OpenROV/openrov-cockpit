@@ -18,11 +18,10 @@
     this.rov = cockpit.rov;
 
     // for plugin management:
-    this.pluginDefaults = {
+    this.Plugin_Meta = {
       name : 'example',   // for the settings
       viewName : 'Example plugin', // for the UI
-      canBeDisabled : true, //allow enable/disable
-      defaultEnabled: true
+      defaultEnabled: false
    };
 
   };

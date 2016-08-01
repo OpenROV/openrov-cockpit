@@ -61,10 +61,18 @@ var errorHandler        = require('errorhandler');
 
 var pluginFolder        = CONFIG.preferences.get('pluginsDownloadDirectory');
 
+var Promise             = require( "bluebird" );
+var rimrafAsync         = Promise.promisify( require("rimraf") );
+var mkdirpAsync         = Promise.promisify( require("mkdirp") );
+
 // Setup required directories
 mkdirp(CONFIG.preferences.get('photoDirectory'));
 process.env.NODE_ENV    = true;
+
+// NOTE: If you don't increase the default max listeners, you can get a potential memory leak warning
 var globalEventLoop     = require('./static/js/eventEmitterStoreAndForward.js')(new EventEmitter2());
+globalEventLoop.setMaxListeners( 20 );
+
 var DELAY               = Math.round(1000 / CONFIG.video_frame_rate);
 io                      = require('./static/js/socketIOStoreAndForward.js')(io);
 var client              = new CockpitMessaging(io);
@@ -170,8 +178,8 @@ io.use(function(socket, next){
         if (socket.handshake.query.token == 'reset'){
             socketConnectToken = null;
             //And kick anyone already connected
-         //   if (typeof(io.sockets.server.eio.clients) == 'Array'){
-              var socketCollection = io.sockets.connected;
+        //   if (typeof(io.sockets.server.eio.clients) == 'Array'){
+            var socketCollection = io.sockets.connected;
                 Object.keys(socketCollection).forEach(function(key){
                     var client = socketCollection[key];
                     
@@ -183,7 +191,7 @@ io.use(function(socket, next){
 
                     }
                 });
-          //  }
+        //  }
         }
         return next();
     };
@@ -204,9 +212,9 @@ deps.cockpit.on('disconnect', function ()
 });
 
 // Handle global events
-deps.globalEventLoop.on( 'physicalInterface.rovsys', function( data ) 
+deps.globalEventLoop.on( 'mcu.rovsys', function( data ) 
 {
-    deps.cockpit.emit( 'physicalInterface.rovsys', data );
+    deps.cockpit.emit( 'mcu.rovsys', data );
 } );
 
 
@@ -217,55 +225,53 @@ var loader = new PluginLoader();
 
 mkdirp.sync(pluginFolder);
 
-var funcs = [
- loader.loadPlugins(path.join(__dirname, 'system-plugins'), 'system-plugin', deps),
- loader.loadPlugins(path.join(__dirname, 'plugins'), 'plugin', deps),
- loader.loadPlugins(pluginFolder, 'community-plugin', deps, function (file) 
- {
-   return file.substring(0, 15) === 'openrov-plugin-';
- } )
+var promises = 
+[
+    loader.loadPlugins(path.join(__dirname, 'system-plugins'), 'system-plugin', true, deps),
+    loader.loadPlugins(path.join(__dirname, 'plugins'), 'plugin', true, deps),
+    loader.loadPlugins( pluginFolder, 'community-plugin', false, deps, function (file) 
+    {
+        return file.substring(0, 15) === 'openrov-plugin-';
+    } )
 ]
 
-Q.allSettled(funcs).then(function(results)
+// If a required plugin fails to load, cockpit will terminate. Otherwise, the plugin will be skipped.
+Promise.all( promises )
+.each( function( results )
 {
-    // Get plugin assets
-    results.forEach(function (result) 
-    {
-        if (result.state === "fulfilled") 
-        {
-            var value = result.value;
-            addPluginAssets(value);
-        }
-        else 
-        {
-            var reason = result.reason;
-            console.error(reason);
-        }
-    });
-
-    console.warn("Starting following plugins:");
-    console.dir(deps.loadedPlugins);
+    addPluginAssets( results );
+})
+.then( function()
+{
+    console.log( "Starting following plugins:" );
+    console.dir( deps.loadedPlugins );
 
     // Start each plugin
-    deps.loadedPlugins.forEach(function(plugin)
+    deps.loadedPlugins.forEach( function( plugin )
     {
-        if (plugin.start !== undefined)
+        if( plugin.start !== undefined )
         {
             plugin.start();
         }
+    } );
+})
+.then( function()
+{
+    console.log( "Plugin loading successful!" );
+
+    // Start the web server
+    server.listen( app.get('port'), function() 
+    {
+        console.log('Started listening on port: ' + app.get('port'));
     });
 
-}).fail(function (error) 
-{
-    console.log("Error starting plugins:");
-    
-    if( error !== undefined )
-    {
-        console.dir(error);
-    }
-    
-    throw new Error("Error in loading plugins");
 })
+.catch( function( err )
+{
+    console.log( "Error starting plugins: " + err.message );
+    console.log( "Stack trace: " + err.stack );
+    process.abort();
+});
 
 // Helper function
 function addPluginAssets(result) 
@@ -297,12 +303,6 @@ function addPluginAssets(result)
     }
 }
 // ------------------------------------------------------------------------
-
-// Start the web server
-server.listen( app.get('port'), function() 
-{
-    console.log('Started listening on port: ' + app.get('port'));
-});
 
 
 

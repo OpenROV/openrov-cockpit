@@ -40,7 +40,7 @@
 
   Cockpit.prototype.listen = function listen() {
     var cockpit = this;
-    cockpit.rov.on('physicalInterface.rovsys', function (data) {
+    cockpit.rov.on('mcu.rovsys', function (data) {
       console.log('got RovSys update from Arduino');
       if ('capabilities' in data) {
         cockpit.capabilities = data.capabilities;
@@ -64,10 +64,9 @@
         console.dir(err);
       }
       if (loadedPlugin != null && loadedPlugin !== undefined) {
-        if (loadedPlugin.canBeDisabled != undefined) {
-          if (loadedPlugin.name == undefined) {
+        if ((loadedPlugin.Plugin_Meta !== undefined) && (loadedPlugin.Plugin_Meta.name == undefined)) {
+            //This alert should help plugin authurs find they missed a required section for a plugin
             alert('Plugin ' + loadedPlugin + 'has to define a name property!');
-          }
         }
         cockpit.loadedPlugins.push(loadedPlugin);
       }

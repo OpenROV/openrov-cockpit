@@ -36,14 +36,14 @@ thrusters2x1.prototype.start = function start(){
     //todo: Move to motor-diag plugin
     //API to Arduino to pass a percent in 2 decimal accuracy requires multipling by 100 before sending.
     command = 'mtrmod1(' + port * 100 + ',' + vertical * 100 + ',' + starbord * 100 + ')';
-    self.deps.globalEventLoop.emit( 'physicalInterface.send', command );
+    self.deps.globalEventLoop.emit( 'mcu.SendCommand', command );
     
     command = 'mtrmod2(' + nport * 100 + ',' + nvertical * 100 + ',' + nstarbord * 100 + ')';
-    self.deps.globalEventLoop.emit( 'physicalInterface.send', command );
+    self.deps.globalEventLoop.emit( 'mcu.SendCommand', command );
 
   })
 
-  self.deps.globalEventLoop.on('physicalInterface.status', function (status) 
+  self.deps.globalEventLoop.on('mcu.status', function (status) 
   {
     if ('mtrmod' in status) 
     {
@@ -51,13 +51,13 @@ thrusters2x1.prototype.start = function start(){
   });
 
   self.cockpit.on('callibrate_escs', function () {
-    self.deps.globalEventLoop.emit( 'physicalInterface.send', 'mcal()');
+    self.deps.globalEventLoop.emit( 'mcu.SendCommand', 'mcal()');
     console.log('mcal() sent');
   });
 
   self.cockpit.on('plugin.thrusters2x1.motorTest', function(positions)
   {
-     self.deps.globalEventLoop.emit( 'physicalInterface.sendMotorTest', positions.port, positions.starboard, positions.vertical);
+     self.deps.globalEventLoop.emit( 'mcu.SendMotorTest', positions.port, positions.starboard, positions.vertical);
   });
 }
 

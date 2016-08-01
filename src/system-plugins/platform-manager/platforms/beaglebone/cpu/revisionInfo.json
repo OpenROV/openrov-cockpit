@@ -1,0 +1,17 @@
+{
+	"aa5533ee41333335424f4e4530304134":{"model":"White", "pcbRev":"A4", "ram": 256 },
+	"aa5533ee41333335424f4e4530304135":{"model":"White", "pcbRev":"A5", "ram": 256 },
+	"aa5533ee41333335424f4e4530304136":{"model":"White", "pcbRev":"A6", "ram": 256 },
+	"aa5533ee41333335424f4e4530413641":{"model":"White", "pcbRev":"A6A", "ram": 256 },
+	"aa5533ee41333335424f4e4530413642":{"model":"White", "pcbRev":"A6B", "ram": 256 },
+	"aa5533ee41333335424f4e4530303042":{"model":"White", "pcbRev":"B", "ram": 256 },
+
+	"aa5533ee41333335424e4c5430413541":{"model":"Black", "pcbRev":"A5A", "ram": 512 },
+	"aa5533ee41333335424e4c5430413542":{"model":"Black", "pcbRev":"A5B", "ram": 512 },
+	"aa5533ee41333335424e4c5430413543":{"model":"Black", "pcbRev":"A5C", "ram": 512 },
+	"aa5533ee41333335424e4c5430304136":{"model":"Black", "pcbRev":"A6", "ram": 512 },
+	"aa5533ee41333335424e4c5430303043":{"model":"Black", "pcbRev":"C", "ram": 512 },
+	"aa5533ee41333335424e4c5430304330":{"model":"Black", "pcbRev":"C0", "ram": 512 },
+
+	"aa5533ee41333335424e4c5445494130":{"model":"BlackIndustrial", "pcbRev":"A0", "ram": 512 }
+}

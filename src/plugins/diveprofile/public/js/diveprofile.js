@@ -18,11 +18,10 @@
     this.rov = cockpit.rov;
 
     // for plugin management:
-    this.pluginDefaults = {
+    this.Plugin_Meta = {
       name : 'diveprofile',   // for the settings
       viewName : 'DiveProfile plugin', // for the UI
-      canBeDisabled : false, //allow enable/disable
-      defaultEnabled: true
+      defaultEnabled: false
    };
 
   };
@@ -45,7 +44,13 @@
         self.cockpit.emit('plugin.diveprofile.watertype',watertype);
     });
 
-
+    this.cockpit.on('plugin.diveprofile.watertype.set', function(watertype){
+        self.rov.emit('plugin.diveprofile.watertype.set',watertype);
+    });
+    
+    this.cockpit.on('plugin.diveprofile.depth.zero', function(){
+        self.rov.emit('plugin.diveprofile.depth.zero');
+    });   
 
 
   };

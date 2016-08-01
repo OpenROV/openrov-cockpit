@@ -12,7 +12,7 @@
     <%
       var head = scriplets.find(function(item){return item.name=='head'});
     %>
-    <%if (header !== undefined){ %>
+    <%if (head !== undefined){ %>
     <%- include(head.path,{
       title: title,
       scripts: scripts,
@@ -33,7 +33,6 @@
   <script type='text/javascript' src="config.js"></script>
   <script type='text/javascript' src="cockpitsocket/socket.io.js"></script>
   <script type='text/javascript' src="system-plugin/globalization/js/initGlobalization.js"></script>
-  <script type='text/javascript' src='js/message-manager.js'></script>
   <script type='text/javascript' src='js/eventEmitterStoreAndForward.js'></script>
   <script type='text/javascript' src='js/socketIOStoreAndForward.js'></script>
   <script type='text/javascript' src='js/socketIOtoEmitterBridge.js'></script>  

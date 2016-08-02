@@ -3,7 +3,7 @@
 	[
 		{ "src": "openocd.cfg", 	"dest": "/opt/openrov/system/etc" },
 		{ "src": "rc.local", 		"dest": "/opt/openrov/system/scripts" },
-		{ "src": "nginx.location", 	"dest": "/opt/openrov/system/scripts" },
+		{ "src": "nginx.location", 	"dest": "/opt/openrov/system/etc" },
 		{ "src": "dt-overlays/openrov-eeprom.dtbo", "dest": "/boot/overlays" }
 	],
 	

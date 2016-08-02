@@ -25,6 +25,15 @@ fs.readFileAsync( "/opt/openrov/system/config/platform.conf" )
 } )
 .then( function()
 {
+	// Install shared stage
+	var installDir = "/opt/openrov/cockpit/src/system-plugins/platform-manager/install";
+		
+	// Install board files
+	return Installer.Install( installDir );
+} )
+.then( function()
+{
+	// Install platform specific stage
 	var installDir = path.join( "/opt/openrov/cockpit/src/system-plugins/platform-manager/platforms", platformName, "install" );
 		
 	// Install board files

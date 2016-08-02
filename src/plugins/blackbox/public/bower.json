@@ -26,7 +26,7 @@
     "paper-progress": "PolymerElements/paper-progress#^1.0.9"
   },
   "resolutions": {
-    "polymer": "^1.2.1",
-    "webcomponentsjs": "^0.7.20"
+    "polymer": "^1.2.4",
+    "webcomponentsjs": "^0.7.2"
   }
 }

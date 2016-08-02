@@ -36,7 +36,7 @@
 
 
   Thrusters2x1.prototype.sendTestMotorMessage = function sendTestMotorMessage(motor_values) {
-    this.cockpit.rov.emit('plugin.thursters2x1.set', motor_values);
+    this.cockpit.rov.emit('plugin.thrusters2x1.motorTest', motor_values);
   };
   Thrusters2x1.prototype.setMotorTestSpeed = function setMotorTestSpeed(propertyName, value) {
     this[propertyName](value);

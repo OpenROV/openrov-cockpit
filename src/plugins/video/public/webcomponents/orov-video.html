@@ -2,11 +2,11 @@
 <link rel="import" href="../mjpeg-video-webcomponents/mjpeg-video.html">
 <link rel="import" href="../packet-video/packet-video.html">
 <link rel="import" href="../orov-behaviors/orov-behavior.html">
+
 <dom-module name="orov-video">
   <style>
   </style>
   <template>
-
     <template is="dom-if" if="{{displayPlayer(videoMimeType,'video/x-motion-jpeg')}}" iff="{{videoMimeType == 'video/x-motion-jpeg'}}">
     <mjpeg-video id="camera1" border='1' style='width: 100%; height:100%'
       menuState='on'
@@ -35,7 +35,7 @@
 
   </template>
   <script>
-    (function() {
+
       Polymer({
         is: "orov-video",
         properties: {
@@ -50,9 +50,15 @@
         detached: function(){
           this.shortCircuit=true;
         },
+				attached : function() {
+					if (this.emitter) {
+						this.emitter.emit('video.ready');
+					}
+				},
         packetVideo_initializationInProgress: false,
         registerEmitterHanlders: function(emitter){
           var self = this;
+					self.emitter = emitter;
           this.shortCircuit=false;
           emitter.withHistory.on('settings-change.videosettings',function(settings){
             if (self.shortCircuit) {return;}
@@ -66,8 +72,8 @@
               callback({forwardCanvas:this.canvas});
             }
           });
-
           emitter.withHistory.on('CameraRegistration',function(data){
+            
             if (self.shortCircuit) {return;}            
             if (data.location!==self.location) return;
             //      self.rov.emit('CameraRegistration',{cameraLocation:'front', videoMimeType:'video/mp4', resolution:'1920x1080', framerate:30, sourcePort:service.port, sourceAddress:service.address});
@@ -102,7 +108,92 @@
                 },5000);
               }
             }
-          })
+          });
+
+          var image = new Image();
+          var imageSrc = '';
+          var tick = 2;
+
+          var draw;
+          var drawFrame;
+          var canvas;
+          var ctx;
+          var proportionalHeight;
+          var width;
+          var height;
+
+					var drawCounter = 0;
+
+					setInterval(function(){
+						console.log('FPS: ' + drawCounter);
+						drawCounter = 0;
+					}, 1000);
+
+					var img = new Image;
+					img.onload = function() {
+							URL.revokeObjectURL(this.src);
+							ctx.drawImage(img, 0, 0, canvas.width, proportionalHeight);
+							drawCounter++;
+					};
+
+					var loadImage = function(frame, canvas, proportionalHeight) {
+							var blob = new Blob([frame], {type: 'application/octet-binary'});
+							var url = URL.createObjectURL(blob);
+							img.src = url;
+					};
+          draw = function() {
+            var frame = buffer.pop();
+            if (frame ) {
+							drawFrame(frame);
+					}};
+					drawFrame = function(frame) {
+						if (frame.isDrawn == true) return;
+						frame.isDrawn = true;
+
+              if (!canvas || !width > 0 || !height > 0) {
+								var blob = new Blob([frame.data], {type: 'application/octet-binary'});
+								var url = URL.createObjectURL(blob);
+								image.onload = function() {
+
+									self.$$('#camera1').src = url; // set first frame
+									canvas = self.$$('#camera1').videocanvas;
+									var style = window.getComputedStyle(canvas.parentElement, null);
+									width = parseInt(style.getPropertyValue('width'));
+									height = parseInt(style.getPropertyValue('height'));
+									proportionalHeight = width * image.height / image.width;
+									ctx = canvas.getContext('2d');
+									self.$$('#camera1').stop();
+									self.$$('#camera1').isHidden = true;
+									URL.revokeObjectURL(url);
+								}
+								image.src = url;
+
+                
+              }            
+              if (canvas && (canvas.width== 0 || canvas.height == 0)) {
+                canvas.width = width;
+                canvas.height = height;
+              }
+							if (canvas && canvas.width > 0 && canvas.height > 0 ) 
+								loadImage(frame.data, canvas, proportionalHeight);
+            }
+
+					var mjpegDrawIntervall;
+
+          emitter.on('x-motion-jpeg.data',function(frame){
+            if (self.shortCircuit) {return;}            
+            if (self.$$('#camera1')===null){
+              return;
+            }
+						// we draw the image via window.postMessage, this causes a context change and the
+						// image is drawn on the GPU thread;
+						window.postMessage({type: 'draw', data: frame, isDrawn: false}, '*', [frame]);
+          });
+					window.onmessage = function(message) {
+						if (message.data.type == 'draw') {
+							drawFrame(message.data);
+						}
+					}
 
         },
         _canvasChanged: function(){
@@ -113,8 +204,7 @@
         displayPlayer(mimeType,playerType){
           return mimeType==playerType;
         }
-      })
-    })();
+    });
   </script>
 
 </dom-module>

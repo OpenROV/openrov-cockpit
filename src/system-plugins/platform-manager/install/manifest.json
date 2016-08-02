@@ -1,0 +1,24 @@
+{
+	"files":
+	[
+		{ "src": "nginx.location", 	"dest": "/opt/openrov/system/etc" }
+	],
+	
+	"preinstall": 
+	[ 
+	],
+	
+	"postinstall":
+	[
+	],
+	
+	"preuninstall":
+	[
+		
+	],
+	
+	"postuninstall":
+	[
+		
+	]
+}

@@ -3,6 +3,7 @@
 <link rel="import" href="../mobile-ui/grid-menu/grid-menu.html">
 <link rel="import" href="../mobile-ui/grid-menu/grid-menu-button.html">
 <link rel="import" href="../fontawesome-iconset/fa-all.html">
+<link rel="import" href="orov-appletswitcher-behavior.html">
 <dom-module name="orov-appletswitcher">
 <style>
   grid-menu-button
@@ -37,35 +38,28 @@
   Polymer({
     is:'orov-appletswitcher',
     properties: {
-      applets: {type: Array, value: []},
       showSelection: {type: Boolean, value: true},
-      selection: {type: String, value: '', notify: true},
       horizontalOffset: {type: Number}
     },
     listeners:
     {
       'menuSelection': 'handleMenuSelection'
     },
-    behaviors: [namespace('behaviors').oROVStandard],
-    registerEmitterHanlders: function(emitter){
-      var self = this;
-      emitter.withHistory.on('ui-manager-applets',function(applets){
-        self.set('applets',applets);
-      });
-
-    },
+    behaviors: [namespace('behaviors').oROVStandard, namespace('behaviors').oROVAppletSwitcher],
     handleMenuSelection: function(e)
     {
       console.log( "Clicked App Menu Button: " + e.detail.label );
       console.log( "Action: " + e.detail.action );
       console.log( "Target: " + e.detail.target );
+      var options = {target:e.detail.target};
+
       if (lastMouseEvent.shiftKey){
-        window.open('popup?app='+e.detail.target);
+        options.mode="popout"
       } else {
-        this.set('selection',e.detail.target);
+        options.mode="swap"
       }
 
-//      document.location.href = "mobile-ui?page=" + e.detail.target;
+      this.handleSelection(options);
     },
   })
 })();

@@ -23,7 +23,7 @@
         </metadata>
         <g id="layer1" transform="translate(4.40625,-21.3125)">
           <rect id="indicator" height="17.431" width="102.93" y="98.468" x="-4.1823" fill="#09531d"/>
-          <text id="voltage" style="word-spacing:0px;letter-spacing:0px;text-anchor:middle;text-align:center;" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" xml:space="preserve" font-size="12.9946394px" line-height="125%" font-style="normal" y="114.32999" x="95.878906" font-weight="normal" fill="#ffffff"><tspan id="tspan3893" y="114.32999" x="95.878906"><tspan id="tspan3895" font-size="20px" y="114.32999" x="95.878906" font-weight="bold" fill="#ffffff"><tspan>{{ voltage }}</tspan>{{__('v')}}</tspan></tspan></text>
+          <text id="voltage" style="word-spacing:0px;letter-spacing:0px;text-anchor:middle;text-align:center;" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" xml:space="preserve" font-size="12.9946394px" line-height="125%" font-style="normal" y="114.32999" x="95.878906" font-weight="normal" fill="#ffffff"><tspan id="tspan3893" y="114.32999" x="95.878906"><tspan id="tspan3895" font-size="20px" y="114.32999" x="95.878906" font-weight="bold" fill="#ffffff"><tspan>{{ formatVoltage(voltage) }}</tspan>{{__('v')}}</tspan></tspan></text>
           <path id="path3005" stroke-linejoin="miter" d="m81.992,90.313,27.188,0,0,0" stroke="#FFF" stroke-linecap="butt" stroke-miterlimit="4" stroke-dasharray="none" stroke-width="2.79675651" fill="none"/>
           <path id="path3775" stroke-linejoin="miter" d="m86.513,80.302,18.135,0,0,0" stroke="#FFF" stroke-linecap="butt" stroke-miterlimit="4" stroke-dasharray="none" stroke-width="2.28410721" fill="none"/>
           <path id="path3777" stroke-linejoin="miter" d="m81.992,70.313,27.188,0,0,0" stroke="#FFF" stroke-linecap="butt" stroke-miterlimit="4" stroke-dasharray="none" stroke-width="2.79675651" fill="none"/>
@@ -118,7 +118,7 @@
           },
           leftCurrent: {
             type: Number,
-            value: 0.1
+            value: function(){return 0.1}
           },
           leftIndicator: {
             type: Object,
@@ -142,7 +142,7 @@
           },
           rightCurrent: {
             type: Number,
-            value: 0.1
+            value: function(){return 0.1}
           },
           rightIndicator: {
             type: Object,
@@ -158,7 +158,7 @@
           },
           voltage: {
             type: Number,
-            value: 5
+            value: function(){return 5}
           }
         },
         behaviors: [namespace('behaviors').oROVStandard],
@@ -174,15 +174,15 @@
             lastData=newData;
             var data=newData;
               if ('voltage' in data.board){
-                self.setVoltage(data.board.voltage);
+                self.setVoltage(parseFloat(data.board.voltage));
               };
 
               if ('port' in data.battery.current){
-                self.setLeftBattery(data.battery.current.port);
+                self.setLeftBattery(parseFloat(data.battery.current.port));
               };
 
               if ('starboard' in data.battery.current){
-                self.setRightBattery(data.battery.current.starboard);
+                self.setRightBattery(parseFloat(data.battery.current.starboard));
               };            
             
           },500)
@@ -220,7 +220,7 @@
         },
         setVoltage: function (voltage) {
           voltage = parseFloat(voltage);
-          this.voltage = voltage;
+          this.set("voltage",voltage);
           var change = (this.maxVoltage - this.minVoltage) / (voltage - this.minVoltage);
           var percentage = 100 / change;
           var indicatorWidth = 200 / change;
@@ -240,8 +240,11 @@
             $(this.$.indicator).attr('width', indicatorWidth);
           }
         },
+        formatVoltage: function (value) {
+          return value.toFixed(2);          
+        },
         formatCurrent: function (value) {
-          return value.toFixed(3);
+          return value.toFixed(2);
         },
         attached: function () {
           var self = this;

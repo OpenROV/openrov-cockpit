@@ -211,9 +211,12 @@ function Bridge()
     time += 1000;
   };
   
+  var BT1I=0;
+  var BT2I=0;
+  var BRDV=11;
   bridge.emitStats = function() 
   {
-    var data = 'vout:9.9;iout:0.2;BT.1.I:0.3;BT.2.I:0.5;BNO055.enabled:true;BNO055.test1.pid:passed;BNO055.test2.zzz:passed;';
+    var data = 'iout:0.2;BT.1.I:0.3;BT.2.I:0.5;BNO055.enabled:true;BNO055.test1.pid:passed;BNO055.test2.zzz:passed;';
     var status = reader.parseStatus(data);
     bridge.emit('status', status);
   };
@@ -248,13 +251,20 @@ function Bridge()
     rnd = (Math.random() * 20 - 10)/100;
     current += current*rnd;
     current = Math.min(Math.max(current, 1), 10);
-    result+='bt1i:' + current + ';'
+    result+='BT1I:' + current + ';'
 
     // Generate battery tube 2 current
     rnd = (Math.random() * 20 - 10)/100;
     current += current*rnd;
     current = Math.min(Math.max(current, 1), 10);
-    result+='bt2i:' + current + ';'
+    result+='BT2I:' + current + ';'
+
+    // Generate board voltage
+    rnd = (Math.random() * 20 - 10)/100;
+    BRDV += BRDV*rnd;
+    BRDV = Math.min(Math.max(BRDV, 1), 10);
+    result+='BRDV:' + BRDV + ';'    
+    result+='vout:' + BRDV + ';' 
 
     // Generate servo command
     currentServo +=50;

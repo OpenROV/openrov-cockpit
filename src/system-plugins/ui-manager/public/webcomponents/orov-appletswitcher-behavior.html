@@ -1,0 +1,42 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+
+<script>
+(function (window) {
+  'use strict';
+  var behaviors = namespace('behaviors');
+  behaviors.oROVAppletSwitcher = {
+    properties: {
+      applets: {type: Array, value: []},
+      selection: {type: String, value: '', notify: true}
+    },
+    behaviors: [namespace('behaviors').oROVStandard],
+    attached: function(){
+      var self=this;
+      if(typeof(this.registerEmitterHanlders)=='function'){
+        var org = this.registerEmitterHanlders;
+        this.registerEmitterHanlders=function(emitter){
+          self.registerBaseEmitterHanlders(emitter);
+          org(emitter);
+        };
+      } 
+      this.registerBaseEmitterHanlders(this.eventEmitter);
+    },
+    registerBaseEmitterHanlders: function(emitter){
+      var self = this;
+      emitter.withHistory.on('ui-manager-applets',function(applets){
+        self.set('applets',applets);
+      });
+    },
+    handleSelection: function(detail)
+    {
+      //detail:{target,mode(popout,swap)}
+      if (detail.mode=='popout'){
+        window.open('popup?app='+detail.target);
+      } else {
+        this.set('selection',detail.target);
+      }
+    }
+  }
+})(window);
+</script>

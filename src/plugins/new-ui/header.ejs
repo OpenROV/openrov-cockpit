@@ -51,6 +51,7 @@ body {
       <p class="navbar-text user-role">{{userRole}}</p>
       <orov-mc-status-indicator class="navbar-text" event-emitter="{{cockpitEventEmitter}}" ></orov-mc-status-indicator>
 
+      <!-- Using pull-right instead of navbar-right due to known bug in navbar magins -->
       <orov-appletswitcher class="navbar-btn pull-right" style="display:inline-block; height:30px" event-emitter="{{cockpitEventEmitter}}" selection="{{routedata.page}}" horizontal-offset='-200'></orov-appletswitcher>      
       <orov-login class="navbar-btn pull-right" event-emitter="{{cockpitEventEmitter}}" />
     </div>

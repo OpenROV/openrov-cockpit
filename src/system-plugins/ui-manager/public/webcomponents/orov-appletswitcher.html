@@ -19,7 +19,7 @@
   }
 </style>
 <template>
-    <grid-menu trigger-icon="apps" horizontal-offset=[[horizontalOffset]]>
+    <grid-menu id="gm" trigger-icon="apps" horizontal-offset=[[horizontalOffset]]>
       <template is="dom-repeat" items="{{applets}}">
 			<grid-menu-button label="{{__(item.name)}}" action="page-change" target="{{item.name}}" icon="{{item.iconMeta}}"></grid-menu-button>
       </template>
@@ -60,6 +60,7 @@
       }
 
       this.handleSelection(options);
+      this.$.gm.toggle();
     },
   })
 })();

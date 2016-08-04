@@ -33,12 +33,12 @@ body {
 <div class="navbar navbar-inverse navbar-fixed-top">
   <div class="container-fluid">
     <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+      <!--button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
-      </button>      
+      </button-->      
       <a class="navbar-brand" href="#">
         <img alt="OpenROV" src="themes/OpenROV/img/openrov.png" class="brand">
       </a>
@@ -55,7 +55,9 @@ body {
       <orov-appletswitcher class="navbar-btn pull-right" style="display:inline-block; height:30px" event-emitter="{{cockpitEventEmitter}}" selection="{{routedata.page}}" horizontal-offset='-200'></orov-appletswitcher>      
       <orov-login class="navbar-btn pull-right" event-emitter="{{cockpitEventEmitter}}" />
     </div>
-
+    <div class="navbar-toggle collapsed" data-toggle="collapse" id="navStatus2">
+      <orov-appletswitcher class="navbar-btn pull-right" style="display:inline-block; height:30px" event-emitter="{{cockpitEventEmitter}}" selection="{{routedata.page}}" horizontal-offset='-200'></orov-appletswitcher>      
+    </div>
 
   </div>
 </div>

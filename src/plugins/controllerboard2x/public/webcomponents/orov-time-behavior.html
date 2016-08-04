@@ -1,0 +1,41 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+
+  <script>
+  var behaviors = namespace('behaviors');
+  behaviors.oROVtimeBehavior = {
+      properties: {
+        runtime: {
+          type: String,
+          value: '00:00:00'
+        },
+        time: {
+          value: function () {
+            return new Date().toLocaleTimeString();
+          },
+          notify: true
+        }
+      },
+      behaviors: [namespace('behaviors').oROVStandard],
+      registerBaseEmitterHanlders: function(emitter) {
+        var self = this;
+        emitter.withHistory.on('systemEnvironment.state', function (state) {
+          if ('runTime' in state.mcu){
+            self.runtime = state.mcu.runTime;
+          }
+        });
+      },
+      attached: function () {
+        var self=this;
+        if(typeof(this.registerEmitterHanlders)=='function'){
+          var org = this.registerEmitterHanlders;
+          this.registerEmitterHanlders=function(emitter){
+            self.registerBaseEmitterHanlders(emitter);
+            org(emitter);
+          };
+        } 
+        this.registerBaseEmitterHanlders(this.eventEmitter);
+        setInterval(function(){self.time = new Date().toLocaleTimeString();},1000);
+      }
+    };
+  </script>

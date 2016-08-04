@@ -36,7 +36,7 @@
         ready: function () {
           this.$.connectionHealth.style['background-image'] = this.imgSrc;
         },
-        registerEmitterHanlders: function(emitter){
+        registerEmitterHandlers: function(emitter){
           var self = this;
           emitter.withHistory.on('plugin.connection-health.state',function(state){
             self.isConnected = state.connected;

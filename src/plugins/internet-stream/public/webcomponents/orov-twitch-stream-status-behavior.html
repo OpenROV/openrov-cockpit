@@ -24,10 +24,10 @@
       behaviors: [namespace('behaviors').oROVStandard],
       attached: function(){
         var self=this;
-        if(typeof(this.registerEmitterHanlders)=='function'){
+        if(typeof(this.registerEmitterHandlers)=='function'){
           console.log('twitch found function');
-          var org = this.registerEmitterHanlders;
-          this.registerEmitterHanlders=function(emitter){
+          var org = this.registerEmitterHandlers;
+          this.registerEmitterHandlers=function(emitter){
             self.registerBaseEmitterHanlders(emitter);
             org(emitter);
           };

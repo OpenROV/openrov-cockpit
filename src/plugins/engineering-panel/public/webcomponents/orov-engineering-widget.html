@@ -210,7 +210,7 @@
           }
       },
       behaviors: [namespace('behaviors').oROVStandard],
-      registerEmitterHanlders: function(emitter) {
+      registerEmitterHandlers: function(emitter) {
         this.define = function(item,callback){
           emitter.emit('telemetry.getDefinition',item,callback);
         }

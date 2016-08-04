@@ -42,7 +42,7 @@
       ]}
     },   
     behaviors: [namespace('behaviors').oROVStandard],
-    registerEmitterHanlders: function(emitter){
+    registerEmitterHandlers: function(emitter){
       var self = this;
       emitter.on('settings-change.thrusters2x1',function(settings){
         self.motors.forEach(function(motor){

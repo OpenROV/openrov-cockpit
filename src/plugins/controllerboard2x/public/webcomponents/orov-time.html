@@ -1,5 +1,7 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../orov-behaviors/orov-behavior.html">
+<link rel="import" href="../controllerboard2x/orov-time-behavior.html">
+
 
 <dom-module id="orov-time">
   <style type="text/css">
@@ -61,31 +63,7 @@
   <script>
     Polymer({
       is: 'orov-time',
-      properties: {
-        runtime: {
-          type: String,
-          value: '00:00:00'
-        },
-        time: {
-          value: function () {
-            return new Date().toLocaleTimeString();
-          },
-          notify: true
-        }
-      },
-      behaviors: [namespace('behaviors').oROVStandard],
-      registerEmitterHanlders: function(emitter) {
-        var self = this;
-        emitter.withHistory.on('systemEnvironment.state', function (state) {
-          if ('runTime' in state.mcu){
-            self.runtime = state.mcu.runTime;
-          }
-        });
-      },
-      attached: function () {
-        var self=this;
-        setInterval(function(){self.time = new Date().toLocaleTimeString();},1000);
-      }
+      behaviors: [namespace('behaviors').oROVStandard,namespace('behaviors').oROVtimeBehavior],
     });
   </script>
 </dom-module>

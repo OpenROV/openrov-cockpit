@@ -1,10 +1,10 @@
-#include "../SysConfig.h"
+#include "SysConfig.h"
 #if(HAS_EXT_LIGHTS && CONTROLLERBOARD == CONTROLLERBOARD_CB25 )
 
 // Includes
 #include <Arduino.h>
 #include "CExternalLights.h"
-#include "../CPin.h"
+#include "CPin.h"
 
 // Set pin definitions
 #define ELIGHTS0_PIN 46

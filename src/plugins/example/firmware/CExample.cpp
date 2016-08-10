@@ -1,4 +1,4 @@
-#include "../SysConfig.h"
+#include "SysConfig.h"
 #if(HAS_EXAMPLE_PLUGIN)
 
 // Includes

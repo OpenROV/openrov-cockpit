@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../SysConfig.h"
+#include "SysConfig.h"
 #if(HAS_EXT_LIGHTS)
 
 	#include "CExternalLights.h"

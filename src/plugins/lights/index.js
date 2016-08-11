@@ -8,7 +8,7 @@
     self.setting        = 0;
 
     //  Settings:       = [ 0 .. 5 ]
-    self.levelMap        = [ 0, 48, 64, 96, 160, 255 ];
+    self.levelMap        = [ 0, 80, 100, 130, 190, 255 ];
     self.maxLevel        = self.levelMap.length - 1;
 
     // Cockpit
@@ -56,8 +56,6 @@
             {
                 // The new setting value is the array index of the level in the level map, if it exists
                 self.setting = setting;
-
-                console.log( "A: " + self.setting );
             }
             else
             {
@@ -69,8 +67,6 @@
                 
                 // Set the new setting value based on the index of the closest level
                 self.setting = self.levelMap.indexOf( closest );
-
-                console.log( "B: " + self.setting );
             }
 
             deps.cockpit.emit( 'plugin.lights.state', { level: self.setting } );
@@ -80,9 +76,6 @@
      var adjustLights = function adjustLights( value ) 
     {
         // Modify current setting
-        console.log( "C: " + ( self.setting + value ) );
-        console.log( "D: " + value );
-
         setLights( self.setting + value );
     };
 
@@ -102,8 +95,6 @@
 
     var setLights = function setLights( value ) 
     {
-        console.log( "E: " + value );
-
         // Range limit the new setting from 0 to the max number of defined levels
         if( value < 0 )
         {
@@ -118,8 +109,6 @@
         self.setting = Math.round( value );
 
         var command = 'ligt(' + self.levelMap[ self.setting ] + ')';
-
-        console.log( "F: " + self.setting );
 
         deps.globalEventLoop.emit( 'mcu.SendCommand', command );
     };

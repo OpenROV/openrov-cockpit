@@ -43,11 +43,13 @@ function ExternalLights(name, deps)
 
     // Arduino
     deps.globalEventLoop.on( 'mcu.status', function (data) 
-    {
+    {   
         if ('LIGPE0' in data) 
         {
             // Value of 0-255 representing percent
             var level = data.LIGPE0;
+
+            console.log( "External light 0 status: " + level );
 
             // Search for the level in the level map
             var setting = self.levelMap.indexOf( level );
@@ -75,6 +77,8 @@ function ExternalLights(name, deps)
         {
             // Value of 0-255 representing percent
             var level = data.LIGPE1;
+
+            console.log( "External light 1 status: " + level );
 
             // Search for the level in the level map
             var setting = self.levelMap.indexOf( level );
@@ -122,6 +126,8 @@ function ExternalLights(name, deps)
 
     var setLights = function setLights( lightNum, value ) 
     {
+        console.log( "Attemping to set lights [" + lightNum + "] to: " + value );
+
         // Range limit the new setting from 0 to the max number of defined levels
         if( value < 0 )
         {
@@ -134,6 +140,8 @@ function ExternalLights(name, deps)
         
         // Make sure the new setting is an integer
         self.settings[ lightNum ] = Math.round( value );
+
+        console.log( "Setting lights [" + lightNum + "] to: " + self.settings[ lightNum ] );
 
         var command = 'elight' + lightNum +'(' + self.levelMap[ self.settings[ lightNum ] ] + ')';
 

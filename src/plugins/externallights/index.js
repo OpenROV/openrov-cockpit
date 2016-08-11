@@ -44,10 +44,10 @@ function ExternalLights(name, deps)
     // Arduino
     deps.globalEventLoop.on( 'mcu.status', function (data) 
     {   
-        if ('LIGPE0' in data) 
+        if ('LIGTE0' in data) 
         {
             // Value of 0-255 representing percent
-            var level = data.LIGPE0;
+            var level = data.LIGTE0;
 
             console.log( "External light 0 status: " + level );
 
@@ -73,10 +73,10 @@ function ExternalLights(name, deps)
 
             deps.cockpit.emit( 'plugin.externalLights.state', 0, { level: self.settings[ 0 ] } );
         }
-        else if ('LIGPE1' in data) 
+        else if ('LIGTE1' in data) 
         {
             // Value of 0-255 representing percent
-            var level = data.LIGPE1;
+            var level = data.LIGTE1;
 
             console.log( "External light 1 status: " + level );
 
@@ -93,7 +93,7 @@ function ExternalLights(name, deps)
                 // Find the closest level in our map
                 var closest = self.levelMap.reduce( function (prev, curr) 
                 {
-                    return (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev);
+                    return (Math.abs(curr - level) < Math.abs(prev - level) ? curr : prev);
                 });
                 
                 // Set the new setting value based on the index of the closest level

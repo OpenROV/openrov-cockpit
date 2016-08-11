@@ -47,10 +47,6 @@ void CExternalLights::Update( CCommand& commandIn )
 		Serial.print( F( "LIGTE0:" ) );
 		Serial.print( value );
 		Serial.print( ';' );
-		
-		Serial.print( F( "LIGPE0:" ) );
-		Serial.print( value );
-		Serial.println( ';' );
 	}
     
     // Handle messages
@@ -74,10 +70,6 @@ void CExternalLights::Update( CCommand& commandIn )
 		Serial.print( F( "LIGTE1:" ) );
 		Serial.print( value );
 		Serial.print( ';' );
-		
-		Serial.print( F( "LIGPE1:" ) );
-		Serial.print( value );
-		Serial.println( ';' );
 	}
 }
 

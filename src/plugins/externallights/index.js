@@ -9,6 +9,7 @@ function ExternalLights(name, deps)
 
     //  Settings:       = [ 0 .. 5 ]
     self.levelMap        = [ 0, 16, 32, 64, 128, 255 ];
+    self.maxLevel        = self.levelMap.length - 1;
 
     // Cockpit
     deps.cockpit.on('plugin.externalLights.toggle', function( lightNum ) 
@@ -31,7 +32,7 @@ function ExternalLights(name, deps)
         if( setOn )
         {
             // Max light power
-            setLights( lightNum, self.levelMap.length );
+            setLights( lightNum, self.maxLevel );
         }
         else
         {
@@ -124,7 +125,7 @@ function ExternalLights(name, deps)
         else 
         {
             // Set to max power
-            setLights( lightNum, self.levelMap.length );
+            setLights( lightNum, self.maxLevel );
         }
     };
 
@@ -137,9 +138,9 @@ function ExternalLights(name, deps)
         {
             value = 0;
         }
-        else if( value >= self.levelMap.length )
+        else if( value >= self.maxLevel )
         {
-            value = self.levelMap.length;
+            value = self.maxLevel;
         }
         
         // Make sure the new setting is an integer

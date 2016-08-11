@@ -28,7 +28,7 @@ plugins.ExternalLights.prototype.inputDefaults = function ()
     {
       name: 'plugin.externalLights.0.adjust_increment',
       description: 'Makes the ROV lights brighter.',
-      defaults: { keyboard: '6'},
+      defaults: { keyboard: '8'},
       down: function () 
       {
         cockpit.rov.emit( 'plugin.externalLights.set', 0, self.state[0].level + 1 );
@@ -46,7 +46,7 @@ plugins.ExternalLights.prototype.inputDefaults = function ()
     {
       name: 'plugin.externalLights.0.toggle',
       description: 'Toggles the ROV lights on/off.',
-      defaults: { keyboard: '8' },
+      defaults: { keyboard: '6' },
       down: function () 
       {
         cockpit.rov.emit( 'plugin.externalLights.toggle', 0 );
@@ -57,7 +57,7 @@ plugins.ExternalLights.prototype.inputDefaults = function ()
     {
       name: 'plugin.externalLights.1.adjust_increment',
       description: 'Makes the ROV lights brighter.',
-      defaults: { keyboard: '9'},
+      defaults: { keyboard: '-'},
       down: function () 
       {
         cockpit.rov.emit('plugin.externalLights.set', 1, self.state[1].level + 1 );
@@ -76,7 +76,7 @@ plugins.ExternalLights.prototype.inputDefaults = function ()
     {
       name: 'plugin.externalLights.1.toggle',
       description: 'Toggles the ROV lights on/off.',
-      defaults: { keyboard: '-' },
+      defaults: { keyboard: '9' },
       down: function () 
       {
         cockpit.rov.emit('plugin.externalLights.toggle', 1);

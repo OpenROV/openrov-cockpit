@@ -17,6 +17,8 @@
 
   plugins.Lights.prototype.inputDefaults = function inputDefaults() 
   {
+    var self = this;
+
     return [
       // lights increment
       {

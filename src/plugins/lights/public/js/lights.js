@@ -1,25 +1,31 @@
-(function(window) {
+(function(window) 
+{
   'use strict';
   var plugins = namespace('plugins');
-  plugins.Lights = function(cockpit) {
-    var self = this;
-    self.cockpit = cockpit;
 
+  plugins.Lights = function(cockpit)
+  {
+    var self      = this;
+    self.cockpit  = cockpit;
+    self.state    = {};
   };
 
-  plugins.Lights.prototype.getTelemetryDefintions = function getTelemetryDefintions() {
-    return([{name: 'LIGP', description: 'Internal lights percent of power'}]);
+  plugins.Lights.prototype.getTelemetryDefintions = function getTelemetryDefintions() 
+  {
+    return( [{name: 'LIGP', description: 'Internal lights percent of power'}] );
   }
 
-  plugins.Lights.prototype.inputDefaults = function inputDefaults() {
+  plugins.Lights.prototype.inputDefaults = function inputDefaults() 
+  {
     return [
       // lights increment
       {
         name: 'plugin.lights.adjust_increment',
         description: 'Makes the ROV lights brighter.',
         defaults: { keyboard: 'p', gamepad: 'DPAD_UP' },
-        down: function () {
-          cockpit.rov.emit('plugin.lights.adjust', 0.1);
+        down: function () 
+        {
+          cockpit.rov.emit('plugin.lights.adjust', self.state.level + 1 );
         }
       },
 
@@ -29,8 +35,9 @@
         description: 'Makes the ROV lights dimmer.',
         defaults: { keyboard: 'o', gamepad: 'DPAD_DOWN' },
 
-        down: function () {
-          cockpit.rov.emit('plugin.lights.adjust', -0.1);
+        down: function () 
+        {
+          cockpit.rov.emit('plugin.lights.adjust', self.state.level -1 );
         }
       },
 
@@ -39,12 +46,12 @@
         name: 'plugin.lights.toggle',
         description: 'Toggles the ROV lights on/off.',
         defaults: { keyboard: 'i' },
-        down: function () {
+        down: function () 
+        {
           cockpit.rov.emit('plugin.lights.toggle');
         }
       }
-    ]
-
+    ];
   };
 
   //This pattern will hook events in the cockpit and pull them all back
@@ -52,11 +59,13 @@
   plugins.Lights.prototype.listen = function listen() {
     var self = this;
 
-    self.cockpit.rov.withHistory.on('plugin.lights.state', function(state) {
-      self.cockpit.emit('plugin.lights.state',state);
+    self.cockpit.rov.withHistory.on('plugin.lights.state', function(state) 
+    {
+      self.cockpit.emit('plugin.lights.level', state.level );
     });
 
-    self.cockpit.on('plugin.lights.set',function(value){
+    self.cockpit.on('plugin.lights.set',function(value)
+    {
         cockpit.rov.emit('plugin.lights.set',value);
     });
 

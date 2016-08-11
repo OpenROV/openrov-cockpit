@@ -58,6 +58,8 @@ function ExternalLights(name, deps)
             {
                 // The new setting value is the array index of the level in the level map, if it exists
                 self.settings[ 0 ] = setting;
+
+                console.log( "External light 0 setting: " + setting );
             }
             else
             {
@@ -69,6 +71,8 @@ function ExternalLights(name, deps)
                 
                 // Set the new setting value based on the index of the closest level
                 self.settings[ 0 ] = self.levelMap.indexOf( closest );
+
+                console.log( "External light 0 closest setting: " + self.settings[ 0 ] );
             }
 
             deps.cockpit.emit( 'plugin.externalLights.state', 0, { level: self.settings[ 0 ] } );

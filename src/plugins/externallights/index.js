@@ -62,7 +62,7 @@ function ExternalLights(name, deps)
                 // Find the closest level in our map
                 var closest = self.levelMap.reduce( function (prev, curr) 
                 {
-                    return (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev);
+                    return (Math.abs(curr - level) < Math.abs(prev - level) ? curr : prev);
                 });
                 
                 // Set the new setting value based on the index of the closest level

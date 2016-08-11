@@ -179,14 +179,16 @@
 					if( e.detail.active )
 					{
 						console.log( "turning lights on" );
-						this.eventEmitter.emit( 'plugin.lights.set', 1 );
-						this.eventEmitter.emit( 'plugin.externalLights.set', 1 );
+						this.eventEmitter.emit( 'plugin.lights.setOnOff', true );
+						this.eventEmitter.emit( 'plugin.externalLights.setOnOff', 0, true );
+						this.eventEmitter.emit( 'plugin.externalLights.setOnOff', 1, true );
 					}
 					else
 					{
 						console.log( "turning lights off" );
-						this.eventEmitter.emit( 'plugin.lights.set', 0 );
-						this.eventEmitter.emit( 'plugin.externalLights.set', 1 );
+						this.eventEmitter.emit( 'plugin.lights.setOnOff', 0 );
+						this.eventEmitter.emit( 'plugin.externalLights.setOnOff', 0, false );
+						this.eventEmitter.emit( 'plugin.externalLights.setOnOff', 1, false );
 					}
 				},
 

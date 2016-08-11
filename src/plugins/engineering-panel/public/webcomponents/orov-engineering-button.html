@@ -134,11 +134,17 @@
                   events: [
                     {message:'plugin.lights.state',fn: function(state){return state.level>0;}}
                   ],
-                  switch: function (state) {
-                    if (self.eventEmitter !== undefined){
-                      var level = 1;
-                      if (state==true) level = 0;
-                      self.eventEmitter.emit('plugin.lights.set',level);
+                  switch: function (state) 
+                  {
+                    if( state == true )
+                    {
+                      // Turn off
+                      self.eventEmitter.emit('plugin.lights.setOnOff', false );
+                    }
+                    else
+                    {
+                      // Turn on to max
+                      self.eventEmitter.emit('plugin.lights.setOnOff', true );
                     }
                   }
                 },
@@ -150,10 +156,18 @@
                     {message:'plugin.externalLights.level',fn: function(lightNum, level){ if( lightNum == 0){ return level > 0; } else{ return null; } }}
                   ],
                   switch: function (state) {
-                    if (self.eventEmitter !== undefined){
-                      var level = 1;
-                      if (state==true) level = 0;
-                      self.eventEmitter.emit('plugin.externalLights.set', 0, level);
+                    if (self.eventEmitter !== undefined)
+                    {
+                      if( state == true )
+                      {
+                        // Turn off
+                        self.eventEmitter.emit('plugin.externalLights.setOnOff', 0, false );
+                      }
+                      else
+                      {
+                        // Turn on to max
+                        self.eventEmitter.emit('plugin.externalLights.setOnOff', 0, true );
+                      }
                     }
                   }
                 },
@@ -165,10 +179,18 @@
                     {message:'plugin.externalLights.level',fn: function(lightNum, level){if( lightNum == 1){ return level > 0; } else{ return null; } } }
                   ],
                   switch: function (state) {
-                    if (self.eventEmitter !== undefined){
-                      var level = 1;
-                      if (state==true) level = 0;
-                      self.eventEmitter.emit('plugin.externalLights.set', 1, level);
+                    if (self.eventEmitter !== undefined)
+                    {
+                      if( state == true )
+                      {
+                        // Turn off
+                        self.eventEmitter.emit('plugin.externalLights.setOnOff', 1, false );
+                      }
+                      else
+                      {
+                        // Turn on to max
+                        self.eventEmitter.emit('plugin.externalLights.setOnOff', 1, true );
+                      }
                     }
                   }
                 },

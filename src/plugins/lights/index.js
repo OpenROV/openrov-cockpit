@@ -108,7 +108,7 @@
         // Make sure the new setting is an integer
         self.setting = Math.round( value );
 
-        var command = 'ligt' + lightNum +'(' + self.levelMap[ self.setting ] + ')';
+        var command = 'ligt(' + self.levelMap[ self.setting ] + ')';
 
         deps.globalEventLoop.emit( 'mcu.SendCommand', command );
     };

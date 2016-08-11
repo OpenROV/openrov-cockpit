@@ -8,7 +8,7 @@ function ExternalLights(name, deps)
     self.settings        = [ 0, 0 ];
 
     //  Settings:       = [ 0 .. 5 ]
-    self.levelMap        = [ 0, 0.0625, 0.125, 0.25, 0.5, 1.0 ];
+    self.levelMap        = [ 0, 16, 32, 64, 128, 255 ];
 
     // Cockpit
     deps.cockpit.on('plugin.externalLights.toggle', function( lightNum ) 

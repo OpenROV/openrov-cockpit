@@ -62,6 +62,7 @@
     self.cockpit.rov.withHistory.on('plugin.lights.state', function(state) 
     {
       self.cockpit.emit('plugin.lights.level', state.level );
+      self.state = state;
     });
 
     self.cockpit.on('plugin.lights.set',function(value)

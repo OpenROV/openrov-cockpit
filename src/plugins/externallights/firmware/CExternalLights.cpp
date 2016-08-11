@@ -29,8 +29,18 @@ void CExternalLights::Update( CCommand& commandIn )
 {
     if( commandIn.Equals( "elight0" ) )
 	{
-		float percentValue = ( float )commandIn.m_arguments[1] / 100.0f;
-		int value = (int)( 255.0f * percentValue );
+		// Should be between 0-255, with 255 being full brightness
+		int value = commandIn.m_arguments[1];
+
+		// Bounds corrections
+		if( value < 0 )
+		{
+			value = 0;
+		}
+		if( value > 255 )
+		{
+			value = 255;
+		}
 		
 		elight0.Write( value );
 		
@@ -46,16 +56,25 @@ void CExternalLights::Update( CCommand& commandIn )
     // Handle messages
 	if( commandIn.Equals( "elight1" ) )
 	{
-		// 0 - 255
-		float percentValue = ( float )commandIn.m_arguments[1] / 100.0f; //0 - 255
-		int value = (int)( 255.0f * percentValue );
+		// Should be between 0-255, with 255 being full brightness
+		int value = commandIn.m_arguments[1];
+
+		// Bounds corrections
+		if( value < 0 )
+		{
+			value = 0;
+		}
+		if( value > 255 )
+		{
+			value = 255;
+		}
 		
 		elight1.Write( value );
-
+		
 		Serial.print( F( "LIGTE1:" ) );
 		Serial.print( value );
 		Serial.print( ';' );
-
+		
 		Serial.print( F( "LIGPE1:" ) );
 		Serial.print( percentValue );
 		Serial.println( ';' );

@@ -4,8 +4,11 @@ function ExternalLights(name, deps)
     console.log('ExternalLights plugin loaded');
 
     var self            = this;
-    var ArduinoHelper   = require('../../lib/ArduinoHelper')();
-     var lights         = [ 0, 0 ];
+
+    self.settings        = [ 0, 0 ];
+
+    //  Settings:       = [ 0 .. 5 ]
+    self.levelMap        = [ 0, 0.0625, 0.125, 0.25, 0.5, 1.0 ];
 
     // Cockpit
     deps.cockpit.on('plugin.externalLights.toggle', function( lightNum ) 
@@ -13,83 +16,128 @@ function ExternalLights(name, deps)
         toggleLights( lightNum );
     });
 
-    deps.cockpit.on('plugin.externalLights.adjust', function(lightNum, value) 
+    deps.cockpit.on('plugin.externalLights.adjust', function( lightNum, value ) 
     {
-        adjustLights(lightNum, value);
+        adjustLights( lightNum, value );
     });
 
-    deps.cockpit.on('plugin.externalLights.set', function (lightNum, value) 
+    deps.cockpit.on('plugin.externalLights.set', function( lightNum, value ) 
     {
-        setLights(lightNum, value);
+        setLights( lightNum, value );
     });
+
+    deps.cockpit.on('plugin.externalLights.setOnOff', function( lightNum, setOn ) 
+    {
+        if( setOn )
+        {
+            // Max light power
+            setLights( lightNum, self.levelMap.length );
+        }
+        else
+        {
+            // Min light power
+            setLights( lightNum, 0 );
+        }
+    });
+
 
     // Arduino
-    deps.globalEventLoop.on( 'mcu.status', function (data) {
+    deps.globalEventLoop.on( 'mcu.status', function (data) 
+    {
         if ('LIGPE0' in data) 
         {
-            //value of 0-1.0 representing percent
+            // Value of 0-255 representing percent
             var level = data.LIGPE0;
-            lights[ 0 ] = Number.parseFloat(level);
-            deps.cockpit.emit('plugin.externalLights.state', 0, {level:level});
+
+            // Search for the level in the level map
+            var setting = self.levelMap.indexOf( level );
+
+            if( setting != -1 )
+            {
+                // The new setting value is the array index of the level in the level map, if it exists
+                self.settings[ 0 ] = setting;
+            }
+            else
+            {
+                // Find the closest level in our map
+                var closest = self.levelMap.reduce( function (prev, curr) 
+                {
+                    return (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev);
+                });
+                
+                // Set the new setting value based on the index of the closest level
+                self.settings[ 0 ] = self.levelMap.indexOf( closest );
+            }
+
+            deps.cockpit.emit( 'plugin.externalLights.state', 0, { level: self.settings[ 0 ] } );
         }
         else if ('LIGPE1' in data) 
         {
-            //value of 0-1.0 representing percent
+            // Value of 0-255 representing percent
             var level = data.LIGPE1;
-            lights[ 1 ] = Number.parseFloat(level);
-            deps.cockpit.emit('plugin.externalLights.state', 1, {level:level});
+
+            // Search for the level in the level map
+            var setting = self.levelMap.indexOf( level );
+
+            if( setting != -1 )
+            {
+                // The new setting value is the array index of the level in the level map, if it exists
+                self.settings[ 1 ] = setting;
+            }
+            else
+            {
+                // Find the closest level in our map
+                var closest = self.levelMap.reduce( function (prev, curr) 
+                {
+                    return (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev);
+                });
+                
+                // Set the new setting value based on the index of the closest level
+                self.settings[ 1 ] = self.levelMap.indexOf( closest );
+            }
+
+            deps.cockpit.emit( 'plugin.externalLights.state', 1, { level: self.settings[ 1 ] } );
         }
     });
 
     var adjustLights = function adjustLights(lightNum, value) 
     {
-        console.log("adjustLights[" + lightNum + "]: " + value);
-        
-        if (lights[ lightNum ] === 0 && value < 0) 
-        {
-            //this code rounds the horn so to speak by jumping from zero to max and vise versa
-            lights[ lightNum ] = 0;  //disabled the round the horn feature
-        } 
-        else if (lights[ lightNum ] == 1 && value > 0) 
-        {
-            lights[ lightNum ] = 1;  //disabled the round the horn feature
-        } 
-        else 
-        {
-            lights[ lightNum ] = parseFloat(value) + parseFloat(lights[ lightNum ]);
-        };
-
-        setLights(lightNum, lights[ lightNum ]);
+        // Modify current setting
+        setLights( lightNum, self.settings[ lightNum ] + value );
     };
 
     var toggleLights = function toggleLights( lightNum ) 
     {
-        if (lights[ lightNum ] > 0) 
+        if( self.settings[ lightNum ] > 0 ) 
         {
-            setLights(lightNum, 0);
+            // Set to min power
+            setLights( lightNum, 0 );
         } 
         else 
         {
-            setLights(lightNum, 1);
+            // Set to max power
+            setLights( lightNum, self.levelMap.length );
         }
     };
 
     var setLights = function setLights( lightNum, value ) 
     {
-        lights[ lightNum ] = value;
-
-        if (lights[ lightNum ] >= 1)
+        // Range limit the new setting from 0 to the max number of defined levels
+        if( value < 0 )
         {
-            lights[ lightNum ] = 1;
+            value = 0;
         }
-        else if (lights[ lightNum ] <= 0)
+        else if( value >= self.levelMap.length )
         {
-            lights[ lightNum ] = 0;
+            value = self.levelMap.length;
         }
+        
+        // Make sure the new setting is an integer
+        self.settings[ lightNum ] = Math.round( value );
 
-        var command = 'elight' + lightNum +'(' + ArduinoHelper.serial.packPercent(lights[ lightNum ]) + ')';
+        var command = 'elight' + lightNum +'(' + self.levelMap[ self.settings[ lightNum ] ] + ')';
 
-        deps.globalEventLoop.emit( 'mcu.SendCommand', command);
+        deps.globalEventLoop.emit( 'mcu.SendCommand', command );
     };
 };
 

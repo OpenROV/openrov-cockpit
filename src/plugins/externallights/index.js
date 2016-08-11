@@ -48,7 +48,7 @@ function ExternalLights(name, deps)
         if ('LIGTE0' in data) 
         {
             // Value of 0-255 representing percent
-            var level = data.LIGTE0;
+            var level = parseInt( data.LIGTE0 );
 
             console.log( "External light 0 status: " + level );
 
@@ -81,7 +81,7 @@ function ExternalLights(name, deps)
         else if ('LIGTE1' in data) 
         {
             // Value of 0-255 representing percent
-            var level = data.LIGTE1;
+            var level = parseInt( data.LIGTE1 );
 
             console.log( "External light 1 status: " + level );
 

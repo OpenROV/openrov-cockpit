@@ -49,7 +49,7 @@ void CExternalLights::Update( CCommand& commandIn )
 		Serial.print( ';' );
 		
 		Serial.print( F( "LIGPE0:" ) );
-		Serial.print( percentValue );
+		Serial.print( value );
 		Serial.println( ';' );
 	}
     
@@ -76,7 +76,7 @@ void CExternalLights::Update( CCommand& commandIn )
 		Serial.print( ';' );
 		
 		Serial.print( F( "LIGPE1:" ) );
-		Serial.print( percentValue );
+		Serial.print( value );
 		Serial.println( ';' );
 	}
 }

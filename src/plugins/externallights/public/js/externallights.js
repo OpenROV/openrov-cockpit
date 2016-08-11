@@ -7,7 +7,7 @@
   {
     var self      = this;
     self.cockpit  = cockpit;
-    self.state    = [ {}, {} ];
+    //self.state    = [ {}, {} ];
   };
 
   plugins.ExternalLights.prototype.getTelemetryDefintions = function getTelemetryDefintions() 
@@ -31,7 +31,8 @@ plugins.ExternalLights.prototype.inputDefaults = function ()
       defaults: { keyboard: '8'},
       down: function () 
       {
-        cockpit.rov.emit( 'plugin.externalLights.set', 0, self.state[0].level + 1 );
+        //cockpit.rov.emit( 'plugin.externalLights.set', 0, self.state[0].level + 1 );
+        cockpit.rov.emit( 'plugin.externalLights.adjust', 0, 1 );
       }
     },
     {
@@ -40,7 +41,8 @@ plugins.ExternalLights.prototype.inputDefaults = function ()
       defaults: { keyboard: '7'},
       down: function () 
       {
-        cockpit.rov.emit( 'plugin.externalLights.set', 0, self.state[0].level - 1 );
+        //cockpit.rov.emit( 'plugin.externalLights.set', 0, self.state[0].level - 1 );
+        cockpit.rov.emit( 'plugin.externalLights.adjust', 0, -1 );
       }
     },
     {
@@ -60,7 +62,8 @@ plugins.ExternalLights.prototype.inputDefaults = function ()
       defaults: { keyboard: '-'},
       down: function () 
       {
-        cockpit.rov.emit('plugin.externalLights.set', 1, self.state[1].level + 1 );
+        //cockpit.rov.emit('plugin.externalLights.set', 1, self.state[1].level + 1 );
+        cockpit.rov.emit('plugin.externalLights.adjust', 1, 1 );
       }
     },
     {
@@ -70,7 +73,8 @@ plugins.ExternalLights.prototype.inputDefaults = function ()
 
       down: function () 
       {
-        cockpit.rov.emit('plugin.externalLights.set', 1, self.state[1].level - 1);
+        //cockpit.rov.emit('plugin.externalLights.set', 1, self.state[1].level - 1);
+        cockpit.rov.emit('plugin.externalLights.adjust', 1, -1 );
       }
     },
     {
@@ -94,12 +98,12 @@ plugins.ExternalLights.prototype.inputDefaults = function ()
       self.cockpit.rov.withHistory.on('plugin.externalLights.state', function(lightNum, state) 
       {
         self.cockpit.emit('plugin.externalLights.level', lightNum, state.level );
-        self.state[ lightNum ]  = state;
+        //self.state[ lightNum ]  = state;
       });
 
-      self.cockpit.on('plugin.externalLights.set',function( lightNum, value )
+      self.cockpit.on('plugin.externalLights.adjust',function( lightNum, value )
       {
-          cockpit.rov.emit('plugin.externalLights.set', lightNum, value );
+          cockpit.rov.emit('plugin.externalLights.adjust', lightNum, value );
       });
 
   };

@@ -7,7 +7,6 @@
   {
     var self      = this;
     self.cockpit  = cockpit;
-    self.state    = {};
   };
 
   plugins.Lights.prototype.getTelemetryDefintions = function getTelemetryDefintions() 
@@ -27,7 +26,7 @@
         defaults: { keyboard: 'p', gamepad: 'DPAD_UP' },
         down: function () 
         {
-          cockpit.rov.emit('plugin.lights.adjust', self.state.level + 1 );
+          cockpit.rov.emit('plugin.lights.set', 1 );
         }
       },
 
@@ -39,7 +38,7 @@
 
         down: function () 
         {
-          cockpit.rov.emit('plugin.lights.adjust', self.state.level -1 );
+          cockpit.rov.emit('plugin.lights.adjust', -1 );
         }
       },
 
@@ -64,12 +63,11 @@
     self.cockpit.rov.withHistory.on('plugin.lights.state', function(state) 
     {
       self.cockpit.emit('plugin.lights.level', state.level );
-      self.state = state;
     });
 
-    self.cockpit.on('plugin.lights.set',function(value)
+    self.cockpit.on('plugin.lights.adjust',function(value)
     {
-        cockpit.rov.emit('plugin.lights.set',value);
+        cockpit.rov.emit('plugin.lights.adjust',value);
     });
 
   };

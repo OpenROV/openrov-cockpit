@@ -26,7 +26,7 @@
         defaults: { keyboard: 'p', gamepad: 'DPAD_UP' },
         down: function () 
         {
-          cockpit.rov.emit('plugin.lights.set', 1 );
+          cockpit.rov.emit('plugin.lights.adjust', 1 );
         }
       },
 

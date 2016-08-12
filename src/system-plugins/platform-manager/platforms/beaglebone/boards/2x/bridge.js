@@ -19,7 +19,7 @@ function Bridge()
   {
     serialPort = new SerialPort.SerialPort( uartPath,
     {
-      baudrate: uartBaud,
+      baudRate: uartBaud,
       parser: SerialPort.parsers.readline( '\r\n' )
     } );
 

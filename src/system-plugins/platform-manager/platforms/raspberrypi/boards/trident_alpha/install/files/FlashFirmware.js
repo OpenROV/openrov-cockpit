@@ -3,7 +3,7 @@ var Promise                     = require( "bluebird" );
 var fs                          = Promise.promisifyAll( require( "fs-extra" ) );
 var execFileAsync               = require('child-process-promise').execFile;
 
-var command = "program /opt/openrov/firmware/bin/trident/OpenROV.bin; reset; exit"; 
+var command = "program /opt/openrov/firmware/bin/trident_alpha/Trident.bin; reset; exit"; 
 
 var args = 
 [

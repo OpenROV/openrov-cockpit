@@ -1,7 +1,7 @@
 #pragma once
 
 // Includes
-#include "../CModule.h"
+#include "CModule.h"
 
 class CExternalLights : public CModule
 {

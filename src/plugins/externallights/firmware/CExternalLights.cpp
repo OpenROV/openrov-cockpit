@@ -1,10 +1,10 @@
-#include "../SysConfig.h"
+#include "SysConfig.h"
 #if(HAS_EXT_LIGHTS && CONTROLLERBOARD == CONTROLLERBOARD_CB25 )
 
 // Includes
 #include <Arduino.h>
 #include "CExternalLights.h"
-#include "../CPin.h"
+#include "CPin.h"
 
 // Set pin definitions
 #define ELIGHTS0_PIN 46
@@ -29,36 +29,47 @@ void CExternalLights::Update( CCommand& commandIn )
 {
     if( commandIn.Equals( "elight0" ) )
 	{
-		float percentValue = ( float )commandIn.m_arguments[1] / 100.0f;
-		int value = (int)( 255.0f * percentValue );
+		// Should be between 0-255, with 255 being full brightness
+		int value = commandIn.m_arguments[1];
+
+		// Bounds corrections
+		if( value < 0 )
+		{
+			value = 0;
+		}
+		if( value > 255 )
+		{
+			value = 255;
+		}
 		
 		elight0.Write( value );
 		
 		Serial.print( F( "LIGTE0:" ) );
 		Serial.print( value );
 		Serial.print( ';' );
-		
-		Serial.print( F( "LIGPE0:" ) );
-		Serial.print( percentValue );
-		Serial.println( ';' );
 	}
     
     // Handle messages
 	if( commandIn.Equals( "elight1" ) )
 	{
-		// 0 - 255
-		float percentValue = ( float )commandIn.m_arguments[1] / 100.0f; //0 - 255
-		int value = (int)( 255.0f * percentValue );
+		// Should be between 0-255, with 255 being full brightness
+		int value = commandIn.m_arguments[1];
+
+		// Bounds corrections
+		if( value < 0 )
+		{
+			value = 0;
+		}
+		if( value > 255 )
+		{
+			value = 255;
+		}
 		
 		elight1.Write( value );
-
+		
 		Serial.print( F( "LIGTE1:" ) );
 		Serial.print( value );
 		Serial.print( ';' );
-
-		Serial.print( F( "LIGPE1:" ) );
-		Serial.print( percentValue );
-		Serial.println( ';' );
 	}
 }
 

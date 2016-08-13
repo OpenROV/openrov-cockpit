@@ -44,7 +44,7 @@
           targetHeading:{type: Number}
         },
         behaviors: [namespace('behaviors').oROVStandard],
-        registerEmitterHanlders: function(emitter){
+        registerEmitterHandlers: function(emitter){
           var self = this;
           emitter.withHistory.on('plugin.rovpilot.headingHold.state',function(state){
             self.headingHoldEnabled=state.enabled;

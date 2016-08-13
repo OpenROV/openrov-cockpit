@@ -27,9 +27,9 @@
       },
       attached: function () {
         var self=this;
-        if(typeof(this.registerEmitterHanlders)=='function'){
-          var org = this.registerEmitterHanlders;
-          this.registerEmitterHanlders=function(emitter){
+        if(typeof(this.registerEmitterHandlers)=='function'){
+          var org = this.registerEmitterHandlers;
+          this.registerEmitterHandlers=function(emitter){
             self.registerBaseEmitterHanlders(emitter);
             org(emitter);
           };

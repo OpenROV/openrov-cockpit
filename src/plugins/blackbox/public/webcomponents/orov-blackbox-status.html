@@ -28,7 +28,7 @@
           status: {type: Boolean, value: false, observer: '_statusChanged'}
         },
         behaviors: [namespace('behaviors').oROVStandard],
-        registerEmitterHanlders: function(emitter){
+        registerEmitterHandlers: function(emitter){
           var self = this;
           emitter.on('plugin-blackbox-recording-status',function(status){
             self.status = status;

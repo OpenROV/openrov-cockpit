@@ -28,8 +28,8 @@
     },
     attached: function () {
       //Added a new lifecycle event for the control:
-      if (this.eventEmitter !== undefined && this.registerEmitterHanlders !== undefined) {
-        this.registerEmitterHanlders(this.eventEmitter);
+      if (this.eventEmitter !== undefined && this.registerEmitterHandlers !== undefined) {
+        this.registerEmitterHandlers(this.eventEmitter);
       }
       console.log('OROV-BEHAVIOR: Registerd eventEmitter');
       this.processedAttached=true;
@@ -42,8 +42,8 @@
         return;
       if (oldvalue === newvalue)
         return;
-      if (this.eventEmitter !== undefined && this.registerEmitterHanlders !== undefined) {
-        this.registerEmitterHanlders(this.eventEmitter);
+      if (this.eventEmitter !== undefined && this.registerEmitterHandlers !== undefined) {
+        this.registerEmitterHandlers(this.eventEmitter);
       }
     }
   };

@@ -3,8 +3,18 @@ var PREFERENCES = 'plugins:plugin-finder';
 
 function pluginFinder(name, deps) {
   console.log('Pugin Finder plugin loaded.');
-  var preferences = getPreferences(deps.config);
+  //instance variables
+  this.cockpit = deps.cockpit;
+  this.global = deps.globalEventLoop;
+  this.deps = deps;
 
+}
+
+pluginFinder.prototype.start = function start(){
+  var self=this;
+  var deps = this.deps;
+
+  self.global.withHistory.on('settings-change.pluginFinder',function(data){
   deps.cockpit.on('plugin.pluginFinder.search', function (name,callback) {
     console.log('performing search for plugins.');
     console.dir(callback);
@@ -27,6 +37,18 @@ function pluginFinder(name, deps) {
               callback(results);
             }
         });
+    });
+  });
+
+  deps.cockpit.on('plugin.pluginFinder.info', function (name,callback) {
+    if (typeof(callback) !== "function"){
+      return;
+    } 
+    console.log('performing list for plugins');
+    bower.commands
+    .info('openrov-plugin-'+name)
+    .on('end',function (result) {
+        callback(result);
     });
   });
 
@@ -98,18 +120,23 @@ function pluginFinder(name, deps) {
       });
   });
 
+
+  })
 }
 
+pluginFinder.prototype.getSettingSchema = function getSettingSchema(){
+  return [
+    {
+        "title": "Plugin Finder Settings",
+        "id" : "pluginFinder",
+        "type": "object",
+        "properties": {
 
-function getPreferences(config) {
-  var preferences = config.preferences.get(PREFERENCES);
-  if (preferences === undefined) {
-    preferences = {};
-    config.preferences.set(PREFERENCES, preferences);
-  }
-  console.log('Plugin Finder loaded preferences: ' + JSON.stringify(preferences));
-  return preferences;
+        }
+    }
+  ]
 }
+
 module.exports = function(name,deps){
   return new pluginFinder(name,deps);
 }

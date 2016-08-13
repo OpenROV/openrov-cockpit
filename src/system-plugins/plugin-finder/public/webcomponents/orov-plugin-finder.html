@@ -15,6 +15,9 @@
   button {
 
   }
+  .keywords {
+    font-style: italic;
+  }
   </style>
   <template>
     <div id="pluginFinder-settings">
@@ -29,12 +32,17 @@
               <tr>
                   <td>
                         <div><strong>{{item.name}}</strong></div>
-                        <div><span>{{item.description}}</span> <a target="_blank" href:"{{item.homepage}}">{{__('more...')}}</a></div>
+                        <div><span>{{item.description}}</span> <a target="_blank" href="{{item.homepage}}">{{__('more...')}}</a></div>
                         <span class="badge" ><span>{{item.raiting}}</span> stars</span>
+                        <div class="keywords">
+                          <template is="dom-repeat" items="{{item.bowerinfo.latest.keywords}}" as="keyword">
+                            <span>{{keyword}}</span>
+                          </template>
+                        </div>
                   </td>
                   <td>
-                    <button type="button" class="btn btn-xs btn-default pull-right hide" hidden?={{!item.installed}} click='installPlugin'>{{__('Install')}}</button>
-                    <button type="button" class="btn btn-xs btn-default pull-right hide" hidden?={{item.installed}} click='uninstallPlugin'>{{__('Uninstall')}}</button>
+                    <button type="button"  hidden$="{{NotOkayToInstall(item)}}" click='installPlugin'>{{__('Install')}}</button>
+                    <button type="button"  hidden$="{{NotInstalled(item)}}" click='uninstallPlugin'>{{__('Uninstall')}}</button>
                   </td>
               </tr>
             </template>
@@ -63,7 +71,7 @@
         //  console.dir(e);
           this._queryChanged(e.srcElement.value,null);
         },
-        registerEmitterHanlders: function(emitter){
+        registerEmitterHandlers: function(emitter){
           var self = this;
 //          emitter.on('plugin.cameraTilt.angle',function(angle){
 //            self.servoAngle = angle;
@@ -99,6 +107,17 @@
               self.isInstalling = false;
             })
           }
+        },
+        NotOkayToInstall: function(item){
+          if ((item.installed) ||
+              (!item.bowerinfo.latest.keywords.includes('plugin-api-2'))
+          ) {
+            return true;
+          }
+          return false;
+        },
+        NotInstalled: function(item){
+          return item.installed!==true;
         }
       })
     })();

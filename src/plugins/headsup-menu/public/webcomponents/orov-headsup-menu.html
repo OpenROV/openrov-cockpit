@@ -677,7 +677,7 @@
           visible:{type:Boolean, value:false}
         },
         behaviors: [orovbehaviors.oROVStandard],
-        registerEmitterHanlders: function(emitter){
+        registerEmitterHandlers: function(emitter){
           var self = this;
           emitter.on('plugin.cameraTilt.angle',function(angle){
             self.servoAngle = angle;

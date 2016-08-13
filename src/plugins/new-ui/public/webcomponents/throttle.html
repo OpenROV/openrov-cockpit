@@ -258,7 +258,7 @@ TODO:  Change the interface for motors to -1/1 with deadzone accounted for to tr
         }
       },
       behaviors: [namespace('behaviors').oROVStandard],
-      registerEmitterHanlders: function(emitter) {
+      registerEmitterHandlers: function(emitter) {
         var self = this;
         emitter.withHistory.on('plugin.rovpilot.setPowerLevel', function (level) {
           self.setPowerLevel(level);

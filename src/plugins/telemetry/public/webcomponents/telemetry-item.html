@@ -46,7 +46,7 @@ label {
           toggleEnabled: {type:Boolean, value: true}
         },
         behaviors: [namespace('behaviors').oROVStandard],
-        registerEmitterHanlders: function(emitter){
+        registerEmitterHandlers: function(emitter){
           var self = this;
           emitter.on('status',function(status){
             self.logStatusData(status);

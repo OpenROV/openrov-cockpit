@@ -21,7 +21,7 @@
           sendData: {type: String}
         },
         behaviors: [namespace('behaviors').oROVStandard],
-        registerEmitterHanlders: function(emitter){
+        registerEmitterHandlers: function(emitter){
           var self = this;
           emitter.on('plugin.serial-monitor.serial-received',function(data){
             var list = self.$.serialMonitorList;

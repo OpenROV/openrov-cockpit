@@ -8,7 +8,7 @@
     this.cachedAvailablePlugins = [];
     var configManager = new window.Plugins.PluginFinder.Config();
     //TODO: Figure out why this blocks
-    this.primeCache();
+
   };
 
   PluginFinder.prototype.listen = function listen(){
@@ -38,10 +38,16 @@
       alert('Plugin Installed, you will need to refresh the browser to load the plugin. ');
     });
 
+    this.primeCache();
   };
 
   PluginFinder.prototype.primeCache = function primeCache(){
+    if (this.cockpit.rov.connection!=='socket.io'){
+      setTimeout(this.primeCache.bind(this),1000);
+      return;
+    }
     var self = this;
+
     this.cockpit.rov.emit('plugin.pluginFinder.search','',function(results){
 
   //  this.cockpit.rov.socket.emit('plugin.pluginFinder.search','',function(results){
@@ -65,14 +71,19 @@
         var giturl = plugin
           .url
           .replace('.git','')
-          .replace('git://github.com/','https://api.github.com/repos/');
+          .replace('git://github.com/','https://api.github.com/repos/')
+          .replace('https://github.com/','https://api.github.com/repos/');
 
-/*        $.getJSON( giturl, function( data ) {
+        $.getJSON( giturl, function( data ) {
           p.description = data.description;
           p.raiting = data.stargazers_count;
           p.homepage = data.homepage !== null ? data.homepage : data.html_url;
         });
-*/      });
+
+        self.cockpit.rov.emit('plugin.pluginFinder.info',p.name,function(result){
+          p.bowerinfo=result;
+        });        
+      });
     });
   }
 

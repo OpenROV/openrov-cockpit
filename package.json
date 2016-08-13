@@ -13,8 +13,10 @@
   },
   "dependencies": {
     "binary-parser": "1.1.5",
+    "bluebird": "^3.4.1",
     "body-parser": "^1.14.2",
-    "bower": "=1.7.7",
+    "bower": "^1.7.9",
+    "child-process-promise": "",
     "crc": "",
     "debug": "^2.2.0",
     "ejs": "~2.4.1",
@@ -24,6 +26,7 @@
     "express-session": "^1.13.0",
     "findit": "^2.0.0",
     "forever-monitor": "",
+    "fs-extra": "",
     "jquery-file-upload-middleware": "",
     "json-schema-defaults": "^0.1.1",
     "lazy": ">= 1.0.11",
@@ -46,10 +49,7 @@
     "serve-index": "^1.7.3",
     "socket.io": "~1.4.5",
     "sync": "",
-    "systemd": "git://github.com/plietar/node-systemd.git",
-    "bluebird": "^3.4.1",
-    "fs-extra": "",
-    "child-process-promise": ""
+    "systemd": "git://github.com/plietar/node-systemd.git"
   },
   "bundleDependencies": [
     "express",

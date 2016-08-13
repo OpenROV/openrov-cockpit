@@ -24,7 +24,7 @@ Built on the latest and greatest web standards, Cockpit works with embedded Linu
 
 
 # Getting started
-The fastest way to see the software running if your don't already have it installed on a robot is to follow [these](DEV-HOWTO.md) instructions to get it running on your local computer.
+The fastest way to see the software running if your don't already have it installed on a robot is to follow [these](docs/DEV-HOWTO.md) instructions to get it running on your local computer.
 
 # Related Projects
 
@@ -42,9 +42,9 @@ For embedding in the robotic system, openrov-cockpit is typically installed with
 # How to Contribute
 
 Review the 
-* [Dev-HowTo](DEV-HOWTO.md)
+* [Dev-HowTo](docs/DEV-HOWTO.md)
 * [Issues List](https://github.com/openrov/openrov-software/issues)
-* [Creating Plugins](CREATING-PLUGINS.md)
+* [Creating Plugins](docs/CREATING-PLUGINS.md)
 
 Filing issues: We have centralized all issues in the umbrella [openrov-software project](https://github.com/openrov/openrov-software/issues)
 

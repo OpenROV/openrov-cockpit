@@ -6,7 +6,8 @@
     "jquery": "2.1",
     "jquery-ui": "1.11",
     "polymer": "^1.5.0",
-    "webcomponentsjs": "^0.7.22"
+    "webcomponentsjs": "^0.7.22",
+    "eventemitter2": "^1.0.0"
   },
   "resolutions": {
     "webcomponentsjs": "^0.7.20",

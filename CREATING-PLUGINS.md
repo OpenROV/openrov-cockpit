@@ -16,6 +16,9 @@ The cockpit software has a built in search feature that looks for plugins that a
 
 All plugins will show, but to install your plugin you must indicate which plugin API was being developed against.  The current version is V2.  You indicate this by adding the keyword "plugin-api-2" to your bower.json file.
 
+Bower.io requires you to "tag" your code so that it knows its okay to distribute.  There are lots of ways to tag your project. An easy way using github is to create a release for your code.
+https://help.github.com/articles/creating-releases/  (the documentation may be a little out of data, but the UI will walk you through the process)
+
 You can add you plugin to the registry using the following command.
 ```
 $ bower register <my-package-name> <git-endpoint>
@@ -24,10 +27,7 @@ $ bower register openrov-plugin-example git://github.com/user/example.git
 ```
 Note: You can name the plugin something different than the name your github repository has.
 
-The commands to signal updates to the registry can be found in the bower.io documentation: https://bower.io/docs/creating-packages/
-
-Bower.io requires you to "tag" your code so that it knows its okay to distribute.  There are lots of ways to tag your project. An easy way using github is to create a release for your code.
-https://help.github.com/articles/creating-releases/  (the documentation may be a little out of data, but the UI will walk you through the process)
+The commands to manage your entry in the registry can be found in the bower.io documentation: https://bower.io/docs/creating-packages/
 
 That will register your plugin with the bower registry that is used by OpenROV cockpit. You can see your plugin in the registry by typing `bower search openrov-plugin`.
 

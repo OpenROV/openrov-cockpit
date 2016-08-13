@@ -6,11 +6,11 @@ The Cockpit is the UI and control systems for any remote operated vehicle or dev
 Built on the latest and greatest web standards, Cockpit works with embedded Linux and micro-controllers to provide tele-robotic control of those systems.  
 
 ## Key Features
-* Run on mobile, desktops, and tablets, no installation required
+* Connect to cockpit on mobile, desktops, and tablets, no installation required
 * In browser near real-time h.264/MJPEG video viewing with sub 120ms latency
 * Gamepad, keyboard, and joystick control (fully configurable)
 * Gyro/Accelerometer stabilized flight controls 
-* GPU based video filters and computer vision augmented 
+* GPU based video filters and computer augmented video
 * Fully extensible plugin based architecture
 * Community supported themes and plugins
 * In browser recording and playback of video and sensor telemetry

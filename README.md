@@ -1,6 +1,3 @@
-[![Views in the last 24 hours](https://sourcegraph.com/api/repos/github.com/OpenROV/openrov-cockpit/counters/views-24h.png)](https://sourcegraph.com/github.com/OpenROV/openrov-cockpit)
-[![Build Status](https://secure.travis-ci.org/OpenROV/openrov-cockpit.png?branch=master)](http://travis-ci.org/OpenROV/openrov-cockpit)
-[![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/OpenROV/openrov-cockpit/badges/quality-score.png?s=c24130cbf17aaa23f2680e3b45a0ec675ef2037f)](https://scrutinizer-ci.com/g/OpenROV/openrov-cockpit/)
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/OpenROV/discuss?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 OpenROV Cockpit

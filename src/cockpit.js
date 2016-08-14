@@ -86,7 +86,7 @@ app.use(express.static(__dirname + '/static/'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('port', process.env.LISTEN_FDS > 0 ? 'systemd' : CONFIG.port);
-app.set('views', __dirname + '/views');
+app.set('views','/');
 app.set('view engine', 'ejs', { pretty: true });
 app.use(favicon(__dirname + '/static/favicon.ico'));
 app.use(logger('dev'));

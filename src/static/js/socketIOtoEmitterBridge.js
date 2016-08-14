@@ -19,14 +19,18 @@
     
     //Apparently socket checks the last variable for a function callback and
     //does magic.  Have to send only the right number of arguments.
+    var ignoreEvents=['newListener','removeListener'];
     emitter.onAny(function() {
-      if (this.event !== 'newListener') {
+      if (!ignoreEvents.includes(this.event)) {
         var args = new Array(arguments.length);
         for(var i = 0; i < args.length; ++i) {
                     //i is always valid index in the arguments object
             args[i] = arguments[i];
         }
         if (args[args.length-1]===self.senderID) {return;}
+        if (args[0]==this.event){
+          args.shift(); //to catch behavior change of onyAny after ugprade
+        }
         //args.push(self.senderID)
         socket.emit.apply(socket,[this.event].concat(args));
         //console.log("Socket <1- ",this.event);

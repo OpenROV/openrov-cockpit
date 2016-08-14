@@ -18,7 +18,7 @@
   ],
   "dependencies": {
     "bootstrap": "~3.3.5",
-    "jquery": "~2.1.4",
+    "jquery": "~3.1.0",
     "iron-media-query": "PolymerElements/iron-media-query#^1.0.8"
   },
   "resolutions": {

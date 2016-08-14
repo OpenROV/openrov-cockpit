@@ -82,7 +82,7 @@
       self.positions = rates;
 //      console.log("this should be a callback!");
 //      console.dir(fn);
-//      fn(ack); //ack
+      fn(ack); //ack
     });
 
 

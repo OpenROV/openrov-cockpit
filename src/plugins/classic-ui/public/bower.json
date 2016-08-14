@@ -18,11 +18,11 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap": "2.3.2",
-    "jquery": "~2.1.4"
+    "bootstrap": "3.3.7",
+    "jquery": "~3.1.0"
   },
   "resolutions": {
-    "jquery": "~2.1.4",
+    "jquery": "~3.1.0",
     "webcomponentsjs": "^0.6.0"
   }
 }

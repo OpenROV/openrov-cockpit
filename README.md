@@ -37,7 +37,7 @@ openrov-cockpit is one of several packages that are combined together to enable 
 - ffmpeg: (to simulate the h.264 video pipeline)
 - Node.js:  [http://nodejs.org/](http://nodejs.org/)
 
-For embedding in the robotic system, openrov-cockpit is typically installed with several other packages that also include drivers and configuration for various hardware solutions.  We provide images for the OpenROV products. If you have questions about installing on other devices, reach out to us on Gitter or the (OpenROV Forums)[http://forum.openrov.com].
+For embedding in the robotic system, openrov-cockpit is typically installed with several other packages that also include drivers and configuration for various hardware solutions.  We provide images for the OpenROV products. If you have questions about installing on other devices, reach out to us on Gitter or the [OpenROV Forums](http://forum.openrov.com).
 
 
 # How to Contribute

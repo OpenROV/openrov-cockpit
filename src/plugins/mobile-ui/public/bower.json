@@ -18,7 +18,7 @@
   ],
   "dependencies": {
     "bootstrap": "~3.3.5",
-    "jquery": "~2.1.4",
+    "jquery": "~3.1.0",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
     "iron-dropdown": "PolymerElements/iron-dropdown#^1.0.0",
     "paper-button": "PolymerElements/paper-button#^1.0.0",

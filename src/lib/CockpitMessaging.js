@@ -4,22 +4,41 @@
   var CockpitMessaging = function(io, opts) {
     var listeners = [];
     var sockets = [];
-
+ 
+    var ignoreEvents=['newListener','removeListener']
     this.volatile = {
-      emit: function(event, data1, data2, data3, data4, data5) {
+      emit: function() {
+        if (ignoreEvents.includes(arguments[0])){ return;};
+        var args = new Array(arguments.length);
+        for(var i = 0; i < args.length; ++i) {
+                    //i is always valid index in the arguments object
+            args[i] = arguments[i];
+        }
+        if (args[0]==[args[1]]){
+          args.shift(); //After an upgrade of eventemitter, it appears the arguments now include the event type.
+        }
+        
         sockets.forEach(function(socket) {
-          socket.volatile.emit(event, data1, data2, data3, data4, data5);
+          socket.volatile.emit.apply(socket,args);
         });
       }
     };
 
-    this.onAny(function(data1, data2, data3, data4, data5) {
+    this.onAny(function() {
+      if (ignoreEvents.includes(arguments[0])){ return;};
       var event = this.event;
-      if (event !== 'newListener') {
+        var args = new Array(arguments.length);
+        for(var i = 0; i < args.length; ++i) {
+                    //i is always valid index in the arguments object
+            args[i] = arguments[i];
+        }
+        if (args[0]==[args[1]]){
+          args.shift(); //After an upgrade of eventemitter, it appears the arguments now include the event type.
+        }
+        
         sockets.forEach(function(socket) {
-          socket.emit(event, data1, data2, data3, data4, data5);
+          socket.emit.apply(socket,args);
         });
-      }
     });
 
     this.on('newListener', function(aType, aListener) {

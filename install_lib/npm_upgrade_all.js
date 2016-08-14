@@ -3,12 +3,12 @@ var finder = find(process.cwd());
 var ncu = require('npm-check-updates');
 
 var currentdirectory = process.cwd();
-var bowersToInstall = [];
+var npmsToInstall = [];
 
 finder.on('file', function(file,stat){
-  if(file.indexOf("bower.json")>-1){
-    console.log("Execute bower install on " + file)
-    bowersToInstall.push(file);
+  if(file.indexOf("package.json")>-1){
+    console.log("Examining package: " + file)
+    npmsToInstall.push(file);
   }
 });
 
@@ -30,18 +30,18 @@ finder.on('directory', function(dir,stat,stop){
 
 finder.on('end', function(){
   console.log('====== upgrading ======');
-  installbower(0,bowersToInstall);
+  installnpm(0,npmsToInstall);
   //console.dir(bowersToInstall);
 });
 
 var result = "";
-var installbower = function(index, array){
+var installnpm = function(index, array){
   var file = array[index];
   console.log('======== installing =======');
   console.log(file);
   ncu.run({
       packageFile: file,
-      packageManager: 'bower',
+      packageManager: 'npm',
       upgrade: true,
       upgradeall: true,
       jsonUpgraded:false
@@ -53,7 +53,7 @@ var installbower = function(index, array){
       console.log('dependencies to upgrade:', upgraded);
       index++;
       if (index<array.length){
-        installbower(index,array);
+        installnpm(index,array);
       }
   });
 

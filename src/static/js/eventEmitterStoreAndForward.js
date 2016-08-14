@@ -9,7 +9,7 @@
 */
 (function() {
   var root = this;
-
+  var ignoreEvents=['newListener','removeListener']
   var EventEmiiterStoreAndForward = function(coveredEventEmitter,cacheSeed) {
     var self = this;
     this.eventCache = cacheSeed==undefined?{}:cacheSeed;
@@ -27,7 +27,16 @@
     };
 
     coveredEventEmitter.onAny(function(){
-      self.eventCache[this.event]={context:this,args:arguments};
+      if (ignoreEvents.includes(this.event)){return;}
+      var args = new Array(arguments.length);
+      for(var i = 0; i < args.length; ++i) {
+                  //i is always valid index in the arguments object
+          args[i] = arguments[i];
+      }
+      if (args[0]==[this.event]){
+        args.shift(); //After an upgrade of eventemitter, it appears the arguments now include the event type.
+      }
+      self.eventCache[this.event]={context:this,args:args};
     });
 
     return coveredEventEmitter;

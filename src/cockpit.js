@@ -27,6 +27,7 @@ if (process.platform === 'linux') {
   });
 }
 require('systemd');
+var includesPollyfill=require("array-includes-pollyfill.js").enable();
 var CONFIG = require('./lib/config');
 var fs = require('fs');
 var express = require('express');

@@ -79,11 +79,20 @@
   // so that the reference to this instance is available for further processing
   plugins.ExternalLights.prototype.listen = function listen() {
     var self = this;
-    self.cockpit.rov.withHistory.on('plugin.externalLights.state', function (lightNum, state) {
+
+    self.cockpit.rov.withHistory.on('plugin.externalLights.state', function (lightNum, state) 
+    {
       self.cockpit.emit('plugin.externalLights.level', lightNum, state.level);  //self.state[ lightNum ]  = state;
     });
-    self.cockpit.on('plugin.externalLights.adjust', function (lightNum, value) {
+
+    self.cockpit.on('plugin.externalLights.adjust', function (lightNum, value) 
+    {
       cockpit.rov.emit('plugin.externalLights.adjust', lightNum, value);
+    });
+
+    self.cockpit.on('plugin.externalLights.setOnOff', function (lightNum, setOn) 
+    {
+      cockpit.rov.emit('plugin.externalLights.setOnOff', lightNum, setOn);
     });
   };
   window.Cockpit.plugins.push(plugins.ExternalLights);

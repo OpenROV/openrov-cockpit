@@ -10,7 +10,7 @@ function HostDiagnostics(name, deps) {
         self.currCpuUsage = v;
         //TODO: Refactor mcu.status to be a global telemetry message so that we can
         //aggegate telemetry form any source in to a single message stream.
-        self.deps.globalEventLoopww.emit('mcu.status',{cpu:v});
+        self.deps.globalEventLoop.emit('mcu.status',{cpu:v});
       });
     }, 1000); 
 }

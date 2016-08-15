@@ -1,4 +1,5 @@
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/OpenROV/discuss?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![bitHound Overall Score](https://www.bithound.io/github/OpenROV/openrov-cockpit/badges/score.svg)](https://www.bithound.io/github/OpenROV/openrov-cockpit)
 
 # [OpenROV](http://openrov.com/) Cockpit
 
@@ -36,7 +37,7 @@ openrov-cockpit is one of several packages that are combined together to enable 
 - ffmpeg: (to simulate the h.264 video pipeline)
 - Node.js:  [http://nodejs.org/](http://nodejs.org/)
 
-For embedding in the robotic system, openrov-cockpit is typically installed with several other packages that also include drivers and configuration for various hardware solutions.  We provide images for the OpenROV products. If you have questions about installing on other devices, reach out to us on Gitter or the (OpenROV Forums)[http://forum.openrov.com].
+For embedding in the robotic system, openrov-cockpit is typically installed with several other packages that also include drivers and configuration for various hardware solutions.  We provide images for the OpenROV products. If you have questions about installing on other devices, reach out to us on Gitter or the [OpenROV Forums](http://forum.openrov.com).
 
 
 # How to Contribute

@@ -150,7 +150,7 @@
           emitter.withHistory.on('cloudprofile-status',function(status){
             self.loggedin=status.loggedIn;
             var isProvisioned = false;
-            if ((status.profile.dataOpenROVcom) && (status.profile.dataOpenROVcom.service_url)){
+            if (status.loggedIn && (status.profile.dataOpenROVcom) && (status.profile.dataOpenROVcom.service_url)){
               isProvisioned=true;
             }
             self.set('canSync',status.loggedIn && isProvisioned);
@@ -185,7 +185,7 @@
         delete: function(e){
            var model = e.model;
            if(this.eventEmitter !== undefined){
-             if(confirm(__("Pressing OK will permanetly delete the selected dive data from your computer/device."))){
+             if(confirm(this.__("Pressing OK will permanetly delete the selected dive data from your computer/device."))){
               this.eventEmitter.emit('plugin-blackbox-delete-session',e.model.item.sessionID);
              }
            }                    

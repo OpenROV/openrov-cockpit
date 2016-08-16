@@ -28,8 +28,14 @@ pluginFinder.prototype.start = function start() {
           if (typeof callback == 'function') {
             callback(results);
           }
-        });
-      });
+        })
+        .on('error', function (error) {
+            console.log(error);
+        });       
+        
+      }).on('error', function (error) {
+            console.log(error);
+      });  
     });
     deps.cockpit.on('plugin.pluginFinder.info', function (name, callback) {
       if (typeof callback !== 'function') {

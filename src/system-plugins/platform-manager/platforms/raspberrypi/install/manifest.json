@@ -2,6 +2,7 @@
 	"files":
 	[
 		{ "src": "openocd.cfg", 	"dest": "/opt/openrov/system/etc" },
+		{ "src": "openocd-pac.cfg", "dest": "/opt/openrov/system/etc" },
 		{ "src": "rc.local", 		"dest": "/opt/openrov/system/scripts" },
 		{ "src": "dt-overlays/openrov-eeprom.dtbo", "dest": "/boot/overlays" }
 	],

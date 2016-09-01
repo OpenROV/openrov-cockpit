@@ -1,5 +1,5 @@
 {
-  "name": "public",
+  "name": "ui-manager",
   "homepage": "https://github.com/BrianAdams/openrov-cockpit",
   "authors": [
     "BrianAdams <brian@babastik.com>"
@@ -24,5 +24,8 @@
   "resolutions": {
     "polymer": "1.6.1",
     "webcomponentsjs": "^0.7.20"
+  },
+  "devDependencies": {
+    "web-component-tester": "^4.3.4"
   }
 }

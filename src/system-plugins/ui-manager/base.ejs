@@ -73,6 +73,11 @@
 <app-location use-hash-as-path url-space-regex="^/#/" route={{route}}></app-location>
 <app-route route="{{route}}" pattern="/:page" data={{routedata}} active="{{homeActive}}"></app-route>
 
+<link rel="import" href="components/ui-manager/orov-widget-registry.html">
+<orov-widget-registry>
+  <%=JSON.stringify(webcomponents);%>
+</orov-widget-registry>
+
   <%
     var header = scriplets.find(function(item){return item.name=='header'});
   %>

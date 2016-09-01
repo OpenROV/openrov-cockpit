@@ -65,6 +65,7 @@ UIManager.prototype.start = function start() {
       scripts: pathInfo.scripts,
       styles: pathInfo.styles,
       sysscripts: pathInfo.sysscripts,
+      webcomponents: pathInfo.webcomponents,
       config: self.deps.config,
       scriplets: scriplets,
       theme: theme

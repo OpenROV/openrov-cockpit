@@ -1,0 +1,68 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<dom-module name="orov-widget-registry">
+<template>
+  <div hidden="true">
+  <content id="ctnt"></content>
+  </div>    
+</template>
+<script>
+
+(function() {
+  Polymer({
+    is:'orov-widget-registry',
+    properties: {
+    },
+    behaviors: [namespace('behaviors').oROVStandard],
+    ready: function(){
+      if (this.$.ctnt.getDistributedNodes()[0]!==undefined){
+        this.widgetsList = JSON.parse(this.$.ctnt.getDistributedNodes()[0].data);
+      }
+    },
+    attached: function(){
+      var self=this;
+      //This part is polymer specific. It should be possible to extend this for other web component types by figuring out where their module type name
+      //is stored in the file.  In polymer it is under html.body.dom-module id attribute.
+      this.widgetsList.forEach(function(wc){
+        
+        var link = self.importHref(wc.path,
+          function(link){
+            console.log("success link load");
+        },function(err){
+          console.log("failed link load")
+          throw err
+        },
+        false);
+
+        link.onload= function(e){
+            var elements = e.currentTarget.import.getElementsByTagName("DOM-MODULE");
+            if (elements.length==1){
+              var id = elements[0].getAttribute('id');
+              wc.tag=id;
+              console.log(id);
+              if (e.currentTarget.href.indexOf(id+".html")<0){
+                console.warn(e.currentTarget.href + " filename is a mismatch for the html element type: " + id);
+              }
+              var widget = self.create(id);
+              wc.element=widget;
+            }
+            else{
+              //If there was no dom-module it is probably a behavior, just ignore.
+            }
+        };
+        
+      })
+    },
+    registerEmitterHandlers: function(emitter){
+      var self = this;
+      emitter.on('widget-registry-enumerate-widgets',function(filterFn,callback){
+        callback(self.widgetsList
+          .map(function(listItem){return listItem.element})
+          .filter(filterFn)
+          .map(function(element){return element.is}));
+      });
+    },    
+  })
+})();
+</script>
+</dom-module>

@@ -44,7 +44,8 @@
           canvas: {type:Object, observer: '_canvasChanged'},
           videoMimeType: {type:String},
           location: {type:String},
-          showStats: {type:Boolean, value:function(){return false;}}
+          showStats: {type:Boolean, value:function(){return false;}},
+          shortCircuit: {type:Boolean, value:function(){return false;}}
         },
         behaviors: [namespace('behaviors').oROVStandard],
         detached: function(){
@@ -54,12 +55,12 @@
 					if (this.emitter) {
 						this.emitter.emit('video.ready');
 					}
+          this.shortCircuit=false;
 				},
         packetVideo_initializationInProgress: false,
         registerEmitterHandlers: function(emitter){
           var self = this;
 					self.emitter = emitter;
-          this.shortCircuit=false;
           emitter.withHistory.on('settings-change.videosettings',function(settings){
             if (self.shortCircuit) {return;}
             self.showStats = settings.videosettings['show-stats'];
@@ -125,7 +126,7 @@
 					var drawCounter = 0;
 
 					setInterval(function(){
-						console.log('FPS: ' + drawCounter);
+					//	console.log('FPS: ' + drawCounter);
 						drawCounter = 0;
 					}, 1000);
 

@@ -74,7 +74,7 @@
 <app-route route="{{route}}" pattern="/:page" data={{routedata}} active="{{homeActive}}"></app-route>
 
 <link rel="import" href="components/ui-manager/orov-widget-registry.html">
-<orov-widget-registry>
+<orov-widget-registry event-emitter="{{cockpitEventEmitter}}">
   <%=JSON.stringify(webcomponents);%>
 </orov-widget-registry>
 

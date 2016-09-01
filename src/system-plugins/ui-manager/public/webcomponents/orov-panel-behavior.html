@@ -1,0 +1,60 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<script src="../orov-behaviors/utilities.js"></script>
+<script>
+(function (window) {
+  'use strict';
+  var behaviors = namespace('behaviors');
+  behaviors.oROVPanel = {
+      properties: {
+        panelType:{type:String}
+      },
+      behaviors: [namespace('behaviors').oROVStandard],
+     panelFilter: function(){
+       var self=this;
+       return function(element){
+        var panelTypes;
+        if (self.panelType.indexOf(',')>0){
+          panelTypes=self.panelType.split(",");
+        } else {
+          panelTypes=[self.panelType];
+        }
+        return panelTypes.includes(element.defaultPanel);
+       }
+     },
+     processAvailableWidgets:function(widgets){
+       var self=this;
+       var defaultProperties={eventEmitter:this.eventEmitter};
+       widgets.forEach(function(widget){
+         var el = self.create(widget,defaultProperties);
+         Polymer.dom(self.root).appendChild(el);
+       });
+     },
+     attached: function(){
+        var self=this;
+        if(typeof(this.registerEmitterHandlers)=='function'){
+          var org = this.registerEmitterHandlers;
+          this.registerEmitterHandlers=function(emitter){
+            self.registerBaseEmitterHanlders(emitter);
+            org(emitter);
+          };
+        }else{
+          this.registerEmitterHandlers=function(emitter){
+            self.registerBaseEmitterHanlders(emitter);
+          };          
+        }
+        this.registerBaseEmitterHanlders(this.eventEmitter);
+        if(this.eventEmitter){
+          this.eventEmitter.emit('widget-registry-enumerate-widgets',this.panelFilter(),this.processAvailableWidgets.bind(this)); 
+        }      
+      },
+      registerBaseEmitterHanlders: function(emitter){
+        var self = this;
+
+      },
+      ready: function(){
+        var self=this;
+      }
+    }
+  })();
+</script>

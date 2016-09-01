@@ -1,0 +1,26 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<link rel="import" href="orov-panel-behavior.html">
+<dom-module name="orov-panel">
+<style>
+</style>
+<template>
+    <p>Items:</p>
+    <div>
+        <content>
+        </content>
+    </div>
+</template>
+<script>
+
+(function() {
+  Polymer({
+    is:'orov-panel',
+    properties: {
+
+    },
+    behaviors: [namespace('behaviors').oROVStandard, namespace('behaviors').oROVPanel],
+  })
+})();
+</script>
+</dom-module>

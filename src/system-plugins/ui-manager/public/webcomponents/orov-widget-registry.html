@@ -18,13 +18,15 @@
       if (this.$.ctnt.getDistributedNodes()[0]!==undefined){
         this.widgetsList = JSON.parse(this.$.ctnt.getDistributedNodes()[0].data);
       }
+      this.subscribers = [];
     },
     attached: function(){
       var self=this;
       //This part is polymer specific. It should be possible to extend this for other web component types by figuring out where their module type name
       //is stored in the file.  In polymer it is under html.body.dom-module id attribute.
+      var pendingLinkVerifications = 0;
       this.widgetsList.forEach(function(wc){
-        
+        pendingLinkVerifications++;
         var link = self.importHref(wc.path,
           function(link){
             console.log("success link load");
@@ -32,10 +34,15 @@
           console.log("failed link load")
           throw err
         },
-        false);
+        true);
 
+        link.onerror=function(err){
+          pendingLinkVerifications--;
+          console.log("Failed link load");
+        }
         link.onload= function(e){
             var elements = e.currentTarget.import.getElementsByTagName("DOM-MODULE");
+            wc.loaded=true;
             if (elements.length==1){
               var id = elements[0].getAttribute('id');
               wc.tag=id;
@@ -49,17 +56,49 @@
             else{
               //If there was no dom-module it is probably a behavior, just ignore.
             }
+            pendingLinkVerifications--;
+
+            if (pendingLinkVerifications==1){
+              var missing = self.widgetsList.filter(function(item){
+                return item.loaded==undefined;
+              });
+              console.log("Last item:" + JSON.stringify(missing));
+            //  debugger;
+            }
+
+
+            if (pendingLinkVerifications==0){
+              self.subscribers.forEach(function(fn){
+                fn();
+              });
+              self.loadloadedControls=true;
+            }
         };
         
       })
+
     },
     registerEmitterHandlers: function(emitter){
       var self = this;
       emitter.on('widget-registry-enumerate-widgets',function(filterFn,callback){
-        callback(self.widgetsList
-          .map(function(listItem){return listItem.element})
-          .filter(filterFn)
-          .map(function(element){return element.is}));
+        var responseFn = function(){
+          callback(self.widgetsList
+            .map(function(listItem){return listItem.element})
+            .filter(function(item){
+              if(item==undefined){
+                return false;
+              }
+              return filterFn(item);
+            })
+            .map(function(element){return element.is}));
+        }
+
+        //If the controls have been enumerated go ahead and filter and return, else defer the call back
+        if (self.loadedControls){
+          responseFn();
+        } else {
+          self.subscribers.push(responseFn);
+        }
       });
     },    
   })

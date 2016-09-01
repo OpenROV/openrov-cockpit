@@ -6,7 +6,9 @@
 
 <link rel="import" href="components/ui-manager/orov-appletswitcher.html">
 <link rel="import" href="components/cloud-profile/orov-login.html">
-<link rel="import" href="components/peer-view/orov-mc-status-indicator.html">
+<link rel="import" href="components/ui-manager/orov-panel.html">
+
+<!--link rel="import" href="components/peer-view/orov-mc-status-indicator.html"-->
 
 <!--This example shows how to selectivly apply settings per applet that override the overall style sheet-->
 <template is="dom-if" restamp=true if="{{!displaySection(routedata.page,'cockpit')}}">
@@ -49,7 +51,8 @@ body {
     <div class="collapse navbar-collapse" id="navStatus">
       <p class="navbar-text online-indicator" hidden="{{rovOnline}}">{{__('ROV Offline')}}</p>
       <p class="navbar-text user-role">{{userRole}}</p>
-      <orov-mc-status-indicator class="navbar-text" event-emitter="{{cockpitEventEmitter}}" ></orov-mc-status-indicator>
+      <orov-panel event-emitter="{{cockpitEventEmitter}}" panel-type="warning-display"></orov-panel>
+      <!--orov-mc-status-indicator class="navbar-text" event-emitter="{{cockpitEventEmitter}}" ></orov-mc-status-indicator-->
 
       <!-- Using pull-right instead of navbar-right due to known bug in navbar magins -->
       <orov-appletswitcher class="navbar-btn pull-right" style="display:inline-block; height:30px" event-emitter="{{cockpitEventEmitter}}" selection="{{routedata.page}}" horizontal-offset='-200'></orov-appletswitcher>      

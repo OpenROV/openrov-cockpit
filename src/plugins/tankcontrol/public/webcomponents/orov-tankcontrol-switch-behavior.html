@@ -5,11 +5,9 @@
 <script>
 (function (window) {
   'use strict';
-  var behaviors = namespace('behaviors');
-  behaviors.oROVtankControlSwitch = {
+      var switchBehaviorImpl= {
       properties: {
       },
-      behaviors: [namespace('behaviors').oROVStandard,window.OROV.behaviors.switchBehavior],
       on:function(){
         this.eventEmitter.emit('plugin.tankControl.activate')
       },
@@ -30,5 +28,9 @@
         var self=this;
       }
     }
+
+  var behaviors = namespace('behaviors');
+  behaviors.oROVtankControlSwitch=[namespace('behaviors').oROVStandard,window.OROV.behaviors.switchBehavior,switchBehaviorImpl];
+
   })(window);
 </script>

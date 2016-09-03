@@ -53,9 +53,9 @@
         <div class="switches-switch-off">{{__('OFF')}}</div>
       </div>
       <template is="dom-repeat" items="{{_coveredControls}}">
-        <div id="{{item.shortName}}" class="switches-row switchable switch-off" title="{{item.description}}">
-          <div class="switches-switch-on" on-tap="_handleClick">{{item.shortName}}</div>
-          <div class="switches-switch-off" on-tap="_handleClick">{{item.shortName}}</div>
+        <div id="{{item.shortName}}" class="switches-row switchable switch-off" title="{{__(item.description)}}">
+          <div class="switches-switch-on" on-tap="_handleClick">{{__(item.shortName)}}</div>
+          <div class="switches-switch-off" on-tap="_handleClick">{{__(item.shortName)}}</div>
         </div>
       </template>
     </div>

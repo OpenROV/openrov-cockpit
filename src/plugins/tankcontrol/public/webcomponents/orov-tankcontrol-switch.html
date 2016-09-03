@@ -13,13 +13,13 @@
   Polymer({
     is:'orov-tankcontrol-switch',
     properties: {
-          defaultPanel:{type:String,value:"flight-switches"},
-          shortName:{type:String,value:"TNK"},
-          description:{type:String,value:"Tank control controller configuration"}
     },
-    //TODO: Figure out why I have to directly reference the behavior for eventEmitter via oROVStandard when it is already referenced inside oROVtankControlSwitch. If I don't reference
-    //it, the eventEmitter behavior's attached() does not fire.  Bug?!?!
-    behaviors: [namespace('behaviors').oROVStandard,window.OROV.behaviors.switchBehavior,namespace('behaviors').oROVtankControlSwitch],
+    behaviors: [namespace('behaviors').oROVStandard,namespace('behaviors').oROVtankControlSwitch],
+    ready:function(){
+        this.defaultPanel="flight-switches";
+        this.shortName="TNK";
+        this.description="Tank control controller configuration";
+    },
     _handleSwitchChange:function(){
         if (this.$.toggle.checked){
             this.on();

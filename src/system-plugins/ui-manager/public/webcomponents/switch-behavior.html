@@ -1,0 +1,34 @@
+<link rel="import" href="../polymer/polymer.html">
+<script>
+  (function(window) {
+    'use strict';
+    var validStates=["on","off","switching",undefined]
+    //ensure the namespace exists in the window object
+    if(!(window.OROV)){window.OROV={}}
+    if(!(window.OROV.behaviors)){window.OROV.behaviors={}}
+    
+    window.OROV.behaviors.switchBehavior = {
+      properties: {
+        switchState: {
+          type: String,
+          observer:"_handleStateChange",
+          notify:true,
+          value:function(){return "off"}
+        } //on,off,switching
+      },
+      on: function(){
+        this.set("switchState","on");
+      },
+      off: function(){
+        this.set("switchState","off");
+      },
+      _handleStateChange: function(newValue, oldValue){
+        if (!validStates.includes(newValue)){
+          this.switchState=oldValue;
+          throw(new Error(newValue + " is not a valid state for a switch"))
+        }
+        this.fire('switched',newValue)
+      }
+    }
+  })(window);
+</script>

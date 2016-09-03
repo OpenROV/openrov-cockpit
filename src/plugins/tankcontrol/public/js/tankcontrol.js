@@ -1,5 +1,7 @@
+//TODO: This needs to be ripped out for some concept of pre-sets for configurable controls
 //TODO: Make sure the tank mode indicator in swithes does not show if this plugin is disabled
 //TODO: Move this plugin to a community plugin
+
 (function (window, $, undefined) {
   'use strict';
   var TankControl;
@@ -31,14 +33,19 @@
     var self = this;
     this.enable = function () {
       if (!self.tankControlActive) {
-        self.toggleControl();
+        self.activateControl();
       }
     };
     this.disable = function () {
       if (self.tankControlActive) {
-        self.toggleControl();
+        self.deactivateControl();
       }
     };
+
+    this.controls = [];
+    for (var name in this.controlNames) {
+      this.controls.push('tankControl.' + name);
+    }
   };
   TankControl.prototype.inputDefaults = function inputDefaults() {
     var rov = this;
@@ -109,28 +116,35 @@
     ];
   };
   TankControl.prototype.listen = function listen() {
-    var rov = this;
+    var self = this;
+    self.cockpit.on('plugin.tankControl.activate',function(){
+      self.activateControl();
+    });
+    self.cockpit.on('plugin.tankControl.deactivate',function(){
+      self.deactivateControl();
+    })    
   };
-  TankControl.prototype.toggleControl = function toggleControl() {
-    var rov = this;
-    var controls = [];
-    for (var name in rov.controlNames) {
-      controls.push('tankControl.' + name);
-    }
-    if (!this.tankControlActive) {
-      //TODO: Be sure to upgrade input controller for message activation
-      rov.cockpit.emit('inputController.activate', controls, function () {
+
+  TankControl.prototype.activateControl = function activateControl() {
+      var rov = this;
+      rov.cockpit.emit('inputController.activate', this.controls, function () {
         rov.cockpit.emit('plugin.tankControl.state', { enabled: true });
         rov.tankControlActive = true;
         console.log('Tank Control Active');
-      });
-    } else {
-      rov.cockpit.emit('inputController.deactivate', controls, function () {
-        rov.tankControlActive = false;
-        rov.cockpit.emit('plugin.tankControl.state', { enabled: false });
-        console.log('Tank Control Deactivated');
-      });
-    }
-  };
+      });    
+      //TODO: This state update is a work around to ensure switch abstraction works given the underlyung interface to inputController is not firing back.
+              rov.cockpit.emit('plugin.tankControl.state', { enabled: true });
+  }
+  
+  TankControl.prototype.deactivateControl = function deactivateControl() {
+    var rov = this;
+    rov.cockpit.emit('inputController.deactivate', this.controls, function () {
+      rov.tankControlActive = false;
+      rov.cockpit.emit('plugin.tankControl.state', { enabled: false });
+      console.log('Tank Control Deactivated');
+    });
+          rov.cockpit.emit('plugin.tankControl.state', { enabled: false });
+  }
+  
   window.Cockpit.plugins.push(TankControl);
 }(window, jQuery));

@@ -6,6 +6,7 @@
 <link rel="import" href="components/new-ui/depth.html">
 <link rel="import" href="components/new-ui/throttle.html">
 <link rel="import" href="components/new-ui/switches.html">
+<link rel="import" href="components/new-ui/switchesnew.html">
 <link rel="import" href="components/new-ui/power.html">
 <link rel="import" href="components/new-ui/power-slim.html">
 <link rel="import" href="components/diagnostics/diagnostics.html">
@@ -68,10 +69,18 @@
                 <div class="center">
                   <h4>{{__('Switches')}}</h4>
                   <div id="newui-switches" class="center control">
+                    <orov-newui-switchesnew class="center" event-emitter="{{cockpitEventEmitter}}"></orov-newui-switchesnew>
+                  </div>
+                </div>
+              </div>              
+              <!--div class="newui-item" id="switches-item">
+                <div class="center">
+                  <h4>{{__('Switches')}}</h4>
+                  <div id="newui-switches" class="center control">
                     <orov-newui-switches id="newui-switches" class="center" event-emitter="{{cockpitEventEmitter}}"></orov-newui-switches>
                   </div>
                 </div>
-              </div>
+              </div-->
               <div class="newui-item" id="power-item">
                 <div class="center">
                   <h4>{{__('Battery')}}</h4>

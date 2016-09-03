@@ -27,8 +27,9 @@
        var defaultProperties={eventEmitter:this.eventEmitter};
        widgets.forEach(function(widget){
          var el = self.create(widget,defaultProperties);
-         Polymer.dom(self.root).appendChild(el);
+         Polymer.dom(self).appendChild(el);
        });
+       this.fire('contentLoaded');
      },
      attached: function(){
         var self=this;

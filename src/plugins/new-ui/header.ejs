@@ -29,6 +29,15 @@ body {
 .brand {
   height:100%
 }
+.alerts {
+  display: inline-flex;
+  justify-content: flex-start;
+  align-items: center; 
+}
+
+.alerts > * {
+  flex-basis: 20px;;
+}
 </style>
 
 
@@ -51,7 +60,7 @@ body {
     <div class="collapse navbar-collapse" id="navStatus">
       <p class="navbar-text online-indicator" hidden="{{rovOnline}}">{{__('ROV Offline')}}</p>
       <p class="navbar-text user-role">{{userRole}}</p>
-      <orov-panel event-emitter="{{cockpitEventEmitter}}" panel-type="warning-display"></orov-panel>
+      <orov-panel class="navbar-form alerts" event-emitter="{{cockpitEventEmitter}}" panel-type="warning-display"></orov-panel>
       <!--orov-mc-status-indicator class="navbar-text" event-emitter="{{cockpitEventEmitter}}" ></orov-mc-status-indicator-->
 
       <!-- Using pull-right instead of navbar-right due to known bug in navbar magins -->

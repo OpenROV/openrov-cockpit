@@ -1,0 +1,109 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<link rel="import" href="orov-panel-behavior.html">
+<dom-module id="orov-newui-switchesnew">
+  <style type="text/css">
+      #switchesContainer {
+        display: table;
+        border-collapse: collapse;
+      }
+      .switches-header-row {
+        display: table-row;
+        font-size: 1.1vw;
+        line-height: 1em;        
+      }
+      .switches-row {
+        display: table-row;
+        font-size: 1.1vw;
+        line-height: 1em;
+      }
+      .switches-switch-on,
+      .switches-switch-off {
+        display: table-cell;
+        width: 30%;
+      }
+      .switches-switch-on {
+        text-align: right;
+        padding-right: 0.4em;
+        border-right: solid 1px white;
+      }
+      .switches-switch-off {
+        text-align: left;
+        padding-left: 0.4em;
+      }
+      .switches-header-row > div,
+      .switches-row > div {
+        padding-top: 0.1em;
+      }
+      .switches-header-row {
+        border-bottom: solid 1px #ffffff;
+        font-weight: bold;
+      }
+      .switch-on > .switches-switch-on { color: #ffffff }
+      .switch-on > .switches-switch-off { color: transparent }
+      .switch-off > .switches-switch-on { color: transparent }
+      .switch-off > .switches-switch-off { color: #ffffff }
+      .switchable { cursor: pointer }
+
+    </style>
+  <template>
+    <div id="switchesContainer" class="center">
+      <div class="switches-header-row">
+        <div class="switches-switch-on">{{__('ON')}}</div>
+        <div class="switches-switch-off">{{__('OFF')}}</div>
+      </div>
+      <template is="dom-repeat" items="{{_coveredControls}}">
+        <div id="{{item.shortName}}" class="switches-row switchable switch-off" title="{{item.description}}">
+          <div class="switches-switch-on" on-tap="_handleClick">{{item.shortName}}</div>
+          <div class="switches-switch-off" on-tap="_handleClick">{{item.shortName}}</div>
+        </div>
+      </template>
+    </div>
+        <content id="ctnt">
+        </content>
+  </template>
+  <script>
+    (function () {
+      Polymer({
+        is: 'orov-newui-switchesnew',
+        properties: {
+          panelType:{type:String,value:function(){return "flight-switches"}},
+          _coveredControls:{type:Array}
+        },
+        behaviors: [namespace('behaviors').oROVStandard, namespace('behaviors').oROVPanel],
+        ready: function(){
+          this.listen(this, 'contentLoaded', '__oncontentLoaded');
+        },
+        __oncontentLoaded: function(){
+          var self=this;
+          this.set("_coveredControls",Polymer.dom(this).children);
+          //TODO: on detach, remove the listeners
+          Polymer.dom(self).children.forEach(function(control){
+            control.addEventListener('switched',function(e){
+              self._swapStateClasses(self.$$("#"+control.shortName),e.detail);
+            })
+            control.style.display="none";
+          });
+        },
+        _swapStateClasses:function(element,state){
+          if(state=="on"){
+            element.classList.add("switch-on");
+            element.classList.remove("switch-off");
+          } else {
+            element.classList.add("switch-off");
+            element.classList.remove("switch-on");                 
+          }
+        },
+        _handleClick:function(e){
+          if(e.currentTarget.parentElement.classList.contains("switch-off")){
+            e.model.item.on();
+            this._swapStateClasses( e.currentTarget.parentElement,"on")
+          } else {
+            e.model.item.off();  
+            this._swapStateClasses( e.currentTarget.parentElement,"off")                 
+          }
+        }
+      });
+    }());
+  </script>
+</dom-module>

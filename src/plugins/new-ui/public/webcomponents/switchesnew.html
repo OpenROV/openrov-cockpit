@@ -1,6 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../orov-behaviors/orov-behavior.html">
-<link rel="import" href="orov-panel-behavior.html">
+<link rel="import" href="../ui-manager/orov-panel-behavior.html">
 <dom-module id="orov-newui-switchesnew">
   <style type="text/css">
       #switchesContainer {
@@ -76,7 +76,7 @@
         },
         __oncontentLoaded: function(){
           var self=this;
-          this.set("_coveredControls",Polymer.dom(this).children);
+          this.set("_coveredControls",Polymer.dom(this).children.filter(function(item){return item.collectionDomElement==undefined}));
           //TODO: on detach, remove the listeners
           Polymer.dom(self).children.forEach(function(control){
             control.addEventListener('switched',function(e){

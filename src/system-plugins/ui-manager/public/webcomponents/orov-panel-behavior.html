@@ -27,34 +27,31 @@
        var defaultProperties={eventEmitter:this.eventEmitter};
        widgets.forEach(function(widget){
          var el = self.create(widget,defaultProperties);
-         Polymer.dom(self).appendChild(el);
+         //if widget is a widget-collection, we will register w
+        if (el.collectionDomElement!==undefined){
+          //since we created the elemenet with the bus connected,
+          //it may have already started "loading" its widgets.
+          //We use the withHistory to make sure we get the latest
+          //list of widgets from it.
+
+          el.collectionDomElement=Polymer.dom(self);
+
+          self.eventEmitter.on(el.widgetCollectionEventName,function(widgetArray){
+            //TODO: Extend for late binding dynmaic widgets.  Right now
+            //not sure what happens if it tries to add a widget a second time.
+            widgetArray.filter(self.panelFilter).forEach(function(widget){
+               Polymer.dom(self).appendChild(widget);        
+            })
+          })
+        }
+        Polymer.dom(self).appendChild(el);
        });
        this.fire('contentLoaded');
      },
      attached: function(){
-        var self=this;
-        if(typeof(this.registerEmitterHandlers)=='function'){
-          var org = this.registerEmitterHandlers;
-          this.registerEmitterHandlers=function(emitter){
-            self.registerBaseEmitterHanlders(emitter);
-            org(emitter);
-          };
-        }else{
-          this.registerEmitterHandlers=function(emitter){
-            self.registerBaseEmitterHanlders(emitter);
-          };          
-        }
-        this.registerBaseEmitterHanlders(this.eventEmitter);
         if(this.eventEmitter){
           this.eventEmitter.emit('widget-registry-enumerate-widgets',this.panelFilter(),this.processAvailableWidgets.bind(this)); 
         }      
-      },
-      registerBaseEmitterHanlders: function(emitter){
-        var self = this;
-
-      },
-      ready: function(){
-        var self=this;
       }
     }
   })();

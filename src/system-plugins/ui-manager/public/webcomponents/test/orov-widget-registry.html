@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../polymer/polymer.html">
+  <script src="../web-component-tester/browser.js"></script>
+  <link rel="import" href="orov-widget-registry.html">
+</head>
+<body>
+  <test-fixture id="test-element-fixture">
+     <template id='t'>
+       <orov-widget-registry id="test-element"></orov-widget-registry>
+     </template>
+   </test-fixture>
+
+  <script>
+    suite('orov-widget-registry', function() {
+      var myEl;
+      setup(function() {
+        var f = fixture('test-element-fixture');
+        myEl = f[0];
+      });
+      test('can get handle to dynamic test element', function() {
+        assert.isNotNull(myEl);
+        assert.equal(document.getElementById('test-element'),myEl);
+      });
+    });
+  </script>
+</body>
+</html>

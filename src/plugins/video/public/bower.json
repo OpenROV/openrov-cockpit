@@ -15,10 +15,12 @@
   ],
   "dependencies": {
     "mjpeg-video-webcomponents": "~2.0.1",
-    "packet-video": "https://github.com/OpenROV-atoms/packet-video.git"
+    "packet-video": "https://github.com/OpenROV-atoms/packet-video.git",
+    "polymer": "^1.2.0",
+    "webcomponentsjs": "^0.7.20"
   },
   "resolutions": {
-    "webcomponentsjs": "^0.7.20",
+    "webcomponentsjs": "0.7.22",
     "polymer": "^1.0.0"
   }
 }

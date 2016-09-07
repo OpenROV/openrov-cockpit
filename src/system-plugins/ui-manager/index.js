@@ -65,6 +65,9 @@ UIManager.prototype.start = function start() {
       scripts: pathInfo.scripts,
       styles: pathInfo.styles,
       sysscripts: pathInfo.sysscripts,
+      webcomponents: pathInfo.webcomponents.filter(function(wcInfo){
+        return (wcInfo.path.indexOf('ui-manager/orov-widget-registry.html')==-1)
+      }),
       config: self.deps.config,
       scriplets: scriplets,
       theme: theme

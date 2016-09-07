@@ -69,6 +69,7 @@
     "mocha": "^3.0.2",
     "npm-check-updates": "^2.6.3",
     "phantomjs": "^2.1.3",
+    "polymer-cli": "^0.16.0",
     "request": "^2.69.0",
     "should": "^11.0.0",
     "sinon": "^1.17.3",

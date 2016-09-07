@@ -28,7 +28,7 @@
       Polymer({
         is: "orov-mc-status-indicator",
         properties: {
-
+          defaultPanel:{type:String,value:"warning-display"}
         },
         behaviors: [namespace('behaviors').oROVStandard,namespace('behaviors').oROVMCStatusIndicator],
         registerEmitterHandlers: function(emitter){

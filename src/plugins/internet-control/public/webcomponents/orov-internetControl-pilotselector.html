@@ -42,10 +42,12 @@
 
           }
           */
-          this.$.icon2.className = this.$.icon2.className.replace(/\boff\b/,'');
-          this.$.icon2.className = this.$.icon2.className.replace(/\bstarting\b/,'');
-          this.$.icon2.className = this.$.icon2.className.replace(/\bstreaming\b/,'');
-          this.$.icon2.className = this.$.icon2.className + ' ' + newv.status;
+          if (this.$.icon2!==undefined){ //This can get called before the control is attached
+            this.$.icon2.className = this.$.icon2.className.replace(/\boff\b/,'');
+            this.$.icon2.className = this.$.icon2.className.replace(/\bstarting\b/,'');
+            this.$.icon2.className = this.$.icon2.className.replace(/\bstreaming\b/,'');
+            this.$.icon2.className = this.$.icon2.className + ' ' + newv.status;
+          }
         },
         handleClick: function(){
           if (this.eventEmitter !== undefined){

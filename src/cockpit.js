@@ -100,13 +100,14 @@ app.use(function (req, res, next) {
 });
 // ---------------------------------------------------------------
 // Keep track of plugins js and css to load them in the view
-var scripts = [], styles = [], applets = [], sysscripts = [];
+var scripts = [], styles = [], applets = [], sysscripts = [], webcomponents = [];
 var pathInfo = function () {
   return {
     scripts: scripts,
     styles: styles,
     sysscripts: sysscripts,
-    applets: applets
+    applets: applets,
+    webcomponents: webcomponents
   };
 };
 // Prepare dependency map for plugins
@@ -219,6 +220,7 @@ function addPluginAssets(result) {
     console.log('SCRIPT: ' + asset);
   });
   styles = styles.concat(result.styles);
+  webcomponents = webcomponents.concat(result.webcomponents);
   result.assets.forEach(function (asset) {
     console.log('TEST: ' + asset.path);
     console.dir(asset);

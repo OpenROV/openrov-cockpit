@@ -27,19 +27,6 @@
         };
         size();
         $(window).resize(size);
-        var serialMonitorWindow = undefined;
-        window.cockpit.rov.on('plugin.serial-monitor.toggle', function () {
-          if (serialMonitorWindow) {
-            serialMonitorWindow.close();
-            serialMonitorWindow = undefined;
-          } else {
-            serialMonitorWindow = window.open('new-ui/serial-monitor', '__telemetry', 'menubar=no, status=no, titlebar=no, toolbar=no, width=300, height=400, location=no');
-            serialMonitorWindow.cockpit = window.cockpit;
-            serialMonitorWindow.onclose = function () {
-              window.cockpit.rov.emit('plugin.serial-monitor.toggle');
-            };
-          }
-        });
       }
     });
   </script>

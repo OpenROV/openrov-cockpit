@@ -104,7 +104,9 @@
           if (profile.picture!==undefined){
             self.profilePictureURL=profile.picture;
           }
-          self.eventEmitter.emit('cloudprofile-status',{loggedIn:true,profile:profile});  
+          if(self.eventEmitter){
+            self.eventEmitter.emit('cloudprofile-status',{loggedIn:true,profile:profile});  
+          }
 
        })
 

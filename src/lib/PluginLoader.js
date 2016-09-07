@@ -1,6 +1,7 @@
 var path = require('path');
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require('fs-extra'));
+
 // Checking existence
 //return fs.statAsync( path.join( pluginDir, "firmware" ) )
 var PluginLoader = function () {
@@ -16,7 +17,8 @@ var PluginLoader = function () {
         scripts: [],
         styles: [],
         plugins: [],
-        applets: []
+        applets: [],
+        webcomponents: []
       };
     // Get the directory contents
     return fs.readdirAsync(dir).filter(function (file) {
@@ -48,7 +50,8 @@ var PluginLoader = function () {
             applets: [],
             styles: [],
             scripts: [],
-            assets: []
+            assets: [],
+            webcomponents: []
           };
           result.plugins.push(pluginInstance);
         }
@@ -114,6 +117,12 @@ var PluginLoader = function () {
               path: 'components' + '/' + plugin,
               assets: wcAssets
             });
+            return fs.readdirAsync(wcAssets).filter(getFilter('html')).each(function (wc) {
+              // Add wc assets
+              // TODO: Make clear documentation that the filename must = the component name as a convention OR 
+              // update this code to parse the wc file and pull out the is: property
+              result.webcomponents.push({path:path.join('components/',plugin,wc)});
+            });             
           }).catch(function (err) {
           });
         // Add bower assets to a static route

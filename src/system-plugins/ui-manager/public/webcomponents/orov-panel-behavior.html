@@ -1,0 +1,70 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+
+<script>
+(function (window) {
+  'use strict';
+  //ensure the namespace exists in the window object
+  if(!(window.OROV)){window.OROV={}}
+  if(!(window.OROV.behaviors)){window.OROV.behaviors={}}  
+  var behaviors = window.OROV.behaviors;
+
+  /**
+   * Behavior for widget-panels.
+   * Temporarily stoping polymer tag as it is breaking the documentation parser
+   * @ polymerBehavior
+   * 
+   */      
+  window.OROV.behaviors.oROVPanel = {
+      properties: {
+        /* A comma delimited list of 'tags' that are used to match with widgets automatically */
+        panelType:{type:String}
+      },
+      behaviors: [behaviors.oROVStandard],
+      /* Function passed to the widget-registry to find compatible widets. Defaults to matching on panelType */
+     panelFilter: function(){
+       var self=this;
+       return function(element){
+        var panelTypes;
+        if (self.panelType.indexOf(',')>0){
+          panelTypes=self.panelType.split(",");
+        } else {
+          panelTypes=[self.panelType];
+        }
+        return panelTypes.includes(element.defaultPanel);
+       }
+     },
+     _processAvailableWidgets:function(widgets){
+       var self=this;
+       var defaultProperties={eventEmitter:this.eventEmitter};
+       widgets.forEach(function(widget){
+         var el = self.create(widget,defaultProperties);
+         //if widget is a widget-collection, we will register w
+        if (el.collectionDomElement!==undefined){
+          //since we created the elemenet with the bus connected,
+          //it may have already started "loading" its widgets.
+          //We use the withHistory to make sure we get the latest
+          //list of widgets from it.
+
+          el.collectionDomElement=Polymer.dom(self);
+
+          self.eventEmitter.on(el.widgetCollectionEventName,function(widgetArray){
+            //TODO: Extend for late binding dynmaic widgets.  Right now
+            //not sure what happens if it tries to add a widget a second time.
+            widgetArray.filter(self.panelFilter).forEach(function(widget){
+               Polymer.dom(self).appendChild(widget);        
+            })
+          })
+        }
+        Polymer.dom(self).appendChild(el);
+       });
+       this.fire('contentLoaded');
+     },
+     attached: function(){
+        if(this.eventEmitter){
+          this.eventEmitter.emit('widget-registry-enumerate-widgets',this.panelFilter(),this._processAvailableWidgets.bind(this)); 
+        }      
+      }
+    }
+  })(window);
+</script>

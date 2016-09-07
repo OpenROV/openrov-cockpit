@@ -19,10 +19,12 @@
     "paper-menu-button": "PolymerElements/paper-menu-button#^1.1.0",
     "paper-menu": "PolymerElements/paper-menu#^1.2.2",
     "paper-item": "PolymerElements/paper-item#^1.2.1",
-    "jwt-decode": "^2.0.1"
-  },
-  "resolutions": {
+    "jwt-decode": "^2.0.1",
     "polymer": "^1.2.4",
     "webcomponentsjs": "^0.7.20"
+  },
+  "resolutions": {
+    "webcomponentsjs": "0.7.22",
+    "polymer": "^1.2.4"
   }
 }

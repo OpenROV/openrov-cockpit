@@ -1,0 +1,22 @@
+{
+  "name": "software-update-alert",
+  "homepage": "https://github.com/BrianAdams/openrov-cockpit",
+  "authors": [
+    "BrianAdams <brian@babastik.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "iron-ajax": "^1.4.3",
+    "polymer": "^1.0.0",
+    "webcomponentsjs": "^0.7.20"    
+  }
+}

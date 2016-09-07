@@ -1,8 +1,7 @@
-This document is intended to give a developer background on why we have made some of the techncial decsisions that we have.
+This document is intended to give a developer background on why we have made some of the technical decisions that we have.
 
 ## Its Web Based ##
 Goals: 
-* ACE
 * Easy for developers to hack
 
 Benefits that we enjoy:
@@ -24,11 +23,11 @@ Benefits that we enjoy:
 
 ## It only runs on the latest browsers ##
 Goals:
-* Capable system that can harnest the full power of the topside hardware
+* Capable system that can harness the full power of the topside hardware
 * Minimize support costs
 
 Benefits that we enjoy:
-* Resonable computational capability with any other platform that might be used
+* Reasonable computational capability with any other platform that might be used
 * We avoid the whole legacy browser issue
 
 This document is intended to give a developer an overview of how the UI portion of the OpenROV stack is arranged.

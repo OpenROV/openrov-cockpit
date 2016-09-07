@@ -8,7 +8,7 @@ function Bridge() {
   var emitRawSerial = false;
   var serialConnected = false;
   var uartPath = '/dev/ttyAMA0';
-  var uartBaud = 115200;
+  var uartBaud = 1500000;
   var serialPort = {};
   var lastWriteTime = new Date();
   bridge.connect = function () {

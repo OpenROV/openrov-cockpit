@@ -5,7 +5,6 @@
     <link rel="import" href="components/menu/menu.html">
     <link rel="import" href="components/navigation-data/topdowncompass.html">
     <link rel="import" href="components/connection-health/orov-ping-graph.html">
-    <link rel="import" href="components/serial-monitor/orov-serial-monitor.html">
     <link rel="import" href="components/telemetry/orov-telemetry-monitor.html">
     <link rel="import" href="components/telemetry/telemetry-item.html">
     <link rel="import" href="components/controllerboard2x/orov-time.html">
@@ -40,7 +39,6 @@
               </div>
             </div>
             <div id="rov_status_panel" class="span3 pull-right visible-desktop" style="overflow: auto; height: 100%">
-              <orov-serial-monitor class="hidden" style=""  event-emitter="{{cockpitEventEmitter}}"></orov-serial-monitor>
               <orov-telemetry-monitor id="telemetry" class=""  event-emitter="{{cockpitEventEmitter}}" ></orov-telemetry-monitor>
             </div>
           </div>

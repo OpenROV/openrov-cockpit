@@ -8,7 +8,6 @@
   <link rel="import" href="../menu/menu.html">
   <link rel="import" href="../navigation-data/topdowncompass.html">
   <link rel="import" href="../connection-health/orov-ping-graph.html">
-  <link rel="import" href="../serial-monitor/orov-serial-monitor.html">
   <link rel="import" href="../telemetry/orov-telemetry-monitor.html">
   <link rel="import" href="../connection-health/orov-connection-health.html">
   <link rel="import" href="../camera-tilt/orov-servo-tilt.html">
@@ -344,7 +343,6 @@ img.center {
     </div>
     <div id="rov_status_panel" class="span3 pull-right visible-desktop" style="overflow: auto; height: 100%">
       <div id="buttonPanel" class="controller well well-small"></div>
-      <orov-serial-monitor class="hidden" style=""  event-emitter="{{eventEmitter}}"></orov-serial-monitor>
       <orov-telemetry-monitor id="telemetry" class=""  event-emitter="{{eventEmitter}}" ></orov-telemetry-monitor>
     </div>
   </div>

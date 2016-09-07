@@ -97,6 +97,9 @@
       })
 
     },
+    /**
+     * Listens for 'widget-registry-enumerate-widgets',function(filterFn,callback)
+     */
     registerEmitterHandlers: function(emitter){
       var self = this;
       emitter.on('widget-registry-enumerate-widgets',function(filterFn,callback){

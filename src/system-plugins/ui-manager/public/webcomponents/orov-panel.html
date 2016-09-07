@@ -10,14 +10,14 @@
 </template>
 <script>
 
-(function() {
+(function(window) {
   Polymer({
     is:'orov-panel',
     properties: {
 
     },
-    behaviors: [namespace('behaviors').oROVStandard, namespace('behaviors').oROVPanel],
+    behaviors: [namespace('behaviors').oROVStandard, window.OROV.behaviors.oROVPanel],
   })
-})();
+})(window);
 </script>
 </dom-module>

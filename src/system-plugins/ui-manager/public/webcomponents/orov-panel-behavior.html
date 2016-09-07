@@ -1,15 +1,18 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../orov-behaviors/orov-behavior.html">
-<script src="../orov-behaviors/utilities.js"></script>
+
 <script>
 (function (window) {
   'use strict';
-  var behaviors = namespace('behaviors');
-  behaviors.oROVPanel = {
+  //ensure the namespace exists in the window object
+  if(!(window.OROV)){window.OROV={}}
+  if(!(window.OROV.behaviors)){window.OROV.behaviors={}}  
+  var behaviors = window.OROV.behaviors;
+  window.OROV.behaviors.oROVPanel = {
       properties: {
         panelType:{type:String}
       },
-      behaviors: [namespace('behaviors').oROVStandard],
+      behaviors: [behaviors.oROVStandard],
      panelFilter: function(){
        var self=this;
        return function(element){
@@ -54,5 +57,5 @@
         }      
       }
     }
-  })();
+  })(window);
 </script>

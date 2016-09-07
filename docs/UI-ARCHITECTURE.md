@@ -50,6 +50,10 @@ This document is intended to give a developer an overview of how the UI portion 
 |     + -- views [ Base page templates ]
 ```
 
+## UI-Manager
+The page discovery and layout are handled by the UI-Manager system service.  You can read more [here](../src/system-plugins/ui-manager/README.md)
+
+
 ##SPA Initialization Sequence Diagram##
 ```
 Cockpit SPA initialization Sequence

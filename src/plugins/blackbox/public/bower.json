@@ -28,6 +28,7 @@
     "webcomponentsjs": "^0.7.2"
   },
   "resolutions": {
-    "polymer": "^1.2.4"
+    "polymer": "^1.2.4",
+    "webcomponentsjs": "0.7.22"
   }
 }

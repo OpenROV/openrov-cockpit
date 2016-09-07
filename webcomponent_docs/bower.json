@@ -1,11 +1,13 @@
 {
-  "name": "orov-video",
-  "version": "1.0.1",
+  "name": "webcomponent_docs",
   "homepage": "https://github.com/BrianAdams/openrov-cockpit",
   "authors": [
     "BrianAdams <brian@babastik.com>"
   ],
+  "description": "",
+  "main": "",
   "license": "MIT",
+  "private": true,
   "ignore": [
     "**/.*",
     "node_modules",
@@ -14,13 +16,12 @@
     "tests"
   ],
   "dependencies": {
-    "mjpeg-video-webcomponents": "~2.0.1",
-    "packet-video": "https://github.com/OpenROV-atoms/packet-video.git",
-    "polymer": "^1.2.0",
-    "webcomponentsjs": "^0.7.20"
+    "ui-manager-widgets": "../src/system-plugins/ui-manager/public/webcomponents",
+    "iron-component-page": "^1.1.7",
+    "orov-behaviors": "../src/static/webcomponents/orov-behaviors"
   },
   "resolutions": {
     "webcomponentsjs": "0.7.22",
-    "polymer": "^1.0.0"
+    "polymer": "1.6.1"
   }
 }

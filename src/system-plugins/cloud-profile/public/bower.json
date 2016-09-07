@@ -21,6 +21,10 @@
     "paper-item": "PolymerElements/paper-item#^1.2.1",
     "jwt-decode": "^2.0.1",
     "polymer": "^1.2.4",
-    "webcomponentsjs": "^0.7.20"    
+    "webcomponentsjs": "^0.7.20"
+  },
+  "resolutions": {
+    "webcomponentsjs": "0.7.22",
+    "polymer": "^1.2.4"
   }
 }

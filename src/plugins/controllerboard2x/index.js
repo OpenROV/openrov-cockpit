@@ -14,12 +14,14 @@
     deps.globalEventLoop.on('mcu.status', function (data) {
       var mappedPowerObject = sharedFunctions.telemetryToSystemPower(data);
     });
-    deps.cockpit.on('plugin.systemPower.powerOnESCs', function () {
-      deps.globalEventLoop.emit('mcu.SendCommand', 'escp(1)');
+    deps.cockpit.on('plugin.systemPower.powerESCs', function (enable) {
+      if (enable){
+        deps.globalEventLoop.emit('mcu.SendCommand', 'escp(1)');
+      } else {
+        deps.globalEventLoop.emit('mcu.SendCommand', 'escp(0)');      
+      }
     });
-    deps.cockpit.on('plugin.systemPower.powerOffESCs', function () {
-      deps.globalEventLoop.emit('mcu.SendCommand', 'escp(0)');
-    });
+
   };
   SystemPower.prototype.getSettingSchema = function getSettingSchema() {
     //Technically the json-editor supports "watch" that can be used

@@ -35,11 +35,11 @@
   Polymer({
     is:'orov-thrusters2x1-motortest',
     properties: {
-      motors: {type: Array, value: [
+      motors: {type: Array, value: function(){return[
         {name:'port', percent: 0, reversed: false},
         {name:'vertical', percent: 0, reversed: false},
         {name:'starboard', percent: 0, reversed: false}
-      ]}
+      ]}}
     },   
     behaviors: [namespace('behaviors').oROVStandard],
     registerEmitterHandlers: function(emitter){

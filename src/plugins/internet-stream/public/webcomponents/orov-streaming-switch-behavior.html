@@ -9,15 +9,15 @@
       properties: {
       },
       on:function(){
-        this.eventEmitter.emit('plugin.light.set',true)
+        this.eventEmitter.emit('internet-stream-start')
       },
       off:function(){
-        this.eventEmitter.emit('plugin.light.set',false)
+        this.eventEmitter.emit('internet-stream-stop')
       },
       registerEmitterHandlers: function(emitter){
         var self = this;
-        emitter.withHistory.on('plugin.light.state',function(state){
-          if (state.enabled){
+        emitter.withHistory.on('internet-stream-status',function(state){
+          if (state.isStreaming||state.connecting){
             self.set('switchState','on')
           } else {
             self.set('switchState','off')
@@ -30,7 +30,7 @@
     }
 
   var behaviors = namespace('behaviors');
-  behaviors.oROVLightSwitch=[namespace('behaviors').oROVStandard,window.OROV.behaviors.switchBehavior,switchBehaviorImpl];
+  behaviors.oROVstreamingSwitch=[namespace('behaviors').oROVStandard,window.OROV.behaviors.switchBehavior,switchBehaviorImpl];
 
   })(window);
 </script>

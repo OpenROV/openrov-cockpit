@@ -1,0 +1,40 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<link rel="import" href="../ui-manager/orov-panel-behavior.html">
+<dom-module name="orov-widget-list-panel">
+<style>
+</style>
+<template>
+  <p>{{__('All widgets')}}:</p>
+  <div>
+        <content>
+        </content>
+  </div>
+</template>
+<script>
+
+(function() {
+  Polymer({
+    is:'orov-widget-list-panel',
+    properties: {
+
+    },
+    behaviors: [namespace('behaviors').oROVStandard, namespace('behaviors').oROVPanel],
+    panelFilter: function(){
+      var self=this;
+      return function(element){
+        if (element.is=='orov-widget-list-panel'){
+          return false;
+        }
+        return element.defaultPanel!==undefined;
+      }
+    },
+    detach: function(){
+//      Polymer.dom(this).children.forEach(function(element){
+//        delete element;
+//      });
+    }
+  })
+})();
+</script>
+</dom-module>

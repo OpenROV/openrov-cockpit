@@ -8,7 +8,7 @@
 </template>
 <script>
 
-(function() {
+(function(window) {
   Polymer({
     is:'orov-widget-registry',
     properties: {
@@ -22,25 +22,25 @@
     },
     attached: function(){
       var self=this;
+      //Links are not supported in shadowdom, so using importHref helper to load in to the main
+      //document.
+
+      if (window.__Fix3814_LinksLoaded==true){
+              self.subscribers.forEach(function(fn){
+                fn();
+              });
+              self.loadloadedControls=true;
+              return;        
+      }
+
       //This part is polymer specific. It should be possible to extend this for other web component types by figuring out where their module type name
       //is stored in the file.  In polymer it is under html.body.dom-module id attribute.
       var pendingLinkVerifications = 0;
       this.widgetsList.forEach(function(wc){
         pendingLinkVerifications++;
         var link = self.importHref(wc.path,
-          function(link){
-            console.log("success link load");
-        },function(err){
-          console.log("failed link load")
-          throw err
-        },
-        true);
-
-        link.onerror=function(err){
-          pendingLinkVerifications--;
-          console.log("Failed link load");
-        }
-        link.onload= function(e){
+          function(e){
+            console.log("loading link:",e.currentTarget.href);
             var elements = e.currentTarget.import.getElementsByTagName("DOM-MODULE");
             wc.loaded=true;
             if (elements.length==1){
@@ -66,14 +66,33 @@
             //  debugger;
             }
 
-
+            console.log("pendingLinkVerifications:",pendingLinkVerifications);
             if (pendingLinkVerifications==0){
+              //TODO: Check on the issue below to see if we can remove this work around
+              //of setting a window global variable to indivate the links have already
+              //been loaded.
+              //https://github.com/Polymer/polymer/issues/3814
+              window.__Fix3814_LinksLoaded = true;
               self.subscribers.forEach(function(fn){
                 fn();
               });
               self.loadloadedControls=true;
             }
-        };
+        },function(err){
+          console.log("failed link load")
+          throw err
+        },
+        false); //importHref will return before sub depenency links are loaded using Async=true.  That causes behavior to fail to load.
+
+        
+        link.onload=function(e){
+          console.log('loaded');
+        }
+
+        link.onerror=function(err){
+          pendingLinkVerifications--;
+          console.log("Failed link load");
+        }
         
       })
 
@@ -94,7 +113,7 @@
         }
 
         //If the controls have been enumerated go ahead and filter and return, else defer the call back
-        if (self.loadedControls){
+        if (self.loadedControls || window.__Fix3814_LinksLoaded){
           responseFn();
         } else {
           self.subscribers.push(responseFn);
@@ -102,6 +121,6 @@
       });
     },    
   })
-})();
+})(window);
 </script>
 </dom-module>

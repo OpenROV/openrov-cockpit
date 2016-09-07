@@ -16,5 +16,9 @@
   ],
   "dependencies": {
     "iron-ajax": "^1.4.3"
+  },
+  "resolutions": {
+    "polymer": "^1.0.0",
+    "webcomponentsjs": "^0.7.20"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "tankcontrol",
+  "name": "thrusters2x1",
   "homepage": "https://github.com/BrianAdams/openrov-cockpit",
   "authors": [
     "BrianAdams <brian@babastik.com>"
@@ -15,10 +15,6 @@
     "tests"
   ],
   "dependencies": {
-    "paper-toggle-button": "PolymerElements/paper-toggle-button#^1.2.0"
-  },
-  "resolutions": {
-    "polymer": "^1.2.0",
-    "webcomponentsjs": "^0.7.20"
+    "paper-slider": "PolymerElements/paper-slider#^1.0.11"
   }
 }

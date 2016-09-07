@@ -6,18 +6,16 @@
 (function (window) {
   'use strict';
       var switchBehaviorImpl= {
-      properties: {
-      },
       on:function(){
-        this.eventEmitter.emit('plugin.light.set',true)
+        this.eventEmitter.emit('plugin.systemPower.powerESCs',true)
       },
       off:function(){
-        this.eventEmitter.emit('plugin.light.set',false)
+        this.eventEmitter.emit('plugin.systemPower.powerESCs',false)
       },
       registerEmitterHandlers: function(emitter){
         var self = this;
-        emitter.withHistory.on('plugin.light.state',function(state){
-          if (state.enabled){
+        emitter.withHistory.on('plugin.systemPower.state',function(state){
+          if (state.escs_powered){
             self.set('switchState','on')
           } else {
             self.set('switchState','off')
@@ -30,7 +28,7 @@
     }
 
   var behaviors = namespace('behaviors');
-  behaviors.oROVLightSwitch=[namespace('behaviors').oROVStandard,window.OROV.behaviors.switchBehavior,switchBehaviorImpl];
+  behaviors.oROVESCSwitch=[namespace('behaviors').oROVStandard,window.OROV.behaviors.switchBehavior,switchBehaviorImpl];
 
   })(window);
 </script>

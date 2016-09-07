@@ -13,9 +13,8 @@
     "tests"
   ],
   "dependencies": {
-    "three.js": "threejs#*"
-  },
-  "resolutions": {
-    "webcomponentsjs": "^0.6.0"
+    "three.js": "threejs#*",
+    "polymer": "^1.2.0",
+    "webcomponentsjs": "^0.7.20"    
   }
 }

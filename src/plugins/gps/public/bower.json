@@ -19,9 +19,7 @@
   "dependencies": {
     "openlayers": "https://github.com/openlayers/ol3/releases/download/v3.16.0/v3.16.0-dist.zip",
     "leaflet-map": "^1.0.0",
-    "paper-toggle-button": "PolymerElements/paper-toggle-button#^1.0.0"
-  },
-  "resolutions": {
+    "paper-toggle-button": "PolymerElements/paper-toggle-button#^1.0.0",
     "polymer": "^1.2.0",
     "webcomponentsjs": "^0.7.20"
   }

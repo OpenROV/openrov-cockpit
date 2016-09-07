@@ -19,10 +19,8 @@
   "dependencies": {
     "bootstrap": "~3.3.5",
     "jquery": "~3.1.0",
-    "iron-media-query": "PolymerElements/iron-media-query#^1.0.8"
-  },
-  "resolutions": {
-    "webcomponentsjs": "^0.7.20",
-    "polymer": "^1.0.0"
+    "iron-media-query": "PolymerElements/iron-media-query#^1.0.8",
+    "polymer": "^1.2.0",
+    "webcomponentsjs": "^0.7.20"    
   }
 }

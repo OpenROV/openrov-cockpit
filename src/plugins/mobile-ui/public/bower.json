@@ -29,10 +29,8 @@
     "paper-behaviors": "PolymerElements/paper-behaviors#^1.0.0",
     "paper-material": "PolymerElements/paper-material#^1.0.0",
     "paper-dialog": "PolymerElements/paper-dialog#^1.0.0",
-    "paper-slider": "PolymerElements/paper-slider#^1.0.11"
-  },
-  "resolutions": {
-    "webcomponentsjs": "^0.7.20",
-    "polymer": "^1.2.1"
+    "paper-slider": "PolymerElements/paper-slider#^1.0.11",
+    "polymer": "^1.2.0",
+    "webcomponentsjs": "^0.7.20"    
   }
 }

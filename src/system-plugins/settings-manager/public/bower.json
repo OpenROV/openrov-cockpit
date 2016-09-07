@@ -16,9 +16,7 @@
   ],
   "dependencies": {
     "json-editor": "https://github.com/BrianAdams/json-editor.git#patched",
-    "paper-toast": "PolymerElements/paper-toast#^1.2.2"
-  },
-  "resolutions": {
+    "paper-toast": "PolymerElements/paper-toast#^1.2.2",
     "webcomponentsjs": "^0.7.20",
     "polymer": "^1.5.0"
   }

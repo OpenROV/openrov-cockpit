@@ -180,6 +180,7 @@
         if (session.duration == undefined) {
           fixes.push(firstTelemetryItem(self.idb, session.sessionID).then(function (firstItem) {
             return lastTelemetryItem(self.idb, session.sessionID).then(function (lastItem) {
+              if (lastItem==null){return;}
               session.duration = lastItem.timestamp - firstItem.timestamp;
               return;
             });

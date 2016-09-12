@@ -1,7 +1,7 @@
 exports.enable = function() {
     //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes
     if (!Array.prototype.includes) {
-        Object.defineProperty(Array.prototype, 'include', {
+        Object.defineProperty(Array.prototype, 'includes', {
             enumerable: false,
             value: function(searchElement /*, fromIndex*/ ) {
                 'use strict';

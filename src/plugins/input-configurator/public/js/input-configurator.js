@@ -106,6 +106,9 @@
     var current = settings.currentMap;
     var result = settings;
 
+    //TODO: What happens when another mapping from a new plugin is added after
+    //the default has been generated.  I suspect we need to regenerate the OpenROV default each
+    //time we load.
     self.loadDefaultMapping(function(defaultMap) {
       if (current.length == 1 && current[0] === null) { // the default mapping isn't setup as the current map yet.
         result = { 

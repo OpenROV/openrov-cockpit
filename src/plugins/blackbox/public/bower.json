@@ -25,7 +25,7 @@
     "paper-card": "PolymerElements/paper-card#^1.1.1"
   },
   "resolutions": {
-    "polymer": "^1.2.1",
+    "polymer": "^1.2.4",
     "webcomponentsjs": "^0.7.2"
   }
 }

@@ -5,23 +5,14 @@
 <link rel="import" href="../paper-item/paper-item.html">">
 <link rel="import" href="../paper-listbox/paper-listbox.html">">
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../paper-dialog/paper-dialog.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-spinner/paper-spinner-lite.html">
+<link rel="import" href="../paper-checkbox/paper-checkbox.html">
 
 <dom-module name="orov-input-configurator">
-    <style include="foundation5-styles"></style>
-    <style include="normalized-styles"></style>
 
     <style type="text/css">
-        .row.full-width {
-            width: 100%;
-            max-width: 100%;
-        }
-        
-        #controls {
-            height: 150px;
-            border: solid 1px black;
-            overflow: scroll;
-        }
-        
         .successfullySaved {
             opacity: 1;
         }
@@ -32,650 +23,670 @@
             transition: opacity 1.5s ease-out;
         }
         
-        .header {
-            font-weight: bold;
+        td,
+        th {
+            border-bottom: 1px solid #eee;
+            padding: 10px 25px;
         }
         
-        .currentItem {
-            background-color: #dff0d8;
+        th {
+            height: 0;
+            line-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            border: none;
+            white-space: nowrap;
         }
         
-        .controlsRow:hover {
-            background-color: #ddd;
+        th div {
+            position: absolute;
+            padding: 9px 25px;
+            top: 0;
+            margin-left: -25px;
+            line-height: normal;
         }
         
-        .hidden {
-            display: none;
+        th:first-child div {
+            border: none;
         }
+        
+        .container {
+            overflow-y: auto;
+            height: 200px;
+        }
+        
+        section {
+            position: relative;
+            border: 1px solid #000;
+            padding-top: 37px;
+        }
+
+/**
+ * KEYS.css
+ *
+ * A simple stylesheet for rendering beautiful keyboard-style elements.
+ *
+ * Author:  Michael Hüneburg
+ * Website: http://michaelhue.com/keyscss
+ * License: MIT License (see LICENSE.txt)
+ */
+
+/* Base style, essential for every key. */
+kbd, .key {
+	display: inline;
+	display: inline-block;
+	min-width: 1em;
+	padding: .2em .3em;
+	font: normal .85em/1 "Lucida Grande", Lucida, Arial, sans-serif;
+	text-align: center;
+	text-decoration: none;
+	-moz-border-radius: .3em;
+	-webkit-border-radius: .3em;
+	border-radius: .3em;
+	border: none;
+	cursor: default;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+}
+kbd[title], .key[title] {
+	cursor: help;
+}
+
+/* Dark style for display on light background. This is the default style. */
+kbd, kbd.dark, .dark-keys kbd, .key, .key.dark, .dark-keys .key {
+	background: rgb(80, 80, 80);
+	background: -moz-linear-gradient(top, rgb(60, 60, 60), rgb(80, 80, 80));
+	background: -webkit-gradient(linear, left top, left bottom, from(rgb(60, 60, 60)), to(rgb(80, 80, 80)));
+	color: rgb(250, 250, 250);
+	text-shadow: -1px -1px 0 rgb(70, 70, 70);
+	-moz-box-shadow: inset 0 0 1px rgb(150, 150, 150), inset 0 -.05em .4em rgb(80, 80, 80), 0 .1em 0 rgb(30, 30, 30), 0 .1em .1em rgba(0, 0, 0, .3);
+	-webkit-box-shadow: inset 0 0 1px rgb(150, 150, 150), inset 0 -.05em .4em rgb(80, 80, 80), 0 .1em 0 rgb(30, 30, 30), 0 .1em .1em rgba(0, 0, 0, .3);
+	box-shadow: inset 0 0 1px rgb(150, 150, 150), inset 0 -.05em .4em rgb(80, 80, 80), 0 .1em 0 rgb(30, 30, 30), 0 .1em .1em rgba(0, 0, 0, .3);
+}
+
+/* Light style for display on dark background. */
+kbd.light, .light-keys kbd, .key.light, .light-keys .key {
+	background: rgb(250, 250, 250);
+	background: -moz-linear-gradient(top, rgb(210, 210, 210), rgb(255, 255, 255));
+	background: -webkit-gradient(linear, left top, left bottom, from(rgb(210, 210, 210)), to(rgb(255, 255, 255)));
+	color:  rgb(50, 50, 50);
+	text-shadow: 0 0 2px rgb(255, 255, 255);
+	-moz-box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
+	-webkit-box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
+	box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
+}        
     </style>
     <template>
-        <h2>{{__('Input configurator')}}</h2>
-
-        <div id="controls" class="center">
-            <div id="commandsList" class="table">
-                <div class="header">
-                    <div style="float:left; min-width:40%">{{__('Command')}}</div>
-                    <div style="float:left; width:50px">{{__('KBD')}}&nbsp;</div>
-                    <div style="float:left; width:100px">{{__('GMP')}}&nbsp;</div>
-                    <div style="">{{__('Description')}}</div>
-                </div>
-                <iron-list id="list" items="[[commands]]" as="item" selected-item="{{selectedItem}}" selection-enabled>
-                    <template>
-                        <div class$="controlsRow [[getClassForItem(item, selected)]]">
-                            <div style="float:left; min-width:44%">{{__(item.name)}}</div>
-                            <div style="float:left; width:50px">{{item.bindings.keyboard}}&nbsp;</div>
-                            <div style="float:left; width:100px">{{item.bindings.gamepad}}&nbsp;</div>
-                            <div style="">{{__(item.description)}}</div>
-                        </div>
-                    </template>
-                </iron-list>
-            </div>
+        <h2 style="display:inline">{{__('Input configurator BETA')}}</h2>
+        <div style="float:right">
+                <label class="prefix" for="find">{{__('Find')}}:</label>
+                <input id="find" type="text" value="{{find::input}}" />
         </div>
+        <p>
+            {{__('To change control mapping click on the control to change.')}}
+        </p>
+  <section class="">      
+  <div class="container">
+        <table>
+        <thead>
+            <tr class="header">
+            <th>
+                <div>{{__('Command')}}</div>
+            </th>
+            <th>
+                <div>{{__('KBD')}}</div>
+            </th>
+            <th>
+                <div>{{__('GMP')}}</div>
+            </th>
+            <th>
+                <div>{{__('Description')}}</div>
+            </th>            
+            </tr>
+        </thead>
+    <tbody>
+        <template is="dom-repeat" items="[[commands]]">
+            <tr>
+                <td>{{__(item.name)}}</td>
+                <td><kbd on-tap="_handleKeyboardChange">{{item.bindings.keyboard}}&nbsp;</kbd></td>
+                <td><kbd on-tap="_handleGamepadChange">{{item.bindings.gamepad}}&nbsp;</kbd></td>
+                <td>{{__(item.description)}}</td>
+            </tr>
+        </template>
+    </tbody>
+    </table>
+    </div>
+    </section>
 
-        <div class="row full-width">
-            <div class="small-6 columns">
-                <div class="row collapse prefix-radius">
-                    <div class="small-2 columns">
-                        <label class="prefix" for="find">{{__('Find')}}:</label>
-                    </div>
-                    <div class="small-3 columns left">
-                        <input id="find" type="text" value="{{find::input}}" />
-                    </div>
-                </div>
-            </div>
-        </div>
+<paper-dialog id="keyboardmodal" modal on-iron-overlay-closed="_onkeyboardModalClosed" on-iron-overlay-opened="_handleKeyBoardFocus">
+    <label for="keyboard">{{__('Type the key or sequence of keys to use')}}:</label>
+    <br>
+    <label>{{__('Current Mapping')}}: <kbd>{{selectedItem.bindings.keyboard}}</kbd></label>
+    <paper-spinner-lite active$={{_isLIsteningForKeyBoardBinding}}></paper-spinner-lite>
+        <h1>{{_candidateBinding}}</h1>
+        <label hidden$={{_noConflictWithCandidate(_candidateBinding,selectedItem.bindings.keyboard)}}>{{__('Keybinding already in use')}}</label>
+    </div>
+  <div class="buttons">
+    <paper-button hidden$={{_noConflictWithCandidate(_candidateBinding,selectedItem.bindings.keyboard)}} dialog-confirm>{{__('replace conflicting binding')}}</paper-button>
+    <paper-button hidden$={{_isLIsteningForKeyBoardBinding}} on-click="_handleKeyBoardFocus">{{__('enter different key')}}</paper-button>
+    <paper-button on-tap="_handleClearBinding" dialog-confirm>{{__('clear binding')}}</paper-button>
+    <paper-button dialog-confirm disabled$={{!_isValidReplacementBinding('keyboard',_candidateBinding,selectedItem.bindings.keyboard)}} on-click="handleKeyBoardFocuse">{{__('accept')}}</paper-button>
+    <paper-button dialog-dismiss>{{__('cancel')}}</paper-button>
+  </div>
+</paper-dialog>
 
-        <div class$="[[showEditor(selectedItem)]]">
+<paper-dialog id="gamepadmodal" modal on-iron-overlay-closed="_ongamepadModalClosed">
+    <label for="gamepad">{{__('Gamepad')}}:</label>
+    <div>
+        <paper-dropdown-menu id="candidategamepad" label="gamepad control">
+            <paper-listbox class="dropdown-content" attr-for-selected="value" selected="{{_candidateBinding}}" on-iron-select="_handleCanidateGamePadSelected">
+                <paper-item value=""></paper-item>
+                <paper-item value="A">{{__('A')}}</paper-item>
+                <paper-item value="B">{{__('B')}}</paper-item>
+                <paper-item value="X">{{__('X')}}</paper-item>
+                <paper-item value="Y">{{__('Y')}}</paper-item>
+                <paper-item value="LB">{{__('LB')}}</paper-item>
+                <paper-item value="RB">{{__('RB')}}</paper-item>
+                <paper-item value="LEFT_TRIGGER">{{__('LEFT_TRIGGER')}}</paper-item>
+                <paper-item value="RIGHT_TRIGGER">{{__('RIGHT_TRIGGER')}}</paper-item>
+                <paper-item value="LEFT_STICK">{{__('LEFT_STICK')}}</paper-item>
+                <paper-item value="RIGHT_STICK">{{__('RIGHT_STICK')}}</paper-item>
+                <paper-item value="START">{{__('START')}}</paper-item>
+                <paper-item value="BACK">{{__('BACK')}}</paper-item>
+                <paper-item value="DPAD_UP">{{__('DPAD_UP')}}</paper-item>
+                <paper-item value="DPAD_DOWN">{{__('DPAD_DOWN')}}</paper-item>
+                <paper-item value="DPAD_LEFT">{{__('DPAD_LEFT')}}</paper-item>
+                <paper-item value="DPAD_RIGHT">{{__('DPAD_RIGHT')}}</paper-item>
+                <paper-item value="HOME">{{__('HOME')}}</paper-item>
+                <paper-item value="LEFT_STICK_X">{{__('LEFT_STICK_X')}}</paper-item>
+                <paper-item value="LEFT_STICK_Y">{{__('LEFT_STICK_Y')}}</paper-item>
+                <paper-item value="RIGHT_STICK_X">{{__('RIGHT_STICK_X')}}</paper-item>
+                <paper-item value="RIGHT_STICK_Y">{{__('RIGHT_STICK_Y')}}</paper-item>
+            </paper-listbox>
+        </paper-dropdown-menu> 
+        <paper-checkbox disabled>{{__('invert')}}</paper-checkbox>       
+    </div>
 
-            <div class="row full-width">
-                <div class="small-6 columns">
-                    <div class="row collapse prefix-radius">
-                        <div class="small-2 columns">
-                            <label class="prefix" for="keyboard">{{__('Keyboard')}}:</label>
-                        </div>
-                        <div class="small-3 columns left">
-                            <input id="keyboard" type="text" disabled class$="{{ getClassInCaseOfDuplicates(keyboardDuplicates.*, 'error') }}" value="{{selectedItem.bindings.keyboard}}"
-                            />
-                            <small class$="[[ getClassInCaseOfDuplicates(keyboardDuplicates.*, 'error', 'hide') ]]">{{__('Duplicate!')}}</small>
-                            <paper-button raised on-click="handleKeyBoardFocuse">{{__('change')}}</paper-button>
-                        </div>
-                    </div>
+  <div class="buttons">
+    <paper-button hidden$={{_noConflictWithCandidateGP(_candidateBinding,selectedItem.bindings.gamepad)}} dialog-confirm>{{__('replace conflicting binding')}}</paper-button>
+    <paper-button dialog-confirm disabled$={{!_isValidReplacementBinding('gamepad',_candidateBinding,selectedItem.bindings.gamepad)}} on-click="handleGamePadFocus">{{__('accept')}}</paper-button>
+    <paper-button dialog-dismiss>{{__('cancel')}}</paper-button>
+  </div>
+</paper-dialog>
 
-                    <div class="row collapse prefix-radius">
-                        <div class="small-2 columns">
-                            <label class="prefix" for="gamepad">{{__('Gamepad')}}:</label>
-                        </div>
-                        <div class="small-3 columns left">
-                            <input id="gamepad" type="text" disabled class$="{{ getClassInCaseOfDuplicates(gamepadDuplicates.*, 'error') }}" value="{{__(selectedItem.bindings.gamepad)}}"
-                            />
-                            <small class$="[[ getClassInCaseOfDuplicates(gamepadDuplicates.*, 'error', 'hide') ]]">{{__('Duplicate!')}}</small>
-                            <paper-button raised on-click="handleGamePadFocuse">{{__('change')}}</paper-button>                            
-                        </div>
-                    </div>
-
-
-                </div>
-            </div>
-            <div class="row full-width">
-                <div class$="small-12 columns {{ getClass(duplicates, '', 'hide') }}">
-                    Duplicates:
-                    <div class="row full-width">
-                        <div class="small-9 columns left">
-                            <iron-list id="keyboardList" items="[[keyboardDuplicates]]" as="item">
-                                <template>
-                                    <div class$="controlsRow [[getClassForItem(item, selected)]]">
-                                        <div style="float:left; min-width:40%">{{__(item.name)}}</div>
-                                        <div style="">{{__(item.description)}}</div>
-                                    </div>
-                                </template>
-                            </iron-list>
-                            <iron-list id="gamepadList" items="[[gamepadDuplicates]]" as="item">
-                                <template>
-                                    <div class$="controlsRow [[getClassForItem(item, selected)]]">
-                                        <div style="float:left; min-width:40%">{{__(item.name)}}</div>
-                                        <div style="">{{__(item.description)}}</div>
-                                    </div>
-                                </template>
-                            </iron-list>
-
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row full-width">
-                    <div class="small-6 columns">
-                        <button on-tap="onSave" type="button" class$="button {{ getClass(duplicates,'secondary disabled') }}">{{__('Save')}}</button>
-                        <button on-tap="onReset" type="button" class="button">{{__('Reset')}}</button>
-                    </div>
-
-                    <div class="small-6 columns">
-                        <div class$="small-4 columns successfullySaved {{ getClass(successfullySaved, '', 'hide') }}">
-                            <div data-alert class="alert-box success">
-                                {{__('Binding saved!')}}
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-        <div class="row full-width">
-            <div class="small-12 columns">
-                <div class="small-8 columns">
-                    <paper-dropdown-menu id="preset" label="Presets">
-                        <paper-listbox class="dropdown-content" selected="{{selectedPreset}}">
-                            <template is="dom-repeat" items="{{presets}}" as="p">
+<paper-dialog id="savenewpresetmodal" modal>
+        <paper-input label="preset name" floatingLabel value="{{newPresetName}}"></paper-input>
+        <button on-tap="onSaveNewPreset" dialog-confirm type="button" class="button">{{__('Save')}}</button>
+        <button dialog-dismiss type="button" class="button">{{__('Cancel')}}</button>
+</paper-dialog>
+    <div class="row full-width">
+        <div class="small-12 columns">
+            <div class="small-8 columns">
+                <paper-dropdown-menu id="preset" label="Presets">
+                    <paper-listbox class="dropdown-content" selected="{{selectedPreset}}">
+                        <template is="dom-repeat" items="{{presets}}" as="p">
                                 <paper-item>{{p.name}}</paper-item>
                             </template>
-                        </paper-listbox>
-                    </paper-dropdown-menu>
-                    <button on-tap="onLoadPreset" type="button" class$="button {{ getClass(canLoadPreset,'', 'secondary disabled') }}">{{__('Load')}}</button>
-                    <button on-tap="onSavePreset" type="button" class$="button {{ getClass(canSavePreset, '', 'secondary disabled') }}">{{__('Save')}}</button>
-                    <button on-tap="onDeletePreset" type="button" class$="button {{ getClass(canSavePreset, '', 'secondary disabled') }}">{{__('Delete')}}</button>
-                    <button on-tap="onWantSavePreset" type="button" class$="button {{ getClass(saveNewPreset, 'secondary disabled') }}">{{__('Save new preset')}}</button>
+                    </paper-listbox>
+                </paper-dropdown-menu>
+                <button on-tap="onLoadPreset" type="button" class$="button {{ getClass(canLoadPreset,'', 'secondary disabled') }}">{{__('Load')}}</button>
+                <button on-tap="onSavePreset" type="button" class$="button {{ getClass(canSavePreset, '', 'secondary disabled') }}">{{__('Save')}}</button>
+                <button on-tap="onDeletePreset" type="button" class$="button {{ getClass(canSavePreset, '', 'secondary disabled') }}">{{__('Delete')}}</button>
+                <button on-tap="onWantSavePreset" type="button" class$="button {{ getClass(saveNewPreset, 'secondary disabled') }}">{{__('New')}}</button>
 
-                    <div class$="successfullySaved {{ getClass(presetLoaded, '', 'hide') }}">
-                        <div data-alert class="alert-box success">
-                            {{__('Loaded!')}}
-                        </div>
+                <div class$="successfullySaved {{ getClass(presetLoaded, '', 'hide') }}">
+                    <div data-alert class="alert-box success">
+                        {{__('Loaded!')}}
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row full-width">
-            <div class="small-12 columns">
-                <div class="small-4 columns">
-
-
-                    <div class$="{{ getClass(saveNewPreset, '', 'hide' )}}">
-                        <paper-input label="Save a new preset" floatingLabel value="{{newPresetName}}"></paper-input>
-                        <button on-tap="onSaveNewPreset" type="button" class="button">{{__('Save')}}</button>
-                    </div>
-
-                </div>
-            </div>
-        </div>
+    </div>
 
 
     </template>
+    <script src="MouseTrapExtension.js"></script>
     <script>
-/**
- * This extension allows you to record a sequence using Mousetrap.
- *
- * @author Dan Tao <daniel.tao@gmail.com>
- */
-(function(Mousetrap) {
-    /**
-     * the sequence currently being recorded
-     *
-     * @type {Array}
-     */
-    var _recordedSequence = [],
+        (function() {
 
-        /**
-         * a callback to invoke after recording a sequence
-         *
-         * @type {Function|null}
-         */
-        _recordedSequenceCallback = null,
+            var keyboardMap = ["", "", "", "CANCEL", "", "", "HELP", "", "BACK_SPACE", "TAB", "", "", "CLEAR", "ENTER", "RETURN", "", "SHIFT", "CTRL", "ALT", "PAUSE", "CAPSLOCK", "KANA", "EISU", "JUNJA", "FINAL", "HANJA", "", "ESC", "CONVERT", "NONCONVERT", "ACCEPT", "MODECHANGE", "SPACE", "PAGE_UP", "PAGE_DOWN", "END", "HOME", "LEFT", "UP", "RIGHT", "DOWN", "SELECT", "PRINT", "EXECUTE", "PRINTSCREEN", "INSERT", "DELETE", "", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", ";", "LESS_THAN", "=", "GREATER_THAN", "QUESTION_MARK", "AT", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "WIN", "", "CONTEXT_MENU", "", "SLEEP", "NUMPAD0", "NUMPAD1", "NUMPAD2", "NUMPAD3", "NUMPAD4", "NUMPAD5", "NUMPAD6", "NUMPAD7", "NUMPAD8", "NUMPAD9", "MULTIPLY", "ADD", "SEPARATOR", "SUBTRACT", "DECIMAL", "DIVIDE", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "F13", "F14", "F15", "F16", "F17", "F18", "F19", "F20", "F21", "F22", "F23", "F24", "", "", "", "", "", "", "", "", "NUM_LOCK", "SCROLL_LOCK", "WIN_OEM_FJ_JISHO", "WIN_OEM_FJ_MASSHOU", "WIN_OEM_FJ_TOUROKU", "WIN_OEM_FJ_LOYA", "WIN_OEM_FJ_ROYA", "", "", "", "", "", "", "", "", "", "CIRCUMFLEX", "EXCLAMATION", "\"", "#", "$", "%", "&", "_", "(", ")", "*", "+", "|", "HYPHEN_MINUS", "{", "}", "~", "", "", "", "", "VOLUME_MUTE", "VOLUME_DOWN", "VOLUME_UP", "", "", ";", "=", ",", "-", ".", "/", "`", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "[", "\\", "]", "'", "", "META", "ALTGR", "", "WIN_ICO_HELP", "WIN_ICO_00", "", "WIN_ICO_CLEAR", "", "", "WIN_OEM_RESET", "WIN_OEM_JUMP", "WIN_OEM_PA1", "WIN_OEM_PA2", "WIN_OEM_PA3", "WIN_OEM_WSCTRL", "WIN_OEM_CUSEL", "WIN_OEM_ATTN", "WIN_OEM_FINISH", "WIN_OEM_COPY", "WIN_OEM_AUTO", "WIN_OEM_ENLW", "WIN_OEM_BACKTAB", "ATTN", "CRSEL", "EXSEL", "EREOF", "PLAY", "ZOOM", "", "PA1", "WIN_OEM_CLEAR", ""];
 
-        /**
-         * a list of all of the keys currently held down
-         *
-         * @type {Array}
-         */
-        _currentRecordedKeys = [],
+            Polymer({
+                is: "orov-input-configurator",
+                properties: {
+                    find: {
+                        type: String,
+                        value: '',
+                        observer: 'findChanged'
+                    },
+                    commands: {
+                        type: Array,
+                        value: []
+                    },
+                    unfilteredCommands: {
+                        type: Array,
+                        value: []
+                    },
+                    prests: {
+                        type: Array,
+                        value: []
+                    },
+                    selectedPreset: {
+                        type: Object,
+                        value: -1,
+                        observer: 'selectedPresetChanged'
+                    },
+                    presetLoaded: {
+                        type: Boolean,
+                        value: false
+                    },
+                    selectedItem: {
+                        type: Object,
+                        value: undefined,
+                        observer: ''
+                    },
+                    keyboardDuplicates: {
+                        type: Array,
+                        value: []
+                    },
+                    gamepadDuplicates: {
+                        type: Array,
+                        value: []
+                    },
+                    duplicates: {
+                        type: Boolean,
+                        computed: 'hasDuplicates(keyboardDuplicates.*, gamepadDuplicates.*)'
+                    },
+                    successfullySaved: {
+                        type: Boolean,
+                        value: false
+                    },
+                    saveNewPreset: {
+                        type: Boolean,
+                        value: false
+                    },
+                    canSavePreset: {
+                        type: Boolean,
+                        computed: 'getCanSavePreset(selectedPreset)'
+                    },
+                    canLoadPreset: {
+                        type: Boolean,
+                        computed: 'getCanLoadPreset(selectedPreset)'
+                    },
+                },
+                behaviors: [namespace('behaviors').oROVStandard],
 
-        /**
-         * temporary state where we remember if we've already captured a
-         * character key in the current combo
-         *
-         * @type {boolean}
-         */
-        _recordedCharacterKey = false,
+                attached: function() {
+                    var self = this;
+                    if (this.eventEmitter !== undefined) {
+                        this.eventEmitter.emit('InpitController.suspendAll')
+                    }
+                },
+                detached: function() {
+                    if (this.eventEmitter !== undefined) {
+                        this.eventEmitter.emit('InpitController.resumeAll')
+                    }
+                },
+                registerEmitterHanlders: function(emitter) {
+                    var self = this;
 
-        /**
-         * a handle for the timer of the current recording
-         *
-         * @type {null|number}
-         */
-        _recordTimer = null,
+                    emitter.withHistory.on('plugin.inputConfigurator.currentMap.update', function(keyMap) {
+                        self.unfilteredCommands = keyMap.map(function(mapping) { // map from array to object 
+                            var result = {
+                                name: mapping.name,
+                                description: mapping.description ? mapping.description : '',
+                                bindings: {},
+                                defaults: mapping.defaults
+                            };
+                            mapping.bindings.forEach(function(binding) {
+                                result.bindings[binding.name] = binding.binding;
+                            });
+                            return result;
+                        });
+                        self.updateCommands();
+                    });
 
-        /**
-         * the original handleKey method to override when Mousetrap.record() is
-         * called
-         *
-         * @type {Function}
-         */
-        _origHandleKey = Mousetrap.prototype.handleKey;
+                    emitter.withHistory.on('plugin.inputConfigurator.presets.update', function(presets) {
+                        self.presets = presets;
+                    });
 
-    /**
-     * handles a character key event
-     *
-     * @param {string} character
-     * @param {Array} modifiers
-     * @param {Event} e
-     * @returns void
-     */
-    function _handleKey(character, modifiers, e) {
-        var self = this;
+                    emitter.on('InputController.registeredCommand', function(command) {
+                        var index=self.commands.findIndex(function(item){
+                            return item.name==command.name
+                        })
+                        if (index==null){
+                            self.push('commands', command);
+                        } else {
+                            self.set(`command.${index}`,command)
+                        }
+                    });
 
-        if (!self.recording) {
-            _origHandleKey.apply(self, arguments);
-            return;
-        }
+                    var checkForGamepadDuplicate = function(button) {
+                        self.gamepadDuplicates = [];
+                        self.unfilteredCommands.forEach(function(command) {
+                            if (command.bindings.gamepad === button && command != self.selectedItem) {
+                                self.push('gamepadDuplicates', command);
+                            }
+                        });
+                    }
 
-        // remember this character if we're currently recording a sequence
-        if (e.type == 'keydown') {
-            if (character.length === 1 && _recordedCharacterKey) {
-                _recordCurrentCombo();
-            }
+                    //TODO Add dupplicates handling!
+                    emitter.on('systemPlugin.inputController.gamepad.buttonDown', function(button) {
+                        if (self.selectedItem) {
+                            checkForGamepadDuplicate(button);
+                            self.set('selectedItem.bindings.gamepad', button);
+                            // $(self.$.gamepad).val(button);   
+                        }
+                    });
 
-            for (i = 0; i < modifiers.length; ++i) {
-                _recordKey(modifiers[i]);
-            }
-            _recordKey(character);
+                    emitter.on('systemPlugin.inputController.gamepad.axisChanged', function(axis) {
+                        if (self.selectedItem) {
+                            checkForGamepadDuplicate(axis);
+                            self.set('selectedItem.bindings.gamepad', axis);
+                            //$(self.$.gamepad).val(axis);   
+                        }
+                    });
+                },
+                enable: function(e) {},
+                disable: function(e) {},
 
-        // once a key is released, all keys that were held down at the time
-        // count as a keypress
-        } else if (e.type == 'keyup' && _currentRecordedKeys.length > 0) {
-            _recordCurrentCombo();
-        }
-    }
+                selectedItemChanged: function() {
+                    if (this.selectedItem) {
+                        //  $(this.$.keyboard).val(this.selectedItem.bindings.keyboard);
+                        //  $(this.$.gamepad).val(this.selectedItem.bindings.gamepad);
+                        this.keyboardDuplicates = [];
+                    }
+                },
 
-    /**
-     * marks a character key as held down while recording a sequence
-     *
-     * @param {string} key
-     * @returns void
-     */
-    function _recordKey(key) {
-        var i;
+                selectedPresetChanged: function() {
+                    if (this.selectedPreset >= 0) {
+                        console.log(this.presets[this.selectedPreset].name);
+                    }
+                },
 
-        // one-off implementation of Array.indexOf, since IE6-9 don't support it
-        for (i = 0; i < _currentRecordedKeys.length; ++i) {
-            if (_currentRecordedKeys[i] === key) {
-                return;
-            }
-        }
+                findChanged: function() {
+                    this.updateCommands();
+                },
 
-        _currentRecordedKeys.push(key);
+                commandsChanged: function() {
+                    var self = this;
+                    self.selectedItem = undefined;
+                },
 
-        if (key.length === 1) {
-            _recordedCharacterKey = true;
-        }
-    }
+                updateActiveMapping: function(command) {
+                    var self = this;
+                    /*            if (this.selectedItem) {
+                                    this.selectedItem.bindings.keyboard = $(this.$.keyboard).val();
+                                    this.selectedItem.bindings.gamepad = $(this.$.gamepad).val();
+                                }
+                    */
+                    if (this.eventEmitter !== undefined) {
+                        var arg = {
+                            name: command.name,
+                            bindings: [{
+                                name: 'keyboard',
+                                binding: command.bindings.keyboard
+                            }, {
+                                name: 'gamepad',
+                                binding: command.bindings.gamepad
+                            }, ]
+                        };
 
-    /**
-     * marks whatever key combination that's been recorded so far as finished
-     * and gets ready for the next combo
-     *
-     * @returns void
-     */
-    function _recordCurrentCombo() {
-        _recordedSequence.push(_currentRecordedKeys);
-        _currentRecordedKeys = [];
-        _recordedCharacterKey = false;
-        _restartRecordTimer();
-    }
-
-    /**
-     * ensures each combo in a sequence is in a predictable order and formats
-     * key combos to be '+'-delimited
-     *
-     * modifies the sequence in-place
-     *
-     * @param {Array} sequence
-     * @returns void
-     */
-    function _normalizeSequence(sequence) {
-        var i;
-
-        for (i = 0; i < sequence.length; ++i) {
-            sequence[i].sort(function(x, y) {
-                // modifier keys always come first, in alphabetical order
-                if (x.length > 1 && y.length === 1) {
-                    return -1;
-                } else if (x.length === 1 && y.length > 1) {
-                    return 1;
-                }
-
-                // character keys come next (list should contain no duplicates,
-                // so no need for equality check)
-                return x > y ? 1 : -1;
-            });
-
-            sequence[i] = sequence[i].join('+');
-        }
-    }
-
-    /**
-     * finishes the current recording, passes the recorded sequence to the stored
-     * callback, and sets Mousetrap.handleKey back to its original function
-     *
-     * @returns void
-     */
-    function _finishRecording() {
-        if (_recordedSequenceCallback) {
-            _normalizeSequence(_recordedSequence);
-            _recordedSequenceCallback(_recordedSequence);
-        }
-
-        // reset all recorded state
-        _recordedSequence = [];
-        _recordedSequenceCallback = null;
-        _currentRecordedKeys = [];
-    }
-
-    /**
-     * called to set a 1 second timeout on the current recording
-     *
-     * this is so after each key press in the sequence the recording will wait for
-     * 1 more second before executing the callback
-     *
-     * @returns void
-     */
-    function _restartRecordTimer() {
-        clearTimeout(_recordTimer);
-        _recordTimer = setTimeout(_finishRecording, 1000);
-    }
-
-    /**
-     * records the next sequence and passes it to a callback once it's
-     * completed
-     *
-     * @param {Function} callback
-     * @returns void
-     */
-    Mousetrap.prototype.record = function(callback) {
-        var self = this;
-        self.recording = true;
-        _recordedSequenceCallback = function() {
-            self.recording = false;
-            callback.apply(self, arguments);
-        };
-    };
-
-    Mousetrap.prototype.handleKey = function() {
-        var self = this;
-        _handleKey.apply(self, arguments);
-    };
-
-    Mousetrap.init();
-
-})(Mousetrap);
-
-    (function() {
-
-      var keyboardMap = ["","","","CANCEL","","","HELP","","BACK_SPACE","TAB","","","CLEAR","ENTER","RETURN","","SHIFT","CTRL","ALT","PAUSE","CAPSLOCK","KANA","EISU","JUNJA","FINAL","HANJA","","ESC","CONVERT","NONCONVERT","ACCEPT","MODECHANGE","SPACE","PAGE_UP","PAGE_DOWN","END","HOME","LEFT","UP","RIGHT","DOWN","SELECT","PRINT","EXECUTE","PRINTSCREEN","INSERT","DELETE","","0","1","2","3","4","5","6","7","8","9",":",";","LESS_THAN","=","GREATER_THAN","QUESTION_MARK","AT","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","WIN","","CONTEXT_MENU","","SLEEP","NUMPAD0","NUMPAD1","NUMPAD2","NUMPAD3","NUMPAD4","NUMPAD5","NUMPAD6","NUMPAD7","NUMPAD8","NUMPAD9","MULTIPLY","ADD","SEPARATOR","SUBTRACT","DECIMAL","DIVIDE","F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12","F13","F14","F15","F16","F17","F18","F19","F20","F21","F22","F23","F24","","","","","","","","","NUM_LOCK","SCROLL_LOCK","WIN_OEM_FJ_JISHO","WIN_OEM_FJ_MASSHOU","WIN_OEM_FJ_TOUROKU","WIN_OEM_FJ_LOYA","WIN_OEM_FJ_ROYA","","","","","","","","","","CIRCUMFLEX","EXCLAMATION","\"","#","$","%","&","_","(",")","*","+","|","HYPHEN_MINUS","{","}","~","","","","","VOLUME_MUTE","VOLUME_DOWN","VOLUME_UP","","",";","=",",","-",".","/","`","","","","","","","","","","","","","","","","","","","","","","","","","","","[","\\","]","'","","META","ALTGR","","WIN_ICO_HELP","WIN_ICO_00","","WIN_ICO_CLEAR","","","WIN_OEM_RESET","WIN_OEM_JUMP","WIN_OEM_PA1","WIN_OEM_PA2","WIN_OEM_PA3","WIN_OEM_WSCTRL","WIN_OEM_CUSEL","WIN_OEM_ATTN","WIN_OEM_FINISH","WIN_OEM_COPY","WIN_OEM_AUTO","WIN_OEM_ENLW","WIN_OEM_BACKTAB","ATTN","CRSEL","EXSEL","EREOF","PLAY","ZOOM","","PA1","WIN_OEM_CLEAR",""];
-
-      Polymer({
-        is: "orov-input-configurator",
-        properties: {
-          find: {type: String, value: '', observer: 'findChanged'},
-          commands: {type: Array, value: []},
-          unfilteredCommands: {type: Array, value: []},
-          prests: {type: Array, value: []},
-          selectedPreset: {type: Object, value: -1, observer: 'selectedPresetChanged'},
-          presetLoaded: {type: Boolean, value: false},
-          selectedItem: {type: Object, value: undefined, observer: '' },
-          keyboardDuplicates: {type: Array, value: []},
-          gamepadDuplicates: {type: Array, value: []},
-          duplicates: {type: Boolean, computed: 'hasDuplicates(keyboardDuplicates.*, gamepadDuplicates.*)'},
-          successfullySaved: {type: Boolean, value: false},
-          saveNewPreset: {type: Boolean, value: false},
-          canSavePreset: {type: Boolean, computed: 'getCanSavePreset(selectedPreset)'},
-          canLoadPreset: {type: Boolean, computed: 'getCanLoadPreset(selectedPreset)'},
-        },
-        behaviors: [namespace('behaviors').oROVStandard],
+                        this.eventEmitter.emit('plugin.inputConfigurator.updateBinding', arg, function() {
+                            self.set('successfullySaved', true);
+                            self.async(function() {
+                                self.set('successfullySaved', false);
+                            }, 2000);
     
-        attached: function () {
-          var self = this;
-          if (this.eventEmitter!==undefined){
-            this.eventEmitter.emit('InpitController.suspendAll')
-              
-            self.async(function() { self.$.list.dispatchEvent(new Event('iron-resize')); }, 500);
-
-          }
-        },
-        detached: function() {
-            if (this.eventEmitter!==undefined){
-                this.eventEmitter.emit('InpitController.resumeAll')
-            }
-        },
-        registerEmitterHanlders: function(emitter){
-            var self = this;
-
-            emitter.withHistory.on('plugin.inputConfigurator.currentMap.update', function(keyMap) {
-                self.unfilteredCommands = keyMap.map(function(mapping) { // map from array to object 
-                    var result = { 
-                        name: mapping.name, 
-                        description: mapping.description ? mapping.description : '', 
-                        bindings: {},
-                        defaults: mapping.defaults 
-                    };
-                    mapping.bindings.forEach(function(binding) {
-                        result.bindings[binding.name] = binding.binding;
-                    });
-                    return result;
-                });
-                self.updateCommands();
-            });
-
-            emitter.withHistory.on('plugin.inputConfigurator.presets.update', function(presets) {
-                self.presets = presets;
-            });
-
-            emitter.on('InputController.registeredCommand',function(command){
-                self.push('commands',command);
-            });
-
-            var checkForGamepadDuplicate = function(button) {
-                self.gamepadDuplicates = [];
-                self.unfilteredCommands.forEach(function(command) {
-                    if (command.bindings.gamepad === button && command != self.selectedItem) {
-                        self.push('gamepadDuplicates', command);
+                        });
                     }
-                });
-            }
-
-            //TODO Add dupplicates handling!
-            emitter.on('systemPlugin.inputController.gamepad.buttonDown', function(button) {
-                if (self.selectedItem) {
-                    checkForGamepadDuplicate(button);
-                    self.set('selectedItem.bindings.gamepad',button);
-                   // $(self.$.gamepad).val(button);   
-                }
-            });
-            
-            emitter.on('systemPlugin.inputController.gamepad.axisChanged', function(axis) {
-                if (self.selectedItem) {
-                    checkForGamepadDuplicate(axis);
-                    self.set('selectedItem.bindings.gamepad',axis);
-                    //$(self.$.gamepad).val(axis);   
-                }
-            });         
-        },
-        enable: function(e){
-        },
-        disable: function(e){
-        },
-        
-        selectedItemChanged: function() {
-            if (this.selectedItem) {
-              //  $(this.$.keyboard).val(this.selectedItem.bindings.keyboard);
-              //  $(this.$.gamepad).val(this.selectedItem.bindings.gamepad);
-                this.keyboardDuplicates = [];
-            }
-        },
-
-        selectedPresetChanged: function() {
-            if (this.selectedPreset >= 0) {
-                console.log(this.presets[this.selectedPreset].name);
-            }
-        },
-
-        findChanged: function() {
-            this.updateCommands();
-        },
-        
-        commandsChanged: function() {
-            var self = this;
-            self.selectedItem = undefined;
-        },
-        
-        onSave: function(e) {
-            var self = this;
-/*            if (this.selectedItem) {
-                this.selectedItem.bindings.keyboard = $(this.$.keyboard).val();
-                this.selectedItem.bindings.gamepad = $(this.$.gamepad).val();
-            }
-*/            
-            if (this.eventEmitter!==undefined) {
-                var arg = { name: this.selectedItem.name, bindings: [
-                    { name: 'keyboard', binding: this.selectedItem.bindings.keyboard },
-                    { name: 'gamepad', binding: this.selectedItem.bindings.gamepad },
-                ] };
-
-                this.eventEmitter.emit('plugin.inputConfigurator.updateBinding', arg, function() {
-                    self.set('successfullySaved', true);
-                    self.async(function() { self.set('successfullySaved', false); }, 2000);
-                });
-            }
-        },
-
-        onLoadPreset: function(e) {
-            var self = this;
-            if (self.eventEmitter!==undefined) {
-                self.eventEmitter.emit('plugin.inputConfigurator.loadPreset', self.presets[self.selectedPreset], 
-                function(){
-                    self.set('presetLoaded', true);
-                    self.async(function() { self.set('presetLoaded', false); }, 2000);
-                });
-            }
-        },
-
-        onDeletePreset: function() {
-            var self = this;
-            if (self.eventEmitter!==undefined) {
-                self.eventEmitter.emit('plugin.inputConfigurator.deletePreset', self.presets[self.selectedPreset], function() {
-                    self.set('selectedPreset', -1);
-                });
-            }
-        },
-
-        onWantSavePreset: function() {
-            this.set('saveNewPreset', true);
-        },
-
-        onSaveNewPreset: function() {
-            var self = this;
-            if (self.eventEmitter) {
-                self.eventEmitter.emit('plugin.inputConfigurator.saveNewPreset', self.newPresetName);
-                self.set('saveNewPreset', false);
-            }
-        },
-        onSavePreset: function() {
-            var self = this;
-            if (self.eventEmitter) {
-                self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.presets[self.selectedPreset]);
-                self.set('saveNewPreset', false);
-            }
-        },
-
-        getClass: function(duplicates, duplicateClass, nonDuplicateClass) {
-            if (duplicates) {
-              return duplicateClass;
-            }  
-            return nonDuplicateClass ? nonDuplicateClass : '';
-        },
-
-        onReset: function() {
-            if (this.selectedItem) {
-               // $(this.$.keyboard).val(this.selectedItem.defaults.keyboard);
-                this.set('selectedItem.bindings.keyboard',this.selectedItem.defaults.keyboard==undefined?null:this.selectedItem.defaults.keyboard);
-               // $(this.$.gamepad).val(this.selectedItem.defaults.gamepad);
-                this.set('selectedItem.bindings.gamepad',this.selectedItem.defaults.gamepad==undefined?null:this.selectedItem.defaults.gamepad);
-                this.keyboardDuplicates = [];
-                this.gamepadDuplicates = [];
-            }
-        },
-        
-        getClassInCaseOfDuplicates: function(list, duplicateClass, nonDuplicateClass) {
-          if (list.base.length > 0) {
-              return duplicateClass;
-          }  
-          return nonDuplicateClass ? nonDuplicateClass : '';
-        },
-        hasDuplicates: function(keyboadDuplicates, gamepadDuplicates) {
-            return keyboadDuplicates.base.length > 0 || gamepadDuplicates.base.length > 0;
-        },
-        
-        getClassForItem: function(item, selected) {
-          return selected ? 'currentItem' : '';
-        },
-        showEditor: function(selectedItem) {
-          return selectedItem === null ? 'hidden' : '';  
-        },
-        getCanSavePreset: function(selectedPreset) {
-            var self = this;
-            if (selectedPreset >= 0) {
-                var preset = self.presets[selectedPreset];
-                return preset.default === undefined || preset.default === false;
-            }
-            return false;
-        },
-        getCanLoadPreset: function(selectedPreset) {
-            var self = this;
-            return (selectedPreset >= 0);
-        },
-        updateCommands: function() {
-            var self = this;
-            var filtered = this.unfilteredCommands;
-            if (this.find.length > 0) { 
-                filtered = 
-                    this.unfilteredCommands.filter(function(item) {
-                    var search = self.find.toLowerCase();
-                    var nameContains = item.name.toLowerCase().indexOf(search) >= 0 ;
-                    var descContains = item.description.toLowerCase().indexOf(search) >= 0;
-                    return nameContains || descContains;
-                    });
-            }
-            else {
-                self.commands = self.unfilteredCommands;
-                return;
-            }
-            var newCommands = [];
-            if (filtered) {
-                filtered.forEach(function(item) {
-                    newCommands.push(item);
-                });        
-            }
-            self.commands = newCommands;
-        },
-        handleKeyBoardFocuse: function(e){
-            var self=this;
-            console.log('focus');
-            Mousetrap.record(function(sequence) {
-                // sequence is an array like ['ctrl+k', 'c']
-                console.log('You pressed: ' + sequence.join(' '));
-                self.set('selectedItem.bindings.keyboard',sequence.join(''));
-                self.keyboardDuplicates = [];
-                self.unfilteredCommands.forEach(function(command) {
-                    if (command.bindings.keyboard === sequence.join(' ') && command != self.selectedItem) {
-                        self.push('keyboardDuplicates', command);
+                },
+                SaveToCurrentSession: function(){
+                    //And after updating the mapped setting for the current session, save them as well.
+                    if (this.presets.some(function(item){return item.name=="current-session"})){
+                        this.eventEmitter.emit('plugin.inputConfigurator.savePreset', "current-session");  
+                    } else {
+                        this.eventEmitter.emit('plugin.inputConfigurator.saveNewPreset', "current-session"); 
                     }
-                });
+                  
+                },
+                onLoadPreset: function(e) {
+                    var self = this;
+                    if (self.eventEmitter !== undefined) {
+                        self.eventEmitter.emit('plugin.inputConfigurator.loadPreset', self.presets[self.selectedPreset],
+                            function() {
+                                self.set('presetLoaded', true);
+                                self.async(function() {
+                                    self.set('presetLoaded', false);
+                                }, 2000);
+                            });
+                    }
+                },
 
-            });
-            
-        },
-        handleGamePadFocuse: function(e){
-            this.$.gamepad.disabled=false;
-        }
-        
-      })
-    })();
-  </script>
+                onDeletePreset: function() {
+                    var self = this;
+                    if (self.eventEmitter !== undefined) {
+                        self.eventEmitter.emit('plugin.inputConfigurator.deletePreset', self.presets[self.selectedPreset], function() {
+                            self.set('selectedPreset', -1);
+                        });
+                    }
+                },
+
+                onWantSavePreset: function() {
+                    this.set('saveNewPreset', true);
+                    this.$.savenewpresetmodal.open();
+                },
+
+                onSaveNewPreset: function() {
+                    var self = this;
+                    if (self.eventEmitter) {
+                        self.eventEmitter.emit('plugin.inputConfigurator.saveNewPreset', self.newPresetName);
+                        self.set('saveNewPreset', false);
+                    }
+                },
+                onSavePreset: function() {
+                    var self = this;
+                    if (self.eventEmitter) {
+                        self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.presets[self.selectedPreset]);
+                        self.set('saveNewPreset', false);
+                    }
+                },
+
+                getClass: function(duplicates, duplicateClass, nonDuplicateClass) {
+                    if (duplicates) {
+                        return duplicateClass;
+                    }
+                    return nonDuplicateClass ? nonDuplicateClass : '';
+                },
+
+                onReset: function() {
+                    if (this.selectedItem) {
+                        // $(this.$.keyboard).val(this.selectedItem.defaults.keyboard);
+                        this.set('selectedItem.bindings.keyboard', this.selectedItem.defaults.keyboard == undefined ? null : this.selectedItem.defaults.keyboard);
+                        // $(this.$.gamepad).val(this.selectedItem.defaults.gamepad);
+                        this.set('selectedItem.bindings.gamepad', this.selectedItem.defaults.gamepad == undefined ? null : this.selectedItem.defaults.gamepad);
+                        this.keyboardDuplicates = [];
+                        this.gamepadDuplicates = [];
+                    }
+                },
+
+                getClassInCaseOfDuplicates: function(list, duplicateClass, nonDuplicateClass) {
+                    if (list.base.length > 0) {
+                        return duplicateClass;
+                    }
+                    return nonDuplicateClass ? nonDuplicateClass : '';
+                },
+                hasDuplicates: function(keyboadDuplicates, gamepadDuplicates) {
+                    return keyboadDuplicates.base.length > 0 || gamepadDuplicates.base.length > 0;
+                },
+
+                getClassForItem: function(item, selected) {
+                    return selected ? 'currentItem' : '';
+                },
+                showEditor: function(selectedItem) {
+                    return selectedItem === null ? 'hidden' : '';
+                },
+                getCanSavePreset: function(selectedPreset) {
+                    var self = this;
+                    if (selectedPreset >= 0) {
+                        var preset = self.presets[selectedPreset];
+                        return preset.default === undefined || preset.default === false;
+                    }
+                    return false;
+                },
+                getCanLoadPreset: function(selectedPreset) {
+                    var self = this;
+                    return (selectedPreset >= 0);
+                },
+                updateCommands: function() {
+                    var self = this;
+                    var filtered = this.unfilteredCommands;
+                    if (this.find.length > 0) {
+                        filtered =
+                            this.unfilteredCommands.filter(function(item) {
+                                var search = self.find.toLowerCase();
+                                var nameContains = item.name.toLowerCase().indexOf(search) >= 0;
+                                var descContains = item.description.toLowerCase().indexOf(search) >= 0;
+                                return nameContains || descContains;
+                            });
+                    } else {
+                        self.commands = self.unfilteredCommands;
+                        return;
+                    }
+                    var newCommands = [];
+                    if (filtered) {
+                        filtered.forEach(function(item) {
+                            newCommands.push(item);
+                        });
+                    }
+                    self.commands = newCommands;
+                },
+                
+                _handleKeyBoardFocus: function(e) {
+                    var self = this;
+                    console.log('focus');
+                    this._isLIsteningForKeyBoardBinding=true;
+                    Mousetrap.record(function(sequence) {
+                        // sequence is an array like ['ctrl+k', 'c']
+                        console.log('You pressed: ' + sequence.join(' '));
+                        self.set('_candidateBinding', sequence.join(''));
+                        self._isLIsteningForKeyBoardBinding=false;
+
+                    });
+
+                },
+                handleGamePadFocuse: function(e) {
+                    this.$.gamepad.disabled = false;
+                },
+                handleKeyboardClear: function(e) {
+                    this.$.keyboard.value = "";
+                },
+                handleGamePadClear: function(e) {
+                    this.$.gamepad.value = "";
+                },
+                _ongamepadModalClosed: function(e){
+                    //The child drop-down-menu appears to be triggering a cascading iron-behavior event that the 
+                    //close of the dialog is tied to.  Must filter that out.
+                    if (e.srcElement!==this.$.gamepadmodal){
+                        return;
+                    }
+                    var self=this;
+                    if (e.detail.confirmed) {
+                        //Check for duplicates in case they choose to unbind the conflicted command
+                        self.unfilteredCommands.filter(function(command) {
+                            return command.bindings.gamepad === self.$.candidategamepad.value;
+                        }).map(function(command){
+                            var index = self.commands.indexOf(command);
+                            self.set(`commands.${index}.bindings.gamepad`,'');
+                            self.updateActiveMapping(self.commands[index]);
+                        })
+
+                        var index = self.commands.indexOf(self.selectedItem);
+                        self.set(`commands.${index}.bindings.gamepad`,self.$.candidategamepad.value);
+                        self.updateActiveMapping(self.commands[index]);
+                        //self.selectedItem.bindings.keyboard = self._candidateBinding
+                        self._candidateBinding = '';
+                        self.SaveToCurrentSession();
+                    }
+                    else {
+                      self._candidateBinding ='';   
+                      self.selectedItem = null;
+                    }
+                },                
+                _onkeyboardModalClosed: function(e){
+                    var self=this;
+                    if (e.detail.confirmed) {
+                        //Check for duplicates in case they choose to unbind the conflicted command
+                        self.unfilteredCommands.filter(function(command) {
+                            return command.bindings.keyboard === self._candidateBinding;
+                        }).map(function(command){
+                            var index = self.commands.indexOf(command);
+                            self.set(`commands.${index}.bindings.keyboard`,'');
+                            self.updateActiveMapping(self.commands[index]);
+                        })
+
+                        var index = self.commands.indexOf(self.selectedItem);
+                        self.set(`commands.${index}.bindings.keyboard`,self._candidateBinding);
+                        self.updateActiveMapping(self.commands[index]);
+                        //self.selectedItem.bindings.keyboard = self._candidateBinding
+                        self._candidateBinding = '';
+                        self.SaveToCurrentSession();
+                    }
+                    else {
+                      self._candidateBinding ='';  
+                    }
+                },
+                _handleKeyboardChange: function(e){
+                    var self=this;
+                    this.selectedItem = e.model.item;
+                    this._candidateBinding=this.selectedItem.bindings.keyboard; 
+                    this.$.keyboardmodal.open();
+                },
+                _handleGamepadChange: function(e){
+                    this.selectedItem = e.model.item;
+                    this._candidateBinding=this.selectedItem.bindings.gamepad;                 
+                    this.$.gamepadmodal.open();
+                },
+                _isValidReplacementBinding: function(bindingType,candidateBinding,currentBinding){
+                    if (bindingType=="keyboard"){
+                        return ((candidateBinding!==currentBinding) &&  this._noConflictWithCandidate(candidateBinding,currentBinding));
+                    } else {
+                        return ((candidateBinding!==currentBinding) &&  this._noConflictWithCandidateGP(candidateBinding,currentBinding));
+                    }
+                },
+                _noConflictWithCandidateGP: function(canidate,original){
+                    var self=this;
+                    if (canidate == ''){
+                        return true;
+                    }
+                    if (canidate == original){
+                        return true
+                    }
+                    return !self.unfilteredCommands.some(function(command) {
+                        return command.bindings.gamepad === canidate;
+                    });                    
+                },                
+                _noConflictWithCandidate: function(canidate,original){
+                    var self=this;
+                    if (canidate == '' || canidate == undefined){
+                        return true;
+                    }
+                    if (canidate == original){
+                        return true
+                    }
+                    return !self.unfilteredCommands.some(function(command) {
+                        return command.bindings.keyboard === canidate;
+                    });                    
+                },
+                _handleClearBinding: function(){
+                    this._candidateBinding = ''; 
+                },
+                _handleCanidateGamePadSelected: function(e){
+                    //this._candidateBinding =e.srcElement.selected; 
+                }
+            })
+        })();
+    </script>
 
 </dom-module>

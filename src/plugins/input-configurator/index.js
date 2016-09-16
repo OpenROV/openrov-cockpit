@@ -21,6 +21,10 @@ inputConfigurator.prototype.getSettingSchema = function getSettingSchema(){
 									"type" : "boolean",
 									"default": false
 								},
+								"writtable": {
+									"type" : "boolean",
+									"default": true
+								},								
 								"bindings": {
 									"type": "array",
 									"uniqueItems": false,

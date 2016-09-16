@@ -31,6 +31,6 @@
     "paper-dialog": "PolymerElements/paper-dialog#^1.0.0",
     "paper-slider": "PolymerElements/paper-slider#^1.0.11",
     "polymer": "^1.2.0",
-    "webcomponentsjs": "^0.7.20"    
+    "webcomponentsjs": "^0.7.20"
   }
 }

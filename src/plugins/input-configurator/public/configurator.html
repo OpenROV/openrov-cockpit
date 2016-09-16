@@ -1,0 +1,134 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<polymer-element name="orov-input-configurator" attributes="time">
+  <template>
+    <link rel="stylesheet" href="../../../css/bootstrap.min.css">
+    <style type="text/css">
+      #controls {
+        max-height: 150px;
+        border: solid 1px black;
+        overflow: scroll;
+      }
+
+    </style>
+    <div id="controls" class="center">
+
+      <table id="commands" class="table">
+        <thead>
+          <tr>
+            <th>Command</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template repeat="{{item in commands}}">
+            <tr>
+              <td>{{item.name}}</td>
+              <td>{{item.description}}</td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+    <label for="find">Find:</label>
+    <input id="find" type="text" value="{{find}}" />
+    <div class="{{ selectedItem == undefined ? 'hidden' : '' }}">
+      <p>{{selectedItem.name}}: {{ selectedItem.description }}</p>
+      <label for="keyboard">Keyboard:</label>
+      <input id="keyboard" type="text" value="{{selectedItem.bindings.keyboard}}" />
+      <label for="gamepad">Gamepad:</label>
+      <input id="gamepad" type="text" value="{{selectedItem.bindings.gamepad}}" />
+    </div>
+  </template>
+  <script>
+      var keyboardMap = ["","","","CANCEL","","","HELP","","BACK_SPACE","TAB","","","CLEAR","ENTER","RETURN","","SHIFT","CTRL","ALT","PAUSE","CAPSLOCK","KANA","EISU","JUNJA","FINAL","HANJA","","ESC","CONVERT","NONCONVERT","ACCEPT","MODECHANGE","SPACE","PAGE_UP","PAGE_DOWN","END","HOME","LEFT","UP","RIGHT","DOWN","SELECT","PRINT","EXECUTE","PRINTSCREEN","INSERT","DELETE","","0","1","2","3","4","5","6","7","8","9",":",";","LESS_THAN","=","GREATER_THAN","QUESTION_MARK","AT","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","WIN","","CONTEXT_MENU","","SLEEP","NUMPAD0","NUMPAD1","NUMPAD2","NUMPAD3","NUMPAD4","NUMPAD5","NUMPAD6","NUMPAD7","NUMPAD8","NUMPAD9","MULTIPLY","ADD","SEPARATOR","SUBTRACT","DECIMAL","DIVIDE","F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12","F13","F14","F15","F16","F17","F18","F19","F20","F21","F22","F23","F24","","","","","","","","","NUM_LOCK","SCROLL_LOCK","WIN_OEM_FJ_JISHO","WIN_OEM_FJ_MASSHOU","WIN_OEM_FJ_TOUROKU","WIN_OEM_FJ_LOYA","WIN_OEM_FJ_ROYA","","","","","","","","","","CIRCUMFLEX","EXCLAMATION","\"","#","$","%","&","_","(",")","*","+","|","HYPHEN_MINUS","{","}","~","","","","","VOLUME_MUTE","VOLUME_DOWN","VOLUME_UP","","",";","=",",","-",".","/","`","","","","","","","","","","","","","","","","","","","","","","","","","","","[","\\","]","'","","META","ALTGR","","WIN_ICO_HELP","WIN_ICO_00","","WIN_ICO_CLEAR","","","WIN_OEM_RESET","WIN_OEM_JUMP","WIN_OEM_PA1","WIN_OEM_PA2","WIN_OEM_PA3","WIN_OEM_WSCTRL","WIN_OEM_CUSEL","WIN_OEM_ATTN","WIN_OEM_FINISH","WIN_OEM_COPY","WIN_OEM_AUTO","WIN_OEM_ENLW","WIN_OEM_BACKTAB","ATTN","CRSEL","EXSEL","EREOF","PLAY","ZOOM","","PA1","WIN_OEM_CLEAR",""];
+
+    Polymer({
+      commands: [],
+      find: '',
+      selectedItem: undefined,
+      findChanged: function() {
+        this.updateCommands();
+      },
+      commandsChanged: function() {
+        var self = this;
+        self.selectedItem = undefined;
+        $(this.$.commands).find('tr').each(function(){
+          $(this).css('cursor','pointer').hover(
+              function(){ 
+                  $(this).addClass('info');
+              },  
+              function(){ 
+                  $(this).removeClass('info'); 
+              }).click( function(){ 
+                  $(self.$.commands).find('tr').each(function(){
+                    $(this).removeClass('success');  
+                  });
+                  $(this).addClass('success');
+                  self.selectedItem = this.templateInstance.model.item; 
+              }
+          );
+        });
+      },
+      ready: function() {
+        var self = this;
+
+        this._commands = window.cockpit.extensionPoints.inputController.commands();
+        this.updateCommands();
+        
+         $(self.$.keyboard).keydown(function(event) {
+           var value = keyboardMap[event.which].toLowerCase();
+                if (value !== 'alt' && event.altKey) {
+                  value = "alt+" + value;
+                }
+                if (value !== 'ctrl' && event.ctrlKey) {
+                  value = "ctrl+" + value;
+                }
+                if (value !== 'shift' && event.shiftKey) {
+                  value = "shift+" + value;
+                }
+           $(self.$.keyboard).val(value);
+           event.preventDefault();
+         });
+
+         window.cockpit.on('systemPlugin.inputController.gamepad.buttonDown', function(button) {
+           if (self.selectedItem) {
+            $(self.$.gamepad).val(button);   
+           }
+         });         
+         window.cockpit.on('systemPlugin.inputController.gamepad.axisChanged', function(axis) {
+           if (self.selectedItem) {
+            $(self.$.gamepad).val(axis);   
+           }
+         });         
+      },
+      domReady: function() {
+        var self = this;
+        this.commandsChanged();
+      },
+      updateCommands: function() {
+        var self = this;
+        var filtered = this._commands;
+        if (this.find.length > 0) { 
+          filtered = 
+            this._commands.filter(function(item) {
+              var search = self.find.toLowerCase();
+              var nameContains = item.name.toLowerCase().indexOf(search) >= 0 ;
+              var descContains = item.description.toLowerCase().indexOf(search) >= 0;
+              return nameContains || descContains;
+            });
+        }
+        self.commands = [];
+        filtered.forEach(function(item) {
+          if (self.commands.indexOf(item) < 0) {
+            self.commands.push(item);
+          }
+        });        
+      }
+    });
+  </script>
+
+</polymer-element>
+  
+
+

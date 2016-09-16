@@ -42,6 +42,11 @@
   inputController.InputController.prototype.register = function (control) {
     this._register(control, true);
   };
+  
+  inputController.InputController.prototype.commands = function() {
+    return this.model.commands();
+  };
+
   inputController.InputController.prototype.listen = function listen() {
     var self = this;
     this.cockpit.on('InputController.activate', function (controls, fn) {
@@ -56,10 +61,14 @@
         fn();
       }
     });
-    this.cockpit.on('InputController.getCommands', function (fn) {
-      var commands = [];
-      if (fn !== undefined) {
-        fn(self.model.commands);
+    this.cockpit.on('InputController.getCommands',function(fn){
+      if (fn!==undefined){
+          // returning a clone of the commands so users can't just change things.
+          // To update a command send a InputController.updateBinding(controls) message.
+          var commands = self.model.commands.map(function(command) {
+            return { name: command.name, description: command.description, bindings: command.bindings, defaults: command.defaults }
+          });
+          fn(commands);
       }
     });
     this.cockpit.on('InputController.register', function (controls, fn) {
@@ -68,6 +77,30 @@
         fn();
       }
     });
+    this.cockpit.on('InputController.updateBinding', function(controls, fn) {
+      self.updateBinding(controls);
+      if (typeof(fn)=="function") {
+        fn();
+      }
+    });
+
+    this.cockpit.on('InpitController.suspendAll', function(fn) {
+      self.model.commands.forEach(function(command) {
+        self.suspend(command.name);
+      });
+      if (fn) {fn();}
+    });
+
+    this.cockpit.on('InpitController.resumeAll', function(fn) {
+      var commands = self.model.commands;
+      self.model.commands = [];
+      commands.forEach(function(command) {
+        self.resume(command.name);
+      });
+      if (fn) {fn();}
+    });
+
+
     /* Crawl the plugins looking for those with settings definitions */
     this.cockpit.loadedPlugins.forEach(function (plugin) {
       if (plugin.inputDefaults !== undefined) {
@@ -152,15 +185,55 @@
     var controlsToDeactivate = [].concat(controlName);
     controlsToDeactivate.forEach(function (commandName) {
       var command = self.registerdCommands[commandName];
-      command.active = false;
-      self.unregister(command);
-      command.replaced.forEach(function (oldcommand) {
-        self._register(oldcommand, false);
-        console.log('re-activated ' + oldcommand.name);
-      });
-      command.replaced = null;
-      console.log('Deactivated command ' + command.name);
+      if (command) {
+        command.active = false;
+        self.unregister(command);
+        command.replaced.forEach(function(oldcommand){
+          self._register(oldcommand, false);
+          console.log('re-activated ' + oldcommand.name);
+        });
+        command.replaced = [];
+        console.log('Deactivated command ' + command.name);
+      }
     });
   };
+
+  inputController.InputController.prototype.updateBinding = function(controls) {
+    var self = this;
+    if (controls === undefined)
+      return;
+    var controlsToUpdate = [].concat(controls);
+    controlsToUpdate.forEach(function(control) {
+      self.deactivate(control.name);
+      var command = self.registerdCommands[control.name];
+      if (command) {
+        for(var property in command.bindings) {
+            if (control.bindings[property] != undefined)
+            command.bindings[property] = control.bindings[property];
+        }
+        self.activate(control.name);
+      }
+    });
+
+  };
+
+  inputController.InputController.prototype.suspend = function(controlName) {
+    var self = this;
+    self.previouslyActiveCommands = self.model.commands
+      .filter(function(command) {return command.active});
+
+     self.controllers.forEach(function (controller) {
+       controller.reset();
+     });
+  };
+
+  inputController.InputController.prototype.resume = function(controlName) {
+    var self = this;
+    self.previouslyActiveCommands.forEach(function(command) {
+      self.register(command);
+    })
+  };
+
+
   window.Cockpit.plugins.push(inputController.InputController);
 }(window, document));

@@ -9,6 +9,8 @@ inputController.Command = function (control) {
   } else {
     self.name = control.name;
   }
+
+  self.replaced = [];
   self.description = control.description || self.name;
   if (control.down !== undefined)
     self.down = control.down;
@@ -17,8 +19,13 @@ inputController.Command = function (control) {
   if (control.axis !== undefined)
     self.axis = control.axis;
   self.defaults = control.defaults;
-  self.bindings = control.defaults;
-  // entry point to load binding values from configuration
+  if ( control.bindings ) {
+      self.bindings = control.bindings;
+  }
+  else {
+      self.bindings = control.defaults;
+  }
+
   self.active = control.active !== undefined ? control.active : true;
   return this;
 };

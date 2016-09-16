@@ -12,7 +12,7 @@ function Bridge() {
   var serialPort = {};
   var lastWriteTime = new Date();
   bridge.connect = function () {
-    serialPort = new SerialPort.SerialPort(uartPath, {
+    serialPort = new SerialPort(uartPath, {
       baudRate: uartBaud,
       parser: SerialPort.parsers.readline('\r\n')
     });

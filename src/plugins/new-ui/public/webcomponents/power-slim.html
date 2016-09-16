@@ -1,0 +1,27 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<link rel="import" href="../controllerboard2x/orov-power-behavior.html">
+<dom-module id="orov-newui-power-slim">
+  <style type="text/css">
+      #voltage
+      {
+        font-size: 1.6vw;
+      }
+      .value{
+        color: #ffffff;
+      }
+    </style>
+  <template>
+        <div id="voltage" class="time-cell text-center">{{__('BAT')}}:<span class="value">{{ formatVoltage(voltage) }}</span></div>
+  </template>
+  <script>
+    Polymer({
+      is: 'orov-newui-power-slim',
+      behaviors: [namespace('behaviors').oROVStandard,namespace('behaviors').oROVpowerBehavior],
+      formatVoltage: function (value) {
+        return value.toFixed(2);          
+      },
+    });
+
+  </script>
+</dom-module>

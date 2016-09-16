@@ -71,7 +71,7 @@
 				data: Array,
 			},
 			behaviors: [namespace('behaviors').oROVStandard],
-			registerEmitterHanlders: function(emitter) {
+			registerEmitterHandlers: function(emitter) {
 				var self = this;
 				emitter.on('plugin.engineering.data', function(data) {
 					if(data[self.type]){
@@ -117,8 +117,9 @@
 
 			},
 
-			ready: function() {
-
+			attached: function() {
+				//TODO: This references a global d3 object, so it should have code that creates the imports the 
+				//script and checks to make sure it is available before running.
 				if(!this.data) this.data = [];
 
 				this.elem = this.$.chart;

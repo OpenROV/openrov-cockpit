@@ -6,7 +6,9 @@
 
 <link rel="import" href="components/ui-manager/orov-appletswitcher.html">
 <link rel="import" href="components/cloud-profile/orov-login.html">
-<link rel="import" href="components/peer-view/orov-mc-status-indicator.html">
+<link rel="import" href="components/ui-manager/orov-panel.html">
+
+<!--link rel="import" href="components/peer-view/orov-mc-status-indicator.html"-->
 
 <!--This example shows how to selectivly apply settings per applet that override the overall style sheet-->
 <template is="dom-if" restamp=true if="{{!displaySection(routedata.page,'cockpit')}}">
@@ -24,21 +26,50 @@ body {
   color: white;
   font-size: 2vh;
 }
+.brand {
+  height:100%
+}
+.alerts {
+  display: inline-flex;
+  justify-content: flex-start;
+  align-items: center; 
+}
+
+.alerts > * {
+  flex-basis: 20px;;
+}
 </style>
 
 
-<div class="navbar navbar-inverse navbar-fixed-top navbar-collapse">
-  <div id="newuiTopbar" class="container"><div class="navbar-header"><a class="navbar-brand" href="#"><img src="themes/OpenROV/img/openrov.png" class="logo"><span class="navbar-titel">{{__('Cockpit')}}</span></a></div>
-    <div class="online-indicator" hidden="{{rovOnline}}">ROV Offline</div>
-    <div class="user-role">{{userRole}}</div>
-    <div class="global-indicators">
-      <orov-mc-status-indicator event-emitter="{{cockpitEventEmitter}}" ></orov-mc-status-indicator>
+<div class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <!--button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button-->      
+      <a class="navbar-brand" href="#">
+        <img alt="OpenROV" src="themes/OpenROV/img/openrov.png" class="brand">
+      </a>
+      <p class="navbar-text">{{__('Cockpit')}}</p>
     </div>
-    <div id="menu">
-      <div id="menuitems" class="nav pull-right navbar-nav">
-        <li><orov-login event-emitter="{{cockpitEventEmitter}}" /></li>
-        <li><orov-appletswitcher event-emitter="{{cockpitEventEmitter}}" selection="{{routedata.page}}" horizontal-offset='-200'></orov-appletswitcher></li>
-      </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="navStatus">
+      <p class="navbar-text online-indicator" hidden="{{rovOnline}}">{{__('ROV Offline')}}</p>
+      <p class="navbar-text user-role">{{userRole}}</p>
+      <orov-panel class="navbar-form alerts" event-emitter="{{cockpitEventEmitter}}" panel-type="warning-display"></orov-panel>
+      <!--orov-mc-status-indicator class="navbar-text" event-emitter="{{cockpitEventEmitter}}" ></orov-mc-status-indicator-->
+
+      <!-- Using pull-right instead of navbar-right due to known bug in navbar magins -->
+      <orov-appletswitcher class="navbar-btn pull-right" style="display:inline-block; height:30px" event-emitter="{{cockpitEventEmitter}}" selection="{{routedata.page}}" horizontal-offset='-200'></orov-appletswitcher>      
+      <orov-login class="navbar-btn pull-right" event-emitter="{{cockpitEventEmitter}}" />
     </div>
+    <div class="navbar-toggle collapsed" data-toggle="collapse" id="navStatus2">
+      <orov-appletswitcher class="navbar-btn pull-right" style="display:inline-block; height:30px" event-emitter="{{cockpitEventEmitter}}" selection="{{routedata.page}}" horizontal-offset='-200'></orov-appletswitcher>      
+    </div>
+
   </div>
 </div>

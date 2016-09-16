@@ -1,48 +1,55 @@
-[![Views in the last 24 hours](https://sourcegraph.com/api/repos/github.com/OpenROV/openrov-cockpit/counters/views-24h.png)](https://sourcegraph.com/github.com/OpenROV/openrov-cockpit)
-[![Build Status](https://secure.travis-ci.org/OpenROV/openrov-cockpit.png?branch=master)](http://travis-ci.org/OpenROV/openrov-cockpit)
-[![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/OpenROV/openrov-cockpit/badges/quality-score.png?s=c24130cbf17aaa23f2680e3b45a0ec675ef2037f)](https://scrutinizer-ci.com/g/OpenROV/openrov-cockpit/)
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/OpenROV/discuss?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![bitHound Overall Score](https://www.bithound.io/github/OpenROV/openrov-cockpit/badges/score.svg)](https://www.bithound.io/github/OpenROV/openrov-cockpit)
 
-OpenROV Cockpit
-================
+# [OpenROV](http://openrov.com/) Cockpit
 
-"[OpenROV](http://openrov.com/) is a DIY telerobotics community centered around underwater exploration & adventure."  One goal of OpenROV is to have onboard video for live viewing as the user operates the ROV.  Enter: OpenROV Cockpit.
+The Cockpit is the UI and control systems for any remote operated vehicle or device.  It is the heart of the OpenROV series of Underwater Robots.  
+Built on the latest and greatest web standards, Cockpit works with embedded Linux and micro-controllers to provide tele-robotic control of those systems.  
 
-The Cockpit project provides the UI and system integration to the hardware of the ROV.  It is a node.js application that is intended to run on the ROV directly that serves a HTML5 Single Page Application to a browser which uses either keyboard, gamepad, or touch to send commands back to the ROV.  
+## Key Features
+* Connect to cockpit on mobile, desktops, and tablets, no installation required
+* In browser near real-time h.264/MJPEG video viewing with sub 120ms latency
+* Gamepad, keyboard, and joystick control (fully configurable)
+* Gyro/Accelerometer stabilized flight controls 
+* GPU based video filters and computer augmented video
+* Fully extensible plugin based architecture
+* Community supported themes and plugins
+* In browser recording and playback of video and sensor telemetry
+* Support for language translations
+* Backup of data and video to the cloud
+* Notification and control of system upgrades
+* Built in configurations for many ROV motor configurations
+* Peer to Peer distribution of real-time video and control
+* Live streaming of video and data
+* And MUCH MUCH more
 
-Cockpit provides a socket.io based API for low latency communication with the ROV.
 
-Getting started
----------------
+# Getting started
+The fastest way to see the software running if your don't already have it installed on a robot is to follow [these](docs/DEV-HOWTO.md) instructions to get it running on your local computer.
 
-Get a working environment
-=========================
+# Related Projects
 
-*On a beaglebone:*
-**If you just getting started and want to have working environment for the OpenROV Cockpit, we recommend that you start with using our lastest stable release as reference from the readme in [openrov-software](https://github.com/OpenROV/openrov-software)**
+openrov-cockpit is one of several packages that are combined together to enable control of an ROV.  Refer to the [openrov-software](https://github.com/OpenROV/openrov-software) for a list of the other packages.
 
-*On a computer:*
-Follow our developer guide:
-https://github.com/OpenROV/openrov-software/tree/master/developer_guide
-
-Key Related Projects
-----------------
-
-openrov-cockpit is one of serveral packages that are combined together to enable control of an ROV.  Refer to the [openrov-software](https://github.com/OpenROV/openrov-software) for a list of the other pacakges.
-
-Requirements for running without a video abstaction
-------------
-- USB webcam:  we're using the Genius F100 HD
+### Requirements to run locally (vs embedded on a robot)
+- USB webcam:  UVC compatible camera that supports MJPEG compression
 - mjpg-streamer:  [http://sourceforge.net/projects/mjpg-streamer/](http://sourceforge.net/projects/mjpg-streamer/)
-- Node.js :  [http://nodejs.org/](http://nodejs.org/)
-- Socket.io:  [http://socket.io/](http://socket.io/)
+- ffmpeg: (to simulate the h.264 video pipeline)
+- Node.js:  [http://nodejs.org/](http://nodejs.org/)
 
-Plugins
-------------
-You can create your own plugins and share them with the community. Take a look at our [openrov-grunt-init-plugin](https://github.com/openrov/openrov-grunt-init-plugin) project.  
+For embedding in the robotic system, openrov-cockpit is typically installed with several other packages that also include drivers and configuration for various hardware solutions.  We provide images for the OpenROV products. If you have questions about installing on other devices, reach out to us on Gitter or the [OpenROV Forums](http://forum.openrov.com).
 
-How to Contribute
-------------
+
+# How to Contribute
+
+Review the 
+* [Dev-HowTo](docs/DEV-HOWTO.md)
+* [Issues List](https://github.com/openrov/openrov-software/issues)
+* [Creating Plugins](docs/CREATING-PLUGINS.md)
+
+Filing issues: We have centralized all issues in the umbrella [openrov-software project](https://github.com/openrov/openrov-software/issues)
+
+> Contributions come in all forms, from creating features, fixing bugs, creating documentation, translating languages, writing tests, testings, etc... if you want to help and are not sure how, reach out to us on gitter.
 
 1) Fork the project in github
 
@@ -56,4 +63,4 @@ How to Contribute
 
 Someone on the team will review the pull request and ensure the changes work on the ROVs before approving the pull request.
 
-env 'plugins__ui-manager__selectedUI=new-ui' USE_MOCK=true video_port=8092 photoDirectory="/tmp" plugins__video__forward_camera_url="http://localhost:8092/?action=stream" configfile="/tmp/rovconfig.js" forever -w -c 'node --debug' cockpit.js  
+* Currently developed and tested against Chrome, but should work with Firefox.  Looking for testers to check Edge and Safari.

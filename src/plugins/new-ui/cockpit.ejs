@@ -1,19 +1,29 @@
 <link rel="import" href="components/polymer/polymer.html">
 
 <link rel="import" href="components/new-ui/time.html">
+<link rel="import" href="components/new-ui/time-slim.html">
 <link rel="import" href="components/new-ui/compass.html">
 <link rel="import" href="components/new-ui/depth.html">
 <link rel="import" href="components/new-ui/throttle.html">
 <link rel="import" href="components/new-ui/switches.html">
+<link rel="import" href="components/new-ui/switches.html">
 <link rel="import" href="components/new-ui/power.html">
+<link rel="import" href="components/new-ui/power-slim.html">
 <link rel="import" href="components/diagnostics/diagnostics.html">
 <link rel="import" href="components/video/orov-video.html">
 <link rel="import" href="components/navigation-data/orov-horizon.html">
 <link rel="import" href="components/connection-health/orov-ping-graph.html">
 <link rel="import" href="components/internet-stream/orov-twitch-stream-status.html">
 <link rel="import" href="components/settings-manager/orov-settings-manager.html">
+<link rel="import" href="components/iron-media-query/iron-media-query.html">
 
 <!--script type='text/javascript' src="js/no-scroll-fullscreen-viewport.js"></script-->
+<style>
+  #time-item[short-layout]{
+        display: none;
+  }
+</style>
+<!--iron-media-query query="(max-height: 600px)" query-matches="{{short}}"></iron-media-query-->
 
   <div id="UI" class="full-height">
         <div id="newuiBody" class="full-height">
@@ -27,6 +37,10 @@
                 <orov-twitch-stream-status style='position:absolute; top:0px; left:0px; z-index:33;' event-emitter="{{cockpitEventEmitter}}"></orov-twitch-stream-status>
 
                 <orov-horizon id="horizon" style='position:absolute; top:0px; left:0px; z-index:33; width:100%; height:100%' event-emitter="{{cockpitEventEmitter}}"></orov-horizon>
+                <div style='position:absolute; top:0px; left:0px; z-index:33; display:flex'>
+                  <orov-newui-time-slim  id="time-item-collapsed" style="margin:5px" event-emitter="{{cockpitEventEmitter}}"></orov-newui-time-slim>
+                  <orov-newui-power-slim  id="power-item-collapsed"  style="margin:5px" event-emitter="{{cockpitEventEmitter}}"></orov-newui-power-slim>
+                </div>
               </orov-video>
             </div>
             <div id="newuiControlpad">
@@ -51,6 +65,14 @@
                   <orov-newui-throttle id="newui-throttle" class="center control" event-emitter="{{cockpitEventEmitter}}"></orov-newui-throttle>
                 </div>
               </div>
+              <div class="newui-item" id="switches-item">
+                <div class="center">
+                  <h4>{{__('Switches')}}</h4>
+                  <div id="newui-switches" class="center control">
+                    <orov-newui-switches class="center" event-emitter="{{cockpitEventEmitter}}"></orov-newui-switches>
+                  </div>
+                </div>
+              </div>              
               <div class="newui-item" id="power-item">
                 <div class="center">
                   <h4>{{__('Battery')}}</h4>
@@ -58,20 +80,12 @@
                     <orov-newui-power id="power" event-emitter="{{cockpitEventEmitter}}"></orov-newui-power>
                   </div>
                 </div>
-              </div>
-              <div class="newui-item" id="switches-item">
-                <div class="center">
-                  <h4>{{__('Switches')}}</h4>
-                  <div id="newui-switches" class="center control">
-                    <orov-newui-switches id="newui-switches" class="center" event-emitter="{{cockpitEventEmitter}}"></orov-newui-switches>
-                  </div>
-                </div>
-              </div>
-              <div class="newui-item" id="time-item">
+              </div>              
+              <div class="newui-item" short-layout$="{{short}}" id="time-item">
                 <div class="center">
                   <h4>{{__('Time')}}</h4>
                   <div id="newui-time" class="center control">
-                    <orov-newui-time event-emitter="{{cockpitEventEmitter}}"></orov-newui-time>
+                    <orov-newui-time event-emitter="{{cockpitEventEmitter}}" below-the-fold="{{testing}}"></orov-newui-time>
                   </div>
                 </div>
               </div>

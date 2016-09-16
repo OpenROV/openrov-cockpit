@@ -1,0 +1,64 @@
+<link rel="import" href="../polymer/polymer.html">
+<script>
+  (function(window) {
+    'use strict';
+    var validStates=["on","off","switching",undefined]
+    //ensure the namespace exists in the window object
+    if(!(window.OROV)){window.OROV={}}
+    if(!(window.OROV.behaviors)){window.OROV.behaviors={}}
+    
+
+  /**
+   * Behavior that highlights stuff.
+   *
+   * @polymerBehavior
+   * 
+   */    
+    window.OROV.behaviors.switchBehavior = {
+      /**
+       * Fired when `switch` changes its state.
+       *
+       * @event switched
+       * @param {string} new state of switch.
+       */  
+      properties: {
+        /** State of the switch.
+         * 
+         * possible values: on,off,switching
+         */
+        switchState: {
+          type: String,
+          observer:"_handleStateChange",
+          notify:true,
+          value:function(){return "off"}
+        },
+        /** The panel that this switch is most symantically compatible with. */ 
+        defaultPanel:{type:String},
+        /** The 3 letter short name for the switch. */ 
+        shortName:{type:String},
+        /** Description of the switch. */         
+        description:{type:String}        
+      },
+     /**
+     * Turn on the switch `element`. 
+     */
+      on: function(){
+        this.set("switchState","on");
+      },
+     /**
+     * Turn off the switch `element`. 
+     */      
+      off: function(){
+        this.set("switchState","off");
+      },
+    
+      _handleStateChange: function(newValue, oldValue){
+        if (!validStates.includes(newValue)){
+          this.switchState=oldValue;
+          throw(new Error(newValue + " is not a valid state for a switch"))
+        }
+        this.fire('switched',newValue)
+      }
+    }
+  })(window);
+</script>

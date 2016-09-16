@@ -2,6 +2,7 @@
 <link rel="import" href="../orov-behaviors/orov-behavior.html">
 <script src="https://cdn.auth0.com/js/lock-9.1.min.js"></script>
 <script src="../orov-behaviors/utilities.js"></script>
+<script src="../jwt-decode/build/jwt-decode.min.js"></script>
 <script>
 (function (window) {
   'use strict';
@@ -20,9 +21,9 @@
       behaviors: [namespace('behaviors').oROVStandard],
      attached: function(){
         var self=this;
-        if(typeof(this.registerEmitterHanlders)=='function'){
-          var org = this.registerEmitterHanlders;
-          this.registerEmitterHanlders=function(emitter){
+        if(typeof(this.registerEmitterHandlers)=='function'){
+          var org = this.registerEmitterHandlers;
+          this.registerEmitterHandlers=function(emitter){
             self.registerBaseEmitterHanlders(emitter);
             org(emitter);
           };
@@ -38,52 +39,107 @@
         }
       },
       ready: function(){
-        this.lock = new Auth0Lock('VeVsaT3dNLVt1Kv5xIx8GgW69mommmvQ', 'openrov.auth0.com');
-        if (localStorage.getItem('id_token')!=null){
-          this.set('loggedIn',true);
-          var profile = localStorage.getItem('id_profile');
-          if (profile !== null){
-            profile=JSON.parse(profile);
-          }
-          if (profile!==null){
-            var d = new Date();
-            var e = new Date(profile.exp*1000);
-            if(d>e){
-              localStorage.removeItem('id_profile');
-              localStorage.removeItem('id_token');
-              this.set('loggedIn',false);             
-            }
-          }
-          if ((profile!==null)&&(profile.picture!==undefined)){
-            this.profilePictureURL=profile.picture;
-          }
-        } else {
+        var self=this;
+        this.lock = new Auth0Lock('BWcCxwJdMnHP7Y3pKCNtbp5IA6o5lKlb', 'openrov.auth0.com');
+
+        if (localStorage.getItem('refresh_token')==null){
           this.loggedIn=false;
+          localStorage.removeItem('id_profile');
+          localStorage.removeItem('id_token');          
+          return;
+        } 
+
+        if (localStorage.getItem('id_token')!=null){
+          if (localStorage.getItem('id_token_expires')<=Date.now()){
+            localStorage.removeItem('id_token');
+            localStorage.removeItem('id_token_expires');
+            localStorage.removeItem('id_profile');                        
+          }
         }
+
+       Promise.resolve()
+       .then(function(){
+        if (localStorage.getItem('id_token')==null){
+          return new Promise(function(resolve,reject){
+            self.lock.getClient().refreshToken(localStorage.getItem('refresh_token'), function (err, delegationResult) {
+              // Get here the new JWT via delegationResult.id_token
+              if (err){
+                //possible remove refresh_token?
+                reject();
+              } else {
+                localStorage.setItem('id_token', delegationResult.id_token);
+                var jwt =  jwt_decode(delegationResult.id_token)
+                var e = new Date(jwt.exp*1000);
+                localStorage.setItem('id_token_expires', e);
+                resolve(delegationResult.id_token);                             
+              } 
+            }); 
+          })
+        } else {
+          return localStorage.getItem('id_token');
+        }
+       })
+       .then(function(id_token){
+          self.set('loggedIn',true);
+          if (localStorage.getItem('id_profile')!==null){
+            return JSON.parse(localStorage.getItem('id_profile'))
+          } else {
+              return new Promise(function(resolve,reject){
+
+                self.lock.getProfile(id_token, function (err, profile) {
+                    if (err) {
+                      console.error('There was an error getting the profile: ' + err.message);
+                      reject();
+                    }
+
+                    localStorage.setItem('id_profile', JSON.stringify(profile));
+                    resolve(profile);
+                });  
+
+              });
+
+          }
+       })
+       .then(function(profile){
+          if (profile.picture!==undefined){
+            self.profilePictureURL=profile.picture;
+          }
+          if(self.eventEmitter){
+            self.eventEmitter.emit('cloudprofile-status',{loggedIn:true,profile:profile});  
+          }
+
+       })
+
+
       },
       showLogin: function(){
         var self=this;
         if (localStorage.getItem('id_token')==null){
-          this.lock.show({ authParams: { scope: 'openid profile' },icon:'https://s3.amazonaws.com/openrov-com-assets/openrov_community_banner_690x138.png',socialBigButtons: true },function (err, profile, token) {
+          this.lock.show({ authParams: { scope: 'openid profile offline_access' },icon:'https://s3.amazonaws.com/openrov-com-assets/openrov_community_banner_690x138.png',socialBigButtons: true },function (err, profile, token, access_token, state, refresh_token) {
             if (err){
               console.alert('Error logging in:', JSON.stringify(err));
               self.eventEmitter.emit('cloudprofile-status',{loggedIn:false,profile:null});
               localStorage.removeItem('id_profile');
               self.loggedIn=false;
               return; //TODO: Better handling of canceling
-            }
+            }  
             localStorage.setItem('id_token', token);
+            var jwt =  jwt_decode(token)
+            var e = new Date(jwt.exp*1000);
+            localStorage.setItem('id_token_expires', e);
+            localStorage.setItem('refresh_token',refresh_token); 
+            self.loggedIn=true;                     
             localStorage.setItem('id_profile', JSON.stringify(profile));
-            self.loggedIn=true;
             self.profilePictureURL=profile.picture;
             console.log(JSON.stringify(profile));
-            self.eventEmitter.emit('cloudprofile-status',{loggedIn:true,profile:profile});
+            self.eventEmitter.emit('cloudprofile-status',{loggedIn:true,profile:profile});  
           });
         }
       },
       logout: function(){
         localStorage.removeItem('id_token');
         localStorage.removeItem('id_profile');
+        localStorage.removeItem('refresh_token');        
         this.eventEmitter.emit('cloudprofile-status',{loggedIn:false,profile:null});
         this.loggedIn=false;
       }

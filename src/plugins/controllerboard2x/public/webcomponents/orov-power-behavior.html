@@ -1,0 +1,106 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+  <script>
+    (function () {
+      var lastData = null;
+      var newData = null;
+      var behaviors = namespace('behaviors');
+      behaviors.oROVpowerBehavior = {
+        properties: {
+          current: {
+            type: Object,
+            value: function () {
+              return {
+                min: 0,
+                max: 2
+              };
+            }
+          },
+          portCurrent: {
+            type: Number,
+            value: function(){return 0.1}
+          },
+          maxVoltage: {
+            type: Number,
+            value: 8
+          },
+          minVoltage: {
+            type: Number,
+            value: 4
+          },
+          starboardCurrent: {
+            type: Number,
+            value: function(){return 0.1}
+          },
+          voltage: {
+            type: Number,
+            value: function(){return 5}
+          }
+        },
+        behaviors: [namespace('behaviors').oROVStandard],
+        registerBaseEmitterHanlders: function(emitter) {
+          var self = this;
+
+          emitter.on('plugin.controllerboard2x.systemPower.update', function(data){
+            newData = data;
+
+          });
+          setInterval(function(){
+            if (newData==lastData) return;
+            lastData=newData;
+            var data=newData;
+              if ('voltage' in data.board){
+                self.setVoltage(parseFloat(data.board.voltage));
+              };
+
+              if ('port' in data.battery.current){
+                self.setportBattery(parseFloat(data.battery.current.port));
+              };
+
+              if ('starboard' in data.battery.current){
+                self.setstarboardBattery(parseFloat(data.battery.current.starboard));
+              };            
+            
+          },500)
+
+          emitter.withHistory.on('settings-change.batteryDefintions', function(settings){
+            var selectedBattery = settings.batteryDefintions.selectedBattery;
+            var definition = settings.batteryDefintions.batteries.find(function(element,index,array){
+              if(element.name == selectedBattery) return true;
+              return false;
+            });
+            if (definition!==undefined){
+              self.minVoltage = definition.minVoltage;
+              self.maxVoltage = definition.maxVoltage;
+            }
+          });
+
+        },
+        setportBattery: function (current) {
+          this.portCurrent = current;
+        },
+        setstarboardBattery: function (current) {
+          this.starboardCurrent = current;
+        },
+        setVoltage: function (voltage) {
+          voltage = parseFloat(voltage);
+          this.set("voltage",voltage);
+        },
+        attached: function () {
+          var self = this;
+          this.setVoltage(this.voltage);
+          this.setportBattery(this.portCurrent);
+          this.setstarboardBattery(this.starboardCurrent);
+
+          if(typeof(this.registerEmitterHandlers)=='function'){
+            var org = this.registerEmitterHandlers;
+            this.registerEmitterHandlers=function(emitter){
+              self.registerBaseEmitterHanlders(emitter);
+              org(emitter);
+            };
+          } 
+          this.registerBaseEmitterHanlders(this.eventEmitter);
+        }
+      };
+    }());
+  </script>

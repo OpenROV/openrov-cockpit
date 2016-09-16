@@ -402,7 +402,7 @@
     case Gamepad.Type.XBOX:
       return Gamepad.Mapping.STANDARD;
     }
-    return Gamepad.Mapping.STANDARD; //if not found, just use standard
+    return Gamepad.Mapping.STANDARD;  //if not found, just use standard
   };
   /**
  * Registers given gamepad.
@@ -413,13 +413,11 @@
   Gamepad.prototype._connect = function (gamepad) {
     gamepad.type = this._resolveControllerType(gamepad);
     if (gamepad.type === Gamepad.Type.UNSUPPORTED) {
-      this._fire(Gamepad.Event.UNSUPPORTED, gamepad);
-      //return false;
+      this._fire(Gamepad.Event.UNSUPPORTED, gamepad);  //return false;
     }
     gamepad.libmapping = this._getMapping(gamepad.type);
     if (gamepad.libmapping === null) {
-      this._fire(Gamepad.Event.UNSUPPORTED, gamepad);
-      //return false;
+      this._fire(Gamepad.Event.UNSUPPORTED, gamepad);  //return false;
     }
     gamepad.state = {};
     gamepad.lastState = {};
@@ -461,11 +459,9 @@
  * @param {String} id Controller id
  * @return {String} Controller type, one of Gamepad.Type
  */
-
-Gamepad.prototype._resolveControllerType = function (gamepad) {
-
+  Gamepad.prototype._resolveControllerType = function (gamepad) {
     var id = gamepad.id.toLowerCase();
-    if (gamepad.mapping=='standard'){
+    if (gamepad.mapping == 'standard') {
       return Gamepad.Type.STANDARD;
     } else if (id.indexOf('rock candy') !== -1) {
       return Gamepad.Type.ROCKCANDY;

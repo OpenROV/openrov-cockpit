@@ -25,10 +25,11 @@
       Polymer({
         is: "orov-blackbox-status",
         properties: {
-          status: {type: Boolean, value: false, observer: '_statusChanged'}
+          status: {type: Boolean, value: false, observer: '_statusChanged'},
+          defaultPanel:{type:String,value:"warning-display"}
         },
         behaviors: [namespace('behaviors').oROVStandard],
-        registerEmitterHanlders: function(emitter){
+        registerEmitterHandlers: function(emitter){
           var self = this;
           emitter.on('plugin-blackbox-recording-status',function(status){
             self.status = status;

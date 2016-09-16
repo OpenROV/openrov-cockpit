@@ -1,0 +1,39 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="orov-esc-switch-behavior.html">
+<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
+<dom-module name="orov-esc-switch">
+<style>
+</style>
+<template>
+    <paper-toggle-button id="toggle" on-change="_handleSwitchChange" checked="[[_isActive()]]"></paper-toggle-button>
+</template>
+<script>
+
+(function() {
+  Polymer({
+    is:'orov-esc-switch',
+    properties: {
+    },
+    behaviors: [namespace('behaviors').oROVStandard,namespace('behaviors').oROVESCSwitch],
+    ready:function(){
+        this.defaultPanel="flight-switches";
+        this.shortName="ESC";
+        this.description="ESC Power on/off";
+    },
+    _handleSwitchChange:function(){
+        if (this.$.toggle.checked){
+            this.on();
+        } else {
+            this.off();
+        }
+    },
+    _isActive:function(switchState){
+        if(this.switchState=='on'){
+            return true;
+        }
+        return false;
+    }
+  })
+})();
+</script>
+</dom-module>

@@ -25,7 +25,7 @@
                  _registerEmitterHandlersCalled : {type: Boolean, value: false}
                },
                behaviors: [namespace('behaviors').oROVStandardImpl],
-               registerEmitterHanlders: function(emitter){
+               registerEmitterHandlers: function(emitter){
                  this._registerEmitterHandlersCalled=true;
                  emitter.on('test-message-1',function(callback){
                    return true;

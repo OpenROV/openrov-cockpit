@@ -13,7 +13,7 @@
   </style>
   <template>
       <span hidden="{{displayLoggedIn(loggedIn)}}">
-      <paper-menu-button>
+      <paper-menu-button style="padding:0">
         <paper-icon-button src='[[profilePictureURL]]' class="dropdown-trigger"></paper-icon-button>
         <paper-menu class="dropdown-content">
           <paper-item on-tap="logout">Logout</paper-item>
@@ -34,7 +34,7 @@
         displayLoggedIn: function(){
           return !this.loggedIn;
         },
-        registerEmitterHanlders: function(emitter){
+        registerEmitterHandlers: function(emitter){
           //Required so that the underlying behavior and also register emitter events
         }
       })

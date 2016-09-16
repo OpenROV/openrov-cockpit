@@ -1,0 +1,22 @@
+{
+  "name": "thrusters2x1",
+  "homepage": "https://github.com/BrianAdams/openrov-cockpit",
+  "authors": [
+    "BrianAdams <brian@babastik.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "paper-slider": "PolymerElements/paper-slider#^1.0.11",
+    "polymer": "^1.2.0",
+    "webcomponentsjs": "^0.7.20"    
+  }
+}

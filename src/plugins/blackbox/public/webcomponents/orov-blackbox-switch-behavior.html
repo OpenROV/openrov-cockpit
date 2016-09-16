@@ -1,0 +1,34 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<link rel="import" href="../ui-manager/switch-behavior.html">
+<script src="../orov-behaviors/utilities.js"></script>
+<script>
+(function (window) {
+  'use strict';
+      var switchBehaviorImpl= {
+      on:function(){
+        this.eventEmitter.emit('plugin-blackbox-recording-start')
+      },
+      off:function(){
+        this.eventEmitter.emit('plugin-blackbox-recording-stop')
+      },
+      registerEmitterHandlers: function(emitter){
+        var self = this;
+        emitter.withHistory.on('plugin-blackbox-recording-status',function(recording){
+          if (recording){
+            self.set('switchState','on')
+          } else {
+            self.set('switchState','off')
+          }
+        })
+      },
+      ready: function(){
+        var self=this;
+      }
+    }
+
+  var behaviors = namespace('behaviors');
+  behaviors.oROVblackboxwitch=[namespace('behaviors').oROVStandard,window.OROV.behaviors.switchBehavior,switchBehaviorImpl];
+
+  })(window);
+</script>

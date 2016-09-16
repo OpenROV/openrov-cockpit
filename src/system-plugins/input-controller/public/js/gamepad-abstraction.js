@@ -5,13 +5,12 @@
 //library.
 var inputController = namespace('systemPlugin.inputController');
 inputController.GamepadAbstraction = function (cockpit) {
-
   var gamepad = new HTML5Gamepad();
   var gp = {
-    cockpit: cockpit,
-    currentButton: undefined,
-    assignment: {}
-  };
+      cockpit: cockpit,
+      currentButton: undefined,
+      assignment: {}
+    };
   var isSupported = function () {
   };
   var ignoreInputUntil = 0;
@@ -23,8 +22,7 @@ inputController.GamepadAbstraction = function (cockpit) {
     var control = e.control;
     if (gp.currentButton === undefined) {
       gp.currentButton = e.control;
-    }
-    else {
+    } else {
       control = gp.currentButton + '+' + e.control;
     }
     if (gp.assignment[control] !== undefined) {
@@ -33,7 +31,9 @@ inputController.GamepadAbstraction = function (cockpit) {
     cockpit.emit('systemPlugin.inputController.gamepad.buttonDown', control);    
   });
   gamepad.bind(HTML5Gamepad.Event.BUTTON_UP, function (e) {
-    if (gp.currentButton === e.control) { gp.currentButton = undefined; }
+    if (gp.currentButton === e.control) {
+      gp.currentButton = undefined;
+    }
     if (gp.assignment[e.control] !== undefined) {
       if (gp.assignment[e.control].BUTTON_UP !== undefined) {
         gp.assignment[e.control].BUTTON_UP();
@@ -56,11 +56,11 @@ inputController.GamepadAbstraction = function (cockpit) {
   gamepad.bind(HTML5Gamepad.Event.CONNECTED, function (device) {
     ignoreInputUntil = new Date().getTime() + 1000;
     console.log('Controller connected', device);
-    gp.cockpit.emit('plugin.input.gamepad.state',{connected:true});
+    gp.cockpit.emit('plugin.input.gamepad.state', { connected: true });
   });
   gamepad.bind(HTML5Gamepad.Event.DISCONNECTED, function (device) {
     console.log('Controller disconnected', device);
-    gp.cockpit.emit('plugin.input.gamepad.state',{connected:false});
+    gp.cockpit.emit('plugin.input.gamepad.state', { connected: false });
   });
   gamepad.bind(HTML5Gamepad.Event.UNSUPPORTED, function (device) {
     console.log('Unsupported controller connected', device);

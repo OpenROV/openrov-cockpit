@@ -1,0 +1,74 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<dom-module name="orov-serial-monitor">
+  <style>
+  </style>
+  <template>
+    <input id='sendbox' type='text'>{{sendData}}</input><button on-click='send'>{{__('Send')}}</button>
+    <textarea id="serialMonitorList">
+    </textarea>
+    <button on-click='start'>{{__('Start')}}</button>
+    <button on-click='stop'>{{__('Stop')}}</button>
+
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        is: "orov-serial-monitor",
+        properties: {
+          maxLines: {type: Number, value: 500},
+          autoScroll: {type: Boolean, value: true},
+          sendData: {type: String}
+        },
+        behaviors: [namespace('behaviors').oROVStandard],
+        registerEmitterHandlers: function(emitter){
+          var self = this;
+          emitter.on('plugin.serial-monitor.serial-received',function(data){
+            var list = self.$.serialMonitorList;
+            var text = self.tail(self.maxLines, list.value.trim() + data);
+            list.value = text;
+            if (self.autoScroll){
+              list.scrollTop = list.scrollHeight;
+            }
+          });
+        },
+        send: function(){
+          if(this.eventEmitter!==undefined){
+            this.eventEmitter.emit('plugin.serial-monitor.serial-sent',this.$.sendbox.value);
+          }
+        },
+        countNewlines: function countNewlines(haystack) {
+          return this.count('\n', haystack);
+        },
+        count: function count(needle, haystack) {
+          var num = 0, len = haystack.length;
+          for (var i = 0; i < len; i++) {
+            if (haystack.charAt(i) === needle) {
+              num++;
+            }
+          }
+          return num;
+        },
+        tail: function tail(limit, haystack) {
+          var lines = this.countNewlines(haystack) + 1;
+          if (lines > limit) {
+            return haystack.split('\n').slice(-limit).join('\n');
+          }
+          return haystack;
+        },
+        start: function start(){
+          if (this.eventEmitter !== undefined){
+            this.eventEmitter.emit('plugin.serial-monitor.start');
+          }
+        },
+        stop: function stop(){
+          if (this.eventEmitter !== undefined){
+            this.eventEmitter.emit('plugin.serial-monitor.stop');
+          }
+        }
+
+      })
+    })();
+  </script>
+
+</dom-module>

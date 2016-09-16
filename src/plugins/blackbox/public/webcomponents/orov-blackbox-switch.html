@@ -1,0 +1,39 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="orov-blackbox-switch-behavior.html">
+<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
+<dom-module name="orov-blackbox-switch">
+<style>
+</style>
+<template>
+    <paper-toggle-button id="toggle" on-change="_handleSwitchChange" checked="[[_isActive()]]"></paper-toggle-button>
+</template>
+<script>
+
+(function() {
+  Polymer({
+    is:'orov-blackbox-switch',
+    properties: {
+    },
+    behaviors: [namespace('behaviors').oROVStandard,namespace('behaviors').oROVblackboxwitch],
+    ready:function(){
+        this.defaultPanel="flight-switches";
+        this.shortName="REC";
+        this.description="Recording on/off";
+    },
+    _handleSwitchChange:function(){
+        if (this.$.toggle.checked){
+            this.on();
+        } else {
+            this.off();
+        }
+    },
+    _isActive:function(switchState){
+        if(this.switchState=='on'){
+            return true;
+        }
+        return false;
+    }
+  })
+})();
+</script>
+</dom-module>

@@ -5,24 +5,22 @@
  *
  */
 var nconf = require('nconf');
-
 //Add your Mock objects here using this same naming convention of library-mock for the mock version.
 //be sure to add it to the expoft at the bottom of this file as well.
 var argv = require('optimist').argv;
-
-nconf.argv().env('__'); //Also look for overrides in environment settings
+nconf.argv().env('__');
+//Also look for overrides in environment settings
 // Will essentially rewrite the file when a change to the defaults are made if there is a parsing error.
 try {
-  nconf.use('file', { file: (nconf.get('configfile') ? nconf.get('configfile') : '/etc/rovconfig.json') });
+  nconf.use('file', { file: nconf.get('configfile') ? nconf.get('configfile') : '/etc/rovconfig.json' });
 } catch (err) {
   console.log('Unable to load the configuration file, resetting to defaults');
   console.log(err);
 }
 console.dir(nconf.get());
-nconf.env(); //Also look for overrides in environment settings
-
+nconf.env();
+//Also look for overrides in environment settings
 // Do not change these values in this file for an individual ROV, use the ./etc/rovconfig.json instead
-
 nconf.defaults({
   'deadzone_pos': 50,
   'deadzone_neg': 50,
@@ -35,11 +33,11 @@ nconf.defaults({
   'thrust_modifier_nport': 2,
   'thrust_modifier_nvertical': -2,
   'thrust_modifier_nstarbord': 2,
-  'debug' : false,
-  'debug_commands' : false,
-  'production' : true,
+  'debug': false,
+  'debug_commands': false,
+  'production': true,
   'sample_freq': 20,
-  'dead_zone':  10,
+  'dead_zone': 10,
   'video_frame_rate': 30,
   'video_resolution': 'SXGA',
   'video_device': '/dev/video0',
@@ -47,11 +45,11 @@ nconf.defaults({
   'port': 8080,
   'serial': '/dev/ttyO1',
   'serial_baud': 115200,
+  'systemDirectory': '/opt/openrov/system',
   'dashboardURL': '',
-  'USE_MOCK' : false,
-  'video_url' : '/rov/forward-camera'
+  'USE_MOCK': false,
+  'video_url': '/rov/forward-camera'
 });
-
 function savePreferences() {
   nconf.save(function (err) {
     if (err) {
@@ -61,7 +59,6 @@ function savePreferences() {
     console.log('Configuration saved successfully.');
   });
 }
-
 var getLibPath = function (lib) {
   var result = lib;
   if (nconf.get('USE_MOCK') === 'true') {
@@ -69,8 +66,6 @@ var getLibPath = function (lib) {
   }
   return result;
 };
-
-
 module.exports = {
   debug: nconf.get('debug'),
   debug_commands: nconf.get('debug_commands'),
@@ -87,6 +82,7 @@ module.exports = {
   serial_baud: nconf.get('serial_baud'),
   dashboardURL: nconf.get('dashboardURL'),
   preferences: nconf,
-  savePreferences: savePreferences
+  savePreferences: savePreferences,
+  systemDirectory: nconf.get('systemDirectory')
 };
 console.log('config', module.exports);

@@ -149,7 +149,7 @@ kbd.light, .light-keys kbd, .key.light, .light-keys .key {
         <template is="dom-repeat" items="[[commands]]">
             <tr>
                 <td>{{__(item.name)}}</td>
-                <td><kbd on-tap="_handleKeyboardChange">{{item.bindings.keyboard}}&nbsp;</kbd></td>
+                <td><kbd class="light" on-tap="_handleKeyboardChange">{{item.bindings.keyboard}}&nbsp;</kbd></td>
                 <td><kbd on-tap="_handleGamepadChange">{{item.bindings.gamepad}}&nbsp;</kbd></td>
                 <td>{{__(item.description)}}</td>
             </tr>
@@ -328,7 +328,7 @@ kbd.light, .light-keys kbd, .key.light, .light-keys .key {
                         this.eventEmitter.emit('InpitController.resumeAll')
                     }
                 },
-                registerEmitterHanlders: function(emitter) {
+                registerEmitterHandlers: function(emitter) {
                     var self = this;
 
                     emitter.withHistory.on('plugin.inputConfigurator.currentMap.update', function(keyMap) {

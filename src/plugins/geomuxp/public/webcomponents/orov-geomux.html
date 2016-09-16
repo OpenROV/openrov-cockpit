@@ -1,8 +1,8 @@
-<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-slider/paper-slider.html">
 <link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../paper-button/paper-button.html">
-<link rel="import" href="../../orov-behaviors/orov-behavior.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
 
 <dom-module id="orov-geomux">
   <style>
@@ -18,23 +18,23 @@
   
   <template>
 	  
-	<h4>0_0 Settings</h4>
+	<h4>Camera Settings</h4>
 
-	<paper-toggle-button checked={{settings.vui.enabled}} id="vui" on-change="SetBooleanValue">VUI</paper-toggle-button>
-	<paper-toggle-button checked={{settings.pict_timing.enabled}} id="pict_timing" on-change="SetBooleanValue">Picture Timing</paper-toggle-button>
+	<!--<paper-toggle-button checked={{settings.vui.enabled}} id="vui" on-change="SetBooleanValue">VUI</paper-toggle-button>
+	<paper-toggle-button checked={{settings.pict_timing.enabled}} id="pict_timing" on-change="SetBooleanValue">Picture Timing</paper-toggle-button>-->
 	<paper-toggle-button checked={{settings.flip_vertical.enabled}} id="flip_vertical" on-change="SetBooleanValue">Flip Vertical</paper-toggle-button>
 	<paper-toggle-button checked={{settings.flip_horizontal.enabled}} id="flip_horizontal" on-change="SetBooleanValue">Flip Horizontal</paper-toggle-button>
-	<paper-toggle-button checked={{settings.histogram_eq.enabled}} id="histogram_eq" on-change="SetBooleanValue">Histogram Equalization</paper-toggle-button>
-	
-	<span>Framerate</span><paper-slider value={{settings.framerate.value}} editable pin id="framerate" 	min="1" max="60" on-change="SetSimpleValue"></paper-slider>
+	<!--<paper-toggle-button checked={{settings.histogram_eq.enabled}} id="histogram_eq" on-change="SetBooleanValue">Histogram Equalization</paper-toggle-button>
+	-->
+	<span>Framerate</span><paper-slider value={{settings.framerate.value}} editable pin id="framerate" 	min="1" max="30" on-change="SetSimpleValue"></paper-slider>
 	<span>Bitrate</span><paper-slider value={{settings.bitrate.value}} editable pin id="bitrate" 	min="1000" max="10000000" on-change="SetSimpleValue"></paper-slider>
 	<span>GOP Length</span><paper-slider value={{settings.goplen.value}} editable pin id="goplen" 	min="1" max="300" on-change="SetSimpleValue"></paper-slider>
-	<span>GOP Hierarchy</span><paper-slider value={{settings.gop_hierarchy_level.value}} editable pin id="gop_hierarchy_level" 	min="0" max="4" on-change="SetSimpleValue"></paper-slider>
+	<!--<span>GOP Hierarchy</span><paper-slider value={{settings.gop_hierarchy_level.value}} editable pin id="gop_hierarchy_level" 	min="0" max="4" on-change="SetSimpleValue"></paper-slider>
 	
 	<span>Zoom</span><paper-slider value={{settings.zoom.value}} editable pin id="zoom" 	min="0" max="100" on-change="SetSimpleValue"></paper-slider>
 	<span>Pan</span><paper-slider value={{settings.pan.value}} editable pin id="pan" 	min="-648000" max="648000" on-change="SetSimpleValue"></paper-slider>
 	<span>Tilt</span><paper-slider value={{settings.tilt.value}} editable pin id="tilt" 	min="-648000" max="648000" on-change="SetSimpleValue"></paper-slider>
-	
+	-->
 	<span>Gamma</span><paper-slider value={{settings.gamma.value}} editable pin id="gamma" 		min="100" max="300" on-change="SetSimpleValue"></paper-slider>
 	<span>Contrast</span><paper-slider value={{settings.contrast.value}} editable pin id="contrast" 	min="0" max="200" on-change="SetSimpleValue"></paper-slider>
 	<span>Brightness</span><paper-slider value={{settings.brightness.value}} editable pin id="brightness" 	min="-255" max="255" on-change="SetSimpleValue"></paper-slider>
@@ -42,10 +42,10 @@
 	<span>Saturation</span><paper-slider value={{settings.saturation.value}} editable pin id="saturation" 	min="0" max="200" on-change="SetSimpleValue"></paper-slider>
 	<span>Gain</span><paper-slider value={{settings.gain.value}} editable pin id="gain" 	min="1" max="100" on-change="SetSimpleValue"></paper-slider>
 	<span>Sharpness</span><paper-slider value={{settings.sharpness.value}} editable pin id="sharpness" 	min="1" max="100" on-change="SetSimpleValue"></paper-slider>
-	<span>Max Analog Gain</span><paper-slider value={{settings.max_analog_gain.value}} editable pin id="max_analog_gain" 	min="0" max="15" on-change="SetSimpleValue"></paper-slider>
+	<!--<span>Max Analog Gain</span><paper-slider value={{settings.max_analog_gain.value}} editable pin id="max_analog_gain" 	min="0" max="15" on-change="SetSimpleValue"></paper-slider>
 	<span>Sharpen Filter</span><paper-slider value={{settings.sharpen_filter.value}} editable pin id="sharpen_filter" 	min="0" max="2" on-change="SetSimpleValue"></paper-slider>
 	<span>Minimum Autoexposure Framerate</span><paper-slider value={{settings.min_exp_framerate.value}} editable pin id="min_exp_framerate" 	min="0" max="30" on-change="SetSimpleValue"></paper-slider>
-	<span>Gain Multiplier</span><paper-slider value={{settings.gain_multiplier.value}} editable pin id="gain_multiplier" 	min="0" max="256" on-change="SetSimpleValue"></paper-slider>
+	<span>Gain Multiplier</span><paper-slider value={{settings.gain_multiplier.value}} editable pin id="gain_multiplier" 	min="0" max="256" on-change="SetSimpleValue"></paper-slider>-->
 
   </template>
   
@@ -63,7 +63,7 @@
 	  
       behaviors: [namespace('behaviors').oROVStandard],
 	  
-      registerEmitterHanlders: function(emitter) 
+      registerEmitterHandlers: function(emitter) 
 			{
 					var self = this;
 			

@@ -12,7 +12,7 @@
     <%
       var head = scriplets.find(function(item){return item.name=='head'});
     %>
-    <%if (header !== undefined){ %>
+    <%if (head !== undefined){ %>
     <%- include(head.path,{
       title: title,
       scripts: scripts,
@@ -72,6 +72,11 @@
 <link rel="import" href="components/app-route/app-location.html">
 <app-location use-hash-as-path url-space-regex="^/#/" route={{route}}></app-location>
 <app-route route="{{route}}" pattern="/:page" data={{routedata}} active="{{homeActive}}"></app-route>
+
+<link rel="import" href="components/ui-manager/orov-widget-registry.html">
+<orov-widget-registry event-emitter="{{cockpitEventEmitter}}">
+  <%=JSON.stringify(webcomponents);%>
+</orov-widget-registry>
 
   <%
     var header = scriplets.find(function(item){return item.name=='header'});

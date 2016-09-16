@@ -2,7 +2,7 @@
 <link rel="import" href="../orov-behaviors/orov-behavior.html">
 <link rel="import" href="orov-engineering-chart.html">
 <link rel="import" href="orov-engineering-button.html">
-<link rel="import" href="/components/video/container.html">
+<link rel="import" href="../video/orov-video.html">
 
 <script type="text/javascript" src="js/d3.min.js"></script>
 
@@ -210,7 +210,7 @@
           }
       },
       behaviors: [namespace('behaviors').oROVStandard],
-      registerEmitterHanlders: function(emitter) {
+      registerEmitterHandlers: function(emitter) {
         this.define = function(item,callback){
           emitter.emit('telemetry.getDefinition',item,callback);
         }
@@ -218,7 +218,7 @@
       getValue: function(change, index, path) {
         return this.get(path, change.base[index]);
       },
-      ready: function() {
+      attached: function() {
         var self = this;
         
         //set default to chart

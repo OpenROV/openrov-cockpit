@@ -15,7 +15,7 @@
           status: {type: Object, value: {status:'off',stats:{viewers:0,pilots:0},pilots:{}}, observer: '_statusChanged'}
         },
         behaviors: [namespace('behaviors').oROVStandard],
-        registerEmitterHanlders: function(emitter){
+        registerEmitterHandlers: function(emitter){
           var self = this;
           emitter.on('plugin-internetControl-status',function(status){
             self.status = status;
@@ -42,10 +42,12 @@
 
           }
           */
-          this.$.icon2.className = this.$.icon2.className.replace(/\boff\b/,'');
-          this.$.icon2.className = this.$.icon2.className.replace(/\bstarting\b/,'');
-          this.$.icon2.className = this.$.icon2.className.replace(/\bstreaming\b/,'');
-          this.$.icon2.className = this.$.icon2.className + ' ' + newv.status;
+          if (this.$.icon2!==undefined){ //This can get called before the control is attached
+            this.$.icon2.className = this.$.icon2.className.replace(/\boff\b/,'');
+            this.$.icon2.className = this.$.icon2.className.replace(/\bstarting\b/,'');
+            this.$.icon2.className = this.$.icon2.className.replace(/\bstreaming\b/,'');
+            this.$.icon2.className = this.$.icon2.className + ' ' + newv.status;
+          }
         },
         handleClick: function(){
           if (this.eventEmitter !== undefined){

@@ -26,21 +26,21 @@
 
       <iron-ajax
         auto
-        url='{{softwareUpdateCheckURL}}'
+        url='{{_softwareUpdateCheckURL}}'
         handle-as="json"
         last-response="{{data}}" //package version
         debounce-duration="300">
       </iron-ajax>
       <iron-ajax
         auto
-        url='{{currentVersionInfoURL}}'
+        url='{{_currentVersionInfoURL}}'
         handle-as="json"
         last-response="{{version}}" //package version
         debounce-duration="300">
       </iron-ajax>
       <iron-ajax
         auto
-        url='{{serialNumberURL}}'
+        url='{{_serialNumberURL}}'
         handle-as="json"
         last-response="{{sn}}" //package version
         debounce-duration="300">
@@ -69,8 +69,15 @@
               self.controlablePlugins = results;
             });
           }
+          //Delay the checks to prevent long holds on the xhttp client
+          setTimeout(function(){
+            this._softwareUpdateCheckURL = this.softwareUpdateCheckURL;
+            this._currentVersionInfoURL = this.currentVersionInfoURL;
+            this._serialNumberURL = this.serialNumberURL;
+            this._applyUpdateURL = this.applyUpdateURL;     
+          },10000)
         },
-        registerEmitterHanlders: function(emitter){
+        registerEmitterHandlers: function(emitter){
           var self = this;
 //          emitter.on('plugin.cameraTilt.angle',function(angle){
 //            self.servoAngle = angle;

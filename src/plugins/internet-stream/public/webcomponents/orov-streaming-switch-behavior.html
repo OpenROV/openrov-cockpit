@@ -1,0 +1,36 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<link rel="import" href="../ui-manager/switch-behavior.html">
+<script src="../orov-behaviors/utilities.js"></script>
+<script>
+(function (window) {
+  'use strict';
+      var switchBehaviorImpl= {
+      properties: {
+      },
+      on:function(){
+        this.eventEmitter.emit('internet-stream-start')
+      },
+      off:function(){
+        this.eventEmitter.emit('internet-stream-stop')
+      },
+      registerEmitterHandlers: function(emitter){
+        var self = this;
+        emitter.withHistory.on('internet-stream-status',function(state){
+          if (state.isStreaming||state.connecting){
+            self.set('switchState','on')
+          } else {
+            self.set('switchState','off')
+          }
+        })
+      },
+      ready: function(){
+        var self=this;
+      }
+    }
+
+  var behaviors = namespace('behaviors');
+  behaviors.oROVstreamingSwitch=[namespace('behaviors').oROVStandard,window.OROV.behaviors.switchBehavior,switchBehaviorImpl];
+
+  })(window);
+</script>

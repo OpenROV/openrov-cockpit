@@ -6,6 +6,10 @@
    paper-slider {
       width: 80%;
    }
+   .control-group {
+      margin-top: 10px;
+      background-color: aliceblue;
+   }
 
 </style>
 <template>
@@ -15,7 +19,7 @@
  <template is="dom-repeat" items="{{motors}}">
    <div class="control-group">
       <label class="control-label" for="{{item.name}}">{{__(item.name)}} {{__('Motor')}}</label><span style='margin-left: 4px; color: red' hidden$={{!item.reversed}} >({{__('Reversed')}})</span>
-      <paper-slider pin="true" min="-1" max="1" step="0.001" id="{{item.name}}" on-immediate-value-change='MotorPercentChange'></paper-slider>
+      <paper-slider pin="true" min="-1" max="1" step="0.001" id="{{item.name}}" on-immediate-value-change='MotorPercentChange' on-value-change='MotorPercentChange'></paper-slider>
       <span>[[formatPercent(item.percent)]]</span>
       <div>
         <button on-click='reverseFull'>-1</button>
@@ -31,14 +35,14 @@
   Polymer({
     is:'orov-thrusters2x1-motortest',
     properties: {
-      motors: {type: Array, value: [
+      motors: {type: Array, value: function(){return[
         {name:'port', percent: 0, reversed: false},
         {name:'vertical', percent: 0, reversed: false},
         {name:'starboard', percent: 0, reversed: false}
-      ]}
-    },
+      ]}}
+    },   
     behaviors: [namespace('behaviors').oROVStandard],
-    registerEmitterHanlders: function(emitter){
+    registerEmitterHandlers: function(emitter){
       var self = this;
       emitter.on('settings-change.thrusters2x1',function(settings){
         self.motors.forEach(function(motor){
@@ -53,11 +57,7 @@
     resolveMotorPercent: function(change,item){
       return this.motorPercent[item];
     },
-    MotorPercentChange: function(e){
-      var motor = e.srcElement.id;
-
-      //this.motorPercent[motor] = e.srcElement.immediateValue;
-      this.set('motors.'+e.model.index+'.percent', e.srcElement.immediateValue);
+    _handleMotorChange: function(){
       var motor_state =  {
                   port: this.motors[0].percent,
                   vertical: this.motors[1].percent,
@@ -68,21 +68,29 @@
       }
       this.fire('motor-state-change',motor_state);
     },
+    MotorPercentChange: function(e){
+      var motor = e.srcElement.id;
+      //this.motorPercent[motor] = e.srcElement.immediateValue;
+      this.set('motors.'+e.model.index+'.percent', e.srcElement.immediateValue);
+      this._handleMotorChange();
+    },
     reverseFull: function(e){
       this.set('motors.'+e.model.index+'.percent', -1.0);
       this.$$('#'+ e.model.item.name).value=-1.0;
+      this._handleMotorChange();
     },
     neutral: function(e){
       this.set('motors.'+e.model.index+'.percent', 0);
       this.$$('#'+ e.model.item.name).value=0;
+      this._handleMotorChange();
     },
     forwardFull: function(e){
       this.set('motors.'+e.model.index+'.percent', 1.0);
       this.$$('#'+ e.model.item.name).value=1.0;
+      this._handleMotorChange();
     },
     formatPercent: function(value){
       return value.toFixed(3);
-
     }
 
   })

@@ -1,0 +1,48 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<link rel="import" href="orov-elight-switch.html">
+<dom-module name="orov-elight-switch-collection">
+<style>
+</style>
+<template>
+</template>
+<script>
+
+(function() {
+  Polymer({
+    is:'orov-elight-switch-collection',
+    properties: {
+        widgetCollectionEventName:{type:String,value:function(){return this.is + Math.random();}},
+        collectionDomElement:{type:Object,value:function(){return null}}
+    },
+    behaviors: [namespace('behaviors').oROVStandard],
+    ready:function(){
+        this.defaultPanel="flight-switches";
+        this.shortName="XL";
+        this.description="Extra Lights on/off";
+    },
+    _addElement:function(tag,properties){
+        if (properties.eventEmitter==undefined){
+            properties.eventEmitter == this.eventEmitter;
+        }
+        properties.managedby=this.widgetCollectionEventName;
+        var el = this.create(tag,properties)
+        Polymer.dom(this.collectionDomElement).appendChild(el);
+//        if (this.eventEmitter!==undefined){
+//         this.eventEmitter.emit(this.widgetCollectionEventName,Polymer.dom(this).children);
+//        }
+    },
+    registerEmitterHandlers: function(emitter){
+        //listen for things that indicate I have to add/remove items from the collection
+        
+        //This is currently hardcoded per the code it replaces. 
+        //TODO: Add messages that specify what external lights exist
+        //  and then dynamically add the elements.
+        this._addElement("orov-elight-switch",{index:0});
+        this._addElement("orov-elight-switch",{index:1});
+     
+    }
+  })
+})();
+</script>
+</dom-module>

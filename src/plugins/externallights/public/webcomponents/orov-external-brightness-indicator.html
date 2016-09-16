@@ -77,7 +77,7 @@
         computedLevelClass : function(value){
           return 'level'+(Number(value).toFixed(1)*10);
         },
-        registerEmitterHanlders: function(emitter){
+        registerEmitterHandlers: function(emitter){
           var self = this;
           emitter.withHistory.on('plugin.lights.state',function(state){
             self.internal_brightnessLevel = state.level;

@@ -63,6 +63,7 @@
 				<grid-menu-button toggles id="lasers" action="callback" target="toggleLasers" icon="image:flare" label="Lasers"></grid-menu-button>
 				<grid-menu-button toggles id="heading" action="callback" target="toggleHeading" icon="maps:navigation" label="Heading"></grid-menu-button>
 				<grid-menu-button toggles id="depth" action="callback" target="toggleDepth" icon="icons:swap-vert" label="Depth"></grid-menu-button>
+				<grid-menu-button id="power" action="callback" target="incPower" icon="device:signal-cellular-1-bar" label="M.Power"></grid-menu-button>
 		</grid-menu>
 
 	</template>
@@ -81,6 +82,7 @@
 				},
 
 				behaviors: [namespace('behaviors').oROVStandard],
+				powerLevel: 0,
 
 				handleMenuSelection: function(e)
 				{
@@ -93,7 +95,7 @@
 					}
 				},
 				
-				registerEmitterHanlders: function(emitter){
+				registerEmitterHandlers: function(emitter){
 						var self=this;
              emitter.withHistory.on('plugin-blackbox-recording-status', function(recording){
 							 if(recording){
@@ -126,6 +128,12 @@
 								 self.$.heading.active=false;
 							 }
 						 });
+
+             emitter.withHistory.on('plugin.rovpilot.setPowerLevel', function(value){							 
+								 self.$.power.icon = "device:signal-cellular-" + (value-1) + "-bar";
+								 self.powerLevel=value;
+						 });
+
 						 
              emitter.withHistory.on('plugin.rovpilot.depthHold.state', function(state){
 							 if(state.enabled){
@@ -171,14 +179,16 @@
 					if( e.detail.active )
 					{
 						console.log( "turning lights on" );
-						this.eventEmitter.emit( 'plugin.lights.set', 1 );
-						this.eventEmitter.emit( 'plugin.externalLights.set', 1 );
+						this.eventEmitter.emit( 'plugin.lights.setOnOff', true );
+						this.eventEmitter.emit( 'plugin.externalLights.setOnOff', 0, true );
+						this.eventEmitter.emit( 'plugin.externalLights.setOnOff', 1, true );
 					}
 					else
 					{
 						console.log( "turning lights off" );
-						this.eventEmitter.emit( 'plugin.lights.set', 0 );
-						this.eventEmitter.emit( 'plugin.externalLights.set', 1 );
+						this.eventEmitter.emit( 'plugin.lights.setOnOff', 0 );
+						this.eventEmitter.emit( 'plugin.externalLights.setOnOff', 0, false );
+						this.eventEmitter.emit( 'plugin.externalLights.setOnOff', 1, false );
 					}
 				},
 
@@ -229,6 +239,14 @@
 						this.eventEmitter.emit( 'plugin.rovpilot.headingHold.set-enabled',false );
 					}
 				},
+				incPower: function(e){
+					this.powerLevel+=1;
+					if (this.powerLevel>5){
+						this.powerLevel=1;
+					}
+					this.eventEmitter.emit('plugin.rovpilot.setPowerLevel',this.powerLevel);
+				}
+				,
 
 				changeToDesktopUI: function( e )
 				{

@@ -1,5 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../orov-behaviors/orov-behavior.html">
+<link rel="import" href="../ui-manager/orov-panel-behavior.html">
 <dom-module id="orov-newui-switches">
   <style type="text/css">
       #switchesContainer {
@@ -8,6 +9,8 @@
       }
       .switches-header-row {
         display: table-row;
+        font-size: 1.1vw;
+        line-height: 1em;        
       }
       .switches-row {
         display: table-row;
@@ -18,12 +21,18 @@
       .switches-switch-off {
         display: table-cell;
         width: 30%;
+        transition:all 1s ease;
+        -webkit-transition-delay:all .15s ease;
+        -moz-transition-delay:all .15s ease;
+        -ms-transition-delay:all .15s ease;
+        -o-transition-delay:all .15s ease;        
       }
       .switches-switch-on {
         text-align: right;
         padding-right: 0.4em;
-        border-right: solid 1px white;
+        border-right: solid 1px white;        
       }
+      .
       .switches-switch-off {
         text-align: left;
         padding-left: 0.4em;
@@ -41,6 +50,8 @@
       .switch-off > .switches-switch-on { color: transparent }
       .switch-off > .switches-switch-off { color: #ffffff }
       .switchable { cursor: pointer }
+      .switch-off >.transitioning {color: red}
+      .switch-on >.transitioning {color: red}
 
     </style>
   <template>
@@ -49,247 +60,71 @@
         <div class="switches-switch-on">{{__('ON')}}</div>
         <div class="switches-switch-off">{{__('OFF')}}</div>
       </div>
-
+      <template is="dom-repeat" items="{{_coveredControls}}">
+        <div id="{{item.shortName}}" class-name="{{_getClasses(item.switchState)}}" title="{{__(item.description)}}">
+          <div class="switches-switch-on" on-tap="_handleClick">{{__(item.shortName)}}</div>
+          <div class="switches-switch-off" on-tap="_handleClick">{{__(item.shortName)}}</div>
+        </div>
+      </template>
     </div>
+        <content id="ctnt">
+        </content>
   </template>
   <script>
     (function () {
       Polymer({
         is: 'orov-newui-switches',
         properties: {
-          lastPing: {
-            value: function () {
-              return new Date();
-            }
-          },
-          switches: {
-            type: Object,
-            value: function () {
-              var self = this;
-              return {
-                COM: {
-                  switchable: false,
-                  state: false,
-                  events: [
-                    {message:'plugin.connection-health.state',fn: function(state){return state.connected;}}
-                  ],
-                  description: 'Communication status'
-                },
-                GPD: {
-                  switchable: false,
-                  state: false,
-                  events: [
-                    {message:'plugin.input.gamepad.state', fn: function(state){return state.connected;}}
-                  ],
-                  description: 'Gamepad active/inactive'
-                },
-                TNK: {
-                  switchable: true,
-                  state: false,
-                  events: [
-                    {message:'plugin.tankControl.state', fn: function(state){return state.enabled;}}
-                  ],
-                  description: 'Tank control active/inactive',
-                  switch: function () {
-                    if (self.eventEmitter !== undefined){
-                      self.eventEmitter.emit('plugin.tankControl.toggle');
-                    }
-                  }
-                },
-                DLK: {
-                  switchable: true,
-                  state: false,
-                  events: [
-                    {message:'plugin.rovpilot.depthHold.state',fn: function(state){return state.enabled;}}
-                  ],
-                  description: 'Depthhold active/inactive',
-                  switch: function (state) {
-                    if (self.eventEmitter !== undefined){
-                      self.eventEmitter.emit('plugin.rovpilot.depthHold.set-enabled',!state);
-                    }
-                  }
-                },
-                HLK: {
-                  switchable: true,
-                  state: false,
-                  events: [
-                    {message:'plugin.rovpilot.headingHold.state',fn: function(state){return state.enabled;}}
-                  ],
-                  description: 'Heading lock active/inactive',
-                  switch: function (state) {
-                    if (self.eventEmitter !== undefined){
-                      self.eventEmitter.emit('plugin.rovpilot.headingHold.set-enabled',!state);
-                    }
-                  }
-                },
-                LSR: {
-                  switchable: true,
-                  state: false,
-                  events: [
-                    {message:'plugin.laser.state',fn: function(state){return state.enabled;}}
-                  ],
-                  description: 'Lasers on/off',
-                  switch: function (state) {
-                    if (self.eventEmitter !== undefined){
-                      self.eventEmitter.emit('plugin.laser.set',state?0:1);
-                    }
-                  }
-                },
-                LED: {
-                  switchable: true,
-                  state: false,
-                  description: 'LED lights on/off',
-                  events: [
-                    {message:'plugin.lights.state',fn: function(state){return state.level>0;}}
-                  ],
-                  switch: function (state) {
-                    if (self.eventEmitter !== undefined){
-                      var level = 1;
-                      if (state==true) level = 0;
-                      self.eventEmitter.emit('plugin.lights.set',level);
-                    }
-                  }
-                },
-                XL0: {
-                  switchable: true,
-                  state: false,
-                  description: 'External LED lights on/off',
-                  events: [
-                    {message:'plugin.externalLights.level',fn: function(lightNum, level){ if( lightNum == 0){ return level > 0; } else{ return null; } }}
-                  ],
-                  switch: function (state) {
-                    if (self.eventEmitter !== undefined){
-                      var level = 1;
-                      if (state==true) level = 0;
-                      self.eventEmitter.emit('plugin.externalLights.set', 0, level);
-                    }
-                  }
-                },
-                XL1: {
-                  switchable: true,
-                  state: false,
-                  description: 'External LED lights on/off',
-                  events: [
-                    {message:'plugin.externalLights.level',fn: function(lightNum, level){if( lightNum == 1){ return level > 0; } else{ return null; } } }
-                  ],
-                  switch: function (state) {
-                    if (self.eventEmitter !== undefined){
-                      var level = 1;
-                      if (state==true) level = 0;
-                      self.eventEmitter.emit('plugin.externalLights.set', 1, level);
-                    }
-                  }
-                },
-                ESC: {
-                  switchable: true,
-                  state: false,
-                  events: [
-                    {message:'plugin.systemPower.state', fn: function(state){return state.escs_powered;}}
-                  ],
-                  description: 'ROV ESCs active/inactive',
-                  switch: function (state) {
-                    if (self.eventEmitter !== undefined){
-                      if (state) {
-                        self.eventEmitter.emit('plugin.systemPower.powerOffESCs');
-                      } else {
-                        self.eventEmitter.emit('plugin.systemPower.powerOnESCs');
-                      }
-                    }
-                  }
-                },
-                REC:{
-                  switchable: true,
-                  state: false,
-                  events: [
-                    {message:'plugin-blackbox-recording-status', fn: function(state){return state;}}
-                  ],
-                  description: 'ROV ESCs active/inactive',
-                  switch: function (state) {
-                    if (self.eventEmitter !== undefined){
-                      if (state) {
-                        self.eventEmitter.emit('plugin-blackbox-recording-stop');
-                      } else {
-                        self.eventEmitter.emit('plugin-blackbox-recording-start');
-                      }
-                    }
-                  }
-                },
-                STR:{
-                  switchable: true,
-                  state: false,
-                  events: [
-                    {message:'internet-stream-status', fn: function(state){return state.isStreaming||state.connecting;}}
-                  ],
-                  description: 'Internet stream video',
-                  switch: function (state) {
-                    if (self.eventEmitter !== undefined){
-                      if (state) {
-                        self.eventEmitter.emit('internet-stream-stop');
-                      } else {
-                        self.eventEmitter.emit('internet-stream-start');
-                      }
-                    }
-                  }
-                }
-              };
-            }
+          panelType:{type:String,value:function(){return "flight-switches"}},
+          _coveredControls:{type:Array}
+        },
+        behaviors: [namespace('behaviors').oROVStandard, namespace('behaviors').oROVPanel],
+        ready: function(){
+          this.listen(this, 'contentLoaded', '__oncontentLoaded');
+        },
+        __oncontentLoaded: function(){
+          var self=this;
+          this.set("_coveredControls",Polymer.dom(this).children.filter(function(item){return item.collectionDomElement==undefined}));
+          //TODO: on detach, remove the listeners
+          Polymer.dom(self).children.forEach(function(control){
+            control.addEventListener('switched',function(e){
+              self._swapStateClasses(self.$$("#"+control.shortName),e.detail);
+            })
+            control.style.display="none";
+          });
+        },
+        _getClasses:function(state){
+          switch(state){
+            case 'on':
+              return "switches-row switchable switch-on"
+            case 'off':
+              return "switches-row switchable switch-off"            
           }
         },
-        behaviors: [namespace('behaviors').oROVStandard],
-        registerEmitterHanlders: function(emitter) {
-          var self = this;
-          var container = $(this.$.switchesContainer);
-          this.$.switchesContainer.innerHTML='';
-          for (var aSwitch in self.switches) {
-            container.append('<div class="switches-row ' + (self.switches[aSwitch].switchable ? 'switchable' : '') + '" id="' + aSwitch + '" title="' + self.switches[aSwitch].description + '">' + '<div class="switches-switch-on">' + aSwitch + '</div>' + '<div class="switches-switch-off">' + aSwitch + '</div>' + '</div>');
-            if (self.switches[aSwitch].switchable) {
-              container.find('#' + aSwitch).click(function () {
-                var property = $(this).attr('id');
-                self.switch(property);
-                self.onSwitch(property);
-              });
-            }
-            this.registerListeners(aSwitch,emitter);
+        _swapStateClasses:function(element,state){
+          var elm = this.$$(".transitioning");
+          if (elm!==null){
+            elm.classList.remove("transitioning");
+          }
+          if(state=="on"){
+            element.classList.add("switch-on");            
+            element.classList.remove("switch-off");
+          } else {
+            element.classList.add("switch-off");
+            element.classList.remove("switch-on");                 
           }
         },
-        update: function () {
-          for (var aSwitch in this.switches) {
-            var theSwitch = $(this.$.switchesContainer).find('#' + aSwitch);
-            var toRemove = this.switches[aSwitch].state ? 'switch-off' : 'switch-on';
-            var toAdd = this.switches[aSwitch].state ? 'switch-on' : 'switch-off';
-            theSwitch.removeClass(toRemove);
-            theSwitch.addClass(toAdd);
+        _handleClick:function(e){
+          if(e.currentTarget.parentElement.classList.contains("switch-off")){
+            e.model.item.on();
+         //   this._swapStateClasses( e.currentTarget.parentElement,"on")
+          } else {
+            e.model.item.off();  
+         //   this._swapStateClasses( e.currentTarget.parentElement,"off")                 
           }
-        },
-        switch: function (aSwitch) {
-          var self = this;
-          self.switches[aSwitch].state = !self.switches[aSwitch].state;
-          self.update();
-        },
-        registerListeners: function (aSwitch,emitter) {
-          var self = this;
-          // register the enabled/disabled messages
-          if (self.switches[aSwitch].events !== undefined){
-            for(i in self.switches[aSwitch].events){
-              var e = self.switches[aSwitch].events[i];
-              console.log("Registering switch listener: " + e.message);
-              emitter.withHistory.on(e.message,function(){
-                var newState = e.fn.apply(this,arguments);
-                self.switches[aSwitch].state = ( newState !== null ? newState : self.switches[aSwitch].state );
-                self.update();
-              })// e.fn.bind(self.switches[aSwitch]));
-            }
-          }
-        },
-        attached: function () {
-          var self = this;
-          self.onSwitch = function (aSwitch) {
-            if (self.switches[aSwitch].switch) {
-              self.switches[aSwitch].state = !self.switches[aSwitch].state;
-              self.switches[aSwitch].switch(self.switches[aSwitch].state);
-            }
-          };
-
+          e.currentTarget.classList.add("transitioning");
+          var target = e.currentTarget;
+          setTimeout(function(){target.classList.remove("transitioning");},300);
         }
       });
     }());

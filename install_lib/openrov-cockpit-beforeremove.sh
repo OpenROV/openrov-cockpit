@@ -1,8 +1,9 @@
 #!/bin/bash
 set -x
 set -e
-rm /etc/init.d/openrov
 
-update-rc.d openrov remove
+# Uninstall Board
+
+# Uninstall Platform
 
 cp /etc/rc.local_orig /etc/rc.local

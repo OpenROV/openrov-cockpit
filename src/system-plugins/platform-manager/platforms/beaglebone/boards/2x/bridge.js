@@ -11,20 +11,27 @@ function Bridge() {
   var uartBaud = 115200;
   var serialPort = {};
   var lastWriteTime = new Date();
-  bridge.connect = function () {
+ bridge.connect = function () {
     serialPort = new SerialPort(uartPath, {
       baudRate: uartBaud,
-      parser: SerialPort.parsers.readline('\r\n')
+      autoOpen: true
     });
+    
+    var ReadLine = SerialPort.parsers.ReadLine;
+    var parser =serialPort.pipe(ReadLine({delimiter: '\r\n'}));    
+
     serialPort.on('open', function () {
       serialConnected = true;
       console.log('Serial port opened!');
     });
+    serialPort.on('error',function(err){
+      console.log('Serial error',err)
+    })
     serialPort.on('close', function (data) {
       console.log('Serial port closed!');
       serialConnected = false;
     });
-    serialPort.on('data', function (data) {
+    parser.on('data', function (data) {
       var status = reader.parseStatus(data);
       bridge.emit('status', status);
       if (emitRawSerial) {
@@ -32,6 +39,7 @@ function Bridge() {
       }
     });
   };
+
   // This code intentionally spaces out the serial commands so that the buffer does not overflow
   bridge.write = function (command) {
     var crc8 = crc.crc81wire(command);

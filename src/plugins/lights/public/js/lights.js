@@ -61,7 +61,7 @@
       cockpit.rov.emit('plugin.lights.adjust', value);
     });
 
-    self.cockpit.on('plugin.lights.setOnOff', function ( setOn ) 
+    self.cockpit.on('plugin.lights.set', function ( setOn ) 
     {
       cockpit.rov.emit('plugin.lights.setOnOff', setOn );
     });

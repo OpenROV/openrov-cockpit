@@ -105,8 +105,21 @@ on compile all enabled plugins firmware files are copied in to the central firmw
 # Making plugins managable via the plugins applet
 A well behaved plugin will allow the user to enable/disable the plugin after it has been installed. That requires the plugin:
 
-* The plugin must have a disable function and enable function defined
+### Browser plugin
+* The plugin must have a disable function and enable function defined. These must be idempotent.
 * The plugin must have a Plugin_Meta object defined
+
+### Node plugin
+* The plugin must have a disable function and enable function defined. These must be idempotent.
+* The plugin must have a Plugin_Meta object defined
+
+### MCU firmware plugin
+
+## How it works
+The applet manager behavior that shows the applets has its list dynamically updated from the node server.
+Do we disable across all levels by default?  That is a global enable/disable.
+Do we allow disabling for just a user? The node process still generates GPS data, but this users browser has the receiver disabled
+
 
 # Distributing your plugin
 The cockpit software has a built in search feature that looks for plugins that are registered in the bower.io registry.

@@ -16,17 +16,39 @@
     }
   </style>
   <template>
-    <paper-tooltip for="icon2">{{__('Data Recorder')}}</paper-tooltip>
+    <paper-tooltip for="icon2">{{__('Remaining Space:')}}{{recordingSpace}}</paper-tooltip>
     <iron-icon on-click="handleClick" id='icon2' icon="fa:database"></iron-icon>
     <!--i id='icon' class="fa fa-database fa-2x"></i-->
   </template>
   <script>
     (function() {
+      function formatBytes(bytes, decimals) {
+        if (bytes == 0)
+          return '0 Byte';
+        var k = 1000;
+        // or 1024 for binary
+        var dm = decimals + 1 || 3;
+        var sizes = [
+            'Bytes',
+            'KB',
+            'MB',
+            'GB',
+            'TB',
+            'PB',
+            'EB',
+            'ZB',
+            'YB'
+          ];
+        var i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+      }
+
       Polymer({
         is: "orov-blackbox-status",
         properties: {
           status: {type: Boolean, value: false, observer: '_statusChanged'},
-          defaultPanel:{type:String,value:"warning-display"}
+          defaultPanel:{type:String,value:"warning-display"},
+          recordingSpace: {type: String}
         },
         behaviors: [namespace('behaviors').oROVStandard],
         registerEmitterHandlers: function(emitter){
@@ -39,6 +61,17 @@
   //        this.importHref(this.resolveUrl('components-font-awesome/css/font-awesome.min.css'), function(e) {
   //          console.log("Imported font-awesome");
   //        });
+            var self=this;
+            this.spaceInterval = setInterval(function(){
+              navigator.webkitTemporaryStorage.queryUsageAndQuota(function (usedBytes, grantedBytes) {
+                self.recordingSpace = self.__('using')+' '+formatBytes(usedBytes, 2) + self.__(' of ') + formatBytes(grantedBytes, 2) + ' ' + formatBytes(grantedBytes - usedBytes, 2) + self.__(' remaining.');
+              }, function (e) {
+                console.log('Error', e);
+              });
+            })
+        },
+        detached:function(){
+          clearInterval(this.spaceInterval);
         },
         _statusChanged: function(newv, oldv){
           if (newv){
@@ -49,7 +82,7 @@
         },
         handleClick: function(){
           if (this.eventEmitter !== undefined){
-            if (status===true) {
+            if (this.status===true) {
               this.eventEmitter.emit('plugin-blackbox-recording-stop');
             } else {
               this.eventEmitter.emit('plugin-blackbox-recording-start');

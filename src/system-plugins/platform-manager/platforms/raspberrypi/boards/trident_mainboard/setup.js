@@ -21,15 +21,13 @@ var SetupBoardInterface = function (board) {
   board.rovsys = { capabilities: 0 };
   // ------------------------------------------------
   // Setup private board methods
-  board.notSafeToControl = function () {
-    // Arduino is OK to accept commands. After the Capabilities was added, all future updates require
-    // being backward safe compatible (meaning you cannot send a command that does something unexpected but
-    // instead it should do nothing).
-    if (board.Capabilities !== 0) {
-      return false;
-    }
-    return true;
+
+  board.notSafeToControl = function () 
+  {
+    // TODO: Implement. for now, default to controllable
+    return false;
   };
+  
   board.requestCapabilities = function () {
     var command = 'rcap();';
     board.bridge.write(command);

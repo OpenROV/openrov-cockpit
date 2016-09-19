@@ -16,7 +16,7 @@
     },
     behaviors: [namespace('behaviors').oROVStandard,namespace('behaviors').oROVESCSwitch],
     ready:function(){
-        this.defaultPanel="flight-switches";
+        this.defaultPanel="";//'flight-switches"; Disabling from discovery until the firmware is updated to emit the state with the rest of the status message.
         this.shortName="ESC";
         this.description="ESC Power on/off";
     },

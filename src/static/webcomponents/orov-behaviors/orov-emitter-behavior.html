@@ -28,6 +28,9 @@
     },
     _registerTreeOfListeners: function(root,emitter){
       var self=this;
+      if(emitter == undefined){
+        return;
+      }
 
       if (this.visited.includes(root)){
       //  return;

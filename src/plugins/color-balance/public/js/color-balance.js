@@ -2,16 +2,16 @@
   'use strict';
 
 
-  var VideoFilter;
+  var ColorBalance;
 
   //These lines register the Example object in a plugin namespace that makes
   //referencing the plugin easier when debugging.
   var plugins = namespace('plugins');
-  plugins.VideoFilter = VideoFilter;
+  plugins.ColorBalance = ColorBalance;
 
-  VideoFilter = function VideoFilter(cockpit) {
+  c = function ColorBalance(cockpit) {
 
-    console.log('Loading VideoFilter plugin in the browser.');
+    console.log('Loading color-balance plugin in the browser.');
 
     //instance variables
     this.cockpit = cockpit;
@@ -20,8 +20,8 @@
 
     // for plugin management:
     this.Plugin_Meta = {
-      name : 'videofilter-edge-threejs',   // for the settings
-      viewName: 'Video Filter: Edge Detection 3js',
+      name : 'color-balance',   // for the settings
+      viewName: 'Color Balance: Color Balance using gl shaders',
       defaultEnabled: false
    };
 
@@ -34,12 +34,12 @@
   //together outside the parent function definition for easier readability.
 
   //Called by the plugin-manager to enable a plugin
-  VideoFilter.prototype.enable = function enable() {
+  ColorBalance.prototype.enable = function enable() {
     this.startfilter();
   };
 
   //Called by the plugin-manager to disable a plugin
-  VideoFilter.prototype.disable = function disable() {
+  ColorBalance.prototype.disable = function disable() {
     this.stopfilter();
   };
 
@@ -60,13 +60,13 @@
     });
   });
 
-  VideoFilter.prototype.stopfilter = function stopfilter() {
+  ColorBalance.prototype.stopfilter = function stopfilter() {
     if (this.removeCanvas!=null){
       this.removeCanvas();
     }
   }
 
-  VideoFilter.prototype.startfilter = function startfilter() {
+  ColorBalance.prototype.startfilter = function startfilter() {
     var self=this;
 
     if ((typeof(THREE) === 'undefined')
@@ -179,6 +179,6 @@
   };
 
 
-  window.Cockpit.plugins.push(VideoFilter);
+  window.Cockpit.plugins.push(ColorBalance);
 
 }(window, document, $));

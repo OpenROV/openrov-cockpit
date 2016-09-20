@@ -6,7 +6,6 @@ var spawn           = require('child_process').spawn;
 var ArduinoBuilder  = require('ArduinoBuilder');
 var ArduinoHelper   = require('ArduinoHelper');
 var Hardware        = require('./bridge.js');
-const StateMachine  = require('javascript-state-machine');
 
 var debug           = {};
 
@@ -23,7 +22,7 @@ var SetupBoardInterface = function (board)
 
   board.hashInfo        = 
   {
-    latest: "",
+    fromBin: "",
     fromMCU: ""
   };
 
@@ -115,7 +114,17 @@ var SetupBoardInterface = function (board)
     // Firmware version
     if ('ver' in status) 
     {
-      board.hashInfo.fromMCU = stats.ver;
+      var regex = /<<{{(.*)}}>>/;
+      var matches = regex.exec( stats.ver );
+
+      try
+      {
+        board.hashInfo.fromMCU = matches[1];
+      }
+      catch( err )
+      {
+        console.error( "Version regex found no matches" )
+      }
     }
 
     // Settings update   
@@ -186,100 +195,100 @@ var RegisterFunctions = function (board)
     board.global.emit('mcu.StartSerial');
   }, false);
 
-  board.AddMethod('BuildFirmware', function (appName) 
-  {
-    debug( 'Building application: ' + appName );
+  // board.AddMethod('BuildFirmware', function (appName) 
+  // {
+  //   debug( 'Building application: ' + appName );
 
-    // Create options for arduino builder library
-    var opts = 
-    {
-      sketchDir: '/opt/openrov/firmware/sketches/' + appName,
-      installBaseDir: '/opt/openrov/firmware/bin',
-      productID: '2x',
-      cleanAfterBuild: true,
-      fqbn: 'openrov:avr:mega:cpu=atmega2560',
-      hardware: '/opt/openrov/arduino/hardware',
-      tools: '/opt/openrov/arduino/hardware/tools',
-      warnings: 'none',
-      verbose: true,
-      quiet: false,
-      debug: 5,
-      libs: ['/opt/openrov/arduino/hardware/openrov/avr/libraries'],
-      preproc: []
-    };
+  //   // Create options for arduino builder library
+  //   var opts = 
+  //   {
+  //     sketchDir: '/opt/openrov/firmware/sketches/' + appName,
+  //     installBaseDir: '/opt/openrov/firmware/bin',
+  //     productID: '2x',
+  //     cleanAfterBuild: true,
+  //     fqbn: 'openrov:avr:mega:cpu=atmega2560',
+  //     hardware: '/opt/openrov/arduino/hardware',
+  //     tools: '/opt/openrov/arduino/hardware/tools',
+  //     warnings: 'none',
+  //     verbose: true,
+  //     quiet: false,
+  //     debug: 5,
+  //     libs: ['/opt/openrov/arduino/hardware/openrov/avr/libraries'],
+  //     preproc: []
+  //   };
 
-    // Use ArduinoBuilder library to perform build
-    ArduinoBuilder.BuildSketch( opts, function (data) 
-      {
-        board.global.emit('mcu.firmwareBuildStd', data.toString('utf8') );
-      }, 
-      function (data) 
-      {
-        board.global.emit('mcu.firmwareBuildErr', data.toString('utf8') );
-      } )
-    .then( function( firmwareFile )
-    {
-      board.global.emit('mcu.firmwareBuildComplete', null, firmwareFile );
-    } )
-    .catch( function(error)
-    {
-      board.global.emit('mcu.firmwareBuildComplete', { "error": error } );
-    } );
-  }, false);
+  //   // Use ArduinoBuilder library to perform build
+  //   ArduinoBuilder.BuildSketch( opts, function (data) 
+  //     {
+  //       board.global.emit('mcu.firmwareBuildStd', data.toString('utf8') );
+  //     }, 
+  //     function (data) 
+  //     {
+  //       board.global.emit('mcu.firmwareBuildErr', data.toString('utf8') );
+  //     } )
+  //   .then( function( firmwareFile )
+  //   {
+  //     board.global.emit('mcu.firmwareBuildComplete', null, firmwareFile );
+  //   } )
+  //   .catch( function(error)
+  //   {
+  //     board.global.emit('mcu.firmwareBuildComplete', { "error": error } );
+  //   } );
+  // }, false);
 
-  board.AddMethod('FlashFirmware', function( firmwareFile ) 
-  {
-    debug( 'Flashing application: ' + firmwareFile );
+  // board.AddMethod('FlashFirmware', function( firmwareFile ) 
+  // {
+  //   debug( 'Flashing application: ' + firmwareFile );
 
-    // Close the bridge until done flashing
-    board.bridge.close();
+  //   // Close the bridge until done flashing
+  //   board.bridge.close();
 
-    var args = 
-    [
-      '-P',
-      '/dev/spidev1.0',
-      '-c',
-      'linuxspi',
-      '-vvv',
-      '-p',
-      'm2560',
-      '-U',
-      'flash:w:' + firmwareFile
-    ];
+  //   var args = 
+  //   [
+  //     '-P',
+  //     '/dev/spidev1.0',
+  //     '-c',
+  //     'linuxspi',
+  //     '-vvv',
+  //     '-p',
+  //     'm2560',
+  //     '-U',
+  //     'flash:w:' + firmwareFile
+  //   ];
 
-    // Use avrdude to flash the AtMega2560
-    var promise = execFileAsync('avrdude', args);
-    var childProcess = promise.childProcess;
+  //   // Use avrdude to flash the AtMega2560
+  //   var promise = execFileAsync('avrdude', args);
+  //   var childProcess = promise.childProcess;
 
-    // Attach listeners
-    childProcess.stdout.on('data', function (stdout)
-    {
-      board.global.emit('mcu.firmwareFlashStd', data.toString('utf8') );
-    });
+  //   // Attach listeners
+  //   childProcess.stdout.on('data', function (stdout)
+  //   {
+  //     board.global.emit('mcu.firmwareFlashStd', data.toString('utf8') );
+  //   });
 
-    childProcess.stderr.on('data', function (stderr) 
-    {
-      board.global.emit('mcu.firmwareFlashErr', data.toString('utf8') );
-    });
+  //   childProcess.stderr.on('data', function (stderr) 
+  //   {
+  //     board.global.emit('mcu.firmwareFlashErr', data.toString('utf8') );
+  //   });
 
-    // Execute flashing process
-    promise.then(function () 
-    { 
-      // Success
-      board.global.emit('mcu.firmwareFlashComplete', null );
-    })
-    .catch( function( error )
-    {
-      // Error
-      board.global.emit('mcu.firmwareFlashComplete', { "error": error } );
-    })
-    .then( function()
-    {
-      // Reconnect to the bridge regardless of success
-      board.bridge.connect();
-    })
+  //   // Execute flashing process
+  //   promise.then(function () 
+  //   { 
+  //     // Success
+  //     board.global.emit('mcu.firmwareFlashComplete', null );
+  //   })
+  //   .catch( function( error )
+  //   {
+  //     // Error
+  //     board.global.emit('mcu.firmwareFlashComplete', { "error": error } );
+  //   })
+  //   .then( function()
+  //   {
+  //     // Reconnect to the bridge regardless of success
+  //     board.bridge.connect();
+  //   })
 
-  }, false);
+  // }, false);
 
   board.AddMethod('ResetMCU', function (path) 
   {
@@ -293,14 +302,14 @@ var RegisterFunctions = function (board)
     }, 1000);
   }, false);
 
-  board.AddMethod('FlashESC', function () 
-  {
-    debug( 'Flashing Afro ESCs' );
+  // board.AddMethod('FlashESC', function () 
+  // {
+  //   debug( 'Flashing Afro ESCs' );
 
-    // TODO: Sort this out
+  //   // TODO: Sort this out
     
-    // Don't start the bridge back up on this command. Firmware needs to be flashed again
-  }, false);
+  //   // Don't start the bridge back up on this command. Firmware needs to be flashed again
+  // }, false);
 
   board.AddMethod('SendCommand', function (command) 
   {

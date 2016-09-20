@@ -4,26 +4,18 @@ const retry = require('bluebird-retry');
 const fs = Promise.promisifyAll(require('fs-extra'));
 const spawnAsync = require('child-process-promise').spawn;
 const execAsync = require('child-process-promise').exec;
-const StateMachine = require('./javascript-state-machine');
-
-const BuildFirmwareScript = "/opt/openrov/system/scripts/BuildFirmware.js";
-const FlashFirmwareScript = "/opt/openrov/system/scripts/FlashFirmware.js";
-const FlashESCScript = "/opt/openrov/system/scripts/FlashESCS.js";
-
-const escConfPath = "/opt/openrov/system/config/esc.conf";
-const mcuBinPath = "/opt/openrov/firmware/bin/2x/OpenROV2x.hex"
+const StateMachine = require('javascript-state-machine');
 
 module.exports = function( board ) 
 {
     var fsm = StateMachine.create(
     {
-        initial: { state: 'startup', defer: true },
-
         events: 
         [
             // Internal events - Should always be called as the final step of a promise chain
-            { name: '_e_trigger_esc_flash',             from: 'startup',                            to: 'flashing_escs' },
-            { name: '_e_esc_flash_complete',            from: ['startup','flashing_escs'] ,         to: 'checking_bin'},
+            { name: '_e_init',                          from: 'none',                               to: 'checking_escs' },
+            { name: '_e_trigger_esc_flash',             from: 'checking_escs',                      to: 'flashing_escs' },
+            { name: '_e_esc_flash_complete',            from: ['checking_escs','flashing_escs'] ,   to: 'checking_bin'},
             { name: '_e_trigger_firmware_build',        from: ['checking_bin','complete'],          to: 'building_firmware' },
             { name: '_e_firmware_build_complete',       from: ['checking_bin','building_firmware'], to: 'get_hash' },
             { name: '_e_hash_obtained',                 from: 'get_hash',                           to: 'verify_version' },    
@@ -35,7 +27,7 @@ module.exports = function( board )
             { name: '_e_trigger_esc_flash_user',        from: 'complete',                           to: 'flashing_escs' },
             { name: '_e_trigger_firmware_build_user',   from: 'complete',                           to: 'building_firmware' },
             { name: '_e_trigger_mcu_flash_user',        from: 'complete',                           to: 'flashing_mcu' },
-            { name: '_e_reset',                         from: ['complete', 'failed'],               to: 'startup' },
+            { name: '_e_reset',                         from: ['complete', 'failed'],               to: 'checking_escs' },
 
             { name: '_e_fail',                          from: '*',                                  to: 'failed' }
             
@@ -44,7 +36,7 @@ module.exports = function( board )
         callbacks: 
         {
             // State handlers - We allow states to handle their own transitions to ensure consistency
-            onstartup: startupHandler,
+            on_e_init: escCheckHandler,
             onflashing_escs: flashESCHandler,
             onchecking_bin: checkBinHandler,
             onbuilding_firmware: buildFirmwareHandler,
@@ -58,7 +50,7 @@ module.exports = function( board )
             onbefore_e_fail: eFailHandler
         },
 
-        error: function(eventName, from, to, args, errorCode, errorMessage, e) 
+        error: function(eventName, from, to, args, errorCode, errorMessage) 
         {
             // The error handler for the statemachine is backed with the above parameters, but since
             // some flows just raise an exception, need to move things around in that case.
@@ -76,8 +68,6 @@ module.exports = function( board )
                 args: args,
                 errorCode: errorCode,
                 errorMessage: errorMessage,
-                originalError: e.message,
-                originalStack: e.stack
             }
 
             console.error( 'MCU State Machine: Error in event <' + eventName + '>: ' + JSON.stringify(errorReport));
@@ -91,96 +81,61 @@ module.exports = function( board )
     return fsm;
 };
 
-var startupHandler = function startupHandler(event, from, to)
+var escCheckHandler = function escCheckHandler(event, from, to)
 {
     var self = this;
 
-    // Check to see if ESCs have been flashed before by testing the existence of esc.conf
-    fs.statAsync( escConfPath )
-    .then( function()
-    {
-        // Existence of file suggests ESCs have been flashed already
-        self._e_esc_flash_complete();
-    })
-    .catch( function(error)
-    {   
-        // ESCs have never been flashed before. Do so now
-        self._e_trigger_esc_flash();
-    });
+    console.log( "MOCK: escCheckHandler" );
+
+    self._e_trigger_esc_flash();
 }
 
 var flashESCHandler = function flashESCHandler(event, from, to)
 {
     var self = this;
 
+    console.log( "MOCK: flashESCHandler" );
+
     // First, disconnect the bridge
-    self.board.bridge.close();
+    //self.board.bridge.close();
+    
+    // Re-enable the bridge
+    //self.board.bridge.connect();
 
-    // Execute the flash firmware script
-    execAsync( 'node', FlashESCScript )
-    .then( function()
-    {
-        return fs.writeFileAsync( escConfPath, "flashed" );
-    })
-    .then( function()
-    {   
-        // Re-enable the bridge
-        self.board.bridge.connect();
-
-        // Success
-        self._e_esc_flash_complete();
-    })
-    .catch( function( error )
-    {
-        // Re-enable the bridge
-        self.board.bridge.connect();
-
-        // Move to failed state
-        self._e_fail( error );
-    });
+    // Success
+    self._e_esc_flash_complete();
+  
 }
 
 var checkBinHandler = function checkBinHandler(event, from, to)
 {
     var self = this;
 
-    // Check to see if ESCs have been flashed before by testing the existence of esc.conf
-    fs.statAsync( mcuBinPath )
-    .then( function()
-    {
-        // Existence of file suggests firmware has already been built
-        self._e_firmware_build_complete();
-    })
-    .catch( function(error)
-    {   
-        // Firmware has never been built. Trigger a build
-        self._e_trigger_firmware_build();
-    });
+    console.log( "MOCK: checkBinHandler" );
+
+    self._e_trigger_firmware_build();
 }
 
 var buildFirmwareHandler = function buildFirmwareHandler(event, from, to)
 {
     var self = this;
 
-    // Execute the build firmware script
-    execAsync( 'node', BuildFirmwareScript )
-    .then( function()
-    {   
-        // Success
-        self._e_firmware_build_complete();
-    })
-    .catch( function( error )
-    {
-        // Move to failed state
-        self._e_fail( error );
-    });
+    console.log( "MOCK: buildFirmwareHandler" );
+
+    // Success
+    self._e_firmware_build_complete();
 }
 
 var getHashHandler = function getHashHandler(event, from, to)
 {
     var self = this;
 
-    fs.readFileAsync( mcuBinPath, 'utf8' )
+    console.log( "MOCK: getHashHandler" );
+
+    Promise.try( function()
+    {
+        return "asdfasdfasdf;ver:<<{{10024121ae3fa7fc60a5945be1e155520fb929dd}}>>;dsfsdfsfdsdfsfddasdasd"
+    })
     .then( function(data)
     {
         // Regex that finds the version string
@@ -196,7 +151,7 @@ var getHashHandler = function getHashHandler(event, from, to)
     .then( function()
     {   
         // Success
-        self._e_firmware_build_complete();
+        self._e_hash_obtained();
     })
     .catch( function( error )
     {
@@ -209,23 +164,17 @@ var flashMCUHandler = function flashMCUHandler(event, from, to)
 {
     var self = this;
 
-    // Execute the build firmware script
-    retry( execAsync( 'node', FlashFirmwareScript ), {interval: 10000})
-    .then( function()
-    {   
-        // Success
-        self._e_mcu_flash_complete();
-    })
-    .catch( function( error )
-    {
-        // Move to failed state
-        self._e_fail( error );
-    });
+    console.log( "MOCK: flashMCUHandler" );
+
+    // Success
+    self._e_mcu_flash_complete();
 }
 
 var verifyVersionHandler = function verifyVersionHandler(event, from, to)
 {
     var self = this;
+
+    console.log( "MOCK: verifyVersionHandler" );
 
     // First, clear out the existing fromMCU hash info
     self.board.hashInfo.fromMCU = "";
@@ -272,11 +221,13 @@ var verifyVersionHandler = function verifyVersionHandler(event, from, to)
 var completeHandler = function completeHandler(event, from, to)
 {
     // Do nothing for now
+    console.log( "MOCK: completeHandler" );
 }
 
 var failHandler = function failHandler(event, from, to)
 {
     // Do nothing for now
+    console.log( "MOCK: failHandler" );
 }
 
 var eFailHandler = function eFailHandler(event, from, to, msg) 

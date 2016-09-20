@@ -8,9 +8,7 @@ const StateMachine = require('./javascript-state-machine');
 
 const BuildFirmwareScript = "/opt/openrov/system/scripts/BuildFirmware.js";
 const FlashFirmwareScript = "/opt/openrov/system/scripts/FlashFirmware.js";
-const FlashESCScript = "/opt/openrov/system/scripts/FlashESCS.js";
 
-const escConfPath = "/opt/openrov/system/config/esc.conf";
 const mcuBinPath = "/opt/openrov/firmware/bin/2x/OpenROV2x.hex"
 
 module.exports = function( board ) 
@@ -52,7 +50,7 @@ module.exports = function( board )
             onget_hash: getHashHandler,
             onverify_version: verifyVersionHandler,
             oncomplete: completeHandler,
-            onfailed: failHandler,
+            onfailed: failHandler
 
             // Event handlers
             onbefore_e_fail: eFailHandler
@@ -95,49 +93,53 @@ var startupHandler = function startupHandler(event, from, to)
 {
     var self = this;
 
+    // For now, assume ESCs are flashed since we don't have hardware yet
+
     // Check to see if ESCs have been flashed before by testing the existence of esc.conf
-    fs.statAsync( escConfPath )
-    .then( function()
-    {
+    // fs.statAsync( escConfPath )
+    // .then( function()
+    // {
         // Existence of file suggests ESCs have been flashed already
         self._e_esc_flash_complete();
-    })
-    .catch( function(error)
-    {   
-        // ESCs have never been flashed before. Do so now
-        self._e_trigger_esc_flash();
-    });
+    // })
+    // .catch( function(error)
+    // {   
+    //     // ESCs have never been flashed before. Do so now
+    //     self._e_trigger_esc_flash();
+    // });
 }
 
 var flashESCHandler = function flashESCHandler(event, from, to)
 {
     var self = this;
 
-    // First, disconnect the bridge
-    self.board.bridge.close();
+    // For now, assume ESCs are flashed since we don't have hardware yet
 
-    // Execute the flash firmware script
-    execAsync( 'node', FlashESCScript )
-    .then( function()
-    {
-        return fs.writeFileAsync( escConfPath, "flashed" );
-    })
-    .then( function()
-    {   
-        // Re-enable the bridge
-        self.board.bridge.connect();
+    // // First, disconnect the bridge
+    // self.board.bridge.close();
+
+    // // Execute the flash firmware script
+    // execAsync( 'node', FlashESCScript )
+    // .then( function()
+    // {
+    //     return fs.writeFileAsync( escConfPath, "flashed" );
+    // })
+    // .then( function()
+    // {   
+    //     // Re-enable the bridge
+    //     self.board.bridge.connect();
 
         // Success
         self._e_esc_flash_complete();
-    })
-    .catch( function( error )
-    {
-        // Re-enable the bridge
-        self.board.bridge.connect();
+    // })
+    // .catch( function( error )
+    // {
+    //     // Re-enable the bridge
+    //     self.board.bridge.connect();
 
-        // Move to failed state
-        self._e_fail( error );
-    });
+    //     // Move to failed state
+    //     self._e_fail( error );
+    // });
 }
 
 var checkBinHandler = function checkBinHandler(event, from, to)

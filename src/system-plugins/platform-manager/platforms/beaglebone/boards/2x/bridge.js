@@ -72,16 +72,17 @@ function Bridge() {
     bridge.stopRawSerialData = function stopRawSerialData() {
         emitRawSerial = false;
     };
-    bridge.close = function() {
+    bridge.close = function() 
+    {
         serialConnected = false;
-        //This code is a work around for a race condition in the serial port code https://github.com/voodootikigod/node-serialport/issues/241#issuecomment-43058353
         var sp = serialPort;
-        serialPort.flush(function(err) {
-            setTimeout(function() {
-                sp.close(function(err) {});
-            }, 10);
+
+        serialPort.flush(function(err) 
+        {
+            sp.close(function(err) {});
         });
     };
+    
     // Listen for firmware settings updates
     // TODO: Has this been deprecated for TSET?
     reader.on('firmwareSettingsReported', function(settings) {

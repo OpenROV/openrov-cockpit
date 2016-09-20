@@ -85,6 +85,7 @@ module.exports = function( board )
 
     // Other state information
     fsm.data = {};
+    fsm.board = board;
 
     return fsm;
 };
@@ -112,7 +113,7 @@ var flashESCHandler = function flashESCHandler(event, from, to)
     var self = this;
 
     // First, disconnect the bridge
-    board.bridge.close();
+    self.board.bridge.close();
 
     // Execute the flash firmware script
     execAsync( 'node', FlashESCScript )
@@ -123,7 +124,7 @@ var flashESCHandler = function flashESCHandler(event, from, to)
     .then( function()
     {   
         // Re-enable the bridge
-        board.bridge.connect();
+        self.board.bridge.connect();
 
         // Success
         self._e_esc_flash_complete();
@@ -131,7 +132,7 @@ var flashESCHandler = function flashESCHandler(event, from, to)
     .catch( function( error )
     {
         // Re-enable the bridge
-        board.bridge.connect();
+        self.board.bridge.connect();
 
         // Move to failed state
         self._e_fail( error );
@@ -160,7 +161,7 @@ var buildFirmwareHandler = function buildFirmwareHandler(event, from, to)
 {
     var self = this;
 
-     // Execute the build firmware script
+    // Execute the build firmware script
     execAsync( 'node', BuildFirmwareScript )
     .then( function()
     {   
@@ -178,10 +179,18 @@ var getHashHandler = function getHashHandler(event, from, to)
 {
     var self = this;
 
-     // Execute the build firmware script
-    Promise.try( function()
+    fs.readFileAsync( mcuBinPath, 'utf8' )
+    .then( function(data)
     {
-        // Execute a grep to 
+        // Regex that finds the version string
+        var regex = /ver[:]<<{{(.*)}}>>;/;
+        var matches = regex.exec( data );
+
+        return matches[1];
+    })
+    .then( function( hash )
+    {
+        self.board.hashInfo.latest = hash;
     })
     .then( function()
     {   
@@ -195,7 +204,77 @@ var getHashHandler = function getHashHandler(event, from, to)
     });
 }
 
+var flashMCUHandler = function flashMCUHandler(event, from, to)
+{
+    var self = this;
 
+    // Execute the build firmware script
+    retry( execAsync( 'node', FlashFirmwareScript ), {interval: 10000})
+    .then( function()
+    {   
+        // Success
+        self._e_mcu_flash_complete();
+    })
+    .catch( function( error )
+    {
+        // Move to failed state
+        self._e_fail( error );
+    });
+}
+
+var verifyVersionHandler = function verifyVersionHandler(event, from, to)
+{
+    var self = this;
+
+    // First, clear out the existing fromMCU hash info
+    self.board.hashInfo.fromMCU = "";
+
+    // Now register a timeout that attempts to fetch the updated hash
+    var counter = 0;
+
+    function RequestHashInfo()
+    {
+        // Send the version request command to the MCU
+        self.board.bridge.write( "version();" );
+
+        // Check for new hash info received from MCU
+        if( self.board.hashInfo.fromMCU !== "" )
+        {
+            // Check it against the binary hash
+            if( self.board.hashInfo.latest == self.board.hashInfo.fromMCU )
+            {  
+                // Success
+                self._e_firmware_validated();
+            }
+            else
+            {
+                // Version mismatch. Flash the latest firmware to the MCU
+                self._e_trigger_mcu_flash();
+            }
+        }
+        else if( counter < 6 )
+        {
+            // Call 6 times, once per 10 secs
+            counter++;
+            setTimeout( RequestHashInfo, 10000 );
+        }
+        else
+        {
+            // Never received hash info from MCU. Flash the latest firmware to the MCU
+            self._e_trigger_mcu_flash();
+        }
+    }();
+}
+
+var completeHandler = function completeHandler(event, from, to)
+{
+    // Do nothing for now
+}
+
+var failHandler = function failHandler(event, from, to)
+{
+    // Do nothing for now
+}
 
 var eFailHandler = function eFailHandler(event, from, to, msg) 
 {

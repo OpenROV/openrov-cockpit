@@ -1,8 +1,8 @@
 {
-    "name": "image-enhancement",
+    "name": "color-balance",
     "main": "index.js",
     "homepage": "https://github.com/openrov/openrov-cockpit",
-    "description": "Applies Simple Color Balance algorithm (using WebGL shaders) to a video feed",
+    "description": "Applies Simple Color Balance algorithm (using gl shaders) to a video feed",
     "moduleType": [],
     "license": "MIT",
     "ignore": [

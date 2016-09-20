@@ -6,6 +6,7 @@ var spawn           = require('child_process').spawn;
 var ArduinoBuilder  = require('ArduinoBuilder');
 var ArduinoHelper   = require('ArduinoHelper');
 var Hardware        = require('./bridge.js');
+const StateMachine  = require('javascript-state-machine');
 
 var debug           = {};
 
@@ -19,6 +20,7 @@ var SetupBoardInterface = function (board)
   board.firmwareVersion = 0;
   board.Capabilities    = 0;
   board.statusdata      = {};
+  board.currentHash     = "";
 
   board.settingsCollection = 
   {
@@ -158,9 +160,24 @@ var SetupBoardInterface = function (board)
   // ------------------------------------------------
   // Setup Public API	
   RegisterFunctions(board);
+
+  // Run initialization routine
+    // Check to see if ESCs have ever been flashed before
+    // If not
+      // Disable flashing
+      // run the ESC flashing script in /opt/openrov/system/scripts
+      // Enable flashing
+    // Check to see if there is a bin file at /opt/openrov/firmware/bin/trident_alpha/Trident.bin
+      // If not, build it
+    // If there is, grep its hash and save it
+    // Request version number from MCU every 10 seconds, retry 5 times
+      // On receipt, compare to saved current hash
+      // If differs, Flash with latest bin
+      // Else, move to DONE state    
   
   // Call initialization routine
   board.global.emit('mcu.Initialize');
+
 };
 
 // ------------------------------------------------

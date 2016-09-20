@@ -179,8 +179,8 @@ var SetupBoardInterface = function (board)
   board.global.emit('mcu.Initialize');
 
   // Create and start statemachine
-  board.fsm = require( 'statemachine' )( board );
-  board.fsm.startup();
+  board.fsm = require( './statemachine.js' )( board );
+  board.fsm._e_init();
 };
 
 // ------------------------------------------------

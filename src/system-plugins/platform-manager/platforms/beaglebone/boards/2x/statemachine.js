@@ -17,13 +17,12 @@ module.exports = function( board )
 {
     var fsm = StateMachine.create(
     {
-        initial: { state: 'startup', defer: true },
-
         events: 
         [
             // Internal events - Should always be called as the final step of a promise chain
-            { name: '_e_trigger_esc_flash',             from: 'startup',                            to: 'flashing_escs' },
-            { name: '_e_esc_flash_complete',            from: ['startup','flashing_escs'] ,         to: 'checking_bin'},
+            { name: '_e_init',                          from: 'none',                               to: 'checking_escs' },
+            { name: '_e_trigger_esc_flash',             from: 'checking_escs',                      to: 'flashing_escs' },
+            { name: '_e_esc_flash_complete',            from: ['checking_escs','flashing_escs'] ,   to: 'checking_bin'},
             { name: '_e_trigger_firmware_build',        from: ['checking_bin','complete'],          to: 'building_firmware' },
             { name: '_e_firmware_build_complete',       from: ['checking_bin','building_firmware'], to: 'get_hash' },
             { name: '_e_hash_obtained',                 from: 'get_hash',                           to: 'verify_version' },    
@@ -35,7 +34,7 @@ module.exports = function( board )
             { name: '_e_trigger_esc_flash_user',        from: 'complete',                           to: 'flashing_escs' },
             { name: '_e_trigger_firmware_build_user',   from: 'complete',                           to: 'building_firmware' },
             { name: '_e_trigger_mcu_flash_user',        from: 'complete',                           to: 'flashing_mcu' },
-            { name: '_e_reset',                         from: ['complete', 'failed'],               to: 'startup' },
+            { name: '_e_reset',                         from: ['complete', 'failed'],               to: 'checking_escs' },
 
             { name: '_e_fail',                          from: '*',                                  to: 'failed' }
             
@@ -44,7 +43,7 @@ module.exports = function( board )
         callbacks: 
         {
             // State handlers - We allow states to handle their own transitions to ensure consistency
-            onstartup: startupHandler,
+            on_e_init: escCheckHandler,
             onflashing_escs: flashESCHandler,
             onchecking_bin: checkBinHandler,
             onbuilding_firmware: buildFirmwareHandler,
@@ -58,7 +57,7 @@ module.exports = function( board )
             onbefore_e_fail: eFailHandler
         },
 
-        error: function(eventName, from, to, args, errorCode, errorMessage, e) 
+        error: function(eventName, from, to, args, errorCode, errorMessage) 
         {
             // The error handler for the statemachine is backed with the above parameters, but since
             // some flows just raise an exception, need to move things around in that case.
@@ -76,8 +75,6 @@ module.exports = function( board )
                 args: args,
                 errorCode: errorCode,
                 errorMessage: errorMessage,
-                originalError: e.message,
-                originalStack: e.stack
             }
 
             console.error( 'MCU State Machine: Error in event <' + eventName + '>: ' + JSON.stringify(errorReport));
@@ -91,7 +88,7 @@ module.exports = function( board )
     return fsm;
 };
 
-var startupHandler = function startupHandler(event, from, to)
+var escCheckHandler = function escCheckHandler(event, from, to)
 {
     var self = this;
 
@@ -196,7 +193,7 @@ var getHashHandler = function getHashHandler(event, from, to)
     .then( function()
     {   
         // Success
-        self._e_firmware_build_complete();
+        self._e_hash_obtained();
     })
     .catch( function( error )
     {

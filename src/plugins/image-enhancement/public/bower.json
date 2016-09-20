@@ -1,0 +1,20 @@
+{
+    "name": "image-enhancement",
+    "main": "index.js",
+    "homepage": "https://github.com/openrov/openrov-cockpit",
+    "description": "Applies Simple Color Balance algorithm (using WebGL shaders) to a video feed",
+    "moduleType": [],
+    "license": "MIT",
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests"
+    ],
+    "dependencies": {
+        "three.js": "threejs#*",
+        "polymer": "^1.2.0",
+        "webcomponentsjs": "^0.7.20"
+    }
+}

@@ -68,7 +68,7 @@
       {
         name: 'rovPilot.powerOnESC',
         description: 'Switches the ESCs on',
-        defaults: { keyboard: '[' },
+        defaults: {},
         down: function () {
           self.cockpit.rov.emit('plugin.systemPower.powerOnESCs');
         }
@@ -76,7 +76,7 @@
       {
         name: 'rovPilot.powerOffESC',
         description: 'Switches the ESCs off',
-        defaults: { keyboard: ']' },
+        defaults: {},
         down: function () {
           self.cockpit.rov.emit('plugin.systemPower.powerOffESCs');
         }

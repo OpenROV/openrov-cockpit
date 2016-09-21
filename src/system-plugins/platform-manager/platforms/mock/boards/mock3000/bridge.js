@@ -33,8 +33,9 @@ function Bridge() {
         break;
       }
     case 'ligt': {
-        bridge.emitStatus('LIGP:' + commandParts[1] / 100);
-        debug('Light status: ' + commandParts[1] / 100);
+        //bridge.emitStatus('LIGP:' + commandParts[1] / 100);
+        bridge.emitStatus('LIGT:' + commandParts[1]);
+        //debug('Light status: ' + commandParts[1] / 100);
         break;
       }
     case 'eligt': {

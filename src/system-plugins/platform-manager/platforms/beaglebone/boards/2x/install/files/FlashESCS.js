@@ -27,7 +27,11 @@ var buildOpts = {
 var mcuFlashArgs = [ '-P', '/dev/spidev1.0', '-c', 'linuxspi', '-vvv', '-p', 'm2560', '-U', 'flash:w:/opt/openrov/firmware/bin/2x/ArduinoUSBLinker.hex' ];
 
 // Create promise for flashing the MCU
-var mcuFlashPromise = execFileAsync('avrdude', flashArgs );
+var mcuFlashPromise = function()
+{
+    execFileAsync('avrdude', flashArgs );
+}
+
 var mcuFlashChildProcess = promise.childProcess;
 
 // Attach listeners to flashing process
@@ -42,7 +46,11 @@ mcuFlashChildProcess.stderr.on('data', function(stderr)
 });
 
 // Create promise for flashing the ESCs themselves
-var escFlashPromise = execFileAsync('sh', "/opt/openrov/system/scripts/FlashESCS.sh" );
+var escFlashPromise = function()
+{
+    return execFileAsync('sh', "/opt/openrov/system/scripts/FlashESCS.sh" );
+}
+
 var escFlashChildProcess = escFlashPromise.childProcess;
 
 // Attach listeners to flashing process

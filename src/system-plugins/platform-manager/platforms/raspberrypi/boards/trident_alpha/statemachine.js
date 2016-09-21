@@ -9,7 +9,7 @@ const StateMachine = require('javascript-state-machine');
 const BuildFirmwareScript = "/opt/openrov/system/scripts/BuildFirmware.js";
 const FlashFirmwareScript = "/opt/openrov/system/scripts/FlashFirmware.js";
 
-const mcuBinPath = "/opt/openrov/firmware/bin/trident_mainboard/TridentPAC.bin"
+const mcuBinPath = "/opt/openrov/firmware/bin/trident_alpha/Trident.bin"
 
 module.exports = function( board ) 
 {
@@ -88,7 +88,7 @@ module.exports = function( board )
 
 var escCheckHandler = function escCheckHandler(event, from, to)
 {
-    console.log( "BOARD STATE: Checking ESCs..." );
+    console.log( "BOARD STATE: CHECKING ESCS" );
 
     var self = this;
 
@@ -99,7 +99,6 @@ var escCheckHandler = function escCheckHandler(event, from, to)
     // .then( function()
     // {
         // Existence of file suggests ESCs have been flashed already
-        console.log( "BOARD STATE: ESCs assumed to be up to date for now." );
         self._e_esc_flash_complete();
     // })
     // .catch( function(error)
@@ -111,7 +110,7 @@ var escCheckHandler = function escCheckHandler(event, from, to)
 
 var flashESCHandler = function flashESCHandler(event, from, to)
 {
-    console.log( "BOARD STATE: Flashing ESCs..." );
+    console.log( "BOARD STATE: FLASHIGN ESCS" );
 
     var self = this;
 
@@ -132,7 +131,6 @@ var flashESCHandler = function flashESCHandler(event, from, to)
     //     self.board.bridge.connect();
 
         // Success
-        console.log( "BOARD STATE: ESCs assumed to be flashed for now." );
         self._e_esc_flash_complete();
     // })
     // .catch( function( error )

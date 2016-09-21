@@ -81,7 +81,7 @@ var SetupBoardInterface = function(board) {
         if ('ver' in status) 
         {
           var regex = /<<{{(.*)}}>>/;
-          var matches = regex.exec( stats.ver );
+          var matches = regex.exec( status.ver );
           
           try
           {

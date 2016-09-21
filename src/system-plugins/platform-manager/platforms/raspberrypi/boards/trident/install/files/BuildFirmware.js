@@ -3,7 +3,7 @@ var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require('fs-extra'));
 var ArduinoBuilder = require('/opt/openrov/cockpit/src/lib/ArduinoBuilder.js');
 var opts = {
-    sketchDir: '/opt/openrov/firmware/sketches/OpenROV',
+    sketchDir: '/opt/openrov/firmware/sketches/Trident',
     installBaseDir: '/opt/openrov/firmware/bin',
     productID: 'trident',
     cleanAfterBuild: true,

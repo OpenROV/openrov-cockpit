@@ -3,7 +3,7 @@ const Promise = require('bluebird');
 const retry = require('bluebird-retry');
 const fs = Promise.promisifyAll(require('fs-extra'));
 const spawnAsync = require('child-process-promise').spawn;
-const execAsync = require('child-process-promise').exec;
+const execFileAsync = require('child-process-promise').execFile;
 const StateMachine = require('javascript-state-machine');
 
 const BuildFirmwareScript = "/opt/openrov/system/scripts/BuildFirmware.js";
@@ -92,16 +92,20 @@ var escCheckHandler = function escCheckHandler(event, from, to)
 {
     var self = this;
 
+    console.log( "BOARD STATE: Checking ESCs..." );
+
     // Check to see if ESCs have been flashed before by testing the existence of esc.conf
     fs.statAsync( escConfPath )
     .then( function()
     {
         // Existence of file suggests ESCs have been flashed already
+        console.log( "BOARD STATE: ESCs already up to date." );
         self._e_esc_flash_complete();
     })
     .catch( function(error)
     {   
         // ESCs have never been flashed before. Do so now
+        console.log( "BOARD STATE: ESCs haven't been flashed. Triggering flash." );
         self._e_trigger_esc_flash();
     });
 }
@@ -110,11 +114,13 @@ var flashESCHandler = function flashESCHandler(event, from, to)
 {
     var self = this;
 
+    console.log( "BOARD STATE: Flashing ESCs..." );
+
     // First, disconnect the bridge
     self.board.bridge.close();
 
     // Execute the flash firmware script
-    execAsync( 'node', FlashESCScript )
+    execFileAsync( "node " + FlashESCScript )
     .then( function()
     {
         return fs.writeFileAsync( escConfPath, "flashed" );
@@ -125,6 +131,7 @@ var flashESCHandler = function flashESCHandler(event, from, to)
         self.board.bridge.connect();
 
         // Success
+        console.log( "BOARD STATE: ESCs flashed successfully." );
         self._e_esc_flash_complete();
     })
     .catch( function( error )
@@ -133,6 +140,7 @@ var flashESCHandler = function flashESCHandler(event, from, to)
         self.board.bridge.connect();
 
         // Move to failed state
+        console.log( "BOARD STATE: ESC flash failed." );
         self._e_fail( error );
     });
 }
@@ -141,40 +149,50 @@ var checkBinHandler = function checkBinHandler(event, from, to)
 {
     var self = this;
 
+    console.log( "BOARD STATE: Checking for existing firmware binary..." );
+
     // Check to see if ESCs have been flashed before by testing the existence of esc.conf
     fs.statAsync( mcuBinPath )
     .then( function()
     {
         // Existence of file suggests firmware has already been built
+        console.log( "BOARD STATE: Binary already exists" );
         self._e_firmware_build_complete();
     })
     .catch( function(error)
     {   
         // Firmware has never been built. Trigger a build
+        console.log( "BOARD STATE: No binary found. Triggering build." );
         self._e_trigger_firmware_build();
     });
 }
 
 var buildFirmwareHandler = function buildFirmwareHandler(event, from, to)
 {
+    console.log( "BOARD STATE: Building firmware..." );
+
     var self = this;
 
     // Execute the build firmware script
-    execAsync( 'node', BuildFirmwareScript )
+    execFileAsync( "node " + BuildFirmwareScript )
     .then( function()
     {   
         // Success
+        console.log( "BOARD STATE: Build succeeded" );
         self._e_firmware_build_complete();
     })
     .catch( function( error )
     {
         // Move to failed state
+        console.log( "BOARD STATE: Build failed" );
         self._e_fail( error );
     });
 }
 
 var getHashHandler = function getHashHandler(event, from, to)
 {
+    console.log( "BOARD STATE: Getting hash from firmware binary..." );
+
     var self = this;
 
     fs.readFileAsync( mcuBinPath, 'utf8' )
@@ -188,6 +206,7 @@ var getHashHandler = function getHashHandler(event, from, to)
     })
     .then( function( hash )
     {
+        console.log( "BOARD STATE: Hash in binary: " + hash );
         self.board.hashInfo.fromBin = hash;
     })
     .then( function()
@@ -204,24 +223,35 @@ var getHashHandler = function getHashHandler(event, from, to)
 
 var flashMCUHandler = function flashMCUHandler(event, from, to)
 {
+    console.log( "BOARD STATE: Flashing firmware..." );
+
     var self = this;
 
+    var flashFunc = function()
+    {
+        return execFileAsync( 'node ' + FlashFirmwareScript );
+    }
+
     // Execute the build firmware script
-    retry( execAsync( 'node', FlashFirmwareScript ), {interval: 10000})
+    retry( flashFunc, {interval: 10000})
     .then( function()
     {   
         // Success
+        console.log( "BOARD STATE: Flash succeeded" );
         self._e_mcu_flash_complete();
     })
     .catch( function( error )
     {
         // Move to failed state
+        console.log( "BOARD STATE: Flash failed" );
         self._e_fail( error );
     });
 }
 
 var verifyVersionHandler = function verifyVersionHandler(event, from, to)
 {
+    console.log( "BOARD STATE: Verifying MCU firmware against latest binary..." );
+
     var self = this;
 
     // First, clear out the existing fromMCU hash info
@@ -242,23 +272,27 @@ var verifyVersionHandler = function verifyVersionHandler(event, from, to)
             if( self.board.hashInfo.fromMCU == self.board.hashInfo.fromBin )
             {  
                 // Success
+                console.log( "BOARD STATE: MCU Firmware is up to date" );
                 self._e_firmware_validated();
             }
             else
             {
                 // Version mismatch. Flash the latest firmware to the MCU
+                console.log( "BOARD STATE: MCU Firmware is out of date. Triggering flash." );
                 self._e_trigger_mcu_flash();
             }
         }
         else if( counter < 6 )
         {
-            // Call 6 times, once per 10 secs
+            // Call 5 times, once per 3 secs
             counter++;
-            setTimeout( RequestHashInfo, 10000 );
+            console.log( "BOARD STATE: Verification attempt #" + counter );
+            setTimeout( RequestHashInfo, 3000 );
         }
         else
         {
             // Never received hash info from MCU. Flash the latest firmware to the MCU
+            console.log( "BOARD STATE: No firmware detected. Triggering flash." );
             self._e_trigger_mcu_flash();
         }
     };
@@ -268,12 +302,12 @@ var verifyVersionHandler = function verifyVersionHandler(event, from, to)
 
 var completeHandler = function completeHandler(event, from, to)
 {
-    // Do nothing for now
+    console.log( "BOARD STATE: Auto-update process complete." );
 }
 
 var failHandler = function failHandler(event, from, to)
 {
-    // Do nothing for now
+    console.log( "BOARD STATE: Auto-update process failed." );
 }
 
 var eFailHandler = function eFailHandler(event, from, to, msg) 

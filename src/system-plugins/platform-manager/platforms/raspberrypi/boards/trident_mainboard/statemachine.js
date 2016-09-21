@@ -88,6 +88,8 @@ module.exports = function( board )
 
 var escCheckHandler = function escCheckHandler(event, from, to)
 {
+    console.log( "MCU STATE: CHECKING ESCS" );
+
     var self = this;
 
     // For now, assume ESCs are flashed since we don't have hardware yet
@@ -108,6 +110,8 @@ var escCheckHandler = function escCheckHandler(event, from, to)
 
 var flashESCHandler = function flashESCHandler(event, from, to)
 {
+    console.log( "MCU STATE: FLASHIGN ESCS" );
+
     var self = this;
 
     // For now, assume ESCs are flashed since we don't have hardware yet
@@ -141,6 +145,8 @@ var flashESCHandler = function flashESCHandler(event, from, to)
 
 var checkBinHandler = function checkBinHandler(event, from, to)
 {
+    console.log( "MCU STATE: CHECKINGBIN" );
+
     var self = this;
 
     // Check to see if ESCs have been flashed before by testing the existence of esc.conf
@@ -159,6 +165,8 @@ var checkBinHandler = function checkBinHandler(event, from, to)
 
 var buildFirmwareHandler = function buildFirmwareHandler(event, from, to)
 {
+    console.log( "MCU STATE: BUILDING FIRMWARE" );
+
     var self = this;
 
     // Execute the build firmware script
@@ -177,6 +185,8 @@ var buildFirmwareHandler = function buildFirmwareHandler(event, from, to)
 
 var getHashHandler = function getHashHandler(event, from, to)
 {
+    console.log( "MCU STATE: GETTING HASH" );
+
     var self = this;
 
     fs.readFileAsync( mcuBinPath, 'utf8' )
@@ -206,6 +216,8 @@ var getHashHandler = function getHashHandler(event, from, to)
 
 var flashMCUHandler = function flashMCUHandler(event, from, to)
 {
+    console.log( "MCU STATE: FLASHINGFIRMWARE" );
+
     var self = this;
 
     // Execute the build firmware script
@@ -224,6 +236,8 @@ var flashMCUHandler = function flashMCUHandler(event, from, to)
 
 var verifyVersionHandler = function verifyVersionHandler(event, from, to)
 {
+    console.log( "MCU STATE: VERIFY" );
+
     var self = this;
 
     // First, clear out the existing fromMCU hash info
@@ -271,11 +285,13 @@ var verifyVersionHandler = function verifyVersionHandler(event, from, to)
 var completeHandler = function completeHandler(event, from, to)
 {
     // Do nothing for now
+    console.log( "MCU STATE: Complete" );
 }
 
 var failHandler = function failHandler(event, from, to)
 {
     // Do nothing for now
+    console.log( "MCU STATE: FAIL" );
 }
 
 var eFailHandler = function eFailHandler(event, from, to, msg) 

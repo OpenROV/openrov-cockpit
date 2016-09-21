@@ -4,7 +4,7 @@ const retry = require('bluebird-retry');
 const fs = Promise.promisifyAll(require('fs-extra'));
 const spawnAsync = require('child-process-promise').spawn;
 const execAsync = require('child-process-promise').exec;
-const StateMachine = require('./javascript-state-machine');
+const StateMachine = require('javascript-state-machine');
 
 const BuildFirmwareScript = "/opt/openrov/system/scripts/BuildFirmware.js";
 const FlashFirmwareScript = "/opt/openrov/system/scripts/FlashFirmware.js";

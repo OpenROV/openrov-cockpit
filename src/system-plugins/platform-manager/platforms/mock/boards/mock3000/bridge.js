@@ -48,6 +48,11 @@ function Bridge() {
         debug('Tilt status: ' + commandParts[1] / 100);
         break;
       }
+    case 'tiltInverted': {
+        bridge.emitStatus('tiltInverted:' + commandParts[1]);
+        debug('Tilt Inverted: ' + ( commandParts[1] == 1 ? "true" : "false" ) );
+        break;
+      }
     case 'claser': {
         if (bridge.laserEnabled) {
           bridge.laserEnabled = false;

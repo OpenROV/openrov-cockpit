@@ -44,8 +44,7 @@ function Bridge() {
         break;
       }
     case 'tilt': {
-        bridge.emitStatus('servo:' + commandParts[1]);
-        debug('Tilt status: ' + commandParts[1] / 100);
+        bridge.emitStatus('servo:' + commandParts[1] );
         break;
       }
     case 'tiltInverted': {
@@ -189,12 +188,7 @@ function Bridge() {
     BRDV = Math.min(Math.max(BRDV, 1), 10);
     result += 'BRDV:' + BRDV + ';';
     result += 'vout:' + BRDV + ';';
-    // Generate servo command
-    currentServo += 50;
-    result += 'servo:' + currentServo + ';';
-    if (currentServo >= 2000) {
-      currentServo = 1000;
-    }
+
     // Emit status update
     bridge.emit('status', reader.parseStatus(result));
   };

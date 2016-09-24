@@ -4,6 +4,10 @@
     const Periodic = require( 'Periodic' );
     const Listener = require( 'Listener' );
 
+    const kZeroPosMicrosecs = 1487.0;
+    const kMicrosecPerDegree = 9.523809;
+    const kDegPerMicrosec = ( 1 / kMicrosecPerDegree );
+
     class CameraTilt
     {
         constructor(name, deps)
@@ -25,13 +29,11 @@
                 if( self.mcuSettings.inverted === self.settings.inverted )
                 {
                     // Synced, no need to continue
-                    console.log( "ACK set camera tilt to: " + ( self.settings.inverted ? "true" : "false" ) );
                     self.SyncSettings.stop();
                 }
                 else
                 {
                     // Send setting request to the MCU
-                    console.log( "REQ set camera tilt to: " + ( self.settings.inverted ? "true" : "false" ) );
                     var command = 'tiltInverted(' + ( self.settings.inverted ? 1 : 0 ) + ')';
                     self.globalBus.emit( 'mcu.SendCommand', command );
                 }
@@ -46,8 +48,10 @@
 
                     // Enable other listeners. If they are already enabled, this will do nothing
                     self.listeners.mcuStatus.enable();
-                    self.listeners.setTilt.enable();
-                    self.listeners.adjustTilt.enable();
+                    self.listeners.setPosition.enable();
+                    self.listeners.modifyPosition.enable();
+                    self.listeners.stepPositive.enable();
+                    self.listeners.stepNegative.enable();
 
                     // Initiate a sync of the settings with the MCU
                     self.SyncSettings.start();
@@ -64,55 +68,75 @@
                     // Servo position
                     if( 'servo' in data ) 
                     {
+                        // TODO: Listen for actual angle
                         // Emit angle value for display purposes
-                        var angle = 90 / 500 * data.servo * -1 - 90;
+                        var angle = ( data.servo - kZeroPosMicrosecs ) * kDegPerMicrosec;
 
                         self.cockpitBus.emit( 'plugin.cameraTilt.angle', angle );
                     }
                 }),
 
-                setTilt: new Listener( this.cockpitBus, 'plugin.cameraTilt.set', false, function( percent )
+                stepPositive: new Listener( this.cockpitBus, 'plugin.cameraTilt.stepPositive', false, function()
                 {
-                    setTilt( percent );
+                    stepPositive();
                 }),
 
-                adjustTilt: new Listener( this.cockpitBus, 'plugin.cameraTilt.adjust', false, function( percent )
+                stepNegative: new Listener( this.cockpitBus, 'plugin.cameraTilt.stepNegative', false, function()
                 {
-                    adjustTilt( percent );
+                    stepNegative();
+                }),
+
+                setPosition: new Listener( this.cockpitBus, 'plugin.cameraTilt.set', false, function( degreesIn )
+                {
+                    setPosition( degreesIn );
+                }),
+
+                modifyPosition: new Listener( this.cockpitBus, 'plugin.cameraTilt.modify', false, function( degreesIn )
+                {
+                    modifyPosition( degreesIn );
                 })
             }
 
-            function adjustTilt( percent )
+            function stepPositive()
             {
-                setTilt( self.tilt + percent );
+                setPosition( self.tilt + 10 );
+            }
+            
+            function stepNegative()
+            {
+                setPosition( self.tilt - 10 );
             }
 
-            function setTilt( percent )
+            function modifyPosition( degreesIn )
+            {
+                setPosition( self.tilt + degreesIn );
+            }
+
+            function setPosition( degreesIn )
             {
                 // Apply limits
-                if( percent > 1.0 )
+                if( degreesIn > self.settings.positiveRange )
                 {
-                    self.tilt = 1.0;
+                    self.tilt = self.settings.positiveRange;
                 }
-                else if( percent < -1.0 )
+                else if( degreesIn < self.settings.negativeRange )
                 {
-                    self.tilt = -1.0;
+                    self.tilt = self.settings.negativeRange;
                 }
                 else
                 {
-                    self.tilt = percent;
+                    self.tilt = degreesIn;
                 }
 
-                // TODO: Work actual floats onto the wire
-                // Map percent to servo command
-                var servoTilt = ArduinoHelper.mapA( self.tilt, -1, 1, 1000, 2000);
+                // TODO: Eventually get float representations of the degrees mapped onto the wire, not servo commands
+                var servoPos = parseInt( ( kMicrosecPerDegree * self.tilt ) + kZeroPosMicrosecs );
 
                 // Emit command to mcu
-                var command = 'tilt(' + servoTilt + ')';
+                var command = 'tilt(' + servoPos + ')';
                 self.globalBus.emit( 'mcu.SendCommand', command );
             }
         }
-
+        
         start()
         {
             this.listeners.settings.enable();
@@ -122,8 +146,10 @@
         {
             this.listeners.settings.disable();
             this.listeners.mcuStatus.disable();
-            this.listeners.setTilt.disable();
-            this.listeners.adjustTilt.disable();
+            this.listeners.setPosition.disable();
+            this.listeners.modifyPosition.disable();
+            this.listeners.stepPositive.disable();
+            this.listeners.stepNegative.disable();
         }
 
         getSettingSchema()
@@ -134,13 +160,17 @@
                 'type': 'object',
                 'id': 'cameratilt',
                 'properties': {
+                    'stepResolution': {
+                        'type': 'number',
+                        'default': '10.0'
+                    },
                     'positiveRange': {
                         'type': 'number',
-                        'default': '.7'
+                        'default': '31.8'
                     },
                     'negativeRange': {
                         'type': 'number',
-                        'default': '-.7'
+                        'default': '-41.7'
                     },
                     'inverted': {
                     'type': 'boolean',
@@ -149,6 +179,7 @@
                     }
                 },
                 'required': [
+                    'stepResolution',
                     'positiveRange',
                     'negativeRange',
                     'inverted'

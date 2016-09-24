@@ -14,7 +14,7 @@
           gamepad: 'A'
         },
         down: function () {
-          cockpit.rov.emit('plugin.cameraTilt.adjust', -0.1);
+          cockpit.rov.emit('plugin.cameraTilt.stepNegative');
         }
       },
       {
@@ -36,7 +36,7 @@
           gamepad: 'Y'
         },
         down: function () {
-          cockpit.rov.emit('plugin.cameraTilt.adjust', 0.1);
+          cockpit.rov.emit('plugin.cameraTilt.stepPositive' );
         }
       }
     ];

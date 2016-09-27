@@ -26,6 +26,13 @@ mjpegvideo.prototype.enumerateDevices = function enumerateDevices() {
       '-e',
       'true'
     ];
+
+  if (process.env.MJPG_MOCK === 'true') {
+    launch_options.push('-m');
+    launch_options.push('true');
+ //   launch_options.splice(1,0,'--debug-brk=15858');
+  }
+
   exec(launch_options.join(' '), { env: { DEBUG: process.env.DEBUG } }, function (error, stdout, stderr) {
     if (error) {
       deferred.reject(error);
@@ -46,9 +53,6 @@ mjpegvideo.prototype.enumerateDevices = function enumerateDevices() {
 };
 mjpegvideo.prototype.start = function start() {
   var self = this;
-  if (process.env.MJPG_MOCK === 'true') {
-    self.startCamera('/dev/video0');
-  } else {
     // self.deps.cockpit.on('plugin.mjpeg-video.start', function(device) {
     //   self.startCamera('/dev/' + device);
     //   self.connectVideoServer();
@@ -57,10 +61,10 @@ mjpegvideo.prototype.start = function start() {
       if (cameras && cameras.length > 0) {
         self.startVideoServer();
         self.connectVideoServer();  // log('Found cameras ' + JSON.stringify(cameras));
-                                    // self.deps.cockpit.emit("plugin.mjpeg-video.cameraInfo", cameras);
+        self.deps.cockpit.emit("plugin.mjpeg-video.cameraInfo", cameras);
       }
     });
-  }
+
 };
 mjpegvideo.prototype.connectVideoServer = function () {
   var self = this;
@@ -95,7 +99,7 @@ mjpegvideo.prototype.connectVideoServer = function () {
     });
   });
 };
-mjpegvideo.prototype.startVideoServer = function startCamera(device) {
+mjpegvideo.prototype.startVideoServer = function startVideoServer(device) {
   var launch_options = [
       'node',
       require.resolve('mjpeg-video-server')
@@ -106,6 +110,8 @@ mjpegvideo.prototype.startVideoServer = function startCamera(device) {
     launch_options.push('true');
     launch_options.push('-u');
     launch_options.push(':8090/?action=stream');
+  //  launch_options.splice(1,0,'--debug-brk=15858');
+    launch_options.splice(1,0,'--debug=15858');
   }
   const infinite = -1;
   log('Starting mjpeg-video-server ' + launch_options);

@@ -57,14 +57,14 @@
                 }
 
                 // Servo speed
-                if( self.mcuSettings.speed !== self.encodedSettings.speed )
-                {
-                    synced = false;
+                // if( self.mcuSettings.speed !== self.encodedSettings.speed )
+                // {
+                //     synced = false;
 
-                    // Send speed setting request to the MCU
-                    var command = 'camServ_spd(' + self.encodedSettings.speed + ')';
-                    self.globalBus.emit( 'mcu.SendCommand', command );
-                }
+                //     // Send speed setting request to the MCU
+                //     var command = 'camServ_spd(' + self.encodedSettings.speed + ')';
+                //     self.globalBus.emit( 'mcu.SendCommand', command );
+                // }
 
                 if( synced )
                 {

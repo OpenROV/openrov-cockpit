@@ -29,7 +29,7 @@
                 },
                 down: function() 
                 {
-                    cockpit.rov.emit( 'plugin.cameraServo.stepNegative' );
+                    cockpit.emit( 'plugin.cameraServo.stepNegative' );
                 }
             }, 
             {
@@ -42,7 +42,7 @@
                 },
                 down: function() 
                 {
-                    cockpit.rov.emit( 'plugin.cameraServo.center' );
+                    cockpit.emit( 'plugin.cameraServo.center' );
                 }
             }, 
             {
@@ -55,7 +55,7 @@
                 },
                 down: function()
                 {
-                    cockpit.rov.emit( 'plugin.cameraServo.stepPositive' );
+                    cockpit.emit( 'plugin.cameraServo.stepPositive' );
                 }
             }];
         };
@@ -142,6 +142,7 @@
         updatePosition()
         {
             // Calculate the currentStep
+            this.calculateStepFromPos();
 
             // Send request to local model
             cockpit.rov.emit( 'plugin.cameraServo.setTargetPos', this.targetPos );
@@ -159,49 +160,46 @@
         stepPositive()
         {
             // Increment step position
-            this.
+            this.currentStep++;
 
             // Update position based on new step
-            this.updatePosition();
+            this.updateStep();
         }
 
         stepNegative()
         {
             // Decrement step position
+            this.currentStep--;
 
             // Update position based on new step
-            this.updatePosition();
-        }
-
-        max()
-        {
-            // Set step position to max positive step
-
-            // Update position based on new step
-            this.updatePosition();
+            this.updateStep();
         }
 
         center()
         {
             // Set step position to 0
+            this.currentStep = 0;
 
             // Update position based on new step
-            this.updatePosition();
+            this.updateStep();
         }
 
         min()
         {
             // Set step position to max negative step
+            this.currentStep = this.stepMap[ this.stepMap.min ];
 
             // Update position based on new step
-            this.updatePosition();
+            this.updateStep();
         }
 
-        updatePosition()
+        max()
         {
-            // Calculate new position based on steps
+            // Set step position to max positive step
+            this.currentStep = this.stepMap[ this.stepMap.max ];
 
-            // Issue new target position to local model
+            // Update position based on new step
+            this.updateStep();
         }
 
         getTelemetryDefinitions()
@@ -214,7 +212,7 @@
             {
                 name: 'cameraServo.targetPos',
                 description: 'Requested camera servo position reported in degrees'
-            }
+            }]
         };
 
         // This pattern will hook events in the cockpit and pull them all back
@@ -247,12 +245,43 @@
 
             // API functions
 
-            // StepPositive
-            // StepNegative
-            // Center
-            // Min
-            // Max
-            // 
+            // stepPositive
+            this.cockpit.on('plugin.cameraServo.stepPositive', function()
+            {
+                self.stepPositive();
+            });
+
+            // stepNegative
+            this.cockpit.on('plugin.cameraServo.stepNegative', function()
+            {
+                self.stepNegative();
+            });
+
+            // center
+            this.cockpit.on('plugin.cameraServo.center', function()
+            {
+                self.center();
+            });
+
+            // min
+            this.cockpit.on('plugin.cameraServo.min', function()
+            {
+                self.min();
+            });
+
+            // max
+            this.cockpit.on('plugin.cameraServo.min', function()
+            {
+                self.max();
+            });
+
+            // setTargetPos
+            this.cockpit.on('plugin.cameraServo.setTargetPos', function( pos )
+            {
+                self.targetPos = pos;
+
+                self.updatePosition();
+            });
         };
     };
 

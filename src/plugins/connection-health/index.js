@@ -3,9 +3,7 @@ function ConnectionHealth(name, deps) {
   var lastping = 0;
   this.deps = deps;
   var self = this;
-  deps.cockpit.onAny(function(e){
-    console.log(this.event);
-  });
+
   deps.cockpit.on('sys.ping', function (id) {
     self.deps.cockpit.emit('sys.pong', id);
     if (new Date().getTime() - lastping > 500) {

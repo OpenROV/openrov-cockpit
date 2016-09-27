@@ -1,14 +1,27 @@
 var find = require('findit');
 var path = require('path');
-var finder = find(process.cwd());
+
 var bower = require('bower');
 var rimraf = require('rimraf');
 var currentdirectory = process.cwd();
 var bowersToInstall = [];
+bowersToInstall.push(path.join(process.cwd(),'/src/static'));
+
+//Force the directories to scan in priority order.  If the Pack dir option is set 
+//bower will use one flat directory for everything with first installed wining in a conflict.
+//var finder = find(process.cwd());
+var finder = find(path.join(process.cwd(),'/src/beta-plugins'));
+var finder = find(path.join(process.cwd(),'/src/dev-plugins'));
+var finder = find(path.join(process.cwd(),'/src/plugins'));
+var finder = find(path.join(process.cwd(),'/src/system-plugins'));
+var finder = find(path.join(process.cwd(),'/src/static'));
+
 finder.on('file', function (file, stat) {
   if (file.indexOf('bower.json') > -1) {
     console.log('Execute bower install on ' + file);
-    bowersToInstall.push(file.substring(0, file.lastIndexOf('/')));
+    if (!bowersToInstall.includes(file.substring(0, file.lastIndexOf('/')))){
+      bowersToInstall.push(file.substring(0, file.lastIndexOf('/')));
+    }
   }
 });
 finder.on('directory', function (dir, stat, stop) {

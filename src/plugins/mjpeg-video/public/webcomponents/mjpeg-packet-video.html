@@ -84,7 +84,10 @@
                  * Takes a byte array for the jpeg image and displays it on screen
                  */
                 append: function(frame) {
-                    this._drawFrame(frame);
+                    var self=this;
+                    window.requestAnimationFrame(function(){
+                        self._drawFrame(frame);
+                    });
                 }
             });
         }());

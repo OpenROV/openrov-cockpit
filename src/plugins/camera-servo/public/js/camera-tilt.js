@@ -41,7 +41,7 @@
       }
     ];
   };
-  plugins.CameraTilt.prototype.getTelemetryDefintions = function getTelemetryDefintions() {
+  plugins.CameraTilt.prototype.getTelemetryDefinitions = function getTelemetryDefinitions() {
     return [
       {
         name: 'servo',

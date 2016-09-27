@@ -6,7 +6,7 @@
     self.cockpit = cockpit;
     console.log('SystemEnvironment Plugin running');
   };
-  plugins.SystemEnvironment.prototype.getTelemetryDefintions = function getTelemetryDefintions() {
+  plugins.SystemEnvironment.prototype.getTelemetryDefinitions = function getTelemetryDefinitions() {
     return [
       {
         name: 'FMEM',

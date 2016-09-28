@@ -4,96 +4,138 @@
 <link rel="import" href="../iron-icon/iron-icon.html">
 <link rel="import" href="../paper-toast/paper-toast.html">
 <link rel="import" href="foundationcss.html">
-<link rel="import" href="normalizecss.html">
+<link rel="import" href="../paper-menu/paper-menu.html">
+<link rel="import" href="../json-schema-editor/json-schema-editor.html">
+
 <script src="../json-editor/dist/jsoneditor.js"></script>
 <!-- Foundation CSS framework (Bootstrap and jQueryUI also supported) -->
 
 <dom-module name="orov-settings-manager">
-<template>
+    <template>
 <style include="foundation5-styles"></style>
-<style include="normalized-styles"></style>
+<style>
+  .container{
+    width:100%;
+    display:flex;
+  }
+  .menu{
+    display:inline;
+    min-width:200px;
+    flex:1;
+  }
+  .detail{
+    flex:8;
+  }
+</style>
 
-
-  <paper-toast id="toast"></paper-toast>
-  <div id='form1'>
-
+<paper-toast id="toast"></paper-toast>
+<div class="container">
+  <paper-menu class="menu" att-for-selected="section-name" selected="{{currentSection}}" on-iron-select="_handleSectionSelect">
+    <template is="dom-repeat" items="{{sections}}">
+    <paper-item section-name$="{{item}}">{{__(item)}}</paper-item>
+    </template>
+  </paper-menu>  
+  <div class="detail" id="form2">
+    <json-schema-editor  id="jedit" on-changed="_handleJeditChange"
+      class="no-mousetrap"
+      disable_collapse="true"
+      form_name_root="{{__('Location')}}"
+      theme="foundation5"
+      iconlib="fontawesome4webcomponent"
+    >{{_jsonSchemaforSelection(currentSection)}}</json-schema-editor>       
   </div>
+</div>
 
 </template>
-<script>
-(function() {
-  var editor;
-  Polymer({
-    is:'orov-settings-manager',
-    properties: {
-      schema: {type: Object},
-      value: {type: Object},
-//      editor: {type: Object},
-      editorOptions: {type: Object, value: {
-        theme: null,
-        disable_edit_json: true,
-        disable_properties: true
-      }}
-    },
-    editor: {},
-    behaviors: [namespace('behaviors').oROVStandard],
-    ready: function(){
-      var emitter = this.eventEmitter;
-      var self = this;
-      emitter.emit('plugin.settings-manager.getSchemas',function(schema){
-        self.schema = schema;
-        console.log(schema);
-        var _self = self;
-        var _emitter = emitter;
+    <script>
+        (function() {
+            var editor;
+            Polymer({
+                is: 'orov-settings-manager',
+                properties: {
+                    schema: {
+                        type: Object
+                    },
+                    sections:{
+                      type: Array,
+                      value: function(){return []}
+                    },
+                    value: {
+                        type: Object
+                    },
+                    //      editor: {type: Object},
+                    editorOptions: {
+                        type: Object,
+                        value: {
+                            theme: null,
+                            disable_edit_json: true,
+                            disable_properties: true
+                        }
+                    }
+                },
+                editor: {},
+                behaviors: [namespace('behaviors')
+                    .oROVStandard
+                ],
+                registerEmitterHandlers: function(emitter){
+                    var self = this;
+                    emitter.withHistory.on('settings-change',function(settings){
+                      self.value = settings;
+                    });
+                },
+                attached: function(){
+                    var emitter = this.eventEmitter;
+                    var self = this;                  
+                    emitter.emit('plugin.settings-manager.getSchemas', function(schema) {
+                        self.schema = schema;
+                        Object.keys(schema.properties)
+                            .filter(function(key) {
+                                //If the schema is marked with a managedBy, the settings control will by default ignore it.
+                                if (schema.properties[key].managedBy) {
+                                    return true;
+                                } else {
+                                    return false;
+                                }
+                            })
+                            .map(function(key) {
+                                delete(self.schema.properties[key]);
+                            })
+                        self.set('sections',Object.keys(self.schema.properties));
+                        console.log(schema);
 
-        /* Go ahead and create a new blank form, then pull in
-           any existing values that had been persisted.  In that
-           way we don't create a broken form that is missing
-           fields.
-        */
-        _emitter.emit('plugin.settings-manager.getSettings',null,function(settings){
-          JSONEditor.defaults.editors.object.options.collapsed = true;
-          _self.$.form1.innerHTML='';
-          _self.value = settings;
-          _self.editorOptions['schema'] = schema;
-          _self.editorOptions['theme'] = 'foundation5';
-          _self.editorOptions['iconlib'] = 'fontawesome4webcomponent';
-          _self.editorOptions['no_additional_properties'] = true;
-          _self.editor = new JSONEditor(_self.$.form1, _self.editorOptions);
 
+                        /* Go ahead and create a new blank form, then pull in
+                           any existing values that had been persisted.  In that
+                           way we don't create a broken form that is missing
+                           fields.
+                        */
 
-          //JSONEditor.defaults.language = "es"; for localizing local error messages
-          var defaults = _self.editor.getValue();
-          console.log("Defaults")
-          console.log(JSON.stringify(defaults));
-          //zips the object properies in to _self.value
-          Object.assign(_self.value,settings);
-          _self.editor.setValue(_self.value);
-
-          _self.editor.on('change',function() {
-              _self.save();
-          });
-        });
-
-      })
-    },
-    save: function(){
-      var data = this.editor.getValue();
-      this.fire('save',data);
-      if (this.eventEmitter !== undefined){
-        this.eventEmitter.emit('plugin.settings-manager.persist-data',data);
-      }
-      this.$.toast.show('Settings Saved');
-    },
-    attached: function(){
-      var self = this;
-
-      if(this.eventEmitter === undefined){
-//          this.editor = new JSONEditor(this.$.form1, this.schema);
-      }
-
-    }
-  })
-})();
-</script>
+                    })
+                },
+                _handleSectionSelect: function(e){
+                  this.$.jedit.load(this._schemaForSelectedSections(this.currentSection),this._valueForSelectedSection(this.currentSection));
+                },
+                _handleJeditChange: function(e){
+                    var setting ={};
+                    setting[this.sections[this.currentSection]]=e.detail;
+                    this.fire('save', setting);
+                    if (this.eventEmitter !== undefined) {
+                        this.eventEmitter.emit('plugin.settings-manager.persist-data', setting);
+                    }
+                    //TODO: Find a faster responding notification. The toast has a built in animation? delay and may take a couple
+                    //seconds to appear.
+                    this.$.toast.show(`${this.sections[this.currentSection]} settings Saved`);                  
+                },
+                _schemaForSelectedSections: function(selection){
+                  return this.schema.properties[this.sections[selection]];
+                },
+                _valueForSelectedSection: function(selection){
+                  return this.value[this.sections[selection]];
+                },
+                _jsonSchemaforSelection: function(selection){
+                  return JSON.stringify(this._schemaForSelectedSections(selection));
+                }
+            })
+        })();
+    </script>
 </dom-module>

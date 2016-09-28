@@ -256,7 +256,8 @@
           //co-pilot
           var copilot_blacklist = [
               'plugin.rovpilot.desiredControlRates',
-              'ping'
+              'ping',
+              'sys.ping'
             ];
           var pilot_blacklist = ['ping'];
           var cockpit_commands = [

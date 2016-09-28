@@ -22,7 +22,7 @@ ClassicControlMapping.prototype.getControlMappingPreset = function getControlMap
               }
             },
             {
-              "name": "plugin.cameraTilt.adjust_down",
+              "name": "plugin.cameraServo.stepNegative",
               "bindings": [
                 {
                   "name": "keyboard",
@@ -40,7 +40,7 @@ ClassicControlMapping.prototype.getControlMappingPreset = function getControlMap
               }
             },
             {
-              "name": "plugin.cameraTilt.adjust_centre",
+              "name": "plugin.cameraServo.center",
               "bindings": [
                 {
                   "name": "keyboard",
@@ -58,7 +58,7 @@ ClassicControlMapping.prototype.getControlMappingPreset = function getControlMap
               }
             },
             {
-              "name": "plugin.cameraTilt.adjust_up",
+              "name": "plugin.cameraServo.stepPositive",
               "bindings": [
                 {
                   "name": "keyboard",

@@ -229,6 +229,9 @@
 
                 // Generate the step map
                 self.generateStepMap();
+
+                // Update the current step based on the new stepMap
+                self.calculateStepFromPos();
             });
 
             // Local Model currentPos

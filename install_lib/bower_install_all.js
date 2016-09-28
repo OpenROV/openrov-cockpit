@@ -1,20 +1,11 @@
 var find = require('findit');
 var path = require('path');
-
+var finder = find(process.cwd());
 var bower = require('bower');
 var rimraf = require('rimraf');
 var currentdirectory = process.cwd();
 var bowersToInstall = [];
 bowersToInstall.push(path.join(process.cwd(),'/src/static'));
-
-//Force the directories to scan in priority order.  If the Pack dir option is set 
-//bower will use one flat directory for everything with first installed wining in a conflict.
-//var finder = find(process.cwd());
-var finder = find(path.join(process.cwd(),'/src/beta-plugins'));
-var finder = find(path.join(process.cwd(),'/src/dev-plugins'));
-var finder = find(path.join(process.cwd(),'/src/plugins'));
-var finder = find(path.join(process.cwd(),'/src/system-plugins'));
-var finder = find(path.join(process.cwd(),'/src/static'));
 
 finder.on('file', function (file, stat) {
   if (file.indexOf('bower.json') > -1) {
@@ -52,7 +43,7 @@ var installbower = function (index, array) {
   var dir = array[index];
   console.log('======== cleaning =======');
   console.log(dir + '/bower_components');
-  rimraf(dir + '/bower_components', function () {
+ // rimraf(dir + '/bower_components', function () {
     console.log('======== installing =======');
     console.log(dir);
     console.log(process.env.PACKDIR)
@@ -72,5 +63,5 @@ var installbower = function (index, array) {
       }
     });
 
-  });
+ // });
 };

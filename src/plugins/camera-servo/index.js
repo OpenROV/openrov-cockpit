@@ -4,12 +4,6 @@
     const Periodic = require( 'Periodic' );
     const Listener = require( 'Listener' );
 
-    // TODO: Move these to MCU
-    // const kZeroPosMicrosecs = 1487.0;
-    // const kMicrosecPerDegree = 9.523809;
-    // const kDegPerMicrosec = ( 1 / kMicrosecPerDegree );
-    //var servoPos = parseInt( ( kMicrosecPerDegree * self.targetPos ) + kZeroPosMicrosecs );
-
     // Encoding helper functions
     function encode( floatIn )
     {
@@ -18,7 +12,7 @@
 
     function decode( intIn )
     {
-        return ( intIn / 1000 );
+        return ( intIn * 0.001 );
     }
 
     class CameraServo
@@ -30,8 +24,9 @@
             this.globalBus  = deps.globalEventLoop;
             this.cockpitBus = deps.cockpit;
 
-            this.targetPos      = 0;
-            this.targetPos_enc  = 0;
+            this.targetPos          = 0;
+            this.targetPos_enc      = 0;
+            this.mcuTargetPos_enc   = 0;
 
             this.settings           = {};
             this.encodedSettings    = {};   // Used to work around floating point settings
@@ -57,14 +52,14 @@
                 }
 
                 // Servo speed
-                // if( self.mcuSettings.speed !== self.encodedSettings.speed )
-                // {
-                //     synced = false;
+                if( self.mcuSettings.speed !== self.encodedSettings.speed )
+                {
+                    synced = false;
 
-                //     // Send speed setting request to the MCU
-                //     var command = 'camServ_spd(' + self.encodedSettings.speed + ')';
-                //     self.globalBus.emit( 'mcu.SendCommand', command );
-                // }
+                    // Send speed setting request to the MCU
+                    var command = 'camServ_spd(' + self.encodedSettings.speed + ')';
+                    self.globalBus.emit( 'mcu.SendCommand', command );
+                }
 
                 if( synced )
                 {
@@ -73,6 +68,29 @@
 
                     // Enable API now that the MCU settings are updated
                     self.listeners.setTargetPos.enable();
+                }
+            });
+
+            this.SyncTargetPosition = new Periodic( 33, "timeout", function()
+            {
+                var synced = true;
+
+                // Send target position to MCU until it responds with affirmation
+                if( self.mcuTargetPos_enc !== self.targetPos_enc )
+                {
+                    synced = false;
+
+                    // Encode floating point position to integer representation
+                    var command = 'camServ_tpos(' + self.targetPos_enc + ')';
+
+                    // Emit command to mcu
+                    self.globalBus.emit( 'mcu.SendCommand', command );
+                }
+
+                if( synced )
+                {
+                    // No need to continue
+                    self.SyncTargetPosition.stop();
                 }
             });
 
@@ -119,7 +137,21 @@
                         // Convert from integer to float
                         var angle = decode( data.camServ_pos );
 
+                        // Emit on cockpit bus for UI purposes
                         self.cockpitBus.emit( 'plugin.cameraServo.currentPos', angle );
+                    }
+
+                    // Servo target position
+                    if( 'camServ_tpos' in data ) 
+                    {
+                        // Save encoded version for sync validation purposes
+                        self.mcuTargetPos_enc = data.camServ_tpos;
+
+                        // Convert from integer to float
+                        var angle = decode( data.camServ_tpos );
+
+                        // Emit the real target position on the cockpit bus for UI purposes
+                        self.cockpitBus.emit( 'plugin.cameraServo.targetPos', angle );
                     }
                 }),
 
@@ -148,14 +180,10 @@
                 self.targetPos = posIn;
             }
 
-            // Encode floating point position to integer representation
-            var command = 'camServ_pos(' + encode( self.targetPos ) + ')';
+            self.targetPos_enc = encode( self.targetPos );
 
-            // Emit command to mcu
-            self.globalBus.emit( 'mcu.SendCommand', command );
-
-            // Emit new target to cockpit for UI purposes
-            self.cockpitBus.emit( 'plugin.cameraServo.targetPos', self.targetPos );
+            // Start targetPos sync, if not already running
+            self.SyncTargetPosition.start();
         }
         
         start()
@@ -188,11 +216,11 @@
                     },
                     'rangeMax': {
                         'type': 'number',
-                        'default': '31.8'
+                        'default': '32.8'
                     },
                     'rangeMin': {
                         'type': 'number',
-                        'default': '-41.7'
+                        'default': '-40.6'
                     },
                     'inverted': {
                     'type': 'boolean',

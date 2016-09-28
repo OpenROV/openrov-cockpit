@@ -9,6 +9,7 @@
 			"stopOnEntry": false,
 			"args": [],
 			"cwd": "${workspaceRoot}",
+			"preLaunchTask": null,
 			"runtimeExecutable": null,
 			"runtimeArgs": [
 				"--nolazy"
@@ -20,14 +21,15 @@
 				"DEV_MODE": "true",
 				"USE_MOCK": "true",
 				"CPU_MOCK": "123MOCK",
-				"GEO_MOCK": "true",
+				"GEO_MOCK": "false",
+				"MJPG_MOCK": "true",
 				"DEBUG": "bridge, mcu, cpu",
 				"port": 8080,
 				"configfile": "/tmp/rovconfig.json",
 				"plugins__ui-manager__selectedUI": "new-ui",
 				"pluginsDownloadDirectory": "/tmp/plugins"
 			},
-			"externalConsole": false,
+            "console": "internalConsole",			
 			"sourceMaps": false,
 			"outDir": null
 		},

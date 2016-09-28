@@ -2,12 +2,13 @@
 <link rel="import" href="../mjpeg-video-webcomponents/mjpeg-video.html">
 <link rel="import" href="../packet-video/packet-video.html">
 <link rel="import" href="../orov-behaviors/orov-behavior.html">
+<link rel="import" href="../mjpeg-video/mjpeg-packet-video.html">
 
 <dom-module name="orov-video">
   <style>
   </style>
   <template>
-    <template is="dom-if" if="{{displayPlayer(videoMimeType,'video/x-motion-jpeg')}}" iff="{{videoMimeType == 'video/x-motion-jpeg'}}">
+    <template is="dom-if" if="{{displayPlayer(videoMimeType,'video/x-motion-jpeg','http',_registerdConnection)}}" >
     <mjpeg-video id="camera1" border='1' style='width: 100%; height:100%'
       menuState='on'
       src='{{videoSource}}'
@@ -19,7 +20,13 @@
      </mjpeg-video>
     </template>
 
-    <template id="mp4template" is="dom-if" if="{{displayPlayer(videoMimeType,'video/mp4')}}" iff="{{videoMimeType == 'video/mp4'}}">
+    <template is="dom-if" if="{{displayPlayer(videoMimeType,'video/x-motion-jpeg','socket.io',_registerdConnection)}}" >
+    <mjpeg-packet-video id="camera1" border='1' style='width: 100%; height:100%'>
+      <content></content>
+     </mjpeg-packet-video>
+    </template>    
+
+    <template id="mp4template" is="dom-if" if="{{displayPlayer(videoMimeType,'video/mp4','socket.io',_registerdConnection)}}">
       <packet-video id="camera1" border='1' style='width: 100%; height:100%'
         menuState='on'
         src='{{videoSource}}'
@@ -45,7 +52,8 @@
           videoMimeType: {type:String},
           location: {type:String},
           showStats: {type:Boolean, value:function(){return false;}},
-          shortCircuit: {type:Boolean, value:function(){return false;}}
+          shortCircuit: {type:Boolean, value:function(){return false;}},
+          _registerdConnection: {type:Object, value:function(){return null;}}
         },
         behaviors: [namespace('behaviors').oROVStandard],
         detached: function(){
@@ -81,6 +89,7 @@
             self.videoMimeType=data.videoMimeType;
             self.framesPerSecond=data.framerate;
             self.videoSource = data.sourceAddress;
+            self.set('_registerdConnection',data);
           });
 
           //If we have segmented mp4 data streaming for this camera,
@@ -111,99 +120,26 @@
             }
           });
 
-          var image = new Image();
-          var imageSrc = '';
-          var tick = 2;
-
-          var draw;
-          var drawFrame;
-          var canvas;
-          var ctx;
-          var proportionalHeight;
-          var width;
-          var height;
-
-					var drawCounter = 0;
-
-					setInterval(function(){
-					//	console.log('FPS: ' + drawCounter);
-						drawCounter = 0;
-					}, 1000);
-
-					var img = new Image;
-					img.onload = function() {
-							URL.revokeObjectURL(this.src);
-							ctx.drawImage(img, 0, 0, canvas.width, proportionalHeight);
-							drawCounter++;
-					};
-
-					var loadImage = function(frame, canvas, proportionalHeight) {
-							var blob = new Blob([frame], {type: 'application/octet-binary'});
-							var url = URL.createObjectURL(blob);
-							img.src = url;
-					};
-          draw = function() {
-            var frame = buffer.pop();
-            if (frame ) {
-							drawFrame(frame);
-					}};
-					drawFrame = function(frame) {
-						if (frame.isDrawn == true) return;
-						frame.isDrawn = true;
-
-              if (!canvas || !width > 0 || !height > 0) {
-								var blob = new Blob([frame.data], {type: 'application/octet-binary'});
-								var url = URL.createObjectURL(blob);
-								image.onload = function() {
-
-									self.$$('#camera1').src = url; // set first frame
-									canvas = self.$$('#camera1').videocanvas;
-									var style = window.getComputedStyle(canvas.parentElement, null);
-									width = parseInt(style.getPropertyValue('width'));
-									height = parseInt(style.getPropertyValue('height'));
-									proportionalHeight = width * image.height / image.width;
-									ctx = canvas.getContext('2d');
-									self.$$('#camera1').stop();
-									self.$$('#camera1').isHidden = true;
-									URL.revokeObjectURL(url);
-								}
-								image.src = url;
-
-                
-              }            
-              if (canvas && (canvas.width== 0 || canvas.height == 0)) {
-                canvas.width = width;
-                canvas.height = height;
-              }
-							if (canvas && canvas.width > 0 && canvas.height > 0 ) 
-								loadImage(frame.data, canvas, proportionalHeight);
-            }
-
-					var mjpegDrawIntervall;
 
           emitter.on('x-motion-jpeg.data',function(frame){
             if (self.shortCircuit) {return;}            
             if (self.$$('#camera1')===null){
               return;
             }
-						// we draw the image via window.postMessage, this causes a context change and the
-						// image is drawn on the GPU thread;
-						window.postMessage({type: 'draw', data: frame, isDrawn: false}, '*', [frame]);
-          });
-					window.onmessage = function(message) {
-						if (message.data.type == 'draw') {
-							drawFrame(message.data);
-						}
-					}
-
+            self.$$('#camera1').append(frame);
+          })
         },
         _canvasChanged: function(){
           if (this.eventEmitter!==undefined){
             this.eventEmitter.emit('video.forward.canvas-changed',this.canvas);
           }
         },
-        displayPlayer(mimeType,playerType){
-          return mimeType==playerType;
+        displayPlayer(mimeType,playerType,connection,registeredConnection){
+          if (registeredConnection == null){
+            return false;
+          }
+          var connectionMatch=connection==null?true:registeredConnection.connectionType==connection;
+          return ((mimeType==playerType) && connectionMatch);
         }
     });
   </script>

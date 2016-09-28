@@ -5,10 +5,14 @@ var bower = require('bower');
 var rimraf = require('rimraf');
 var currentdirectory = process.cwd();
 var bowersToInstall = [];
+bowersToInstall.push(path.join(process.cwd(),'/src/static'));
+
 finder.on('file', function (file, stat) {
   if (file.indexOf('bower.json') > -1) {
     console.log('Execute bower install on ' + file);
-    bowersToInstall.push(file.substring(0, file.lastIndexOf('/')));
+    if (!bowersToInstall.includes(file.substring(0, file.lastIndexOf('/')))){
+      bowersToInstall.push(file.substring(0, file.lastIndexOf('/')));
+    }
   }
 });
 finder.on('directory', function (dir, stat, stop) {
@@ -39,7 +43,7 @@ var installbower = function (index, array) {
   var dir = array[index];
   console.log('======== cleaning =======');
   console.log(dir + '/bower_components');
-  rimraf(dir + '/bower_components', function () {
+ // rimraf(dir + '/bower_components', function () {
     console.log('======== installing =======');
     console.log(dir);
     console.log(process.env.PACKDIR)
@@ -59,5 +63,5 @@ var installbower = function (index, array) {
       }
     });
 
-  });
+ // });
 };

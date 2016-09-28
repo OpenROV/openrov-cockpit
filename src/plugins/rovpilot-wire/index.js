@@ -57,11 +57,14 @@
   };
   ROVPilotWire.prototype.getSettingSchema = function getSettingSchema() {
     return [{
-        'title': 'ROVPilot-wire',
+        'title': 'Computer Assisted',
+        'category' : 'controls',
         'id': 'pilotwire',
         'type': 'object',
         'properties': {
           'controlResetsSetPoint': {
+            'title' : 'Fly-by-wire stabalization',
+            'description' : 'The ROV will automatically hold heading and depth when the pilot finishes manuvering',
             'type': 'boolean',
             'format': 'checkbox',
             'default': false

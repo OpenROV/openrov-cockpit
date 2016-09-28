@@ -110,6 +110,7 @@ pluginFinder.prototype.start = function start() {
 pluginFinder.prototype.getSettingSchema = function getSettingSchema() {
   return [{
       'title': 'Plugin Finder Settings',
+      'managedBy' : 'nobody', //to prevent it from showing up.
       'id': 'pluginFinder',
       'type': 'object',
       'properties': {}

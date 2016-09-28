@@ -48,13 +48,16 @@ thrusters2x1.prototype.start = function start() {
 };
 thrusters2x1.prototype.getSettingSchema = function getSettingSchema() {
   return [{
-      'title': 'Thruster Settings',
+      'title': 'Thrusters',
+      'description' : 'Settings for thrusters in a 2X1 (2 Port/Starboard lateral X 1 Vertical)',
+      'category': 'hardware',
       'id': 'thrusters2x1',
       'type': 'object',
       'properties': {
         'motor-response-delay-ms': {
           'type': 'number',
           'title': 'Motor response delay (ms)',
+          'description' : 'Response delay will smooth out thruster accelerations over time which prevents large current spikes.',
           'minimum': 0,
           'maximum': 100,
           'default': 0
@@ -69,10 +72,12 @@ thrusters2x1.prototype.getSettingSchema = function getSettingSchema() {
               'default': false
             },
             'forward-modifier': {
+              'description' : 'Used to adjust the power sent to the motor so that thrusters provide equal thrust',
               'type': 'number',
               'default': 1
             },
             'reverse-modifier': {
+              'description' : 'Used to adjust the power sent to the motor so that thrusters provide equal thrust',              
               'type': 'number',
               'default': 2
             }
@@ -88,10 +93,12 @@ thrusters2x1.prototype.getSettingSchema = function getSettingSchema() {
               'default': false
             },
             'forward-modifier': {
+              'description' : 'Used to adjust the power sent to the motor so that thrusters provide equal thrust',              
               'type': 'number',
               'default': 1
             },
             'reverse-modifier': {
+              'description' : 'Used to adjust the power sent to the motor so that thrusters provide equal thrust',              
               'type': 'number',
               'default': 2
             }
@@ -107,10 +114,12 @@ thrusters2x1.prototype.getSettingSchema = function getSettingSchema() {
               'default': false
             },
             'forward-modifier': {
+              'description' : 'Used to adjust the power sent to the motor so that thrusters provide equal thrust',              
               'type': 'number',
               'default': 1
             },
             'reverse-modifier': {
+              'description' : 'Used to adjust the power sent to the motor so that thrusters provide equal thrust',              
               'type': 'number',
               'default': 2
             }

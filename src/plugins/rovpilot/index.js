@@ -148,6 +148,7 @@
   ROVPilot.prototype.getSettingSchema = function getSettingSchema() {
     return [{
         'title': 'ROV Pilot Settings',
+        'managedBy' : 'nobody',
         'id': 'rovpilot',
         'type': 'object',
         'properties': {

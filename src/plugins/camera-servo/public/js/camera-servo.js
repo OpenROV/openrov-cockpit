@@ -77,9 +77,10 @@
 
                 // Set the final step to be the max range
                 self.stepMap[ steps ] = self.settings.rangeMax;
+                self.stepMap.max = steps;
 
                 // Loop through the remaining steps (if any) and map them to positions
-                for( i = 1; i < steps; i++ )
+                for( var i =  1; i < steps; i++ )
                 {
                     self.stepMap[ i ] = i * self.settings.stepResolution;
                 }
@@ -91,9 +92,10 @@
 
                 // Set the final step to be the max range
                 self.stepMap[ -steps ] = self.settings.rangeMin;
+                self.stepMap.min = -steps;
 
                 // Loop through the remaining steps (if any) and map them to positions
-                for( i = 1; i < steps; i++ )
+                for( var i =  1; i < steps; i++ )
                 {
                     self.stepMap[ -i ] = -i * self.settings.stepResolution;
                 }
@@ -145,22 +147,25 @@
             this.calculateStepFromPos();
 
             // Send request to local model
-            cockpit.rov.emit( 'plugin.cameraServo.setTargetPos', this.targetPos );
+            this.cockpit.rov.emit( 'plugin.cameraServo.setTargetPos', this.targetPos );
         }
 
         updateStep()
         {
             // Update targetPos based on currentStep
-            this.targetPos = this.stepMap[ self.currentStep ];
+            this.targetPos = this.stepMap[ this.currentStep ];
 
             // Send request to local model
-            cockpit.rov.emit( 'plugin.cameraServo.setTargetPos', this.targetPos );
+            this.cockpit.rov.emit( 'plugin.cameraServo.setTargetPos', this.targetPos );
         }
 
         stepPositive()
         {
-            // Increment step position
-            this.currentStep++;
+            // Increment step position if possible
+            if( this.currentStep !== this.stepMap.max )
+            {
+                this.currentStep++;
+            }
 
             // Update position based on new step
             this.updateStep();
@@ -168,8 +173,11 @@
 
         stepNegative()
         {
-            // Decrement step position
-            this.currentStep--;
+            // Increment step position if possible
+            if( this.currentStep !== this.stepMap.min )
+            {
+                this.currentStep--;
+            }
 
             // Update position based on new step
             this.updateStep();
@@ -290,7 +298,7 @@
 
     // Add plugin to the window object and add it to the plugins list
     var plugins = namespace('plugins');
-    plugins.CameraTilt = CameraTilt;
-    window.Cockpit.plugins.push( plugins.CameraTilt );
+    plugins.CameraServo = CameraServo;
+    window.Cockpit.plugins.push( plugins.CameraServo );
 
 }(window));

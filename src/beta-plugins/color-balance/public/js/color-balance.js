@@ -9,7 +9,7 @@
   var plugins = namespace('plugins');
   plugins.ColorBalance = ColorBalance;
 
-  c = function ColorBalance(cockpit) {
+  ColorBalance = function ColorBalance(cockpit) {
 
     console.log('Loading color-balance plugin in the browser.');
 

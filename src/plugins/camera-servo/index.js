@@ -7,7 +7,7 @@
     // Encoding helper functions
     function encode( floatIn )
     {
-        return parseInt( float * 1000 );
+        return parseInt( floatIn * 1000 );
     }
 
     function decode( intIn )
@@ -128,14 +128,14 @@
                     // Servo speed
                     if( 'camServ_spd' in data )
                     {
-                        self.mcuSettings.speed = data.camServ_spd;
+                        self.mcuSettings.speed = parseInt( data.camServ_spd );
                     }
 
                     // Servo position
                     if( 'camServ_pos' in data ) 
                     {
                         // Convert from integer to float
-                        var angle = decode( data.camServ_pos );
+                        var angle = decode( parseInt( data.camServ_pos ) );
 
                         // Emit on cockpit bus for UI purposes
                         self.cockpitBus.emit( 'plugin.cameraServo.currentPos', angle );
@@ -145,10 +145,10 @@
                     if( 'camServ_tpos' in data ) 
                     {
                         // Save encoded version for sync validation purposes
-                        self.mcuTargetPos_enc = data.camServ_tpos;
+                        self.mcuTargetPos_enc = parseInt( data.camServ_tpos );
 
                         // Convert from integer to float
-                        var angle = decode( data.camServ_tpos );
+                        var angle = decode( self.mcuTargetPos_enc );
 
                         // Emit the real target position on the cockpit bus for UI purposes
                         self.cockpitBus.emit( 'plugin.cameraServo.targetPos', angle );
@@ -208,19 +208,19 @@
                 'properties': {
                     'speed': {
                         'type': 'number',
-                        'default': '45.0'
+                        'default': 45.0
                     },
                     'controlSensitivity': {
                         'type': 'number',
-                        'default': '1.0'
+                        'default': 1.0
                     },
                     'rangeMax': {
                         'type': 'number',
-                        'default': '32.8'
+                        'default': 32.8
                     },
                     'rangeMin': {
                         'type': 'number',
-                        'default': '-40.6'
+                        'default': -40.6
                     },
                     'inverted': {
                     'type': 'boolean',
@@ -229,7 +229,7 @@
                     },
                     'stepResolution': {
                         'type': 'number',
-                        'default': '10.0'
+                        'default': 10.0
                     }
                     
                 },

@@ -36,7 +36,8 @@
       Polymer({
         is: 'orov-ping-graph',
         properties: {
-          pingTime: {type:Number,value:0}
+          pingTime: {type:Number,value:0},
+          enabled: {type:Boolean, value:function(){return true;}}
         },
         behaviors: [orovbehaviors.oROVStandard],
         toFixed: function(n,places){

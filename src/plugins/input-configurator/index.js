@@ -9,6 +9,7 @@ inputConfigurator.prototype.getSettingSchema = function getSettingSchema(){
 
 		var mapSchema = {
 						"type": "array",
+						"managedBy" : "input-configurator",
 						"uniqueItems": false,
 						"items": {
 							"type": "object",
@@ -57,6 +58,7 @@ inputConfigurator.prototype.getSettingSchema = function getSettingSchema(){
 			{
 				"title": "Input Configurator Schema",
 				"id": "inputConfigurator", //Added to support namespacing configurations
+				"managedBy" : "input-configurator",
 				"type": "object",
 				"properties": {
 					"currentMap": mapSchema,

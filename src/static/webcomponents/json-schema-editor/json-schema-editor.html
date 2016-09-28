@@ -1,0 +1,150 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<link rel="import" href="../fontawesome-iconset/fa-all.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../settings-manager/foundationcss.html">
+<script src="../json-editor/dist/jsoneditor.js"></script>
+<!-- Foundation CSS framework (Bootstrap and jQueryUI also supported) -->
+
+<dom-module name="json-schema-editor">
+<template>
+<style include="foundation5-styles"></style>
+
+  <div hidden="true">
+  <content id="ctnt"></content>
+  </div>
+  <div id='form1'>
+
+  </div>
+</template>
+<script>
+(function() {
+  var editor;
+
+  function deepEquals(ar1, ar2) {
+    if (!((Array.isArray(ar1) && Array.isArray(ar2)) || (typeof(ar1) == 'object' && typeof(ar2)== 'object'))) {
+      return false;
+    }
+    if (ar1.length !== ar2.length) {
+      return false;
+    }
+    var match=true;
+    Object.keys(ar1).forEach(function(key){
+      var prop1 = ar1[key];
+      var prop2 = ar2[key];
+      if (prop1 !== prop2 && !deepEquals(prop1, prop2)) {
+        match=false
+      }      
+    })
+    return match;
+  }
+
+  Polymer({
+    is:'json-schema-editor',
+    properties: {
+      schema: {type: Object, notify: true, observer: "_createEditor"},
+      value: {type: Object},
+      ajax: {type: Boolean, value: function(){return false}},
+      disable_array_add: {type: Boolean, value: function(){return false}},
+      disable_array_delete: {type: Boolean, value: function(){return true}},
+      disable_array_reorder: {type: Boolean, value: function(){return false}},
+      disable_collapse: {type: Boolean, value: function(){return false}},
+      disable_edit_json: {type: Boolean, value: function(){return true}},
+      disable_properties: {type: Boolean, value: function(){return true}},
+      form_name_root: {type: String, value: function(){return null}},
+      iconlib: {type: String, value: function(){return null}},      
+      no_additional_properties: {type: Boolean, value: function(){return false}},
+      refs: {type: Object, value: function(){return {}}},
+      required_by_default: {type: Boolean, value: function(){return false}},
+      keep_oneof_values: {type: Boolean, value: function(){return true}},
+      show_errors: {type: String, value: function(){return "interaction"}},
+      startval: {type: Object, value: function(){return {}}},
+      template: {type: String, value: function(){return "default"}},
+      theme: {type: String, value: function(){return "html"}},
+      display_required_only: {type: Boolean, value: function(){return false}}
+    },
+    editor: {},
+    behaviors: [namespace('behaviors').oROVGlobalization],
+    detached: function(){
+      this.editor.destroy();
+    },
+    attached: function(){
+        var self=this;
+
+
+/*
+        this._observer =
+            Polymer.dom(this.$.ctnt).observeNodes(function(info) {
+            try{
+            self.schema = JSON.parse(self.$.ctnt.getDistributedNodes()[0].data);
+            }catch(e){
+              return;
+            }
+        });  
+*/
+        try{
+         this.schema = JSON.parse(this.$.ctnt.getDistributedNodes()[0].data);
+        }catch(e){
+          return;
+        }
+    },
+    _createEditor:function(){
+
+      var _self = this;
+          JSONEditor.defaults.editors.object.options.collapsed = false;
+          JSONEditor.defaults.language = "defer";
+          JSONEditor.defaults.translate = function(key, variables) {  
+              return _self.__(key);
+          }
+
+          _self.$.form1.innerHTML='';
+
+          _self.editor = new JSONEditor(_self.$.form1,{
+            schema: this.schema,
+            ajax: this.ajax,
+            disable_array_add: this.disable_array_add,
+            disable_array_delete: this.disable_array_delete,
+            disable_array_reorder: this.disable_array_reorder,
+            disable_collapse: this.disable_collapse, //
+            disable_edit_json: this.disable_edit_json,
+            disable_properties: this.disable_properties,
+            form_name_root: this.form_name_root,
+            iconlib: this.iconlib,
+            no_additional_properties: this.no_additional_properties,
+            refs: this.refs,
+            required_by_default: this.required_by_default,
+            keep_oneof_values: this.keep_oneof_values,
+            show_errors: this.show_errors,
+            startval:this.startval,
+            template: this.template,
+            theme: this.theme,
+            display_required_only: this.display_required_only
+          });
+
+
+          //JSONEditor.defaults.language = "es"; for localizing local error messages
+          var defaults = _self.editor.getValue();
+          //zips the object properies in to _self.value
+          Object.assign(defaults,_self.value); //defaults now overridden with current values where set
+          _self.editor.setValue(defaults);
+
+          _self.editor.on('change',function() {
+            var data = _self.editor.getValue();
+            if (!deepEquals(data,_self.value)){
+              _self.fire('changed',data);
+              _self.value=data;
+            }
+          });
+    },
+    save: function(){
+      var data = this.editor.getValue();
+      this.fire('save',data);
+    },
+    load: function(schema,data){
+      this.set('value',data);
+      this.set('schema',schema);
+    }
+  })
+})();
+</script>
+</dom-module>

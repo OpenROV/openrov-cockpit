@@ -21,7 +21,7 @@
       strafe: 0
     };
     var self = this;
-    this.cockpit.withHistory.on('settings-change.rovpilot', function (settings) {
+    this.cockpit.withHistory.on('settings-change.inputConfiguratorGeneral', function (settings) {
       self.settings = settings.rovpilot;
     });
     this.cockpit.emit('plugin.rovpilot.setPowerLevel', 2);

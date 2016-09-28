@@ -55,8 +55,29 @@ inputConfigurator.prototype.getSettingSchema = function getSettingSchema(){
 					};
 		
 		return [
+{
+        'title': 'General Controls',
+        'id': 'inputConfiguratorGeneral',
+		'category' : 'controls',
+        'type': 'object',
+        'properties': {
+          'exponentialSticks': {
+            'type': 'boolean',
+            'title': 'Use exponential gamepad sticks',
+			'description': '*Experimental* Makes the stick controls on the gamepad respond in a non-linear fashion for better control of low throttle.',
+            'default': false
+          },
+          'exponentialRate': {
+            'type': 'number',
+            'title': 'The expontetial rate for mapping the stick',
+			'description' : 'Useful values are normally .1 to 3.0',
+            'default': 3
+          }
+        }
+      },
+
 			{
-				"title": "Input Configurator Schema",
+				"title": "Control Mappings",
 				"id": "inputConfigurator", //Added to support namespacing configurations
 				"managedBy" : "input-configurator",
 				"type": "object",

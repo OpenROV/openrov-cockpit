@@ -55,7 +55,7 @@ a .navbar-titel {
 }
 
 #newui-depth {
-    top: -20px;
+
 }
 
 .newui-item h4 {
@@ -75,15 +75,12 @@ a .navbar-titel {
 
 .control {
     width: 100%;
-    top: -40px;
-    margin-bottom: -35px;
     color: white;
     margin-left: 0;
     margin-right: 0;
 }
 
 #newui-compass {
-    margin-bottom: -45px;
 }
 
 #newui-power {
@@ -91,13 +88,10 @@ a .navbar-titel {
 }
 
 orov-newui-switches {
-  margin-top: 10px;
-  display: flex;
+    padding-bottom:.35em;
 }
 
 #newui-time {
-    top: -35px;
-    margin-bottom: -30px;
 }
 
 iron-a11y-announcer {

@@ -43,7 +43,8 @@
     }
     return [{
         'id': 'batteryDefintions',
-        'title': 'Battery Formulas',        
+        'title': 'Battery Formulas',
+        'category' : 'hardware',        
         'type': 'object',
         'properties': {
           'batteries': {

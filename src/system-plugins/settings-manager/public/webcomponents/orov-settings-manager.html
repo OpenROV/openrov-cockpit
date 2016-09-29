@@ -100,9 +100,17 @@
                             .map(function(key) {
                                 delete(self.schema.properties[key]);
                             })
-                        self.set('sections',Object.keys(self.schema.properties));
-                        console.log(schema);
+                        self._categoryMap = {};
+                        Object.keys(schema.properties).forEach(function(key){
+                          var index = schema.properties[key].category==undefined?'general':schema.properties[key].category;
+                          if (!self._categoryMap[index]){
+                            self._categoryMap[index] = {};
+                          }
+                          self._categoryMap[index][key]=schema.properties[key];
+                        })
 
+                        //self.set('sections',Object.keys(self.schema.properties));
+                        self.set('sections',Object.keys(self._categoryMap));
 
                         /* Go ahead and create a new blank form, then pull in
                            any existing values that had been persisted.  In that
@@ -116,8 +124,9 @@
                   this.$.jedit.load(this._schemaForSelectedSections(this.currentSection),this._valueForSelectedSection(this.currentSection));
                 },
                 _handleJeditChange: function(e){
-                    var setting ={};
-                    setting[this.sections[this.currentSection]]=e.detail;
+                //    var setting ={};
+                 //   setting[this.sections[this.currentSection]]=e.detail;
+                    var setting=e.detail;
                     this.fire('save', setting);
                     if (this.eventEmitter !== undefined) {
                         this.eventEmitter.emit('plugin.settings-manager.persist-data', setting);
@@ -127,10 +136,22 @@
                     this.$.toast.show(`${this.sections[this.currentSection]} settings Saved`);                  
                 },
                 _schemaForSelectedSections: function(selection){
-                  return this.schema.properties[this.sections[selection]];
-                },
+                  var schema = this._categoryMap[this.sections[selection]];
+                  //TODO: Figure out how to disable the 'root' (title) display in JSONEDIT
+                  return {
+                    type : 'object',
+                    properties: schema,
+                    title: this.__(this.sections[selection])
+                  }
+                },   
                 _valueForSelectedSection: function(selection){
-                  return this.value[this.sections[selection]];
+                  var self=this;
+                  var schema = this._categoryMap[this.sections[selection]];
+                  var values = {};
+                  Object.keys(schema).forEach(function(key){
+                    values[key]=self.value[key];
+                  })
+                  return values;
                 },
                 _jsonSchemaforSelection: function(selection){
                   return JSON.stringify(this._schemaForSelectedSections(selection));

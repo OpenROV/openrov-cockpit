@@ -122,7 +122,7 @@
                     // Servo inversion
                     if( 'camServ_inv' in data )
                     {
-                        self.mcuSettings.inverted = ( data.camServ_inv == 1 ? true : false );
+                        self.mcuSettings.inverted = ( parseInt( data.camServ_inv ) == 1 ? true : false );
                     }
 
                     // Servo speed
@@ -157,7 +157,14 @@
 
                 setTargetPos: new Listener( this.cockpitBus, 'plugin.cameraServo.setTargetPos', false, function( posIn )
                 {
-                    self.setTargetPos( posIn );
+                    // Validate inputs
+                    var pos = parseInt( posIn );
+
+                    if( !isNaN( pos ) )
+                    {
+                        // Set new target position
+                        self.setTargetPos( pos );
+                    }
                 })
             }
         }

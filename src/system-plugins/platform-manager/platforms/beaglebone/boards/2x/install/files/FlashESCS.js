@@ -2,10 +2,10 @@ var path = require('path');
 var Promise = require('bluebird');
 var Retry = require('bluebird-retry');
 var fs = Promise.promisifyAll(require('fs-extra'));
-var execFileAsync = require('child-process-promise')
-    .execFile;
 var ArduinoBuilder = require('/opt/openrov/cockpit/src/lib/ArduinoBuilder.js');
 
+var spawnAsync = require('child-process-promise').spawn;
+var execAsync = require('child-process-promise').exec;
 
 var buildOpts = {
     sketchDir: '/opt/openrov/firmware/sketches/ArduinoUSBLinker',
@@ -27,12 +27,8 @@ var buildOpts = {
 var mcuFlashArgs = [ '-P', '/dev/spidev1.0', '-c', 'linuxspi', '-vvv', '-p', 'm2560', '-U', 'flash:w:/opt/openrov/firmware/bin/2x/ArduinoUSBLinker.hex' ];
 
 // Create promise for flashing the MCU
-var mcuFlashPromise = function()
-{
-    execFileAsync('avrdude', flashArgs );
-}
-
-var mcuFlashChildProcess = promise.childProcess;
+var mcuFlashPromise = spawnAsync('avrdude', mcuFlashArgs );
+var mcuFlashChildProcess = mcuFlashPromise.childProcess;
 
 // Attach listeners to flashing process
 mcuFlashChildProcess.stdout.on('data', function(stdout) 
@@ -46,11 +42,7 @@ mcuFlashChildProcess.stderr.on('data', function(stderr)
 });
 
 // Create promise for flashing the ESCs themselves
-var escFlashPromise = function()
-{
-    return execFileAsync('sh', "/opt/openrov/system/scripts/FlashESCS.sh" );
-}
-
+var escFlashPromise = spawnAsync('sh', [ "/opt/openrov/system/scripts/FlashESCS.sh" ] );
 var escFlashChildProcess = escFlashPromise.childProcess;
 
 // Attach listeners to flashing process

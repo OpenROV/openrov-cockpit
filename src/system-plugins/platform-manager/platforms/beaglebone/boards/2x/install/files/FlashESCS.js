@@ -4,7 +4,6 @@ var Retry = require('bluebird-retry');
 var fs = Promise.promisifyAll(require('fs-extra'));
 var ArduinoBuilder = require('/opt/openrov/cockpit/src/lib/ArduinoBuilder.js');
 
-var spawnAsync = require('child-process-promise').spawn;
 var execAsync = require('child-process-promise').exec;
 
 var buildOpts = {
@@ -27,34 +26,12 @@ var buildOpts = {
 var mcuFlashArgs = [ '-P', '/dev/spidev1.0', '-c', 'linuxspi', '-vvv', '-p', 'm2560', '-U', 'flash:w:/opt/openrov/firmware/bin/2x/ArduinoUSBLinker.hex' ];
 
 // Create promise for flashing the MCU
-var mcuFlashPromise = spawnAsync('avrdude', mcuFlashArgs );
+var mcuFlashPromise = execAsync('avrdude', mcuFlashArgs );
 var mcuFlashChildProcess = mcuFlashPromise.childProcess;
 
-// Attach listeners to flashing process
-mcuFlashChildProcess.stdout.on('data', function(stdout) 
-{
-    console.log(stdout.toString('utf8'));
-});
-
-mcuFlashChildProcess.stderr.on('data', function(stderr) 
-{
-    console.error(stderr.toString('utf8'));
-});
-
 // Create promise for flashing the ESCs themselves
-var escFlashPromise = spawnAsync('sh', [ "/opt/openrov/system/scripts/FlashESCS.sh" ] );
+var escFlashPromise = execAsync('sh', [ "/opt/openrov/system/scripts/FlashESCS.sh" ] );
 var escFlashChildProcess = escFlashPromise.childProcess;
-
-// Attach listeners to flashing process
-escFlashChildProcess.stdout.on('data', function(stdout) 
-{
-    console.log(stdout.toString('utf8'));
-});
-
-escFlashChildProcess.stderr.on('data', function(stderr) 
-{
-    console.error(stderr.toString('utf8'));
-});
 
 // Run build, flash, upload process
 ArduinoBuilder.BuildSketch( buildOpts, function(data) 
@@ -65,12 +42,26 @@ ArduinoBuilder.BuildSketch( buildOpts, function(data)
   })
 .then(function() 
 {
-  return mcuFlashPromise;
+  return mcuFlashPromise()
+            .then( function( result )
+            {
+                var stdout = result.stdout;
+                var stderr = result.stderr;
+                console.log('ESC MCU FLASH: stdout: ', stdout);
+                console.log('ESC MCU FLASH: stderr: ', stderr);
+            });
 })
 .then( function()
 {
   // Now, try five times to flash the ESCs, every 5 seconds
-  return retry( escFlashPromise, { max_tries: 5, interval: 5000 });
+  return retry( escFlashPromise, { max_tries: 5, interval: 5000 })
+            .then( function( result )
+            {
+                var stdout = result.stdout;
+                var stderr = result.stderr;
+                console.log('ESC FLASH: stdout: ', stdout);
+                console.log('ESC FLASH: stderr: ', stderr);
+            });
 })
 .then( function()
 {

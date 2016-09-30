@@ -113,6 +113,9 @@
                     // Emit settings update to cockpit
                     self.cockpitBus.emit( 'plugin.cameraServo.settingsChange', self.settings );
 
+                    // Update the targetPos in case the ranges changed and it needs re-limiting
+                    self.setTargetPos( self.targetPos );
+
                     // Initiate a sync of the settings with the MCU
                     self.SyncSettings.start();
                 }),

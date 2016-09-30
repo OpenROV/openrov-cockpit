@@ -28,8 +28,10 @@ var mcuFlashArgs = [ '-P', '/dev/spidev1.0', '-c', 'linuxspi', '-vvv', '-p', 'm2
 // Create promise for flashing the MCU
 var mcuFlashPromise = execFileAsync('avrdude', mcuFlashArgs );
 
-// Create promise for flashing the ESCs themselves
-var escFlashPromise = execFileAsync('sh', [ "/opt/openrov/system/scripts/FlashESCS.sh" ] );
+function escFlashFunction()
+{
+    return execFileAsync('sh', [ "/opt/openrov/system/scripts/FlashESCS.sh" ] );
+}
 
 // Run build, flash, upload process
 ArduinoBuilder.BuildSketch( buildOpts, function(data) 
@@ -52,14 +54,7 @@ ArduinoBuilder.BuildSketch( buildOpts, function(data)
 .then( function()
 {
   // Now, try five times to flash the ESCs, every 5 seconds
-  return Retry( escFlashPromise, { max_tries: 5, interval: 5000 })
-            .then( function( result )
-            {
-                var stdout = result.stdout;
-                var stderr = result.stderr;
-                console.log('ESC FLASH: stdout: ', stdout);
-                console.log('ESC FLASH: stderr: ', stderr);
-            });
+  return Retry( escFlashFunction, { max_tries: 5, interval: 5000 })
 })
 .then( function()
 {

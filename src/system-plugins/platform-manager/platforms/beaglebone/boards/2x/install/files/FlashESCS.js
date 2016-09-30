@@ -42,7 +42,7 @@ ArduinoBuilder.BuildSketch( buildOpts, function(data)
   })
 .then(function() 
 {
-  return mcuFlashPromise()
+  return mcuFlashPromise
             .then( function( result )
             {
                 var stdout = result.stdout;

@@ -3,7 +3,7 @@ set -e
 
 if [ ! -d "/opt/openrov/firmware/bin/2x/afro" ]; then
   echo "Cannot find the afro_esc firmware project. Make sure it has been installed."
-  exit -1
+  exit 1
 fi
 
 avrdude -p m8 -b 19200 -P /dev/ttyO1 -c avrispv2 -e -U flash:w:/opt/openrov/firmware/bin/2x/afro/afro_nfet.hex:i -vv

@@ -25,9 +25,6 @@ var buildOpts = {
 
 var mcuFlashArgs = [ '-P', '/dev/spidev1.0', '-c', 'linuxspi', '-vvv', '-p', 'm2560', '-U', 'flash:w:/opt/openrov/firmware/bin/2x/ArduinoUSBLinker.hex' ];
 
-// Create promise for flashing the MCU
-var mcuFlashPromise = execFileAsync('avrdude', mcuFlashArgs );
-
 function escFlashFunction()
 {
     return execFileAsync('sh', [ "/opt/openrov/system/scripts/FlashESCS.sh" ] );
@@ -42,7 +39,7 @@ ArduinoBuilder.BuildSketch( buildOpts, function(data)
   })
 .then(function() 
 {
-  return mcuFlashPromise
+  return execFileAsync('avrdude', mcuFlashArgs )
             .then( function( result )
             {
                 var stdout = result.stdout;

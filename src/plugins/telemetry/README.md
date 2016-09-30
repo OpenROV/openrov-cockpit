@@ -11,7 +11,7 @@ window.cockpit.emit('telemetry.getDefinition',name,function(def){
 
 window.cockpit.emit('telemetry.registerDefinition',{name: 'foo', description: 'bar', short_name: 'fb', units: 'm/s' });
 
-plugins.Lights.prototype.getTelemetryDefintions = function getTelemetryDefintions() {
+plugins.Lights.prototype.getTelemetryDefinitions = function getTelemetryDefinitions() {
   return({name: 'LIGP', description: 'Internal lights percent of power'});
 }
 

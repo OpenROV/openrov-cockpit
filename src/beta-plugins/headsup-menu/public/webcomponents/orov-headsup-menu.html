@@ -679,7 +679,7 @@
         behaviors: [orovbehaviors.oROVStandard],
         registerEmitterHandlers: function(emitter){
           var self = this;
-          emitter.on('plugin.cameraTilt.angle',function(angle){
+          emitter.on('plugin.cameraServo.currentPos',function(angle){
             self.servoAngle = angle;
           });
         },

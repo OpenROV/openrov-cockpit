@@ -5,7 +5,7 @@
     var self = this;
     self.cockpit = cockpit;  //self.state    = [ {}, {} ];
   };
-  plugins.ExternalLights.prototype.getTelemetryDefintions = function getTelemetryDefintions() {
+  plugins.ExternalLights.prototype.getTelemetryDefinitions = function getTelemetryDefinitions() {
     return [
       {
         name: 'LIGPE0',

@@ -168,11 +168,13 @@ UIManager.prototype.getSettingSchema = function getSettingSchema() {
     }
   });
   return [{
-      'title': 'UI Manager',
+      'title': 'Themes',
+      'category': 'ui',
       'type': 'object',
       'id': 'ui-manager',
       'properties': {
         'selectedUI': {
+          'title' : 'Current theme',
           'type': 'string',
           'default': 'new-ui',
           'enum': UIOptions

@@ -1,6 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../orov-behaviors/orov-behavior.html">
-<script src="https://player.twitch.tv/js/embed/v1.js"></script>
+<script src="https://player.twitch.tv/js/embed/v1.js" async></script>
 <script src="../orov-behaviors/utilities.js"></script>
 <script>
 
@@ -65,7 +65,6 @@
         });
       },
       ready: function(){
-
       },
       _previewImageChanged: function(){
         var e = this.$$('#pi531235');

@@ -24,11 +24,11 @@
     this.pinger = setInterval(function () {
       var _starttime = performance.now();
       self.cockpit.emit('ping', _starttime);
-      self.cockpit.rov.emit('ping', _starttime);
+      self.cockpit.rov.emit('sys.ping', _starttime);
       var isConnected = _starttime - lastpong <= 3000;
       self.cockpit.emit('plugin.connection-health.state', { connected: isConnected });
     }, 1000);
-    this.cockpit.rov.on('pong', function (id) {
+    this.cockpit.rov.on('sys.pong', function (id) {
       lastpong = id;
       var t = performance.now();
       var tprime = id;

@@ -23,7 +23,9 @@ Globalization.prototype.getSettingSchema = function getSettingSchema() {
     }
   });
   return [{
-      'title': 'Globalization',
+      'title': 'Language',
+      'category': 'ui',
+      'description': 'Settings for localization',
       'type': 'object',
       'id': 'globalization',
       'properties': {

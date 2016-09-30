@@ -21,5 +21,6 @@
   "Location": "Location",
   "This page allows interaction with past recoded dives.": "This page allows interaction with past recoded dives.",
   "ROV Offline": "ROV Offline",
-  "SwitchesNew": "SwitchesNew"
+  "SwitchesNew": "SwitchesNew",
+  "This feature is in BETA. Please report problems at https://github.com/openrov/openrov-software/issues": "This feature is in BETA. Please report problems at https://github.com/openrov/openrov-software/issues"
 }

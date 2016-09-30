@@ -41,7 +41,7 @@ class Listener
     {
         if( this.enabled === true )
         {
-            this.bus.off( event, func );
+            this.bus.off( this.event, func );
             this.enabled = false;
         }
     }

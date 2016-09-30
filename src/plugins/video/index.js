@@ -48,32 +48,17 @@ video.prototype.getSettingSchema = function getSettingSchema() {
     }
   });
   return [{
-      'title': 'Video Settings',
+      'title': 'Cameras & Video',
+      'category' : 'video',
       'id': 'videosettings',
       'type': 'object',
       'properties': {
         'show-stats': {
+          'title' : 'Show video player statistics',
+          'description' : 'Overlays real-time data about the video on top of the video feed. Does not affect your recorded or streaming video feed.',
           'id': 'show-stats',
           'type': 'boolean',
           'default': false
-        },
-        'cameras': {
-          'id': 'cameras',
-          'type': 'array',
-          'items': {
-            'id': '0',
-            'type': 'object',
-            'properties': {
-              'cameraID': {
-                'type': 'string',
-                'enum': ['TBD']
-              },
-              'location': {
-                'type': 'string',
-                'default': 'forward'
-              }
-            }
-          }
         }
       }
     }];

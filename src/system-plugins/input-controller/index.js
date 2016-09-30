@@ -6,6 +6,7 @@ function InputController(name, deps) {
   logger.log('Loaded nodejs InputController component');
   return self;
 }
+
 module.exports = function (name, deps) {
   return new InputController(name, deps);
 };

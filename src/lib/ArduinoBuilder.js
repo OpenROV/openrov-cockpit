@@ -111,7 +111,7 @@ ArduinoBuilder.prototype.BuildSketch = function(options, onStdout, onStderr) {
               return execAsync("find " + stagedSketchDir + " -name \\*.h -print0 -o -name \\*.hpp -print0 -o -name \\*.c -print0 -o -name \\*.cpp -print0 | xargs -0 sha1sum | sha1sum | awk '{print $1}'")
               .then( function (result) 
               {
-                var hash = result.stdout.trim();
+                hash = result.stdout.trim();
 
                 // Should look something like: "ver:<<{{10024121ae3fa7fc60a5945be1e155520fb929dd}}>>;"
                 var hashDef = "#define VERSION_HASH F(\"ver:<<{{" + hash + "}}>>;\")\n";
@@ -166,6 +166,11 @@ ArduinoBuilder.prototype.BuildSketch = function(options, onStdout, onStderr) {
                         return path.join(installDir, sketchName + '.hex');
                     })
                 ]);
+        })
+        .then( function()
+        {
+            // Write the hash to file
+            return fs.writeFileAsync( "/opt/openrov/system/config/lastBuildHash", hash );
         })
         .then(function(firmwareFile) 
         {

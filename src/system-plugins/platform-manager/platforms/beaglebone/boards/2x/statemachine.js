@@ -10,7 +10,7 @@ const FlashFirmwareScript = "/opt/openrov/system/scripts/FlashFirmware.js";
 const FlashESCScript = "/opt/openrov/system/scripts/FlashESCS.js";
 
 const escConfPath = "/opt/openrov/system/config/esc.conf";
-const mcuBinPath = "/opt/openrov/firmware/bin/2x/OpenROV2x.hex"
+const mcuBinPath = "/opt/openrov/system/config/lastBuildHash"
 
 module.exports = function( board ) 
 {
@@ -194,18 +194,11 @@ var getHashHandler = function getHashHandler(event, from, to)
 
     var self = this;
 
+    // TODO: make this read from a file from somewhere else. Hex doesn't work for clever parsing :(
     fs.readFileAsync( mcuBinPath, 'utf8' )
-    .then( function(data)
-    {
-        // Regex that finds the version string
-        var regex = /ver[:]<<{{(.*)}}>>;/;
-        var matches = regex.exec( data );
-
-        return matches[1];
-    })
     .then( function( hash )
     {
-        console.log( "BOARD STATE: Hash in binary: " + hash );
+        console.log( "BOARD STATE: Hash in last build file: " + hash.trim() );
         self.board.hashInfo.fromBin = hash;
     })
     .then( function()

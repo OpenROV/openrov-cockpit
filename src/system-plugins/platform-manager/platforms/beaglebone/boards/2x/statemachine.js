@@ -259,7 +259,7 @@ var verifyVersionHandler = function verifyVersionHandler(event, from, to)
         self.board.bridge.write( "version();" );
 
         console.log( "BOARD STATE: MCU reported hash: " + self.board.hashInfo.fromMCU );
-        console.log( "BOARD STATE: MCU reported hash: " + self.board.hashInfo.fromBin );
+        console.log( "BOARD STATE: Hash from last build: " + self.board.hashInfo.fromBin );
 
         // Check for new hash info received from MCU
         if( self.board.hashInfo.fromMCU !== "" )

@@ -5,7 +5,7 @@
     var self = this;
     self.cockpit = cockpit;
   };
-  plugins.Lights.prototype.getTelemetryDefintions = function getTelemetryDefintions() {
+  plugins.Lights.prototype.getTelemetryDefinitions = function getTelemetryDefinitions() {
     return [{
         name: 'LIGP',
         description: 'Internal lights percent of power'

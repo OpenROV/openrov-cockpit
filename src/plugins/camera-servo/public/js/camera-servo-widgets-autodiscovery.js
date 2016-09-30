@@ -8,7 +8,7 @@
   widgets['orov-servo-tilt'] = {
     name: 'orov-servo-tilt',
     defaultUISymantic: 'system-panel',
-    url: 'camera-tilt/orov-servo-tilt.html'
+    url: 'camera-servo/orov-servo-tilt.html'
   };
 }  // The line below both ends the anonymous function and then calls
    // it passing in the required depenencies.

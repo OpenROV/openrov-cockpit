@@ -120,6 +120,7 @@ var SetupBoardInterface = function (board)
       try
       {
         board.hashInfo.fromMCU = matches[1];
+        console.log( "Ver report: " + board.hashInfo.fromMCU );
       }
       catch( err )
       {

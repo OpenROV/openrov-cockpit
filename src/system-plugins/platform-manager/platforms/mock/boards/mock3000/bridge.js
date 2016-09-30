@@ -22,6 +22,11 @@ function Bridge() {
     var commandParts = command.split(/\(|\)/);
     var commandText = commandParts[0];
     switch (commandText) {
+    case 'version': {
+      bridge.emitStatus('ver:<<{{10024121ae3fa7fc60a5945be1e155520fb929dd}}>>');
+      debug('ver:<<{{10024121ae3fa7fc60a5945be1e155520fb929dd}}>>');
+      break;
+    }
     case 'camServ_tpos': {
         // Ack command
 

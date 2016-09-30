@@ -4,6 +4,8 @@
 		{ "src": "dt-overlays/OROV-CB25-00A0.dtbo", 	"dest": "/lib/firmware" },
 		{ "src": "BuildFirmware.js", 					"dest": "/opt/openrov/system/scripts" },
 		{ "src": "FlashFirmware.js", 					"dest": "/opt/openrov/system/scripts" },
+		{ "src": "FlashESCS.js", 						"dest": "/opt/openrov/system/scripts" },
+		{ "src": "FlashESCS.sh", 						"dest": "/opt/openrov/system/scripts" },
 		{ "src": "ResetMCU.sh", 						"dest": "/opt/openrov/system/scripts" }
 	],
 	

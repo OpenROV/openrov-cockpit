@@ -2,7 +2,6 @@ const path = require('path');
 const Promise = require('bluebird');
 const retry = require('bluebird-retry');
 const fs = Promise.promisifyAll(require('fs-extra'));
-const spawnAsync = require('child-process-promise').spawn;
 const execFileAsync = require('child-process-promise').execFile;
 const StateMachine = require('javascript-state-machine');
 
@@ -120,7 +119,7 @@ var flashESCHandler = function flashESCHandler(event, from, to)
     self.board.bridge.close();
 
     // Execute the flash firmware script
-    execFileAsync( "node ", [ FlashESCScript ] )
+    execFileAsync( "node", [ FlashESCScript ] )
     .then( function()
     {
         return fs.writeFileAsync( escConfPath, "flashed" );
@@ -174,7 +173,7 @@ var buildFirmwareHandler = function buildFirmwareHandler(event, from, to)
     var self = this;
 
     // Execute the build firmware script
-    execFileAsync( "node ", [ BuildFirmwareScript] )
+    execFileAsync( "node", [ BuildFirmwareScript] )
     .then( function()
     {   
         // Success
@@ -229,7 +228,7 @@ var flashMCUHandler = function flashMCUHandler(event, from, to)
 
     var flashFunc = function()
     {
-        return execFileAsync( 'node ', [ FlashFirmwareScript ] );
+        return execFileAsync( 'node', [ FlashFirmwareScript ] );
     }
 
     // Execute the build firmware script

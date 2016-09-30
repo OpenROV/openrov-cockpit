@@ -69,7 +69,7 @@ $('#telemetry').define = function(name,callback){
      //$.getScript(wid[0].url);
      //  $('servo-tilt')[0].servoAngle = angle;
      //console.log(this.event);
-     //plugin.cameraTilt.angle
+     //plugin.cameraServo.currentPos
      /*          <% for(var i=0; i<ui.systempanel.length; i++) {%>
           <<%ui.systempanel[i].name %> event-emitter={{cockpitEventEmitter}}></<%ui.systempanel[i].name %>>
           <% } %>

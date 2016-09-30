@@ -22,6 +22,31 @@ function Bridge() {
     var commandParts = command.split(/\(|\)/);
     var commandText = commandParts[0];
     switch (commandText) {
+    case 'camServ_tpos': {
+        // Ack command
+
+        var pos = parseInt( commandParts[1] );
+        bridge.emitStatus('camServ_tpos:' + pos );
+
+        setTimeout( function()
+        {
+          // Move to target position
+          bridge.emitStatus('camServ_pos:' + pos );
+        }, 250 );
+
+        break;
+      }
+    case 'camServ_inv': {
+      // Ack command
+      bridge.emitStatus('camServ_inv:' + commandParts[1] );
+      break;
+    }
+    case 'camServ_spd': {
+      // Ack command
+      var speed = parseInt( commandParts[1] );
+      bridge.emitStatus('camServ_spd:' + speed );
+      break;
+    }
     case 'rcap': {
         bridge.emitStatus('CAPA:255');
         debug('CAPA:255');
@@ -41,11 +66,6 @@ function Bridge() {
     case 'escp': {
         bridge.emitStatus('ESCP:' + commandParts[1]);
         debug('ESC status: ' + commandParts[1]);
-        break;
-      }
-    case 'tilt': {
-        bridge.emitStatus('servo:' + commandParts[1]);
-        debug('Tilt status: ' + commandParts[1] / 100);
         break;
       }
     case 'claser': {
@@ -184,12 +204,7 @@ function Bridge() {
     BRDV = Math.min(Math.max(BRDV, 1), 10);
     result += 'BRDV:' + BRDV + ';';
     result += 'vout:' + BRDV + ';';
-    // Generate servo command
-    currentServo += 50;
-    result += 'servo:' + currentServo + ';';
-    if (currentServo >= 2000) {
-      currentServo = 1000;
-    }
+
     // Emit status update
     bridge.emit('status', reader.parseStatus(result));
   };

@@ -6,7 +6,7 @@
     self.cockpit = cockpit;
     this.laserState = { enabled: false };
   };
-  plugins.Laser.prototype.getTelemetryDefintions = function getTelemetryDefintions() {
+  plugins.Laser.prototype.getTelemetryDefinitions = function getTelemetryDefinitions() {
     return [{
         name: 'claser',
         description: 'Scaling Laser power 0 to 255'

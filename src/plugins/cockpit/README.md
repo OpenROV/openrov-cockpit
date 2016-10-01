@@ -1,0 +1,1 @@
+This is a plugin that provides a default set of applets tied to the concept of cockpit.  These can all be overridden in other themes.

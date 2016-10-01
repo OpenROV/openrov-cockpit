@@ -1,0 +1,21 @@
+<link rel="stylesheet" href="plugin/minimal-theme/css/minimaltheme.css">
+<link rel="import" href="components/ui-manager/orov-appletswitcher.html">
+
+<!-- The displaySection is a helper provided by UI-manager -->
+<template is="dom-if" restamp=true if="{{displaySection(routedata.page,'cockpit')}}">
+<style>
+#appletSwitcher {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+}
+
+.notCockpit{
+    display:none;
+}
+</style>
+
+</template>
+
+<orov-appletswitcher id="appletSwitcher" event-emitter="{{cockpitEventEmitter}}" selection="{{routedata.page}}"></orov-appletswitcher>
+<h4 class="notCockpit">THIS IS A MINIMAL THEME</h4>

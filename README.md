@@ -27,6 +27,22 @@ Built on the latest and greatest web standards, Cockpit works with embedded Linu
 # Getting started
 The fastest way to see the software running if your don't already have it installed on a robot is to follow [these](docs/DEV-HOWTO.md) instructions to get it running on your local computer.
 
+# Branches and Tags
+Branches:
+
+* Master : This is the latest code as it is being developed. We will do our best to make sure this is up and running through automated testing before we merge changes.  All changes are done in seperate branches/forks and merged.
+
+* dev-stable: This is the latest cut from Master where we have actually run the code on a phyiscal ROV through our testing checklist.  Be sure to read the release notes for known issues.
+
+* feature/[name] : These are feature branches that are being worked on by teams at OpenROV.
+
+* bug/[id] : These are bug branches for quick bug fixes
+
+Tags:
+
+* v[version] : These are offical releases
+* release/[named-release] : ex NewCamera2016DevImage, are specific releases that were not targeted twoards the general public.  There may have been trade offs where the code only works in certian configurations.
+
 # Related Projects
 
 openrov-cockpit is one of several packages that are combined together to enable control of an ROV.  Refer to the [openrov-software](https://github.com/OpenROV/openrov-software) for a list of the other packages.

@@ -7,7 +7,7 @@ var opts = {
     installBaseDir: '/opt/openrov/firmware/bin',
     productID: 'trident_mainboard',
     cleanAfterBuild: true,
-    fqbn: 'openrov:samd:trident_mainboard',
+    fqbn: 'openrov:samd:trident',
     hardware: '/opt/openrov/arduino/hardware',
     tools: '/opt/openrov/arduino/hardware/tools',
     warnings: 'all',

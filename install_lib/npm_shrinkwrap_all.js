@@ -5,6 +5,7 @@ const exec = require('child_process').execSync;
 var currentdirectory = process.cwd();
 var packagesToInstall = [];
 var path = require('path');
+const fs = require('fs');
 
 finder.on('file', function (file, stat) {
   if (file.indexOf('package.json') > -1) {
@@ -37,15 +38,16 @@ finder.on('end', function () {
 });
 var installPackages = function (index, array) {
   var dir = array[index];
-  console.log('======== cleaning =======');
+  console.log('======== cleaning out old npm-shrinkwrap files if present =======');
+  try{
+    fs.unlinkSync(path.join(dir,'npm-shrinkwrap.json'))
+  }catch(e){
+    //ignore
+  }
   console.log(dir + '/node_modules');
-  rimraf(dir + '/node_modules', function () {
-    console.log('======== installing =======');
-    console.log(dir);
-    exec('npm install ' + process.argv[2], { cwd: dir });
-    index++;
-    if (index < array.length) {
-      installPackages(index, array);
-    }
-  });
+  exec('npm shrinkwrap', { cwd: dir });
+  index++;
+  if (index < array.length) {
+    installPackages(index, array);
+  }
 };

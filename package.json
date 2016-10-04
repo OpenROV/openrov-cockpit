@@ -8,13 +8,16 @@
     "url": "git://github.com/OpenROV/openrov-software.git"
   },
   "scripts": {
+    "deploy:dev": "node install_lib/bower_install_all.js && node install_lib/npm_install_all.js --no-shrinkwrap  ",  
+    "deploy:prod": "node install_lib/bower_install_all.js && node install_lib/npm_install_all.js --production",
     "test": "./node_modules/grunt-cli/bin/grunt test",
-    "install": "node install_lib/bower_install_all.js && node install_lib/npm_install_all.js"
+    "install": "node install_lib/bower_install_all.js && node install_lib/npm_install_all.js",
+    "shrinkwrap": "node install_lib/npm_shrinkwrap_all.js"
   },
   "dependencies": {
     "binary-parser": "1.1.5",
     "bluebird": "^3.4.1",
-    "bluebird-retry": "git+https://github.com/demmer/bluebird-retry.git",
+    "bluebird-retry": "^0.8.0",
     "body-parser": "^1.14.2",
     "bower": "^1.7.9",
     "child-process-promise": "",
@@ -28,7 +31,7 @@
     "findit": "^2.0.0",
     "forever-monitor": "",
     "fs-extra": "",
-    "javascript-state-machine": "",
+    "javascript-state-machine": "^2.3.5",
     "jquery-file-upload-middleware": "",
     "json-schema-defaults": "^0.2.0",
     "lazy": ">= 1.0.11",

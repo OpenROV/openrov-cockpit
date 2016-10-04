@@ -1,0 +1,11 @@
+{
+  "name": "gps",
+  "version": "1.0.0",
+  "dependencies": {
+    "node-gpsd": {
+      "version": "0.2.6",
+      "from": "node-gpsd@>=0.2.5 <0.3.0",
+      "resolved": "https://registry.npmjs.org/node-gpsd/-/node-gpsd-0.2.6.tgz"
+    }
+  }
+}

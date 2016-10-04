@@ -153,7 +153,7 @@
 
         stepNegative()
         {
-            this.currentStep++;
+            this.currentStep--;
 
             // Bound
             if( this.currentStep < this.stepMap.min )

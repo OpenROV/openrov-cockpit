@@ -111,6 +111,7 @@
             if( isNaN( powerIn ) )
             {
               // Ignore
+              return;
             }
 
             // Apply limits

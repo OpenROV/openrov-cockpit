@@ -1,5 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../orov-behaviors/orov-behavior.html">
+
 <dom-module id="orov-newui-compass">
   <style>
     #compass-container {
@@ -12,6 +13,17 @@
       margin-left: auto;
       margin-right: auto;
       float: none;
+    }
+
+    #indicator {
+      transform-origin: 472.5px 472.5px;
+      transition-duration: 0.1s;
+      transition-timing-function: ease-out;
+    }
+
+    #bearing {
+      transform-origin: 472.5px 472.5px;
+      transition-duration: 0.1s;
     }
   </style>
   <template>
@@ -59,8 +71,7 @@
           title="Heading hold target">{{target}}</text>
 
           <g id="indicator">
-            <path fill$="{{ options.indicator }}" d="m 471.41747,-25.529456 c 35.08805,139.334496 35.04692,139.182386 35.04692,139.182386 l -69.01546,0 z" style="fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-            />
+            <path fill$="{{ options.indicator }}" d="m 471.41747,-25.529456 c 35.08805,139.334496 35.04692,139.182386 35.04692,139.182386 l -69.01546,0 z" style="fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"/>
           </g>
           <g id="bearing">
             <path fill$="{{ options.bezel }}" style="fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="m 472.79747,253.34433 c -35.08391,-139.0359 -35.0428,-138.88412 -35.0428,-138.88412 l 69.00736,0 z" />
@@ -69,122 +80,153 @@
       </svg>
     </div>
   </template>
+  
   <script>
-    var lastData = null;
-    var newData = null;
-    Polymer({
-      is: 'orov-newui-compass',
-      properties: {
-        bearing: {
-          observer: 'setBearing',
-          notify: true
-        },
-        heading: {
-          type: String,
-          value: '000',
-          observer: 'setHeading',
-          notify: true
-        },
-        options: {
-          type: Object,
-          value: {
-              indicator: 'white',
-              bezel: 'white',
-              bearing: 'white',
-              background: 'black',
-              headingFill: 'white',
-              // will be set to options.bezel
-              headingStrokeWidth: 0,
-              headingStrokeWidthTargetHold: 15
-            }
-        },
-        target: {
-          type: Number,
-          value: 0
+    ( function() 
+    {
+      var lastData = null;
+      var newData = null;
+
+      //Work around because javascript does not use pass by reference for primitaves
+      //TODO: Is there a better, more idiomatic way?
+      var bearingAngle = { angle: null };
+      var indicatorAngle = { angle: null };
+
+      function rotateElement(element, obj, newRotation) {
+        var aR;
+
+        obj.angle = obj.angle || 0; // if rot undefined or 0, make 0, else rot
+
+        aR = obj.angle % 360;
+        if( aR < 0 )
+        {
+          aR += 360; 
         }
-      },
-      behaviors: [namespace('behaviors').oROVStandard],
-      registerEmitterHandlers: function(emitter) {
-        var self = this;
-        emitter.withHistory.on('plugin.rovpilot.headingHold.state', function(state) {
-          if (state.enabled){
-            self.setBearing(state.targetHeading);
-            self.options.headingFill = 'none';
-            self.options.headingStrokeWidth = self.options.headingStrokeWidthTargetHold;
-          } else {
-            self.setBearing(undefined);
-            self.options.headingFill = self.options.bezel;
-            self.options.headingStrokeWidth = 0;
-          }
-        });
-        emitter.on('plugin.navigationData.data', function(data) {
-          newData = data;
-        });
-        setInterval(function(){
-          if (newData == lastData) return;
-          lastData=newData;
-          self.setHeading(self.pad(parseFloat(newData.heading).toFixed(0), 3));          
-        },100);
-      },
-      attached: function() {
-        var self = this;
-        self.options.headingFill = self.options.bezel;
-        this.setHeading(this.heading);
-        this.setBearing(this.bearing);
-        this.format(this.options);
-      },
-      format: function(newOptions) {
-        this.set('options.indicator', newOptions.indicator ? newOptions.indicator : this.options.indicator);
-        this.set('options.bezel', newOptions.bezel ? newOptions.bezel : this.options.bezel);
-        this.set('options.bearing', newOptions.bearing ? newOptions.bearing : this.options.bearing);
-        this.set('options.background', newOptions.background ? newOptions.background : this.options.background);
-      },
-      setHeading: function(value) {
-        this.heading = value;
-        $(this.$.indicator).animate({
-          svgTransform: 'rotate(' + value + ', 472.5, 472.5)'
-        }, {duration:20,queue:false});
-        if (!this.target) {
-          $(this.$.bearing).animate({
-            svgTransform: 'rotate(' + value + ', 472.5, 472.5)'
-          }, 20);
+        if( aR < 180 && (newRotation > (aR + 180)) ) 
+        { 
+          obj.angle -= 360; 
         }
-      },
-      setBearing: function(value) {
-        this.bearing=value;
-        var bearing = $(this.$.bearing);
-        var target = $(this.$.target);
-        var lock = $(this.$.lock);
-        if (value) {
-          this.target = this.pad(value, 3);
-          bearing.animate({
-            svgTransform: 'rotate(' + value + ', 472.5, 472.5)'
-          }, 20);
-          target.animate({
-            svgOpacity: '100'
-          }, 10);
-          lock.animate({
-            svgOpacity: '100'
-          }, 10);
-        } else {
-          target.animate({
-            svgOpacity: '0'
-          }, 10);
-          lock.animate({
-            svgOpacity: '0'
-          }, 10);
-          bearing.animate({
-            svgTransform: 'rotate(' + this.heading + ', 472.5, 472.5)'
-          }, 20);
-          this.target = undefined;
+        if ( aR >= 180 && (newRotation <= (aR - 180)) ) 
+        { 
+          obj.angle += 360; 
         }
-      },
-      pad: function(num, size) {
-        var s = num + '';
-        while (s.length < size)
-          s = '0' + s;
-        return s;
+        obj.angle += (newRotation - aR);
+
+        element.style.transform = ("rotate( " + obj.angle + "deg )");
       }
-    });
+
+      Polymer({
+        is: 'orov-newui-compass',
+        properties: {
+          bearing: {
+            observer: 'setBearing',
+            notify: true
+          },
+          heading: {
+            type: String,
+            value: function(){return '000';},
+            observer: 'setHeading',
+            notify: true
+          },
+          options: {
+            type: Object,
+            value: {
+                indicator: 'white',
+                bezel: 'white',
+                bearing: 'white',
+                background: 'black',
+                headingFill: 'white',
+                // will be set to options.bezel
+                headingStrokeWidth: 0,
+                headingStrokeWidthTargetHold: 15
+              }
+          },
+          target: {
+            type: Number,
+            value: function(){return 0;}
+          }
+        },
+        behaviors: [namespace('behaviors').oROVStandard],
+        registerEmitterHandlers: function(emitter) {
+          var self = this;
+          emitter.withHistory.on('plugin.rovpilot.headingHold.state', function(state) {
+            if (state.enabled){
+              self.setBearing(state.targetHeading);
+              self.options.headingFill = 'none';
+              self.options.headingStrokeWidth = self.options.headingStrokeWidthTargetHold;
+            } else {
+              self.setBearing(undefined);
+              self.options.headingFill = self.options.bezel;
+              self.options.headingStrokeWidth = 0;
+            }
+          });
+          emitter.on('plugin.navigationData.data', function(data) {
+            newData = data;
+          });
+          setInterval(function(){
+            if (newData == lastData) return;
+            lastData=newData;
+            self.setHeading(self.pad(parseFloat(newData.heading).toFixed(0), 3));          
+          },100);
+        },
+        attached: function() {
+          var self = this;
+          self.options.headingFill = self.options.bezel;
+          this.setHeading(this.heading);
+          this.setBearing(this.bearing);
+          this.format(this.options);
+        },
+        format: function(newOptions) {
+          this.set('options.indicator', newOptions.indicator ? newOptions.indicator : this.options.indicator);
+          this.set('options.bezel', newOptions.bezel ? newOptions.bezel : this.options.bezel);
+          this.set('options.bearing', newOptions.bearing ? newOptions.bearing : this.options.bearing);
+          this.set('options.background', newOptions.background ? newOptions.background : this.options.background);
+        },
+        setHeading: function(value) {
+          this.heading = value;
+
+          rotateElement(this.$.indicator, indicatorAngle, value);
+      
+          if (!this.target) {
+            rotateElement(this.$.bearing, bearingAngle, value);
+          }
+        },
+        setBearing: function(value) {
+          this.bearing=value;
+          var bearing = $(this.$.bearing);
+          var target = $(this.$.target);
+          var lock = $(this.$.lock);
+          if (value) {
+            this.target = this.pad(value, 3);
+            bearing.animate({
+              svgTransform: 'rotate(' + value + ', 472.5, 472.5)'
+            }, 20);
+            target.animate({
+              svgOpacity: '100'
+            }, 10);
+            lock.animate({
+              svgOpacity: '100'
+            }, 10);
+          } else {
+            target.animate({
+              svgOpacity: '0'
+            }, 10);
+            lock.animate({
+              svgOpacity: '0'
+            }, 10);
+            bearing.animate({
+              svgTransform: 'rotate(' + this.heading + ', 472.5, 472.5)'
+            }, 20);
+            this.target = undefined;
+          }
+        },
+        pad: function(num, size) {
+          var s = num + '';
+          while (s.length < size)
+            s = '0' + s;
+          return s;
+        }
+      });
+    }())
   </script>
 </dom-module>

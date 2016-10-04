@@ -16,14 +16,21 @@
     }
 
     #indicator {
+      /*Hardware acceleration*/
+      translate3d(0,0,0);
+
       transform-origin: 472.5px 472.5px;
       transition-duration: 0.1s;
       transition-timing-function: ease-out;
     }
 
     #bearing {
+      /*Hardware acceleration*/
+      translate3d(0,0,0);
+
       transform-origin: 472.5px 472.5px;
       transition-duration: 0.1s;
+      transformation-timing-function: ease-out;
     }
   </style>
   <template>
@@ -184,7 +191,6 @@
         },
         setHeading: function(value) {
           this.heading = value;
-
           rotateElement(this.$.indicator, indicatorAngle, value);
       
           if (!this.target) {
@@ -193,30 +199,29 @@
         },
         setBearing: function(value) {
           this.bearing=value;
+          console.log("set bearing called");
+
           var bearing = $(this.$.bearing);
           var target = $(this.$.target);
           var lock = $(this.$.lock);
+
+          //TODO:
+          //Need to verify that this works
           if (value) {
             this.target = this.pad(value, 3);
-            bearing.animate({
-              svgTransform: 'rotate(' + value + ', 472.5, 472.5)'
-            }, 20);
-            target.animate({
-              svgOpacity: '100'
-            }, 10);
-            lock.animate({
-              svgOpacity: '100'
-            }, 10);
+
+            rotateElement(this.$.bearing, bearingAngle, value);
+
+            target.style.fill-opacity="100.0";
+            lock.style.fill-opacity="100.0";
+
           } else {
-            target.animate({
-              svgOpacity: '0'
-            }, 10);
-            lock.animate({
-              svgOpacity: '0'
-            }, 10);
-            bearing.animate({
-              svgTransform: 'rotate(' + this.heading + ', 472.5, 472.5)'
-            }, 20);
+
+            target.style.fill-opacity="0.0";
+            lock.style.fill-opacity="0.0";
+            
+            rotateElement(this.$.bearing, bearingAngle, this.heading);
+
             this.target = undefined;
           }
         },

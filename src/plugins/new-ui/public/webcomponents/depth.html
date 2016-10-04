@@ -201,9 +201,13 @@
           var update = function () {
             var currentDepth = self.depth;
             if (currentDepth > oldDepth) {
+              
               // descending
               depthChangeUp.animate({ svgFill: self.options.indicatorInactive }, { duration: 600 });
               depthChangeDown.animate({ svgFill: self.options.indicatorActive }, { duration: 600 });
+
+
+
             } else if (currentDepth < oldDepth) {
               // ascending
               depthChangeUp.animate({ svgFill: self.options.indicatorActive }, { duration: 600 });

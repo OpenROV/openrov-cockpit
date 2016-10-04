@@ -224,7 +224,7 @@ ClassicControlMapping.prototype.getControlMappingPreset = function getControlMap
               }
             },
             {
-              "name": "plugin.lights.adjust_increment",
+              "name": "plugin.lights.stepPositive",
               "bindings": [
                 {
                   "name": "keyboard",

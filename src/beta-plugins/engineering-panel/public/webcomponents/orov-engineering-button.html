@@ -139,12 +139,12 @@
                     if( state == true )
                     {
                       // Turn off
-                      self.eventEmitter.emit('plugin.lights.setOnOff', false );
+                      self.eventEmitter.emit('plugin.lights.off' );
                     }
                     else
                     {
                       // Turn on to max
-                      self.eventEmitter.emit('plugin.lights.setOnOff', true );
+                      self.eventEmitter.emit('plugin.lights.on' );
                     }
                   }
                 },

@@ -105,8 +105,8 @@
 							 }
 						 });
 						 
-             emitter.withHistory.on('plugin.lights.state', function(state){
-							 if(state.level>0){
+             emitter.withHistory.on('plugin.lights.currentPower', function(power){
+							 if(power>0){
 								 self.$.lights.active=true;
 							 } else {
 								 self.$.lights.active=false;

@@ -66,7 +66,7 @@
                     self.listeners.mcuStatus.enable();
 
                     // Enable API
-                    self.listeners.setTargetPower.disable();
+                    self.listeners.setTargetPower.enable();
                 }),
 
                 mcuStatus: new Listener( this.globalBus, 'mcu.status', false, function( data )
@@ -98,7 +98,7 @@
                 setTargetPower: new Listener( this.cockpitBus, 'plugin.lights.setTargetPower', false, function( powerIn )
                 {
                     // Set new target Power
-                    self.setTargetPos( powerIn );
+                    self.setTargetPower( powerIn );
                 })
             }
         }

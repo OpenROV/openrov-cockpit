@@ -192,33 +192,31 @@
         setHeading: function(value) {
           this.heading = value;
           rotateElement(this.$.indicator, indicatorAngle, value);
-      
+
           if (!this.target) {
+            var bearing = $(this.$.bearing);
             rotateElement(this.$.bearing, bearingAngle, value);
           }
         },
         setBearing: function(value) {
           this.bearing=value;
-          console.log("set bearing called");
 
           var bearing = $(this.$.bearing);
           var target = $(this.$.target);
           var lock = $(this.$.lock);
 
-          //TODO:
-          //Need to verify that this works
           if (value) {
             this.target = this.pad(value, 3);
 
             rotateElement(this.$.bearing, bearingAngle, value);
 
-            target.style.fill-opacity="100.0";
-            lock.style.fill-opacity="100.0";
+            this.$.target.style.fillOpacity="100.0";
+            this.$.lock.style.fillOpacity="100.0";
 
           } else {
 
-            target.style.fill-opacity="0.0";
-            lock.style.fill-opacity="0.0";
+            this.$.target.style.fillOpacity="0.0";
+            this.$.lock.style.fillOpacity="0.0";
             
             rotateElement(this.$.bearing, bearingAngle, this.heading);
 

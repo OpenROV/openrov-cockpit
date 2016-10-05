@@ -7,7 +7,7 @@ var opts = {
     installBaseDir: '/opt/openrov/firmware/bin',
     productID: 'trident_mainboard',
     cleanAfterBuild: true,
-    fqbn: 'openrov:samd:trident_mainboard',
+    fqbn: 'openrov:samd:trident',
     hardware: '/opt/openrov/arduino/hardware',
     tools: '/opt/openrov/arduino/hardware/tools',
     warnings: 'all',
@@ -20,7 +20,8 @@ var opts = {
     ],
     preproc: [
       'MCUARCH=MCUARCH_SAMD',
-      'CONTROLLERBOARD=CONTROLLERBOARD_TRIDENT'
+      'CONTROLLERBOARD=CONTROLLERBOARD_TRIDENT',
+      'VERSION_HASH=\"ver:<<{{0000000000000000000000000000000000000000}}>>;\"'
     ]
   };
 ArduinoBuilder.BuildSketch(opts, function (data) {

@@ -6,7 +6,7 @@
     self.cockpit = cockpit;
     console.log('SystemEnvironment Plugin running');
   };
-  plugins.SystemEnvironment.prototype.getTelemetryDefintions = function getTelemetryDefintions() {
+  plugins.SystemEnvironment.prototype.getTelemetryDefinitions = function getTelemetryDefinitions() {
     return [
       {
         name: 'FMEM',
@@ -41,7 +41,7 @@
     //Status messages only come out a 1hz from the Node layer but it contains
     //an entire copy of the state information from the ROV.
     this.cockpit.withHistory.on('status', function (data) {
-      //      self.cockpit.emit('plugin.cameraTilt.angle',angle);
+      //      self.cockpit.emit('plugin.cameraServo.currentPos',angle);
       var state = {
           mcu: {},
           cpu: {}

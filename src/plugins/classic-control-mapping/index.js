@@ -22,7 +22,7 @@ ClassicControlMapping.prototype.getControlMappingPreset = function getControlMap
               }
             },
             {
-              "name": "plugin.cameraTilt.adjust_down",
+              "name": "plugin.cameraServo.stepNegative",
               "bindings": [
                 {
                   "name": "keyboard",
@@ -40,7 +40,7 @@ ClassicControlMapping.prototype.getControlMappingPreset = function getControlMap
               }
             },
             {
-              "name": "plugin.cameraTilt.adjust_centre",
+              "name": "plugin.cameraServo.center",
               "bindings": [
                 {
                   "name": "keyboard",
@@ -58,7 +58,7 @@ ClassicControlMapping.prototype.getControlMappingPreset = function getControlMap
               }
             },
             {
-              "name": "plugin.cameraTilt.adjust_up",
+              "name": "plugin.cameraServo.stepPositive",
               "bindings": [
                 {
                   "name": "keyboard",
@@ -133,7 +133,7 @@ ClassicControlMapping.prototype.getControlMappingPreset = function getControlMap
               }
             },
             {
-              "name": "plugin.externalLights.0.adjust_increment",
+              "name": "plugin.externalLights.stepPositive",
               "bindings": [
                 {
                   "name": "keyboard",
@@ -146,7 +146,7 @@ ClassicControlMapping.prototype.getControlMappingPreset = function getControlMap
               }
             },
             {
-              "name": "plugin.externalLights.0.adjust_decrememt",
+              "name": "plugin.externalLights.stepNegative",
               "bindings": [
                 {
                   "name": "keyboard",
@@ -159,7 +159,7 @@ ClassicControlMapping.prototype.getControlMappingPreset = function getControlMap
               }
             },
             {
-              "name": "plugin.externalLights.0.toggle",
+              "name": "plugin.externalLights.toggle",
               "bindings": [
                 {
                   "name": "keyboard",
@@ -169,45 +169,6 @@ ClassicControlMapping.prototype.getControlMappingPreset = function getControlMap
               "description": "Toggles the ROV lights on/off.",
               "defaults": {
                 "keyboard": "6 0"
-              }
-            },
-            {
-              "name": "plugin.externalLights.1.adjust_increment",
-              "bindings": [
-                {
-                  "name": "keyboard",
-                  "binding": "7 ="
-                }
-              ],
-              "description": "Makes the ROV lights brighter.",
-              "defaults": {
-                "keyboard": "7 ="
-              }
-            },
-            {
-              "name": "plugin.externalLights.1.adjust_decrememt",
-              "bindings": [
-                {
-                  "name": "keyboard",
-                  "binding": "7 -"
-                }
-              ],
-              "description": "Makes the ROV lights dimmer.",
-              "defaults": {
-                "keyboard": "7 -"
-              }
-            },
-            {
-              "name": "plugin.externalLights.1.toggle",
-              "bindings": [
-                {
-                  "name": "keyboard",
-                  "binding": "7 0"
-                }
-              ],
-              "description": "Toggles the ROV lights on/off.",
-              "defaults": {
-                "keyboard": "7 0"
               }
             },
             {
@@ -224,7 +185,7 @@ ClassicControlMapping.prototype.getControlMappingPreset = function getControlMap
               }
             },
             {
-              "name": "plugin.lights.adjust_increment",
+              "name": "plugin.lights.stepPositive",
               "bindings": [
                 {
                   "name": "keyboard",

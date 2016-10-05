@@ -3,7 +3,7 @@ var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require('fs-extra'));
 var ArduinoBuilder = require('/opt/openrov/cockpit/src/lib/ArduinoBuilder.js');
 var opts = {
-    sketchDir: '/opt/openrov/firmware/sketches/OpenROV',
+    sketchDir: '/opt/openrov/firmware/sketches/Trident',
     installBaseDir: '/opt/openrov/firmware/bin',
     productID: 'trident',
     cleanAfterBuild: true,
@@ -20,7 +20,8 @@ var opts = {
     ],
     preproc: [
       'MCUARCH=MCUARCH_SAMD',
-      'CONTROLLERBOARD=CONTROLLERBOARD_TRIDENT'
+      'CONTROLLERBOARD=CONTROLLERBOARD_TRIDENT',
+      'VERSION_HASH=\"ver:<<{{0000000000000000000000000000000000000000}}>>;\"'
     ]
   };
 ArduinoBuilder.BuildSketch(opts, function (data) {

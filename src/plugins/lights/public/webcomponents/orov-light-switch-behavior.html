@@ -9,15 +9,15 @@
       properties: {
       },
       on:function(){
-        this.eventEmitter.emit('plugin.lights.set',true)
+        this.eventEmitter.emit('plugin.lights.on')
       },
       off:function(){
-        this.eventEmitter.emit('plugin.lights.set',false)
+        this.eventEmitter.emit('plugin.lights.off')
       },
       registerEmitterHandlers: function(emitter){
         var self = this;
-        emitter.withHistory.on('plugin.lights.level',function(level){
-          if (level>0){
+        emitter.withHistory.on('plugin.lights.currentPower',function(power){
+          if (power>0){
             self.set('switchState','on')
           } else {
             self.set('switchState','off')

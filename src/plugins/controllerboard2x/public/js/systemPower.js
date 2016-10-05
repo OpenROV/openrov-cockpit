@@ -6,7 +6,7 @@
     self.cockpit = cockpit;
     console.log('SystemPower Plugin running');
   };
-  plugins.SystemPower.prototype.getTelemetryDefintions = function getTelemetryDefintions() {
+  plugins.SystemPower.prototype.getTelemetryDefinitions = function getTelemetryDefinitions() {
     return [
       {
         name: 'vout',

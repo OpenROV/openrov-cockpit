@@ -5,7 +5,7 @@
     var self = this;
     self.cockpit = cockpit;
   };
-  plugins.NavigatoinData.prototype.getTelemetryDefintions = function getTelemetryDefintions() {
+  plugins.NavigatoinData.prototype.getTelemetryDefinitions = function getTelemetryDefinitions() {
     return [
       {
         name: 'hdgd',

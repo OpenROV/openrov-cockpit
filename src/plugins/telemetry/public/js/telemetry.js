@@ -42,8 +42,8 @@
     /* Crawl the plugins looking for those with telemetry definitions */
     self.cockpit.loadedPlugins.forEach(function (plugin) {
       var defobject = self.definitions;
-      if (plugin.getTelemetryDefintions !== undefined) {
-        plugin.getTelemetryDefintions().forEach(function (data) {
+      if (plugin.getTelemetryDefinitions !== undefined) {
+        plugin.getTelemetryDefinitions().forEach(function (data) {
           if ('name' in data) {
             defobject[data.name] = data;
           }

@@ -75,7 +75,7 @@
                     if( 'elights_pow' in data ) 
                     {
                         // Convert from integer to float
-                        var power = decode( parseInt( data.lights_pow ) );
+                        var power = decode( parseInt( data.elights_pow ) );
 
                         // Emit on cockpit bus for UI purposes
                         self.cockpitBus.emit( 'plugin.externalLights.currentPower', power );
@@ -85,7 +85,7 @@
                     if( 'elights_tpow' in data ) 
                     {
                         // Save encoded version for sync validation purposes
-                        self.mcuTargetPower_enc = parseInt( data.lights_tpow );
+                        self.mcuTargetPower_enc = parseInt( data.elights_tpow );
 
                         // Convert from integer to float
                         var power = decode( self.mcuTargetPower_enc );

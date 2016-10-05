@@ -39,8 +39,7 @@
                 description: 'Makes the ROV external lights brighter.',
                 defaults: 
                 {
-                  keyboard: 'p',
-                  gamepad: 'DPAD_UP'
+                  keyboard: '=',
                 },
                 down: function () 
                 {
@@ -52,8 +51,7 @@
                 description: 'Makes the ROV external lights dimmer.',
                 defaults: 
                 {
-                  keyboard: 'o',
-                  gamepad: 'DPAD_DOWN'
+                  keyboard: '-',
                 },
                 down: function () 
                 {
@@ -65,7 +63,7 @@
                 description: 'Toggles the ROV external lights on/off.',
                 defaults: 
                 { 
-                  keyboard: 'i' 
+                  keyboard: '0' 
                 },
                 down: function () 
                 {

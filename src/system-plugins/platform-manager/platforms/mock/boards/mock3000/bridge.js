@@ -57,7 +57,7 @@ function Bridge()
         setTimeout( function()
         {
           // Move to target position
-          bridge.emitStatus('lights_pow:' + decode( power ) );
+          bridge.emitStatus('lights_pow:' + power );
         }, 250 );
 
         break;
@@ -72,7 +72,7 @@ function Bridge()
         setTimeout( function()
         {
           // Move to target position
-          bridge.emitStatus('elights_pow:' + decode( power ) );
+          bridge.emitStatus('elights_pow:' + power );
         }, 250 );
 
         break;

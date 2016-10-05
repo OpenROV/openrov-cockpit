@@ -7,7 +7,6 @@
   'use strict';
       var switchBehaviorImpl= {
       properties: {
-        index:{type:Number}
       },
       on:function(){
         this.eventEmitter.emit('plugin.externalLights.on')
@@ -18,7 +17,7 @@
       registerEmitterHandlers: function(emitter){
         var self = this;
         emitter.withHistory.on('plugin.externalLights.currentPower',function(power){
-          if (power > 0 ){
+          if (power>0){
             self.set('switchState','on')
           } else {
             self.set('switchState','off')

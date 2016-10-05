@@ -15,10 +15,10 @@
     properties: {
     },
     behaviors: [namespace('behaviors').oROVStandard,namespace('behaviors').oROVELightSwitch],
-    attached:function(){
-     //   this.defaultPanel="flight-switches";
-        this.shortName="XL" + this.index;
-        this.description="Extra Lights on/off";
+    ready:function(){
+        this.defaultPanel="flight-switches";
+        this.shortName="EXL";
+        this.description="ELights on/off";
     },
     _handleSwitchChange:function(){
         if (this.$.toggle.checked){

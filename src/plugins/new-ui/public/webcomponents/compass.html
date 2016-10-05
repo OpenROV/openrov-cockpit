@@ -191,20 +191,17 @@
         },
         setHeading: function(value) {
           this.heading = value;
+
           rotateElement(this.$.indicator, indicatorAngle, value);
 
           if (!this.target) {
+            
             var bearing = $(this.$.bearing);
             rotateElement(this.$.bearing, bearingAngle, value);
           }
         },
         setBearing: function(value) {
           this.bearing=value;
-
-          var bearing = $(this.$.bearing);
-          var target = $(this.$.target);
-          var lock = $(this.$.lock);
-
           if (value) {
             this.target = this.pad(value, 3);
 

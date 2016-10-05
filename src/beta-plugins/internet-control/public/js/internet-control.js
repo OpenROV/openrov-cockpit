@@ -237,8 +237,10 @@
                     break;
                   case 'plugin.rovpilot.desiredControlRates':
                   case 'plugin.externalLights.toggle':
-                  case 'plugin.externalLights.adjust':
-                  case 'plugin.externalLights.set':
+                  case 'plugin.externalLights.off':
+                  case 'plugin.externalLights.on':
+                  case 'plugin.externalLights.stepPositive':
+                  case 'plugin.externalLights.stepNegative':
                   case 'plugin.laser.set':
                   case 'plugin.lights.toggle':
                   case 'plugin.lights.off':

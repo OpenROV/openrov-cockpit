@@ -82,7 +82,7 @@
           emitter.withHistory.on('plugin.lights.currentPower',function(power){
             self.internal_brightnessLevel = power;
           });
-          emitter.withHistory.on('plugin.externalLights.state',function(state){
+          emitter.withHistory.on('plugin.externalLights.currentPower',function(power){
             self.external_brightnessLevel = power;
           });
         }

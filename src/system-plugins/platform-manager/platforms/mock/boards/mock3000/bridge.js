@@ -63,6 +63,21 @@ function Bridge()
         break;
       }
 
+      case 'elights_tpow': 
+      {
+        // Ack command
+        var power = parseInt( commandParts[1] );
+        bridge.emitStatus('elights_tpow:' + power );
+
+        setTimeout( function()
+        {
+          // Move to target position
+          bridge.emitStatus('elights_pow:' + decode( power ) );
+        }, 250 );
+
+        break;
+      }
+
       case 'camServ_tpos': 
       {
         // Ack command

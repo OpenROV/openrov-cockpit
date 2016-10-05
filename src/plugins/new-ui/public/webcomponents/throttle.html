@@ -50,6 +50,17 @@ TODO:  Change the interface for motors to -1/1 with deadzone accounted for to tr
         transformation-timing-function: ease-out;
       }
 
+      #throttle {
+        fill: #cccccc;
+        fill-opacity: 1;
+        stroke: none;
+
+        /*Hardware acceleration*/
+        translate3d(0,0,0);
+        transition-duration: 0.05s;
+        transformation-timing-function: ease-in;
+      }
+
 
 
     </style>
@@ -111,7 +122,7 @@ TODO:  Change the interface for motors to -1/1 with deadzone accounted for to tr
              x="38.606461"
              y="221.30832"
              id="throttle"
-             style="fill:#cccccc;fill-opacity:1;stroke:none" />
+           />
         </g>
         <path
            d="m 1.0500002,407.07541 104.9296498,0"
@@ -355,6 +366,9 @@ TODO:  Change the interface for motors to -1/1 with deadzone accounted for to tr
           height = -1 * height;
           y = 815 / 2;
         }
+
+        element.attr('height', height);
+        element.attr('y', y);
         element.animate({
           svgHeight: height,
           svgY: y

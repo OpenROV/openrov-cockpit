@@ -26,6 +26,31 @@ TODO:  Change the interface for motors to -1/1 with deadzone accounted for to tr
         float: left;
       }
 
+      #leftThrottleRect {
+        fill: #fff9f9;
+        fill-opacity: 1;
+        stroke: none;
+
+        height: 163;
+
+        /*Hardware acceleration*/
+        translate3d(0,0,0);
+        transition-duration: 0.5s;
+        transformation-timing-function: ease-in;
+      }
+      #rightThrottleRect {
+        fill: #fff9f9;
+        fill-opacity: 1;
+        stroke: none;
+
+        /*Hardware acceleration*/
+        translate3d(0,0,0);
+        transition-duration: 0.5s;
+        transformation-timing-function: ease-in;
+      }
+
+
+
     </style>
   <template>
     <div id="container" class="center" style="">
@@ -69,15 +94,15 @@ TODO:  Change the interface for motors to -1/1 with deadzone accounted for to tr
                height="131.31982"
                x="2.6261578"
                y="341.21436"
-               id="rect3779"
-               style="fill:#ffffff;fill-opacity:1;stroke:none" />
+               id="leftThrottleRect"
+            />
             <rect
                width="20.440001"
                height="131.31982"
                x="84.551224"
                y="341.21436"
-               id="rect3781"
-               style="fill:#fff9f9;fill-opacity:1;stroke:none" />
+               id="rightThrottleRect"
+            />
           </g>
           <rect
              width="30.840309"
@@ -294,14 +319,15 @@ TODO:  Change the interface for motors to -1/1 with deadzone accounted for to tr
         //815 is the design height of the throttle SVG element, 200 the min height of the throttle display at power level 1
         var height = level.map(0, 5, 0, 815);
         var y = 815 / 2 - height / 2;
-        portMaxElement.animate({
-          svgHeight: height,
-          svgY: y
-        }, 10);
-        verticalMaxElement.animate({
-          svgHeight: height,
-          svgY: y
-        }, 10);
+
+        //This will cause port vertical and starboard max throttles to change
+        //portMaxElement.get(0).attr('height', height);
+        
+        console.log($(portMaxElement.get(0)).attr('height', height));
+        console.log($(portMaxElement.get(0)).attr('y', y));
+        console.log(verticalMaxElement.get(0));
+        console.log(starboardMaxElement.get(0));
+        
         starboardMaxElement.animate({
           svgHeight: height,
           svgY: y

@@ -57,8 +57,7 @@ TODO:  Change the interface for motors to -1/1 with deadzone accounted for to tr
 
         /*Hardware acceleration*/
         translate3d(0,0,0);
-        transition-duration: 0.05s;
-        transformation-timing-function: ease-in;
+        transition-duration: 0.01s;
       }
 
 
@@ -330,6 +329,7 @@ TODO:  Change the interface for motors to -1/1 with deadzone accounted for to tr
         var starboardMaxElement = $(this.$.starboard).find('#maxThrottle rect');
         //815 is the design height of the throttle SVG element, 200 the min height of the throttle display at power level 1
         var height = level.map(0, 5, 0, 815);
+        console.log("setPowerHeight: " , height);
         var y = 815 / 2 - height / 2;
 
         //This will cause port vertical and starboard max throttles to change using css
@@ -357,22 +357,25 @@ TODO:  Change the interface for motors to -1/1 with deadzone accounted for to tr
         this.setElement(element, right);
       },
       setElement: function (element, value) {
-        var y;
-        // the min throttle height is 200, therefore we substract 100 px
-        var maxheight = 815;
-        var height = value.map(1000, 2000, 0 - maxheight, maxheight);
-        y = 815 / 2 - height;
-        if (height < 0) {
-          height = -1 * height;
+        
+        // Grab the current maximum drawn throttle value
+        var maxHeight = $(this.$.port).find('#maxThrottle rect').attr('height');
+
+        //Zero point as reported by the throttle value passed in is 1500
+        var height = maxHeight/2.0;
+        if( value == 1500 )
+        {
+          height = 0;
+        } 
+        
+        var y = 815 / 2 - height;
+        if( value < 1500 )
+        {
           y = 815 / 2;
         }
 
         element.attr('height', height);
         element.attr('y', y);
-        element.animate({
-          svgHeight: height,
-          svgY: y
-        }, 10);
       }
     });
   </script>

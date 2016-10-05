@@ -153,18 +153,8 @@
                 'title': 'Lights',
                 'type': 'object',
                 'id': 'lights',
-                'properties': {
-                    'steps': 
-                    {
-                        'type': 'number',
-                        'default': 5
-                    }     
-                },
-
-                // TODO: Need to classify which settings are used at various levels: MCU Model, Local Model, UI model
-                'required': [
-                    'steps'        // (UI)
-                ]
+                'properties': {},
+                'required': []
             }];
         }
     }

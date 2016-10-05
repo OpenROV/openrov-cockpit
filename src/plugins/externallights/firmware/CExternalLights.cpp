@@ -90,68 +90,6 @@ void CExternalLights::Update( CCommand& commandIn )
 		Serial.print( util::Encode1K( m_currentPower ) );
 		Serial.print( ';' );
 	}
-
-	// TODO: Disabled until discrepancies resolved.
-	// Run servo adjustment at 100Hz
-    // if( m_controlTimer.HasElapsed( 10 ) )
-    // {
-	// 	if( m_currentPower_an != m_targetPower_an )
-	// 	{
-	// 		float error = m_targetPower - m_currentPower;
-
-	// 		// Manage transition speed (100% per second)
-	// 		if( abs( error ) < kPowerDelta )
-	// 		{
-	// 			// Move directly to targets. No need to calculate conversions
-	// 			m_currentPower 		= m_targetPower;
-	// 			m_currentPower_an 	= m_targetPower_an;
-	// 		}
-	// 		else
-	// 		{
-	// 			// Move currentPower by kPowerDelta increment
-	// 			m_currentPower += ( ( error < 0.0f ) ? -kPowerDelta : kPowerDelta );
-
-	// 			// Update the analog power representation
-	// 			m_currentPower_an = PercentToAnalog( m_currentPower );
-
-	// 			// Apply ceiling
-	// 			if( m_currentPower_an > 255 )
-	// 			{
-	// 				m_currentPower_an = 255;
-	// 			}
-	// 		}
-
-	// 		// Write the power value to the pin
-	// 		m_pin.Write( m_currentPower_an );
-
-	// 		// Snap floating point power to target power to handle any potential float<->int errors
-	// 		if( m_currentPower_an == m_targetPower_an )
-	// 		{
-	// 			m_currentPower_an = m_targetPower_an;
-	// 		}
-	// 	}
-
-	// 	Serial.print( F( "lights_pow:" ) );
-	// 	Serial.print( util::Encode1K( m_currentPower ) );
-	// 	Serial.print( ';' );
-
-	// 	Serial.print( F( "test_light:" ) );
-	// 	Serial.print( m_currentPower_an );
-	// 	Serial.print( ';' );
-	// }
-
-	// // Emit power telemetry at 10Hz, but only on changes
-    // if( m_telemetryTimer.HasElapsed( 100 ) )
-    // {
-	// 	if( m_lastPower_an != m_currentPower_an )
-	// 	{
-	// 		Serial.print( F( "lights_pow:" ) );
-	// 		Serial.print( util::Encode1K( m_currentPower ) );
-	// 		Serial.print( ';' );
-
-	// 		m_lastPower_an = m_currentPower_an;
-	// 	}
-    // }
 }
 
 #endif

@@ -182,15 +182,12 @@
 
         toggle()
         {
-           
             if( this.isOn === false )
             {
-
                 this.on();
             }
             else
             {
-                this.isOn = false;
                 this.off();
             }
         }

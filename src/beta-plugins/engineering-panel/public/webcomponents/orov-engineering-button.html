@@ -139,12 +139,12 @@
                     if( state == true )
                     {
                       // Turn off
-                      self.eventEmitter.emit('plugin.lights.setOnOff', false );
+                      self.eventEmitter.emit('plugin.lights.off' );
                     }
                     else
                     {
                       // Turn on to max
-                      self.eventEmitter.emit('plugin.lights.setOnOff', true );
+                      self.eventEmitter.emit('plugin.lights.on' );
                     }
                   }
                 },
@@ -153,7 +153,7 @@
                   state: false,
                   description: 'External LED lights on/off',
                   events: [
-                    {message:'plugin.externalLights.level',fn: function(lightNum, level){ if( lightNum == 0){ return level > 0; } else{ return null; } }}
+                    {message:'plugin.externalLights.currentPower',fn: function(power){ return ( power > 0 );}}
                   ],
                   switch: function (state) {
                     if (self.eventEmitter !== undefined)
@@ -161,35 +161,12 @@
                       if( state == true )
                       {
                         // Turn off
-                        self.eventEmitter.emit('plugin.externalLights.setOnOff', 0, false );
+                        self.eventEmitter.emit('plugin.externalLights.off' );
                       }
                       else
                       {
                         // Turn on to max
-                        self.eventEmitter.emit('plugin.externalLights.setOnOff', 0, true );
-                      }
-                    }
-                  }
-                },
-                XL1: {
-                  switchable: true,
-                  state: false,
-                  description: 'External LED lights on/off',
-                  events: [
-                    {message:'plugin.externalLights.level',fn: function(lightNum, level){if( lightNum == 1){ return level > 0; } else{ return null; } } }
-                  ],
-                  switch: function (state) {
-                    if (self.eventEmitter !== undefined)
-                    {
-                      if( state == true )
-                      {
-                        // Turn off
-                        self.eventEmitter.emit('plugin.externalLights.setOnOff', 1, false );
-                      }
-                      else
-                      {
-                        // Turn on to max
-                        self.eventEmitter.emit('plugin.externalLights.setOnOff', 1, true );
+                        self.eventEmitter.emit('plugin.externalLights.on' );
                       }
                     }
                   }

@@ -1,111 +1,166 @@
-(function () {
-  function ExternalLights(name, deps) {
-    console.log('ExternalLights plugin loaded');
-    var self = this;
-    self.settings = [
-      0,
-      0
-    ];
-    //  Settings:       = [ 0 .. 5 ]
-    self.levelMap = [
-      0,
-      16,
-      32,
-      64,
-      128,
-      255
-    ];
-    self.maxLevel = self.levelMap.length - 1;
-    // Cockpit
-    deps.cockpit.on('plugin.externalLights.toggle', function (lightNum) {
-      toggleLights(lightNum);
-    });
-    deps.cockpit.on('plugin.externalLights.adjust', function (lightNum, value) {
-      adjustLights(lightNum, value);
-    });
-    deps.cockpit.on('plugin.externalLights.set', function (lightNum, value) {
-      setLights(lightNum, value);
-    });
-    deps.cockpit.on('plugin.externalLights.setOnOff', function (lightNum, setOn) {
-      if (setOn) {
-        // Max light power
-        setLights(lightNum, self.maxLevel);
-      } else {
-        // Min light power
-        setLights(lightNum, 0);
-      }
-    });
-    // Arduino
-    deps.globalEventLoop.on('mcu.status', function (data) {
-      if ('LIGTE0' in data) {
-        // Value of 0-255 representing percent
-        var level = parseInt(data.LIGTE0);
-        console.log('External light 0 status: ' + level);
-        // Search for the level in the level map
-        var setting = self.levelMap.indexOf(level);
-        if (setting != -1) {
-          // The new setting value is the array index of the level in the level map, if it exists
-          self.settings[0] = setting;
-          console.log('External light 0 setting: ' + setting);
-        } else {
-          // Find the closest level in our map
-          var closest = self.levelMap.reduce(function (prev, curr) {
-              return Math.abs(curr - level) < Math.abs(prev - level) ? curr : prev;
+(function() 
+{
+    const Periodic = require( 'Periodic' );
+    const Listener = require( 'Listener' );
+
+    // Encoding helper functions
+    function encode( floatIn )
+    {
+        return parseInt( floatIn * 1000 );
+    }
+
+    function decode( intIn )
+    {
+        return ( intIn * 0.001 );
+    }
+
+    class ExternalLights
+    {
+        constructor(name, deps)
+        {
+            console.log( 'ExternalLights plugin loaded' );
+
+            this.globalBus  = deps.globalEventLoop;
+            this.cockpitBus = deps.cockpit;
+
+            this.targetPower          = 0;
+            this.targetPower_enc      = 0;
+            this.mcuTargetPower_enc   = 0;
+
+            var self = this;
+
+            this.SyncTargetPower = new Periodic( 33, "timeout", function()
+            {
+                var synced = true;
+
+                // Send target power to MCU until it responds with affirmation
+                if( self.mcuTargetPower_enc !== self.targetPower_enc )
+                {
+                    synced = false;
+
+                    // Encode floating point to integer representation
+                    var command = 'elights_tpow(' + self.targetPower_enc + ')';
+
+                    // Emit command to mcu
+                    self.globalBus.emit( 'mcu.SendCommand', command );
+                }
+
+                if( synced )
+                {
+                    // No need to continue
+                    self.SyncTargetPower.stop();
+                }
             });
-          // Set the new setting value based on the index of the closest level
-          self.settings[0] = self.levelMap.indexOf(closest);
-          console.log('External light 0 closest setting: ' + self.settings[0]);
+
+            this.listeners = 
+            {
+                settings: new Listener( this.globalBus, 'settings-change.external-lights', true, function( settings )
+                {
+                    // Apply settings
+                    self.settings = settings.lights;
+                    
+                    // Emit settings update to cockpit
+                    self.cockpitBus.emit( 'plugin.externalLights.settingsChange', self.settings );
+
+                    // Enable MCU Status listener
+                    self.listeners.mcuStatus.enable();
+
+                    // Enable API
+                    self.listeners.setTargetPower.enable();
+                }),
+
+                mcuStatus: new Listener( this.globalBus, 'mcu.status', false, function( data )
+                {
+                    // Current light power
+                    if( 'elights_pow' in data ) 
+                    {
+                        // Convert from integer to float
+                        var power = decode( parseInt( data.elights_pow ) );
+
+                        // Emit on cockpit bus for UI purposes
+                        self.cockpitBus.emit( 'plugin.externalLights.currentPower', power );
+                    }
+
+                    // Target light power
+                    if( 'elights_tpow' in data ) 
+                    {
+                        // Save encoded version for sync validation purposes
+                        self.mcuTargetPower_enc = parseInt( data.elights_tpow );
+
+                        // Convert from integer to float
+                        var power = decode( self.mcuTargetPower_enc );
+
+                        // Emit the real target power on the cockpit bus for UI purposes
+                        self.cockpitBus.emit( 'plugin.externalLights.targetPower', power );
+                    }
+                }),
+
+                setTargetPower: new Listener( this.cockpitBus, 'plugin.externalLights.setTargetPower', false, function( powerIn )
+                {
+                    // Set new target Power
+                    self.setTargetPower( powerIn );
+                })
+            }
         }
-        deps.cockpit.emit('plugin.externalLights.state', 0, { level: self.settings[0] });
-      } else if ('LIGTE1' in data) {
-        // Value of 0-255 representing percent
-        var level = parseInt(data.LIGTE1);
-        console.log('External light 1 status: ' + level);
-        // Search for the level in the level map
-        var setting = self.levelMap.indexOf(level);
-        if (setting != -1) {
-          // The new setting value is the array index of the level in the level map, if it exists
-          self.settings[1] = setting;
-        } else {
-          // Find the closest level in our map
-          var closest = self.levelMap.reduce(function (prev, curr) {
-              return Math.abs(curr - level) < Math.abs(prev - level) ? curr : prev;
-            });
-          // Set the new setting value based on the index of the closest level
-          self.settings[1] = self.levelMap.indexOf(closest);
+
+        setTargetPower( powerIn )
+        {
+            var self = this;
+
+            // Validate input
+            if( isNaN( powerIn ) )
+            {
+              // Ignore
+              return;
+            }
+
+            // Apply limits
+            if( powerIn > 1.0 )
+            {
+                self.targetPower = 1.0;
+            }
+            else if( powerIn < 0 )
+            {
+                self.targetPower = 0;
+            }
+            else
+            {
+                self.targetPower = powerIn;
+            }
+
+            self.targetPower_enc = encode( self.targetPower );
+
+            // Start targetPower sync, if not already running
+            self.SyncTargetPower.start();
         }
-        deps.cockpit.emit('plugin.externalLights.state', 1, { level: self.settings[1] });
-      }
-    });
-    var adjustLights = function adjustLights(lightNum, value) {
-      // Modify current setting
-      setLights(lightNum, self.settings[lightNum] + value);
+        
+        start()
+        {
+          this.listeners.settings.enable();
+        }
+
+        stop()
+        {
+          this.listeners.settings.disable();
+          this.listeners.mcuStatus.disable();
+          this.listeners.setTargetPower.disable();
+        }
+
+        getSettingSchema()
+        {
+            //from http://json-schema.org/examples.html
+            return [{
+                'title': 'External Lights',
+                'type': 'object',
+                'id': 'external-lights',
+                'properties': {},
+                'required': []
+            }];
+        }
+    }
+
+    module.exports = function(name, deps) 
+    {
+        return new ExternalLights(name, deps);
     };
-    var toggleLights = function toggleLights(lightNum) {
-      if (self.settings[lightNum] > 0) {
-        // Set to min power
-        setLights(lightNum, 0);
-      } else {
-        // Set to max power
-        setLights(lightNum, self.maxLevel);
-      }
-    };
-    var setLights = function setLights(lightNum, value) {
-      console.log('Attemping to set lights [' + lightNum + '] to: ' + value);
-      // Range limit the new setting from 0 to the max number of defined levels
-      if (value < 0) {
-        value = 0;
-      } else if (value >= self.maxLevel) {
-        value = self.maxLevel;
-      }
-      // Make sure the new setting is an integer
-      self.settings[lightNum] = Math.round(value);
-      console.log('Setting lights [' + lightNum + '] to: ' + self.settings[lightNum]);
-      var command = 'elight' + lightNum + '(' + self.levelMap[self.settings[lightNum]] + ')';
-      deps.globalEventLoop.emit('mcu.SendCommand', command);
-    };
-  }
-  module.exports = function (name, deps) {
-    return new ExternalLights(name, deps);
-  };
 }());

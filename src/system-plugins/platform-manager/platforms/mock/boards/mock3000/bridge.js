@@ -1,10 +1,24 @@
 var EventEmitter = require('events').EventEmitter;
 var debug = require('debug')('bridge');
-function Bridge() {
+
+// Encoding helper functions
+function encode( floatIn )
+{
+    return parseInt( floatIn * 1000 );
+}
+
+function decode( intIn )
+{
+    return ( intIn * 0.001 );
+}
+
+function Bridge() 
+{
   var DISABLED = 'DISABLED';
   var bridge = new EventEmitter();
   var reader = new StatusReader();
   var emitRawSerial = false;
+
   // Initial values
   var time = 1000;
   var currentDepth = 1;
@@ -13,21 +27,59 @@ function Bridge() {
   var currentRoll = 0;
   var currentServo = 1500;
   var current = 2;
+
   bridge.depthHoldEnabled = false;
   bridge.targetHoldEnabled = false;
   bridge.laserEnabled = false;
+
   // -----------------------------------------
   // Methods
-  bridge.write = function (command) {
+  bridge.write = function (command) 
+  {
     var commandParts = command.split(/\(|\)/);
     var commandText = commandParts[0];
-    switch (commandText) {
-    case 'version': {
-      bridge.emitStatus('ver:<<{{10024121ae3fa7fc60a5945be1e155520fb929dd}}>>');
-      debug('ver:<<{{10024121ae3fa7fc60a5945be1e155520fb929dd}}>>');
-      break;
-    }
-    case 'camServ_tpos': {
+
+    switch (commandText) 
+    {
+      case 'version': 
+      {
+        bridge.emitStatus('ver:<<{{10024121ae3fa7fc60a5945be1e155520fb929dd}}>>');
+        debug('ver:<<{{10024121ae3fa7fc60a5945be1e155520fb929dd}}>>');
+        break;
+      }
+
+      case 'lights_tpow': 
+      {
+        // Ack command
+        var power = parseInt( commandParts[1] );
+        bridge.emitStatus('lights_tpow:' + power );
+
+        setTimeout( function()
+        {
+          // Move to target position
+          bridge.emitStatus('lights_pow:' + power );
+        }, 250 );
+
+        break;
+      }
+
+      case 'elights_tpow': 
+      {
+        // Ack command
+        var power = parseInt( commandParts[1] );
+        bridge.emitStatus('elights_tpow:' + power );
+
+        setTimeout( function()
+        {
+          // Move to target position
+          bridge.emitStatus('elights_pow:' + power );
+        }, 250 );
+
+        break;
+      }
+
+      case 'camServ_tpos': 
+      {
         // Ack command
 
         var pos = parseInt( commandParts[1] );
@@ -41,68 +93,87 @@ function Bridge() {
 
         break;
       }
-    case 'camServ_inv': {
-      // Ack command
-      bridge.emitStatus('camServ_inv:' + commandParts[1] );
-      break;
-    }
-    case 'camServ_spd': {
-      // Ack command
-      var speed = parseInt( commandParts[1] );
-      bridge.emitStatus('camServ_spd:' + speed );
-      break;
-    }
-    case 'rcap': {
+
+      case 'camServ_inv': 
+      {
+        // Ack command
+        bridge.emitStatus('camServ_inv:' + commandParts[1] );
+        break;
+      }
+
+      case 'camServ_spd': 
+      {
+        // Ack command
+        var speed = parseInt( commandParts[1] );
+        bridge.emitStatus('camServ_spd:' + speed );
+        break;
+      }
+
+      case 'rcap': 
+      {
         bridge.emitStatus('CAPA:255');
         debug('CAPA:255');
         break;
       }
-    case 'ligt': {
-        //bridge.emitStatus('LIGP:' + commandParts[1] / 100);
-        bridge.emitStatus('LIGT:' + commandParts[1]);
-        //debug('Light status: ' + commandParts[1] / 100);
-        break;
-      }
-    case 'eligt': {
+      
+      case 'eligt': 
+      {
         bridge.emitStatus('LIGPE:' + commandParts[1] / 100);
         debug('External light status: ' + commandParts[1] / 100);
         break;
       }
-    case 'escp': {
+
+      case 'escp': 
+      {
         bridge.emitStatus('ESCP:' + commandParts[1]);
         debug('ESC status: ' + commandParts[1]);
         break;
       }
-    case 'claser': {
-        if (bridge.laserEnabled) {
+
+      case 'claser': 
+      {
+        if (bridge.laserEnabled) 
+        {
           bridge.laserEnabled = false;
           bridge.emitStatus('claser:0');
           debug('Laser status: 0');
-        } else {
+        } 
+        else 
+        {
           bridge.laserEnabled = true;
           bridge.emitStatus('claser:255');
           debug('Laser status: 255');
         }
+
         break;
       }
-    case 'holdDepth_on': {
+
+      case 'holdDepth_on': 
+      {
         var targetDepth = 0;
-        if (!bridge.depthHoldEnabled) {
+
+        if (!bridge.depthHoldEnabled) 
+        {
           targetDepth = currentDepth;
           bridge.depthHoldEnabled = true;
         }
+
         bridge.emitStatus('targetDepth:' + (bridge.depthHoldEnabled ? targetDepth.toString() : DISABLED));
         debug('Depth hold enabled');
         break;
       }
-    case 'holdDepth_off': {
+
+      case 'holdDepth_off': 
+      {
         targetDepth = -500;
         bridge.depthHoldEnabled = false;
         bridge.emitStatus('targetDepth:' + (bridge.depthHoldEnabled ? targetDepth.toString() : DISABLED));
         debug('Depth hold disabled');
         break;
       }
-    case 'holdHeading_on': {
+
+      case 'holdHeading_on': 
+      {
         var targetHeading = 0;
         targetHeading = currentHeading;
         bridge.targetHoldEnabled = true;
@@ -110,7 +181,9 @@ function Bridge() {
         debug('Heading hold enabled');
         break;
       }
-    case 'holdHeading_off': {
+
+      case 'holdHeading_off': 
+      {
         var targetHeading = 0;
         targetHeading = -500;
         bridge.targetHoldEnabled = false;
@@ -118,22 +191,30 @@ function Bridge() {
         debug('Heading hold disabled');
         break;
       }
-    // Passthrough tests
-    case 'example_to_foo': {
+
+      // Passthrough tests
+      case 'example_to_foo': 
+      {
         bridge.emitStatus('example_foo:' + commandParts[1]);
         break;
       }
-    case 'example_to_bar': {
+
+      case 'example_to_bar': 
+      {
         bridge.emitStatus('example_bar:' + commandParts[1]);
         break;
       }
-    default: {
+
+      default: 
+      {
         debug('Unsupported command: ' + commandText);
       }
     }
+
     // Echo this command back to the MCU
     bridge.emitStatus('cmd:' + command);
   };
+
   bridge.emitStatus = function (status) {
     var txtStatus = reader.parseStatus(status);
     bridge.emit('status', txtStatus);

@@ -237,12 +237,17 @@
                     break;
                   case 'plugin.rovpilot.desiredControlRates':
                   case 'plugin.externalLights.toggle':
-                  case 'plugin.externalLights.adjust':
-                  case 'plugin.externalLights.set':
+                  case 'plugin.externalLights.off':
+                  case 'plugin.externalLights.on':
+                  case 'plugin.externalLights.stepPositive':
+                  case 'plugin.externalLights.stepNegative':
                   case 'plugin.laser.set':
                   case 'plugin.lights.toggle':
-                  case 'plugin.lights.adjust':
-                  case 'plugin.lights.set':
+                  case 'plugin.lights.off':
+                  case 'plugin.lights.on':
+                  case 'plugin.lights.stepPositive':
+                  case 'plugin.lights.stepNegative':
+                  case 'plugin.lights.setTargetPower':
                   case 'plugin.rovpilot.depthHold.set':
                   case 'plugin.rovpilot.headingHold.set':
                     _self.rov.emit.apply(_self.rov, msg);

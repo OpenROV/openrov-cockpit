@@ -79,11 +79,11 @@
         },
         registerEmitterHandlers: function(emitter){
           var self = this;
-          emitter.withHistory.on('plugin.lights.state',function(state){
-            self.internal_brightnessLevel = state.level;
+          emitter.withHistory.on('plugin.lights.currentPower',function(power){
+            self.internal_brightnessLevel = power;
           });
-          emitter.withHistory.on('plugin.externalLights.state',function(state){
-            self.external_brightnessLevel = state,level;
+          emitter.withHistory.on('plugin.externalLights.currentPower',function(power){
+            self.external_brightnessLevel = power;
           });
         }
 

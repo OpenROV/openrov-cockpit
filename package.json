@@ -8,10 +8,9 @@
     "url": "git://github.com/OpenROV/openrov-software.git"
   },
   "scripts": {
-    "deploy:dev": "node install_lib/bower_install_all.js && node install_lib/npm_install_all.js --no-shrinkwrap  ",  
-    "deploy:prod": "node install_lib/bower_install_all.js && node install_lib/npm_install_all.js --production",
+    "deploy:dev": "npm install && node install_lib/bower_install_all.js && node install_lib/npm_install_all.js --no-shrinkwrap  ",  
+    "deploy:prod": "NODE_ENV=\"production\" npm install && NODE_ENV=\"production\" node install_lib/bower_install_all.js && NODE_ENV=\"production\" node install_lib/npm_install_all.js --production",
     "test": "./node_modules/grunt-cli/bin/grunt test",
-    "install": "node install_lib/bower_install_all.js && node install_lib/npm_install_all.js",
     "shrinkwrap": "node install_lib/npm_shrinkwrap_all.js"
   },
   "dependencies": {

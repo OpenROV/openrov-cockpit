@@ -11,9 +11,14 @@ Step 1: Installation
 You need to install all of the dependencies that are needed.  You do need an active internet connection when running this command.
 
 ```
+npm run deploy:prod
+```
+
+> If you want to install the development dependencies for the system you have to ignore the shrinkwrap settings:
+```
 npm run deploy:dev
 ```
-> The package.json includes the npm scripts.  `deploy:dev` ignores the shrinkwrap.json which means it gets the latest version of the dependent packages as allowed through semantic version numbers.  There is also a `deploy:prod` script that keeps the dependencies as locked down for the last release, but dot not install the development packages.   
+
 
 This will go through all of the directories and look for bower.json files and package.json files and install them.  It will take a few minutes to run.  The goemux project will show some error messages when installing on Intel hardware.  Those can be ignored as the project is setup as an optional dependency and will just keep going.  The install should exit cleanly:
 

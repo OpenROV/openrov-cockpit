@@ -13,8 +13,9 @@
     "tests"
   ],
   "dependencies": {
-    "three.js": "threejs#*",
+    "three.js": "^0.80.0",
     "polymer": "^1.2.0",
-    "webcomponentsjs": "^0.7.20"    
+    "webcomponentsjs": "^0.7.20",
+    "three.js-examples": "^0.80.0" 
   }
 }

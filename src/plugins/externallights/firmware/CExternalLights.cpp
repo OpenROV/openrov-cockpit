@@ -2,7 +2,6 @@
 #if(HAS_EXT_LIGHTS && CONTROLLERBOARD == CONTROLLERBOARD_CB25 )
 
 // Includes
-#include <Arduino.h>
 #include "CExternalLights.h"
 #include "NCommManager.h"
 #include "NVehicleManager.h"
@@ -52,43 +51,41 @@ void CExternalLights::Initialize()
 void CExternalLights::Update( CCommand& commandIn )
 {
 	// Check for messages
-	if( !NCommManager::m_isCommandAvailable )
+	if( NCommManager::m_isCommandAvailable )
 	{
-		return;
-	}
-
-	// Handle messages
-	if( commandIn.Equals( "elights_tpow" ) )
-	{
-		// Update the target position
-		m_targetPower = util::Decode1K( commandIn.m_arguments[1] );
-
-		// TODO: Ideally this unit would have the ability to autonomously set its own target and ack receipt with a separate mechanism
-		// Acknowledge target position
-		Serial.print( F( "elights_tpow:" ) );
-		Serial.print( commandIn.m_arguments[1] );
-		Serial.println( ';' );
-
-		// Pass through linearization function
-		m_targetPower_an = PercentToAnalog( m_targetPower );
-
-		// Apply ceiling
-		if( m_targetPower_an > 255 )
+		// Handle messages
+		if( commandIn.Equals( "elights_tpow" ) )
 		{
-			m_targetPower_an = 255;
+			// Update the target position
+			m_targetPower = util::Decode1K( commandIn.m_arguments[1] );
+
+			// TODO: Ideally this unit would have the ability to autonomously set its own target and ack receipt with a separate mechanism
+			// Acknowledge target position
+			Serial.print( F( "elights_tpow:" ) );
+			Serial.print( commandIn.m_arguments[1] );
+			Serial.println( ';' );
+
+			// Pass through linearization function
+			m_targetPower_an = PercentToAnalog( m_targetPower );
+
+			// Apply ceiling
+			if( m_targetPower_an > 255 )
+			{
+				m_targetPower_an = 255;
+			}
+
+			// Directly move to target power
+			m_currentPower 		= m_targetPower;
+			m_currentPower_an 	= m_targetPower_an;
+
+			// Write the power value to the pin
+			m_pin.Write( m_currentPower_an );
+
+			// Emit current power
+			Serial.print( F( "elights_pow:" ) );
+			Serial.print( util::Encode1K( m_currentPower ) );
+			Serial.print( ';' );
 		}
-
-		// Directly move to target power
-		m_currentPower 		= m_targetPower;
-		m_currentPower_an 	= m_targetPower_an;
-
-		// Write the power value to the pin
-		m_pin.Write( m_currentPower_an );
-
-		// Emit current power
-		Serial.print( F( "elights_pow:" ) );
-		Serial.print( util::Encode1K( m_currentPower ) );
-		Serial.print( ';' );
 	}
 }
 

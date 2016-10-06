@@ -48,6 +48,22 @@ function Bridge()
         break;
       }
 
+      case 'ex_hello': 
+      {
+        var helloGoodbye = parseInt( commandParts[1] );
+
+        if( helloGoodbye === 1 )
+        {
+          bridge.emitStatus('example:Hello!;');
+        }
+        else
+        {
+          bridge.emitStatus('example:Goodbye!;');
+        }
+        
+        break;
+      }
+
       case 'lights_tpow': 
       {
         // Ack command

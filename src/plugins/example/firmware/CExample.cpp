@@ -1,5 +1,4 @@
 #include "SysConfig.h"
-#if(HAS_EXAMPLE_PLUGIN)
 
 // Includes
 #include "CExample.h"
@@ -60,5 +59,3 @@ void CExample::SayHello()
     // Terminate the message
     Serial.print( ';' );
 }
-
-#endif

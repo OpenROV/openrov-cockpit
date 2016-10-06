@@ -6,7 +6,7 @@
 class CExample : public CModule
 {
 public:
-    CExample( uint32_t defaultValueIn = 0 )     // Optional constructor
+    CExample( uint32_t defaultValueIn = 0 );    // Optional constructor
     
     void Initialize();                          // Required function
     void Update( CCommand& commandIn );         // Required function

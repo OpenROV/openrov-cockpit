@@ -96,7 +96,7 @@
         /*Hardware acceleration*/
         translate3d(0,0,0);
 
-        transition-duration: 0.6s;
+        transition-duration: 0.4s;
         transition-timing-function: ease-out;
       }
       #upPolygon {
@@ -105,7 +105,7 @@
         /*Hardware acceleration*/
         translate3d(0,0,0);
 
-        transition-duration: 0.6s;
+        transition-duration: 0.4s;
         transition-timing-function: ease-out;
       }
 
@@ -149,13 +149,13 @@
       <div id="depth-change-container">
         <div id="depthChangeUp" class="depth-change-indicator">
           <svg viewBox="0 0 100 100">
-            <polygon id="upPolygon" points="0,100 50,0 100,100" style="fill:black;stroke:black;stroke-width:4"></polygon>
+            <polygon id="upPolygon" points="0,100 50,0 100,100" style="fill:black;stroke:black;stroke-width:0"></polygon>
           </svg>
         </div>
         <div id="depth-change-value">{{ change }}</div>
         <div id="depthChangeDown" class="depth-change-indicator">
           <svg viewBox="0 0 100 100">
-            <polygon id="downPolygon" points="0,0 50,100 100,0 " style="fill:none;stroke:black;stroke-width:4"></polygon>
+            <polygon id="downPolygon" points="0,0 50,100 100,0 " style="fill:none;stroke:black;stroke-width:0"></polygon>
           </svg>
         </div>
       </div>
@@ -238,22 +238,29 @@
           var update = function () {
             var currentDepth = self.depth;
 
+            var difference = oldDepth - currentDepth;
+            
             if (currentDepth > oldDepth) {
-              // descending
+              // descending, since this value
               self.$.downPolygon.style.fill="white";
+              self.$.downPolygon.style.fillOpacity = Math.sqrt(Math.abs(difference));
+
               self.$.upPolygon.style.fill="black";
 
             } else if (currentDepth < oldDepth) {
               // ascending
               self.$.downPolygon.style.fill="black";
+
               self.$.upPolygon.style.fill="white";
+              self.$.upPolygon.style.fillOpacity = Math.sqrt(Math.abs(difference));
+
             } else {
               // neutral
               self.$.downPolygon.style.fill="black";
               self.$.upPolygon.style.fill="black";
             }
 
-            var difference = oldDepth - currentDepth;
+            
             var changeText = '';
 
             if (difference > 0) {

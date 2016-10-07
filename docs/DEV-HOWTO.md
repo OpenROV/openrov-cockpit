@@ -1,18 +1,24 @@
 ### How to develop without the embedded computer
 This section covers development on your laptop or desktop.  This approach passes flags to the cockpit process which replace actualy interfaces to the hardware with "mock" interfaces that act like the underlying hardware.
 
-Prerequsites:
+Prerequisites:
 * You have done a git clone of the openrov-cockpit repository
 * Are *NOT* running as root (that requires additional flags when doing the install)
-* You are not running on ARM (there were some intel only developmen dependencies that will break the default install)
+* You are not running on ARM (there were some intel only development dependencies that will break the default install)
 * If using the mock video options, FFMPEG needs to be installed on your machine.
 
 Step 1: Installation
-You need to install all of the dependecies that are needed.  You do need an active internet connection when running this command.
+You need to install all of the dependencies that are needed.  You do need an active internet connection when running this command.
 
 ```
-npm install
+npm run deploy:prod
 ```
+
+> If you want to install the development dependencies for the system you have to ignore the shrinkwrap settings:
+```
+npm run deploy:dev
+```
+
 
 This will go through all of the directories and look for bower.json files and package.json files and install them.  It will take a few minutes to run.  The goemux project will show some error messages when installing on Intel hardware.  Those can be ignored as the project is setup as an optional dependency and will just keep going.  The install should exit cleanly:
 
@@ -29,7 +35,7 @@ npm WARN OpenROV-Cockpit@30.1.0 No license field.
 [brian@Babs openrov-cockpit]$
 ```
 
-The node process expects certian environment flags to be set to change its behavior.  You can override all of the setttings that are stored in the config files from the commandline.
+The node process expects certain environment flags to be set to change its behavior.  You can override all of the settings that are stored in the config files from the command-line.
 
 > Windows users: You have to setup the environment variables manually before executing the node command
 
@@ -110,3 +116,8 @@ Additionally, there are plugins that allow debugging the code running in the bro
 https://docs.npmjs.com/cli/update
 
 `ncu --updateAll`
+
+### NPM shrinkwrap all of the packages:
+Do this when readying the repo for the next release to prevent the dependencies from moving.
+
+`npm run shrinkwrap`

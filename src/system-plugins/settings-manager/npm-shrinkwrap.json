@@ -1,0 +1,11 @@
+{
+  "name": "settings-manager",
+  "version": "1.0.0",
+  "dependencies": {
+    "json-schema-defaults": {
+      "version": "0.2.0",
+      "from": "json-schema-defaults@>=0.2.0 <0.3.0",
+      "resolved": "https://registry.npmjs.org/json-schema-defaults/-/json-schema-defaults-0.2.0.tgz"
+    }
+  }
+}

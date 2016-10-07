@@ -21,6 +21,53 @@
       config: config
     })%>
     <%}%>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+
+  ga('create', 'UA-18444815-8', 'auto');
+
+ga('require', 'cleanUrlTracker');
+ga('require', 'eventTracker');
+ga('require', 'outboundLinkTracker');
+ga('require', 'urlChangeTracker');
+ga('require', 'pageVisibilityTracker');
+
+ga('send', 'pageview');
+</script>
+<script async src="js/analytics.js"></script>
+<script async src="js/autotrack.js"></script>
+<script>
+  window.addEventListener('unhandledrejection', function(event) {
+    if (! event) {
+      //Still a new event specification. Ignore if event is undefined
+      return;
+    }
+    ga('send','exception',{
+    'exDescription': `${event.promise}:  ${event.reason}`,
+    'exFatal': false
+    })
+
+    ga('send','event',{
+      eventCategory: '_exception',
+      eventAction: event.promise,
+      eventLabel:  `${event.promise}:  ${event.reason}`  
+    });    
+  });
+  window.addEventListener('error', function(err) {
+    ga('send','exception',{
+    'exDescription': err.message,
+    'exFatal': false
+    });
+
+    ga('send','event',{
+      eventCategory: '_exception',
+      eventAction: err.message,
+      eventLabel:  err.filename + ':  ' + err.lineno  
+    });
+  });  
+</script>
   </head>
 
   <script type='text/javascript' src="js/libs/eventemitter2.js"></script>
@@ -61,9 +108,13 @@
   <body>
 <link rel="import" href="components/platinum-sw/platinum-sw-register.html">
 <link rel="import" href="components/platinum-sw/platinum-sw-cache.html">
+<link rel="import" href="components/terms-of-use/terms-of-use.html">
+
 <!--TODO: Add logic to support either popout or popin(swapping) of applets-->
 <template id="t" is="dom-bind"  strip-whitespace>
+ <terms-of-use style="z-index:9999;display:block;position:absolute;width:100%;heigh:100%;"></terms-of-use> 
 <platinum-sw-register auto-register reload-on-install state="{{pswstate}}">
+  <platinum-sw-offline-analytics></platinum-sw-offline-analytics>  
   <platinum-sw-cache default-cache-strategy="networkFirst"></platinum-sw-cache>
 </platinum-sw-register>
 
@@ -94,7 +145,11 @@
   <% for(var i=0; i<scriplets.length; i++) {
     if ((scriplets[i].name == 'header') || (scriplets[i].name == 'footer')|| (scriplets[i].name == 'head')){continue;}%>
   <template is="dom-if" restamp=true if="{{displaySection(routedata.page,'<%= scriplets[i].name %>')}}">
-
+<script>
+  ga('set', 'page', '<%= scriplets[i].name %>');
+  ga('set', 'dimension1', '<%= theme %>');
+  ga('send', 'pageview');
+</script>
   <%- include(scriplets[i].path,{
     title: title,
     scripts: scripts,

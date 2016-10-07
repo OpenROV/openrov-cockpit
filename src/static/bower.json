@@ -1,13 +1,15 @@
 {
   "name": "static_openrov",
   "dependencies": {
-    "font-roboto": "PolymerElements/font-roboto-local#^1.0.0",   
+    "font-roboto": "PolymerElements/font-roboto-local#^1.0.0",
     "fpsmeter": "~0.3.1",
     "i18next": "~1.11.0",
     "jquery": "3.1",
     "jquery-ui": "1.12",
     "polymer": "^1.6.1",
     "webcomponentsjs": "^0.7.22",
-    "eventemitter2": "^1.0.0"
+    "eventemitter2": "^1.0.0",
+    "iron-localstorage": "PolymerElements/iron-localstorage#^1.0.6",
+    "paper-dialog-scrollable": "PolymerElements/paper-dialog-scrollable#^1.1.5"
   }
 }

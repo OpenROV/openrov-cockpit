@@ -1,0 +1,93 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-dialog/paper-dialog.html">
+<link rel="import" href="../paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../orov-behaviors/orov-globalization-behavior.html">
+
+
+<dom-module id="terms-of-use">
+
+  <style type="text/css">
+  #dialog {
+      position:relative;
+      margin:30px;
+      z-index:103;
+  }
+  </style>
+  <template>
+  <iron-localstorage name="acceptedTOUVersion"
+    value="{{acceptedTOUVersion}}"
+    on-iron-localstorage-load-empty="defaultTOU"
+  ></iron-localstorage>
+<iron-overlay-backdrop id="backdrop" style="z-index: 102;"></iron-overlay-backdrop>
+<paper-dialog id="dialog" modal on-iron-overlay-closed="_onModalClosed" entry-animation="scale-up-animation" exit-animation="fade-out-animation" on-iron-overlay-opened="patchOverlay">
+  <h2>{{__('OpenROV Terms of Services version')}}: {{version}}</h2>  
+  <paper-dialog-scrollable style="height:80%;">    
+    <p>{{__(tou)}}</p>
+  </paper-dialog-scrollable>
+  <div class="buttons">
+    <paper-button dialog-confirm>Accept</paper-button>
+  </div>
+</paper-dialog>
+
+  </template>
+  <script>
+    (function () {
+      Polymer({
+        is: 'terms-of-use',
+        properties:{
+            acceptedTOUVersion:{type:Number},
+            version:{type:Number,value:function(){return 0.1}},
+            tou:{type:String,value:function(){
+                return `By continuing you agree to the following terms of service:
+    You agree to allow OpenROV Inc, to collect usage information which includes location information. 
+    `
+            }}
+        },
+        behaviors:[window.OROV.behaviors.oROVGlobalization],
+        listeners: {
+        'iron-resize': '_onIronResize'
+        },
+        _onIronResize: function(){
+            this.$.dialog.refit();
+        },            
+        attached: function(){
+            var self=this;
+            //because the polymer localstorage control is not loading a value
+            this.acceptedTOUVersion=localStorage.getItem('acceptedTOUVersion')||0;
+            if (this.acceptedTOUVersion < this.version){
+                self.$.backdrop.open();
+                self.$.dialog.open();
+                function fixthisdialog(){
+                    if (self.$.dialog.opened){
+                        self.$.dialog.refit();
+                        setTimeout(fixthisdialog.bind(this),300);
+                    }
+                }
+                fixthisdialog();
+            }
+        },
+        ready: function(){
+            //this.$.dialog.fitInto=this;
+            //this.$.dialog.positionTarget = document.body;
+        },
+        _onModalClosed: function(e){
+            this.$.backdrop.close();
+            if (e.detail.confirmed) {
+                this.set('acceptedTOUVersion',this.version);
+            }
+        },
+        patchOverlay: function (e) {
+        //    if (e.target.withBackdrop) {
+        //        var bd = e.target.backdropElement;
+        //        this.append.insertBefore(bd, e.target);
+        //    }
+        },  
+        defaultTOU: function(){
+            this.acceptedTOUVersion=0;
+        }      
+      });
+    }());
+  </script>
+</dom-module>

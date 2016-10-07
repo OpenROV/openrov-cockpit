@@ -1,6 +1,7 @@
 var EventEmitter = require('events').EventEmitter;
 var debug = require('debug')('bridge');
 
+
 // Encoding helper functions
 function encode( floatIn )
 {
@@ -270,7 +271,9 @@ function Bridge()
     }
     // Generate pitch
     // currentPitch = 0.01 * (Math.floor(Math.random() * 201) - 100);
-    currentPitch = Math.floor(Math.random()*181) - 90;
+    //currentPitch = Math.floor(Math.random()*181) - 90;
+    //p(t) = 90*sin(t)
+    currentPitch = 90*Math.sin(time);
     result += 'pitc:' + currentPitch + ';';
     // Generate roll
     // currentRoll = 0.03 * (Math.floor(Math.random() * 201) - 100);

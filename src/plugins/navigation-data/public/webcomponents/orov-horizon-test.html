@@ -37,28 +37,31 @@
       }
 
       #crosshair {
-        x: -159px;
-        y: 57px;
+        x: -117px;
+        y: -90px;
 
         translate3d(0,0,0);
+        transform-origin: center;
         transition-duration: 0.50s;
         transformation-timing-function: ease-out;
       }
             
       #svg2 {
         position: absolute;
+
         top:0;
         bottom: 0;
-        left: 0;
-        right: 0;
-
+        right: 0px;
+        
+        padding: 10px;
+        
         margin: auto;
       }
 
     </style>
   <template>
-  <svg height="35%"
-   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+<svg height="35%"
+      xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -66,13 +69,13 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="165.07928"
-   height="439.92352"
-   viewBox="0 0 165.07919 439.92344"
+   width="191.87764"
+   height="432.81854"
+   viewBox="0 0 191.87753 432.81846"
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="contrast-hud.svg"
+   sodipodi:docname="both-numbers-hud.svg"
    inkscape:export-filename="/home/gilbert/workspace/openrov-dev/assets/30.0.1_UI/heads-up-display.svg.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
@@ -232,9 +235,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4142136"
-     inkscape:cx="-39.637112"
-     inkscape:cy="413.00629"
+     inkscape:zoom="2"
+     inkscape:cx="137.74843"
+     inkscape:cy="235.1542"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -248,15 +251,36 @@
      inkscape:window-maximized="1"
      fit-margin-top="-0.2"
      units="px"
-     showguides="false"
+     showguides="true"
      fit-margin-left="0"
      fit-margin-right="0"
-     fit-margin-bottom="0">
+     fit-margin-bottom="0"
+     inkscape:guide-bbox="true">
     <inkscape:grid
        type="xygrid"
        id="grid3369"
-       originx="-487.70878"
-       originy="-29.786798" />
+       originx="-498.5864"
+       originy="-33.591888" />
+    <sodipodi:guide
+       position="82.413263,111.40808"
+       orientation="0,1"
+       id="guide12655" />
+    <sodipodi:guide
+       position="83.413263,112.40808"
+       orientation="0,1"
+       id="guide12657" />
+    <sodipodi:guide
+       position="82.413263,320.40804"
+       orientation="0,1"
+       id="guide12659" />
+    <sodipodi:guide
+       position="148.41323,425.40802"
+       orientation="0,1"
+       id="guide12661" />
+    <sodipodi:guide
+       position="120.41324,6.4081041"
+       orientation="0,1"
+       id="guide12663" />
   </sodipodi:namedview>
   <metadata
      id="metadata7">
@@ -275,21 +299,21 @@
      inkscape:groupmode="layer"
      id="layer1"
      style="display:inline"
-     transform="translate(-487.70894,-582.65205)">
+     transform="translate(-498.58656,-585.95195)">
     <rect
        style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.67693496;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect11121"
        width="139.10703"
        height="1.3230646"
        x="498.92511"
-       y="593.21338" />
+       y="593.14124" />
     <rect
        style="display:inline;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.67693549;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect11121-9"
        width="139.10724"
        height="1.3230641"
        x="498.92499"
-       y="1011.5894" />
+       y="1011.5403" />
     <rect
        style="display:inline;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.35726765;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect11121-2"
@@ -320,7 +344,7 @@
        x="516.77246"
        y="798.26776" />
     <rect
-       style="display:inline;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.4099999;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-linecap:butt"
+       style="display:inline;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.40999991;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect11102-5-1-2"
        width="44.596321"
        height="1.5903331"
@@ -354,33 +378,85 @@
        height="201.6546"
        x="567.65131"
        y="593.08734" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:18.60447121px;line-height:100%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;baseline-shift:baseline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="671.53925"
+       y="599.68713"
+       id="text12240"
+       sodipodi:linespacing="100%"><tspan
+         sodipodi:role="line"
+         id="tspan12242"
+         x="671.53925"
+         y="599.68713"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:100%;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';text-align:center;writing-mode:lr-tb;baseline-shift:baseline;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;stroke-opacity:1">90°</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:18.56820107px;line-height:100%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;baseline-shift:baseline;display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="621.12415"
+       y="703.71051"
+       id="text12240-2-6-4"
+       sodipodi:linespacing="100%"
+       transform="scale(0.99805688,1.0019469)"><tspan
+         sodipodi:role="line"
+         id="tspan12242-6-0-1"
+         x="621.12415"
+         y="703.71051"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:100%;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';text-align:center;writing-mode:lr-tb;baseline-shift:baseline;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;stroke-opacity:1">45°</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:18.17208481px;line-height:100%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;baseline-shift:baseline;display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="640.30029"
+       y="883.85602"
+       id="text12240-2-6-4-8"
+       sodipodi:linespacing="100%"
+       transform="scale(0.96800736,1.03305)"><tspan
+         sodipodi:role="line"
+         id="tspan12242-6-0-1-7"
+         x="640.30029"
+         y="883.85602"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:100%;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';text-align:center;writing-mode:lr-tb;baseline-shift:baseline;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;stroke-opacity:1">-45°</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:18.3672924px;line-height:100%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;baseline-shift:baseline;display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="693.03015"
+       y="986.86475"
+       id="text12240-0"
+       sodipodi:linespacing="100%"
+       transform="scale(0.96893752,1.0320583)"><tspan
+         sodipodi:role="line"
+         id="tspan12242-8"
+         x="693.03015"
+         y="986.86475"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:100%;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';text-align:center;writing-mode:lr-tb;baseline-shift:baseline;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;stroke-opacity:1">-90°</tspan></text>
+  </g>
   </g>
     <g id="crosshair"
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-158.18984,-303.87297)">
+     transform="translate(-92.52822,-300.87297)">
     <circle
-       style="display:inline;opacity:1;fill:#b71c1c;fill-opacity:1;stroke:#ffffff;stroke-width:1.47782898;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       style="display:inline;opacity:1;fill:#b71c1c;fill-opacity:1;stroke:#ffffff;stroke-width:1.9704386;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="path8517"
-       cx="185.61319"
-       cy="308.02502"
-       r="3.7610855"
+       cx="187.11037"
+       cy="306.52222"
+       r="5.0147805"
        transform="matrix(0.99999824,0.00187749,-0.00187749,0.99999824,0,0)" />
     <rect
-       style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.30686828;stroke-linejoin:round;stroke-opacity:1"
+       style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.47446811;stroke-linejoin:round;stroke-opacity:1"
        id="rect11102-5"
-       width="22.193132"
-       height="1.7931317"
-       x="158.34328"
-       y="307.47641" />
+       width="58.525532"
+       height="1.6255318"
+       x="122.57442"
+       y="306.06021" />
     <rect
-       style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.30686828;stroke-linejoin:round;stroke-opacity:1"
+       style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.47446811;stroke-linejoin:round;stroke-opacity:1"
        id="rect11102-5-8"
-       width="22.193132"
-       height="1.7931317"
-       x="189.54305"
-       y="307.47641" />
+       width="58.525532"
+       height="1.6255318"
+       x="192.10172"
+       y="306.06021" />
       </g>
       </svg>
     </div>
@@ -433,7 +509,7 @@
         },
         render: function (data) {
           this.setValues({
-            roll: data.roll * Math.PI / 180,
+            roll: data.roll,
             pitch: data.pitch,
           });
           this.draw();
@@ -444,9 +520,12 @@
         },
         draw: function draw() {
           this.pitch *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+          this.roll *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+
           var yPos = map(this.pitch, -90, 90, -287, 112);
           
-          this.$.crosshair.style.transform = "translate3d(-104px," + yPos + "px, 0px)";
+          
+          this.$.crosshair.style.transform = "translate3d(-117px," + yPos + "px, 0px) rotate(" + this.roll + "deg)";
           
         }
       });

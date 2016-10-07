@@ -273,7 +273,8 @@ function Bridge()
     currentPitch = Math.floor(Math.random()*181) - 90;
     result += 'pitc:' + currentPitch + ';';
     // Generate roll
-    currentRoll = 0.03 * (Math.floor(Math.random() * 201) - 100);
+    // currentRoll = 0.03 * (Math.floor(Math.random() * 201) - 100);
+    currentRoll = Math.floor(Math.random()*91) - 45;
     result += 'roll:' + currentRoll + ';';
     // Generate battery tube 1 current
     rnd = (Math.random() * 20 - 10) / 100;

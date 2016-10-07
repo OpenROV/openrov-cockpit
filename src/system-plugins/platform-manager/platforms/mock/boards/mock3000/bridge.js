@@ -269,7 +269,8 @@ function Bridge()
       currentHeading = 0;
     }
     // Generate pitch
-    currentPitch = 0.01 * (Math.floor(Math.random() * 201) - 100);
+    // currentPitch = 0.01 * (Math.floor(Math.random() * 201) - 100);
+    currentPitch = Math.floor(Math.random()*181) - 90;
     result += 'pitc:' + currentPitch + ';';
     // Generate roll
     currentRoll = 0.03 * (Math.floor(Math.random() * 201) - 100);

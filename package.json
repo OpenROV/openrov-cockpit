@@ -57,7 +57,7 @@
     "systemd": "git://github.com/plietar/node-systemd.git"
   },
   "engines": {
-    "node": ">= 5.0.0"
+    "node": ">= 6.0.0"
   },
   "devDependencies": {
     "grunt": "^1.0.1",

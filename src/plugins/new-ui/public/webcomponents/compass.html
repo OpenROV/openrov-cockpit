@@ -34,6 +34,10 @@
       transition-timing-function: ease-out;
     }
 
+    #heading {
+      cursor: pointer;
+    }
+
     #mode:hover {
       cursor: pointer;
     }
@@ -65,7 +69,7 @@
             <rect id="rect4953" transform="matrix(-0.70710678,-0.70710678,0.70710678,-0.70710678,472.5,1140.7159)" fill$="{{ options.bezel }}" height="30" width="10" y="96" x="467.5" />
             <rect id="rect4955" transform="matrix(-0.70710678,0.70710678,-0.70710678,-0.70710678,1140.7159,472.5)" fill$="{{ options.bezel }}" height="30" width="10" y="96" x="467.5" />
             <rect id="rect4957" transform="matrix(0.70710678,0.70710678,-0.70710678,0.70710678,472.5,-195.71591)" fill$="{{ options.bezel }}" height="30" width="10" y="96" x="467.5" />
-            <g id="indicators" font-size="72px" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" style="word-spacing:0;letter-spacing:0;" letter-spacing="0" word-spacing="0" font-weight="bold">
+            <g id="compassIndicators" font-size="72px" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" style="word-spacing:0;letter-spacing:0;" letter-spacing="0" word-spacing="0" font-weight="bold">
               <text id="indicator_n" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" line-height="125%" y="90.702766" x="471.9191">{{__('N')}}</text>
               <text id="text4961" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(-1,0,0,-1,943.74133,945)" line-height="125%" y="80.803268" x="471.90582">{{__('S')}}</text>
               <text id="text4965" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(0,1,-1,0,0,0)" line-height="125%" y="-864.25293" x="471.84961">{{__('E')}}</text>
@@ -108,7 +112,7 @@
       var lastData = null;
       var newData = null;
 
-      var isCompass = false;
+      var isCompass = true;
 
       //Work around because javascript does not use pass by reference for primitaves
       //TODO: Is there a better, more idiomatic way?
@@ -155,6 +159,10 @@
             type: String,
             value: "Compass"
           },
+          headingLock: {
+            type: Boolean,
+            value: false
+          },
           options: {
             type: Object,
             value: {
@@ -175,22 +183,47 @@
           }
         },
         listeners: {
-          'mode.tap': 'changeMode' 
+          'mode.tap': 'toggleMode',
+          'heading.tap': 'toggleHeadingLock'
         },
-        changeMode: function(e) {
+        toggleMode: function(e) {
 
           //This is a toggle
           if(isCompass)
           {
             this.$.mode.textContent = "Gyro";
+            
+            //Hide the svg elements on the rose that show heading
+            $(this.$.compassIndicators).css({display:'none'});
+
+            //And show gyro ticks?
+            //TODO
+            
             isCompass = false;
           }
           else
           {
             this.$.mode.textContent = "Compass";
+
+            //Hide the svg elements on the rose that show heading
+            $(this.$.compassIndicators).css({display:'block'});
             isCompass = true;
           }
           
+        },
+        toggleHeadingLock: function(e) {
+          
+          //This is a toggle
+          if(this.$.headingLock)
+          {
+            console.log("Heading lock disabled")
+            this.$.headingLock = false;
+          }
+          else
+          {
+            console.log("Heading lock enabled");
+            this.$.headingLock = true;
+          }
         },
 
         behaviors: [namespace('behaviors').oROVStandard],

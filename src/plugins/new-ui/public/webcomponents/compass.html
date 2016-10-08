@@ -34,9 +34,13 @@
       transition-timing-function: ease-out;
     }
 
+    #mode:hover {
+      cursor: pointer;
+    }
+
   </style>
   <template>
-    <paper-tooltip for="compass-container" position="left" animation-delay="0">Make sure compass is away from motors</paper-tooltip>
+    <paper-tooltip for="compass-container" position="left" style="text-align:center" animation-delay="0">Make sure the IMU is mounted far away from power lines. Otherwise, it might not work as expected.</paper-tooltip>
 
     <div id="compass-container" class="center">
       <svg id="svg3988" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 989.19 1280.61" version="1.2" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -104,6 +108,8 @@
       var lastData = null;
       var newData = null;
 
+      var isCompass = false;
+
       //Work around because javascript does not use pass by reference for primitaves
       //TODO: Is there a better, more idiomatic way?
       var bearingAngle = { angle: null };
@@ -145,6 +151,10 @@
             observer: 'setHeading',
             notify: true
           },
+          mode: {
+            type: String,
+            value: "Compass"
+          },
           options: {
             type: Object,
             value: {
@@ -164,6 +174,25 @@
             value: function(){return 0;}
           }
         },
+        listeners: {
+          'mode.tap': 'changeMode' 
+        },
+        changeMode: function(e) {
+
+          //This is a toggle
+          if(isCompass)
+          {
+            this.$.mode.textContent = "Gyro";
+            isCompass = false;
+          }
+          else
+          {
+            this.$.mode.textContent = "Compass";
+            isCompass = true;
+          }
+          
+        },
+
         behaviors: [namespace('behaviors').oROVStandard],
         registerEmitterHandlers: function(emitter) {
           var self = this;
@@ -192,8 +221,7 @@
           self.options.headingFill = self.options.bezel;
           this.setHeading(this.heading);
           this.setBearing(this.bearing);
-          this.format(this.options);
-          
+          this.format(this.options);          
         },
         format: function(newOptions) {
           this.set('options.indicator', newOptions.indicator ? newOptions.indicator : this.options.indicator);
@@ -203,7 +231,6 @@
         },
         setHeading: function(value) {
           this.heading = value;
-          this.mode = "Compass";
 
           rotateElement(this.$.indicator, indicatorAngle, value);
 

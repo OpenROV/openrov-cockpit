@@ -76,5 +76,8 @@
     "spec": "^1.0.1",
     "supertest": "^2.0.0",
     "tap": "^6.3.2"
+  },
+  "optionalDependencies": {
+    "fsevents": "^1.0.14"
   }
 }

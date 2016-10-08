@@ -25,6 +25,11 @@
         top: 90%;
         left: 0%;
       }
+      #opacity-slider {
+        position: absolute;
+        top: 85%;
+        left: 0%;
+      }
 
       #hud-container {
 
@@ -492,6 +497,9 @@
       <div id="pitch-slider">
         <paper-slider id="hudPosSlider" min="0" max="100" pin value="0"></paper-slider>
       </div>
+      <div id="opacity-slider">
+        <paper-slider id="opacitySlider" min="0" max="100" pin value="0"></paper-slider>
+      </div>
   </template>
 
   <script>
@@ -515,11 +523,18 @@
           },
         },
         listeners: {
-          'hudPosSlider.immediate-value-change': 'changeHandler'
+          'hudPosSlider.immediate-value-change': 'hudPosHandler',
+          'opacitySlider.immediate-value-change': 'hudOpacityHandler'
         },
-        changeHandler: function(e) {
+        hudPosHandler: function(e) {
           var sliderValue = this.$.hudPosSlider.immediateValue;
-          $(this.$.svg2).css({left:sliderValue+"%"});
+          this.$.svg2.style.left = sliderValue + "%";
+        },
+        hudOpacityHandler: function(e) {
+          var sliderValue = this.$.opacitySlider.immediateValue;
+          sliderValue = sliderValue/100;
+
+          this.$.svg2.style.opacity = sliderValue;
         },
         behaviors: [namespace('behaviors').oROVStandard],
         setData: function (data) {

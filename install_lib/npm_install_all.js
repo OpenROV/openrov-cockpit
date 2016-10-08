@@ -42,7 +42,7 @@ var installPackages = function (index, array) {
   rimraf(dir + '/node_modules', function () {
     console.log('======== installing =======');
     console.log(dir);
-    exec('npm install ' + process.argv[2], { cwd: dir });
+    exec('npm install', { cwd: dir });
     index++;
     if (index < array.length) {
       installPackages(index, array);

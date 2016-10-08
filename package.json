@@ -8,10 +8,11 @@
     "url": "git://github.com/OpenROV/openrov-software.git"
   },
   "scripts": {
-    "deploy:dev": "npm install && node install_lib/bower_install_all.js && node install_lib/npm_install_all.js --no-shrinkwrap  ",  
-    "deploy:prod": "NODE_ENV=\"production\" npm install && NODE_ENV=\"production\" node install_lib/bower_install_all.js && NODE_ENV=\"production\" node install_lib/npm_install_all.js --production",
+    "deploy:dev": "env 'npm_config_unsafe_perm=false' env 'npm_config_shrinkwrap=false' NODE_ENV=development npm install",
+    "deploy:prod": "env 'npm_config_unsafe_perm=true' env 'npm_config_shrinkwrap=true' NODE_ENV=production npm install",
     "test": "./node_modules/grunt-cli/bin/grunt test",
-    "shrinkwrap": "node install_lib/npm_shrinkwrap_all.js"
+    "shrinkwrap": "NODE_ENV=production node install_lib/npm_shrinkwrap_all.js",
+    "install": "node install_lib/bower_install_all.js && node install_lib/npm_install_all.js"
   },
   "dependencies": {
     "binary-parser": "1.1.5",
@@ -55,13 +56,8 @@
     "sync": "",
     "systemd": "git://github.com/plietar/node-systemd.git"
   },
-  "bundleDependencies": [
-    "express",
-    "socket.io",
-    "serialport"
-  ],
   "engines": {
-    "node": ">= 0.10.15"
+    "node": ">= 6.0.0"
   },
   "devDependencies": {
     "grunt": "^1.0.1",

@@ -16,6 +16,11 @@
       float: none;
     }
 
+    #gyroIndicators {
+      /*start off without them displayed*/
+      display:none;
+    }
+
     #indicator {
       /*Hardware acceleration*/
       translate3d(0,0,0);
@@ -47,7 +52,7 @@
     <paper-tooltip for="compass-container" position="left" style="text-align:center" animation-delay="0">Make sure the IMU is mounted far away from power lines. Otherwise, it might not work as expected.</paper-tooltip>
 
     <div id="compass-container" class="center">
-      <svg id="svg3988" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 989.19 1280.61" version="1.2" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/">
+      <svg id="svg3988" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1280" version="1.2" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/">
         <metadata id="metadata4078">
           <rdf:RDF>
             <cc:Work rdf:about="">
@@ -57,7 +62,7 @@
             </cc:Work>
           </rdf:RDF>
         </metadata>
-        <g id="g4986" transform="translate(22.040901,12.197624)">
+        <g id="g4986" transform="translate(170.040901,12.197624)">
           <g id="rose">
             <circle id="circle" stroke-width="10" d="m 832.5,472.5 c 0,198.82251 -161.17749,360 -360,360 -198.82251,0 -360,-161.17749 -360,-360 0,-198.82251 161.17749,-360 360,-360 198.82251,0 360,161.17749 360,360 z" cy="472.5" stroke$="{{ options.bezel }}" cx="472.5"
             r="360" fill="none" />
@@ -78,6 +83,16 @@
               <text id="text4971" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(-0.70710678,-0.70710678,0.70710678,-0.70710678,0,0)" line-height="125%" font-size="72px" y="-393.78027" x="-670.0802">{{__('SW')}}</text>
               <text id="text4973" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(-0.70710678,0.70710678,-0.70710678,-0.70710678,0,0)" line-height="125%" font-size="72px" y="-1060.8452" x="1.1167512">{{__('SE')}}</text>
               <text id="text4975" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(0.70710678,0.70710678,-0.70710678,0.70710678,0,0)" line-height="125%" font-size="72px" y="-391.12482" x="667.26764">{{__('NE')}}</text>
+            </g>
+            <g id="gyroIndicators" font-size="72px" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" style="word-spacing:0;letter-spacing:0;" letter-spacing="0" word-spacing="0" font-weight="bold">
+              <text id="indicator_n" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" line-height="125%" y="60.702766" x="471.9191">{{__('0')}}</text>
+              <text id="text4961" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(1,0,0,1,0,850)" line-height="125%" y="80.803268" x="471.90582">{{__('-180+')}}</text>
+              <text id="text4965" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(1,0,0,1,460,-38)" line-height="125%" y="530" x="460">{{__('+90')}}</text>
+              <text id="text4967" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(1,0,0,1,-425,-35)" line-height="125%" y="530" x="460">{{__('-90')}}</text>
+              <text id="text4969" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(1,0,0,1,-320,300)" line-height="125%" font-size="72px" y="530" x="460">{{__('-135')}}</text>
+              <text id="text4971" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(1,0,0,1,-325,-350)" line-height="125%" font-size="72px" y="530" x="460">{{__('-45')}}</text>
+              <text id="text4973" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(1,0,0,1,325,-350)" line-height="125%" font-size="72px" y="530" x="460">{{__('+45')}}</text>
+              <text id="text4975" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(1,0,0,1,320,300)" line-height="125%" font-size="72px" y="530" x="460">{{__('+135')}}</text>
             </g>
           </g>
 
@@ -106,12 +121,15 @@
   </template>
   
   <script>
-    ( function() 
-    {
       var lastData = null;
       var newData = null;
 
+      //The operating mode of the display
       var isCompass = true;
+
+      var mapTo = function (value, in_min, in_max, out_min, out_max) {
+        return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+      };
 
       //Work around because javascript does not use pass by reference for primitaves
       //TODO: Is there a better, more idiomatic way?
@@ -145,14 +163,16 @@
         is: 'orov-newui-compass',
         properties: {
           bearing: {
-            observer: 'setBearing',
-            notify: true
+            type: String,
+            value: '000'
           },
           heading: {
             type: String,
-            value: function(){return '000';},
-            observer: 'setHeading',
-            notify: true
+            value: '000'
+
+            // value: function(){return '000';},
+            // observer: 'setHeading',
+            // notify: true
           },
           mode: {
             type: String,
@@ -194,18 +214,17 @@
             
             //Hide the svg elements on the rose that show heading
             $(this.$.compassIndicators).css({display:'none'});
+            $(this.$.gyroIndicators).css({display:'block'});
 
-            //And show gyro ticks?
-            //TODO
-            
             isCompass = false;
           }
           else
           {
             this.$.mode.textContent = "Compass";
 
-            //Hide the svg elements on the rose that show heading
+            //Display svg elements on the rose that show heading
             $(this.$.compassIndicators).css({display:'block'});
+            $(this.$.gyroIndicators).css({display:'none'});
             isCompass = true;
           }
           
@@ -262,8 +281,21 @@
           this.set('options.background', newOptions.background ? newOptions.background : this.options.background);
         },
         setHeading: function(value) {
-          this.heading = value;
+          
+          if(isCompass)
+          {
+            this.heading = value;
+          }
+          else  
+          {
+            this.heading = value;
 
+            if(value > 180)
+            {
+              this.heading = -(360 - value);
+            }
+          }      
+          
           rotateElement(this.$.indicator, indicatorAngle, value);
 
           if (!this.target) {
@@ -273,9 +305,22 @@
           }
         },
         setBearing: function(value) {
-          this.bearing=value;
+          if(isCompass)
+          {
+            this.bearing = value;
+          }
+          else  
+          {
+            this.bearing = value;
+            
+            if(value > 180)
+            {
+              this.bearing = -(360 - value);
+            }
+          } 
+
           if (value) {
-            this.target = this.pad(value, 3);
+            this.target = this.pad(this.bearing, 3);
 
             rotateElement(this.$.bearing, bearingAngle, value);
 
@@ -299,6 +344,5 @@
           return s;
         }
       });
-    }())
   </script>
 </dom-module>

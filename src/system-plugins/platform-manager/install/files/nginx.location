@@ -16,8 +16,8 @@ location /peerview{
   proxy_cache_bypass $http_upgrade;
 }
 
-location /cockpit/ {
-  rewrite /cockpit/(.*) /$1 break;
+location / {
+  rewrite /(.*) /$1 break;
   proxy_pass http://127.0.0.1:8080/;
   proxy_http_version 1.1;
   proxy_set_header Upgrade $http_upgrade;

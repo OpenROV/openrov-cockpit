@@ -4,10 +4,11 @@
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="../paper-slider/paper-slider.html">
 
-<dom-module id="orov-horizon-test">
+<dom-module id="attitude-indicator">
   <style type="text/css">
       .hidden { display: none }
       .horizon {
+          display:block;
           width:100%;
           height:100%;
           position:absolute;
@@ -503,11 +504,12 @@
         return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
        };
 
+       var isDemo = false;
        var demoCounter = 0;
 
       (function () {    
       Polymer({
-        is: 'orov-horizon-test',
+        is: 'attitude-indicator',
         properties: {
           pitchValue: {
             type: Number,
@@ -554,7 +556,17 @@
           this.pitch = 0;
 
           var self = this;
-
+          if (this.eventEmitter !== undefined){
+            this.eventEmitter.emit('InputController.register',
+            {
+              name: 'main.toggleHeadsUpDisplay',
+              description: 'Toggle the heads-up-display on/off',
+              defaults: { keyboard: '\\' },
+              down: function () {
+                $(self.$.horizon).toggleClass('hidden');
+              }
+            });
+          }
           this.draw();
         },
         render: function (data) {
@@ -569,16 +581,47 @@
           this.pitch = values.pitch;
         },
         draw: function draw() {
-          var sinVal = Math.sin(demoCounter);
-          demoCounter += Math.PI / 100;
+          if(isDemo)
+          {
+            var sinVal = Math.sin(demoCounter);
+            demoCounter += Math.PI / 100;
 
-          this.pitch = 90*sinVal;
-          this.roll = 25*sinVal;
+            this.pitch = 90*sinVal;
+            this.roll = 25*sinVal;
 
-          var yPos = map(this.pitch, -90, 90, -287, 112);
-          
-          
-          this.$.crosshair.style.transform = "translate3d(-117px," + yPos + "px, 0px) rotate(" + this.roll + "deg)"; 
+            var yPos;
+            if(this.pitch > 90)
+            {
+              yPos = 90;
+            }
+            else if(this.pitch < -90)
+            {
+              yPos = -90;
+            }
+            else
+            {
+              yPos = map(this.pitch, -90, 90, -287, 112);
+            }
+            this.$.crosshair.style.transform = "translate3d(-117px," + yPos + "px, 0px) rotate(" + this.roll + "deg)"; 
+          }
+          else
+          {
+            var yPos;
+            if(this.pitch > 90)
+            {
+              yPos = 90;
+            }
+            else if(this.pitch < -90)
+            {
+              yPos = -90;
+            }
+            else
+            {
+              yPos = map(this.pitch, -90, 90, -287, 112);
+            }
+            this.$.crosshair.style.transform = "translate3d(-117px," + yPos + "px, 0px) rotate(" + this.roll + "deg)";
+          }
+
         }
       });
     }());

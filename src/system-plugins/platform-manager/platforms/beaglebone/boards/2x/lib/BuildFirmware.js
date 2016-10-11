@@ -17,8 +17,18 @@ var opts = {
     libs: ['/opt/openrov/arduino/hardware/openrov/avr/libraries'],
     preproc: [ "VERSION_HASH=\"ver:<<{{0000000000000000000000000000000000000000}}>>;\""]
   };
-ArduinoBuilder.BuildSketch(opts, function (data) {
+ArduinoBuilder.BuildSketch(opts, function (data) 
+{
   console.log(data.toString('utf8'));
-}, function (data) {
+},
+ function (data) {
   console.log(data.toString('utf8'));
+})
+.then( function()
+{
+  return true;
+})
+.catch( function(err)
+{
+  return err;
 });

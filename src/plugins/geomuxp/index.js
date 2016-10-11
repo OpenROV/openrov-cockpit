@@ -138,7 +138,7 @@ geomux.prototype.start = function start()
     // Create all launch options
     var launch_options = [
         'nice',
-        '-1',
+        '--19',
         'node',
         geoprogram,
         '--p',

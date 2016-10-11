@@ -10,12 +10,20 @@ var opts = {
     fqbn: 'openrov:avr:mega:cpu=atmega2560',
     hardware: '/opt/openrov/arduino/hardware',
     tools: '/opt/openrov/arduino/hardware/tools',
-    warnings: 'none',
+    warnings: 'all',
     verbose: true,
     quiet: false,
     debug: 5,
-    libs: ['/opt/openrov/arduino/hardware/openrov/avr/libraries'],
-    preproc: [ "VERSION_HASH=\"ver:<<{{0000000000000000000000000000000000000000}}>>;\""]
+    libs:     [
+                '/opt/openrov/arduino/hardware/openrov/avr/libraries',
+                '/opt/openrov/firmware/libraries'
+              ],
+    preproc:  [ 
+                "MCUARCH=MCUARCH_AVR",
+                "CONTROLLERBOARD=CONTROLLERBOARD_CB25",
+                "VERSION_HASH=\"ver:<<{{0000000000000000000000000000000000000000}}>>;\"",
+                "MPU9150_EEPROM_START=2"
+              ]
   };
 ArduinoBuilder.BuildSketch(opts, function (data) {
   console.log(data.toString('utf8'));

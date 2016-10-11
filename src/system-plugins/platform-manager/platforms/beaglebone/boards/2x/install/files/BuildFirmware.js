@@ -21,8 +21,7 @@ var opts = {
     preproc:  [ 
                 "MCUARCH=MCUARCH_AVR",
                 "CONTROLLERBOARD=CONTROLLERBOARD_CB25",
-                "VERSION_HASH=\"ver:<<{{0000000000000000000000000000000000000000}}>>;\"",
-                "MPU9150_EEPROM_START=2"
+                "VERSION_HASH=\"ver:<<{{0000000000000000000000000000000000000000}}>>;\""
               ]
   };
 ArduinoBuilder.BuildSketch(opts, function (data) {

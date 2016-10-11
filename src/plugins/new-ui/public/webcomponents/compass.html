@@ -49,9 +49,8 @@
 
   </style>
   <template>
-    <paper-tooltip for="compass-container" position="left" style="text-align:center" animation-delay="0">Make sure the IMU is mounted far away from power lines. Otherwise, it might not work as expected.</paper-tooltip>
-
-    <div id="compass-container" class="center">
+    <paper-tooltip for="mode" position="left" style="text-align:center; left:-150px" animation-delay="0">Make sure the IMU is mounted far away from power lines. Otherwise, it might not work as expected.</paper-tooltip>
+    <div  id="compass-container" class="center">
       <svg id="svg3988" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1280" version="1.2" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/">
         <metadata id="metadata4078">
           <rdf:RDF>
@@ -105,7 +104,7 @@
           title="Heading hold target">{{target}}</text>
 
           <text id="mode" fill$="{{ options.modeFill }}" stroke$="{{ options.bezel }}" stroke-width$="{{ options.headingStrokeWidth }}" style="letter-spacing:0;text-anchor:middle;word-spacing:0;text-align:center;" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="200px" letter-spacing="0"
-          line-height="125%" word-spacing="0" y="1206" x="460.67117" font-weight="bold" tabindex="0">{{__(mode)}}</text>
+          line-height="125%" word-spacing="0" y="1206" x="460.67117" font-weight="bold" tabindex="0">{{ compassMode(isCompass) }}</text>
           
           <g id="indicator">
             <path fill$="{{ options.indicator }}" d="m 471.41747,-25.529456 c 35.08805,139.334496 35.04692,139.182386 35.04692,139.182386 l -69.01546,0 z" style="fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"/>
@@ -124,15 +123,10 @@
       var lastData = null;
       var newData = null;
 
-      //The operating mode of the display
-      var isCompass = true;
-
       var mapTo = function (value, in_min, in_max, out_min, out_max) {
         return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
       };
 
-      //Work around because javascript does not use pass by reference for primitaves
-      //TODO: Is there a better, more idiomatic way?
       var bearingAngle = { angle: null };
       var indicatorAngle = { angle: null };
 
@@ -164,23 +158,23 @@
         properties: {
           bearing: {
             type: String,
-            value: '000'
+            value: function(){return '000';}
           },
           heading: {
             type: String,
-            value: '000'
-
-            // value: function(){return '000';},
-            // observer: 'setHeading',
-            // notify: true
-          },
-          mode: {
-            type: String,
-            value: "Compass"
+            value: function(){return '000';}
           },
           headingLock: {
             type: Boolean,
-            value: false
+            value: function(){return false;}
+          },
+          isCompass: {
+            type: Boolean,
+            value: function(){return true;}
+          },
+          mode: {
+            type: String,
+            value: function(){return "Compass";}
           },
           options: {
             type: Object,
@@ -208,24 +202,19 @@
         toggleMode: function(e) {
 
           //This is a toggle
-          if(isCompass)
-          {
-            this.$.mode.textContent = "Gyro";
-            
+          if(this.isCompass)
+          {            
             //Hide the svg elements on the rose that show heading
             $(this.$.compassIndicators).css({display:'none'});
             $(this.$.gyroIndicators).css({display:'block'});
-
-            isCompass = false;
+            this.isCompass = false;
           }
           else
           {
-            this.$.mode.textContent = "Compass";
-
             //Display svg elements on the rose that show heading
             $(this.$.compassIndicators).css({display:'block'});
             $(this.$.gyroIndicators).css({display:'none'});
-            isCompass = true;
+            this.isCompass = true;
           }
           
         },
@@ -234,12 +223,10 @@
           //This is a toggle
           if(this.$.headingLock)
           {
-            console.log("Heading lock disabled")
             this.$.headingLock = false;
           }
           else
           {
-            console.log("Heading lock enabled");
             this.$.headingLock = true;
           }
         },
@@ -282,7 +269,7 @@
         },
         setHeading: function(value) {
           
-          if(isCompass)
+          if(this.isCompass)
           {
             this.heading = value;
           }
@@ -305,7 +292,7 @@
           }
         },
         setBearing: function(value) {
-          if(isCompass)
+          if(this.isCompass)
           {
             this.bearing = value;
           }
@@ -335,6 +322,14 @@
             rotateElement(this.$.bearing, bearingAngle, this.heading);
 
             this.target = undefined;
+          }
+        },
+        compassMode: function() {
+          if(this.isCompass) {
+            return "Compass";
+          }
+          else {
+            return "Gyro";
           }
         },
         pad: function(num, size) {

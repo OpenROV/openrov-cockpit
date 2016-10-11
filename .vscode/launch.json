@@ -1,0 +1,50 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Launch",
+			"type": "node",
+			"request": "launch",
+			"program": "${workspaceRoot}/src/cockpit.js",
+			"stopOnEntry": false,
+			"args": [],
+			"cwd": "${workspaceRoot}",
+			"preLaunchTask": null,
+			"runtimeExecutable": null,
+			"runtimeArgs": [
+				"--nolazy"
+			],
+			"env": {
+				"NODE_ENV": "development",
+				"PLATFORM": "mock",
+				"BOARD":	"mock3000",
+				"DEV_MODE": "true",
+				"USE_MOCK": "true",
+				"CPU_MOCK": "123MOCK",
+				"GEO_MOCK": "true",
+				"MJPG_MOCK": "false",
+				"DEBUG": "bridge, mcu, cpu",
+				"port": 8080,
+				"configfile": "/tmp/rovconfig.json",
+				"plugins__ui-manager__selectedUI": "new-ui",
+				"pluginsDownloadDirectory": "/tmp/plugins"
+			},
+            "console": "internalConsole",			
+			"sourceMaps": false,
+			"outDir": null
+		},
+		{
+			"name": "Attach",
+            "type": "node",
+            "request": "attach",
+            "port": 5858,
+            "address": "localhost",
+            "restart": false,
+            "sourceMaps": false,
+            "outDir": null,
+            "localRoot": "${workspaceRoot}",
+            "remoteRoot": null
+        
+		}
+	]
+}

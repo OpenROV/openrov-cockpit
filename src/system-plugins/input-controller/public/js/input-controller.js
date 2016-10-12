@@ -93,7 +93,7 @@
 
     this.cockpit.on('InpitController.resumeAll', function(fn) {
       var commands = self.model.commands;
-      self.model.commands = [];
+      self.model.commands.length = 0;
       commands.forEach(function(command) {
         self.resume(command.name);
       });

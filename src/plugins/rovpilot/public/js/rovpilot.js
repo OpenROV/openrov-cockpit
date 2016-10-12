@@ -22,7 +22,7 @@
     };
     var self = this;
     this.cockpit.withHistory.on('settings-change.inputConfiguratorGeneral', function (settings) {
-      self.settings = settings.rovpilot;
+      self.settings = settings.inputConfiguratorGeneral;
     });
     this.cockpit.emit('plugin.rovpilot.setPowerLevel', 2);
   };

@@ -17,10 +17,7 @@ var opts =
                 '/opt/openrov/arduino/hardware/openrov/avr/libraries',
                 '/opt/openrov/firmware/libraries'
               ],
-    preproc:  [ 
-                "MCUARCH_AVR=1",
-                "ENABLE_I2C_DEBUG=1"
-              ],
+    preproc:  [],
     generateCode: true
 };
 

@@ -21,7 +21,7 @@ ArduinoBuilder.prototype.BuildSketch = function(options, onStdout, onStderr) {
             buildOpts = ProcessOptions(options);
             sketchName = path.basename(options.sketchDir);
 
-            console.log('Processed options');
+            onStdout('Processed options');
 
         })
         .then(function()
@@ -36,7 +36,7 @@ ArduinoBuilder.prototype.BuildSketch = function(options, onStdout, onStderr) {
         })
         .then(function()
         {
-            console.log('Made dirs');
+            onStdout('Made staging dir');
 
             stagedSketchDir = path.join('/opt/openrov/firmware/staged/', sketchName);
 
@@ -50,7 +50,7 @@ ArduinoBuilder.prototype.BuildSketch = function(options, onStdout, onStderr) {
         })
         .then(function()
         {
-          console.log('Removed old sketch');
+          onStdout('Removed old sketch');
 
           // Handle code generation, if requested
           if( options.generateCode )
@@ -71,7 +71,7 @@ ArduinoBuilder.prototype.BuildSketch = function(options, onStdout, onStderr) {
             return fs.writeFileAsync(path.join(stagedSketchDir, 'CompileOptions.h'), output)
             .then( function()
             {
-              console.log( 'Wrote CompileOptions.h' );
+              onStdout( 'Generated CompileOptions.h' );
 
               var pluginDirs = GetDirectories('/opt/openrov/cockpit/src/plugins');
               var pluginString = '#pragma once\n\n';
@@ -112,7 +112,7 @@ ArduinoBuilder.prototype.BuildSketch = function(options, onStdout, onStderr) {
               .then( function (result) 
               {
                 hash = result.stdout.trim();
-                console.log( "Arduino builder generated hash: " + hash );
+                onStdout( "Arduino builder generated hash: " + hash );
 
                 // Should look something like: "ver:<<{{10024121ae3fa7fc60a5945be1e155520fb929dd}}>>;"
                 var hashDef = "#define VERSION_HASH F(\"ver:<<{{" + hash + "}}>>;\")\n";
@@ -132,9 +132,6 @@ ArduinoBuilder.prototype.BuildSketch = function(options, onStdout, onStderr) {
         {
             buildOpts.push('-fqbn', options.fqbn);
             buildOpts.push(stagedSketchDir);
-
-            console.log('Building with options:');
-            console.log(buildOpts);
 
             // Create promise
             var promise = spawnAsync('arduino-builder', buildOpts);
@@ -170,14 +167,18 @@ ArduinoBuilder.prototype.BuildSketch = function(options, onStdout, onStderr) {
         })
         .then( function()
         {
-            console.log( "Writing hash: " + hash );
+            // Only write hash if building generated code
+            if( options.generateCode )
+            {
+                onStdout( "Writing hash: " + hash );
 
-            // Write the hash to file
-            return fs.writeFileAsync( "/opt/openrov/system/config/lastBuildHash", hash );
+                // Write the hash to file
+                return fs.writeFileAsync( "/opt/openrov/system/config/lastBuildHash", hash );
+            }
         })
         .then(function(firmwareFile) 
         {
-            console.log('SUCCESS');
+            onStdout('SUCCESS');
 
             return Promise.try(function() 
             {
@@ -193,7 +194,7 @@ ArduinoBuilder.prototype.BuildSketch = function(options, onStdout, onStderr) {
                 })
                 .catch(function(error) 
                 {
-                    console.log("Strange error while trying to cleanup firmware staged files: " + error.message);
+                    onStderr("Strange error while trying to cleanup firmware staged files: " + error.message);
                 })
                 .then(function() 
                 {

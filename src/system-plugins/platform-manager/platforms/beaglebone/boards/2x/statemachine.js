@@ -1,20 +1,33 @@
-const path = require('path');
-const Promise = require('bluebird');
-const retry = require('bluebird-retry');
-const fs = Promise.promisifyAll(require('fs-extra'));
-const execFileAsync = require('child-process-promise').execFile;
-const StateMachine = require('javascript-state-machine');
+const path              = require('path');
+const Promise           = require('bluebird');
+const retry             = require('bluebird-retry');
+const fs                = Promise.promisifyAll(require('fs-extra'));
+const execFileAsync     = require('child-process-promise').execFile;
+const StateMachine      = require('javascript-state-machine');
 
-const BuildFirmwareScript = "/opt/openrov/system/scripts/BuildFirmware.js";
-const FlashFirmwareScript = "/opt/openrov/system/scripts/FlashFirmware.js";
-const FlashESCScript = "/opt/openrov/system/scripts/FlashESCS.js";
+const BuildMCUFirmware  = require( "./lib/BuildMCUFirmware.js" );
+const FlashMCUFirmware  = require( "./lib/FlashMCUFirmware.js" );
+const FlashESCFirmware  = require( "./lib/FlashESCFirmware.js" );
 
-const escConfPath = "/opt/openrov/system/config/esc.conf";
-const mcuLastBuildPath = "/opt/openrov/system/config/lastBuildHash";
-const mcuBinPath = "/opt/openrov/firmware/bin/2x/OpenROV2x.hex";
+const escConfPath       = "/opt/openrov/system/config/esc.conf";
+const mcuLastBuildPath  = "/opt/openrov/system/config/lastBuildHash";
+const mcuBinPath        = "/opt/openrov/firmware/bin/2x/OpenROV2x.hex";
+
 
 module.exports = function( board ) 
 {
+    // TODO: Make these emit events
+    function log( data )
+    {
+        console.log( "FIRMWARE UPDATE: " + data.toString('utf8').trim() );
+    }
+
+    function err( data )
+    {
+        console.error( "FIRMWARE UPDATE: " + data.toString('utf8').trim() );
+    }
+
+
     var fsm = StateMachine.create(
     {
         events: 
@@ -77,7 +90,7 @@ module.exports = function( board )
                 errorMessage: errorMessage,
             }
 
-            console.error( 'MCU State Machine: Error in event <' + eventName + '>: ' + JSON.stringify(errorReport));
+            err( 'MCU State Machine: Error in event <' + eventName + '>: ' + JSON.stringify(errorReport));
         }
     });
 
@@ -92,20 +105,20 @@ var escCheckHandler = function escCheckHandler(event, from, to)
 {
     var self = this;
 
-    console.log( "BOARD STATE: Checking ESCs..." );
+    log( "Checking ESCs..." );
 
     // Check to see if ESCs have been flashed before by testing the existence of esc.conf
     fs.statAsync( escConfPath )
     .then( function()
     {
         // Existence of file suggests ESCs have been flashed already
-        console.log( "BOARD STATE: ESCs already up to date." );
+        log( "ESCs already up to date." );
         self._e_esc_flash_complete();
     })
     .catch( function(error)
     {   
         // ESCs have never been flashed before. Do so now
-        console.log( "BOARD STATE: ESCs haven't been flashed. Triggering flash." );
+        log( "ESCs haven't been flashed. Triggering flash." );
         self._e_trigger_esc_flash();
     });
 }
@@ -114,15 +127,16 @@ var flashESCHandler = function flashESCHandler(event, from, to)
 {
     var self = this;
 
-    console.log( "BOARD STATE: Flashing ESCs..." );
+    log( "Flashing ESCs..." );
 
     // First, disconnect the bridge
     self.board.bridge.close();
 
     // Execute the flash firmware script
-    execFileAsync( "node", [ FlashESCScript ] )
+    FlashESCFirmware( log, err )
     .then( function()
     {
+        // Successm, write to a file to indicate this
         return fs.writeFileAsync( escConfPath, "flashed" );
     })
     .then( function()
@@ -131,7 +145,7 @@ var flashESCHandler = function flashESCHandler(event, from, to)
         self.board.bridge.connect();
 
         // Success
-        console.log( "BOARD STATE: ESCs flashed successfully." );
+        log( "ESCs flashed successfully." );
         self._e_esc_flash_complete();
     })
     .catch( function( error )
@@ -140,7 +154,7 @@ var flashESCHandler = function flashESCHandler(event, from, to)
         self.board.bridge.connect();
 
         // Move to failed state
-        console.log( "BOARD STATE: ESC flash failed." );
+        err( "ESC flash failed." );
         self._e_fail( error );
     });
 }
@@ -149,49 +163,49 @@ var checkBinHandler = function checkBinHandler(event, from, to)
 {
     var self = this;
 
-    console.log( "BOARD STATE: Checking for existing firmware binary..." );
+    log( "Checking for existing firmware binary..." );
 
     // Check to see if ESCs have been flashed before by testing the existence of esc.conf
     fs.statAsync( mcuBinPath )
     .then( function()
     {
         // Existence of file suggests firmware has already been built
-        console.log( "BOARD STATE: Binary already exists" );
+        log( "Binary already exists" );
         self._e_firmware_build_complete();
     })
     .catch( function(error)
     {   
         // Firmware has never been built. Trigger a build
-        console.log( "BOARD STATE: No binary found. Triggering build." );
+        log( "No binary found. Triggering build." );
         self._e_trigger_firmware_build();
     });
 }
 
 var buildFirmwareHandler = function buildFirmwareHandler(event, from, to)
 {
-    console.log( "BOARD STATE: Building firmware..." );
+    log( "Building firmware..." );
 
     var self = this;
 
     // Execute the build firmware script
-    execFileAsync( "node", [ BuildFirmwareScript] )
+    BuildMCUFirmware( log, err )
     .then( function()
     {   
         // Success
-        console.log( "BOARD STATE: Build succeeded" );
+        log( "Build succeeded" );
         self._e_firmware_build_complete();
     })
     .catch( function( error )
     {
         // Move to failed state
-        console.log( "BOARD STATE: Build failed" );
+        err( "Build failed" );
         self._e_fail( error );
     });
 }
 
 var getHashHandler = function getHashHandler(event, from, to)
 {
-    console.log( "BOARD STATE: Getting hash from firmware binary..." );
+    log( "Getting hash from firmware binary..." );
 
     var self = this;
 
@@ -199,7 +213,7 @@ var getHashHandler = function getHashHandler(event, from, to)
     fs.readFileAsync( mcuLastBuildPath, 'utf8' )
     .then( function( hash )
     {
-        console.log( "BOARD STATE: Hash in last build file: " + hash.trim() );
+        log( "Hash in last build file: " + hash.trim() );
         self.board.hashInfo.fromBin = hash;
     })
     .then( function()
@@ -209,6 +223,8 @@ var getHashHandler = function getHashHandler(event, from, to)
     })
     .catch( function( error )
     {
+        err( "Failed to find hash file" );
+        
         // Move to failed state
         self._e_fail( error );
     });
@@ -216,34 +232,29 @@ var getHashHandler = function getHashHandler(event, from, to)
 
 var flashMCUHandler = function flashMCUHandler(event, from, to)
 {
-    console.log( "BOARD STATE: Flashing firmware..." );
+    log( "BOARD STATE: Flashing firmware..." );
 
     var self = this;
 
-    var flashFunc = function()
-    {
-        return execFileAsync( 'node', [ FlashFirmwareScript ] );
-    }
-
     // Execute the build firmware script
-    retry( flashFunc, {interval: 10000})
+    retry( function(){ return FlashMCUFirmware( log, err ); }, {interval: 10000})
     .then( function()
     {   
         // Success
-        console.log( "BOARD STATE: Flash succeeded" );
+        log( "BOARD STATE: Flash succeeded" );
         self._e_mcu_flash_complete();
     })
     .catch( function( error )
     {
         // Move to failed state
-        console.log( "BOARD STATE: Flash failed" );
+        log( "BOARD STATE: Flash failed" );
         self._e_fail( error );
     });
 }
 
 var verifyVersionHandler = function verifyVersionHandler(event, from, to)
 {
-    console.log( "BOARD STATE: Verifying MCU firmware against latest binary..." );
+    log( "BOARD STATE: Verifying MCU firmware against latest binary..." );
 
     var self = this;
 
@@ -258,8 +269,8 @@ var verifyVersionHandler = function verifyVersionHandler(event, from, to)
         // Send the version request command to the MCU
         self.board.bridge.write( "version();" );
 
-        console.log( "BOARD STATE: MCU reported hash: " + self.board.hashInfo.fromMCU );
-        console.log( "BOARD STATE: Hash from last build: " + self.board.hashInfo.fromBin );
+        log( "BOARD STATE: MCU reported hash: " + self.board.hashInfo.fromMCU );
+        log( "BOARD STATE: Hash from last build: " + self.board.hashInfo.fromBin );
 
         // Check for new hash info received from MCU
         if( self.board.hashInfo.fromMCU !== "" )
@@ -268,13 +279,13 @@ var verifyVersionHandler = function verifyVersionHandler(event, from, to)
             if( self.board.hashInfo.fromMCU == self.board.hashInfo.fromBin )
             {  
                 // Success
-                console.log( "BOARD STATE: MCU Firmware is up to date" );
+                log( "BOARD STATE: MCU Firmware is up to date" );
                 self._e_firmware_validated();
             }
             else
             {
                 // Version mismatch. Flash the latest firmware to the MCU
-                console.log( "BOARD STATE: MCU Firmware is out of date. Triggering flash." );
+                log( "BOARD STATE: MCU Firmware is out of date. Triggering flash." );
                 self._e_trigger_mcu_flash();
             }
         }
@@ -282,13 +293,13 @@ var verifyVersionHandler = function verifyVersionHandler(event, from, to)
         {
             // Call 5 times, once per 3 secs
             counter++;
-            console.log( "BOARD STATE: Verification attempt #" + counter );
+            log( "BOARD STATE: Verification attempt #" + counter );
             setTimeout( RequestHashInfo, 3000 );
         }
         else
         {
             // Never received hash info from MCU. Flash the latest firmware to the MCU
-            console.log( "BOARD STATE: No firmware detected. Triggering flash." );
+            log( "BOARD STATE: No firmware detected. Triggering flash." );
             self._e_trigger_mcu_flash();
         }
     };
@@ -298,12 +309,12 @@ var verifyVersionHandler = function verifyVersionHandler(event, from, to)
 
 var completeHandler = function completeHandler(event, from, to)
 {
-    console.log( "BOARD STATE: Auto-update process complete." );
+    log( "BOARD STATE: Auto-update process complete." );
 }
 
 var failHandler = function failHandler(event, from, to)
 {
-    console.log( "BOARD STATE: Auto-update process failed." );
+    log( "BOARD STATE: Auto-update process failed." );
 }
 
 var eFailHandler = function eFailHandler(event, from, to, msg) 
@@ -313,6 +324,6 @@ var eFailHandler = function eFailHandler(event, from, to, msg)
     msg = 'No message in failure: ' + event;
   }
 
-  console.error( "StateMachine error: " + msg );
+  err( "StateMachine error: " + msg );
   this.data.error = JSON.stringify( msg );
 };

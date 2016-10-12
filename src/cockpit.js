@@ -15,7 +15,7 @@ if (process.env.NODE_PATH !== undefined) {
 process.env.NODE_PATH = __dirname + '/lib:' + oldpath;
 require('module').Module._initPaths();
 
-process.env.DEBUG = "log*,error*," + process.env.DEBUG;
+// Set default logging options
 process.env.DEBUG = "log*,error*," + process.env.DEBUG;
 
 var log = require('debug')('log:system');

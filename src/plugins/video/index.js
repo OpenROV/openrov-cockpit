@@ -8,7 +8,7 @@ function video(name, deps) {
   var self = this;
   this.deps.globalEventLoop.on('CameraRegistration', function (data) {
     self.cockpit.emit('CameraRegistration', data);
-    console.log('### CameraRegistration');
+    //console.log('### CameraRegistration');
   });
   this.cameras = {};
   function AddCamera(camera) {

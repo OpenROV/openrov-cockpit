@@ -1,8 +1,12 @@
+var log = require('debug')('log:system');
+var error = require('debug')('error:system');
+var debug = require('debug')('debug:system');
+
 var PREFERENCES = 'plugins:ui-manager';
 const path = require('path');
 const fs = require('fs');
 function UIManager(name, deps) {
-  console.log('UI Manager plugin started.');
+  log('UI Manager plugin started.');
   var preferences = getPreferences(deps.config);
   this.UIs = [];
   this.deps = deps;
@@ -14,7 +18,7 @@ function getPreferences(config) {
     preferences = {};
     config.preferences.set(PREFERENCES, preferences);
   }
-  console.log('Plugin Manager loaded preferences: ' + JSON.stringify(preferences));
+  debug('Plugin Manager loaded preferences: ' + JSON.stringify(preferences));
   return preferences;
 }
 UIManager.prototype.start = function start() {
@@ -146,7 +150,7 @@ UIManager.prototype.getApplets = function getApplets() {
       }
     }
     result[rpath] = result[rpath].concat(plugin._raw.applets.map(function (item) {
-      console.log('adding: ' + rpath + ': ' + item);
+      debug('adding: ' + rpath + ': ' + item);
       return {
         name: path.basename(item.path, '.ejs'),
         path: item.path,
@@ -154,8 +158,8 @@ UIManager.prototype.getApplets = function getApplets() {
       };
     }));
   });
-  console.log('getApplets');
-  console.dir(result);
+  debug('getApplets');
+  debug( JSON.stringify( result ) );
   return result;
 };
 UIManager.prototype.getSettingSchema = function getSettingSchema() {

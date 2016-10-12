@@ -1,6 +1,11 @@
+var log = require('debug')('log:system');
+var error = require('debug')('error:system');
+var debug = require('debug')('debug:system');
+
 var PREFERENCES = 'plugins:plugin-manager';
+
 function pluginManager(name, deps) {
-  console.log('Pugin Manager plugin started.');
+  log('Pugin Manager plugin started.');
   var preferences = getPreferences(deps.config);
   deps.app.get('/addons', function (req, res) {
     var view = __filename.substring(0, __filename.lastIndexOf('/')) + '/' + 'addonmanager.ejs';
@@ -20,7 +25,7 @@ function getPreferences(config) {
     preferences = {};
     config.preferences.set(PREFERENCES, preferences);
   }
-  console.log('Plugin Manager loaded preferences: ' + JSON.stringify(preferences));
+  debug('Plugin Manager loaded preferences: ' + JSON.stringify(preferences));
   return preferences;
 }
 module.exports = function (name, deps) {

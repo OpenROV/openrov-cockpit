@@ -9,12 +9,18 @@ var opts =
     fqbn: 'openrov:avr:mega:cpu=atmega2560',
     hardware: '/opt/openrov/arduino/hardware',
     tools: '/opt/openrov/arduino/hardware/tools',
-    warnings: 'none',
+    warnings: 'all',
     verbose: true,
     quiet: false,
     debug: 5,
-    libs: ['/opt/openrov/arduino/hardware/openrov/avr/libraries'],
-    preproc: [],
+    libs:     [
+                '/opt/openrov/arduino/hardware/openrov/avr/libraries',
+                '/opt/openrov/firmware/libraries'
+              ],
+    preproc:  [ 
+                "MCUARCH=MCUARCH_AVR",
+                "CONTROLLERBOARD=CONTROLLERBOARD_CB25"
+              ],
     generateCode: true
 };
 

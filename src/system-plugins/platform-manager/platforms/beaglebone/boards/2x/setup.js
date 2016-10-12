@@ -193,133 +193,25 @@ var RegisterFunctions = function (board)
   board.AddMethod('Initialize', function () 
   {
     debug('MCU Interface initialized!');
+
+    // TODO: Only allow the statemachine to do this
+    // Turn on the serial
     board.global.emit('mcu.StartSerial');
   }, false);
-
-  // board.AddMethod('BuildFirmware', function (appName) 
-  // {
-  //   debug( 'Building application: ' + appName );
-
-  //   // Create options for arduino builder library
-  //   var opts = 
-  //   {
-  //     sketchDir: '/opt/openrov/firmware/sketches/' + appName,
-  //     installBaseDir: '/opt/openrov/firmware/bin',
-  //     productID: '2x',
-  //     cleanAfterBuild: true,
-  //     fqbn: 'openrov:avr:mega:cpu=atmega2560',
-  //     hardware: '/opt/openrov/arduino/hardware',
-  //     tools: '/opt/openrov/arduino/hardware/tools',
-  //     warnings: 'none',
-  //     verbose: true,
-  //     quiet: false,
-  //     debug: 5,
-  //     libs: ['/opt/openrov/arduino/hardware/openrov/avr/libraries'],
-  //     preproc: []
-  //   };
-
-  //   // Use ArduinoBuilder library to perform build
-  //   ArduinoBuilder.BuildSketch( opts, function (data) 
-  //     {
-  //       board.global.emit('mcu.firmwareBuildStd', data.toString('utf8') );
-  //     }, 
-  //     function (data) 
-  //     {
-  //       board.global.emit('mcu.firmwareBuildErr', data.toString('utf8') );
-  //     } )
-  //   .then( function( firmwareFile )
-  //   {
-  //     board.global.emit('mcu.firmwareBuildComplete', null, firmwareFile );
-  //   } )
-  //   .catch( function(error)
-  //   {
-  //     board.global.emit('mcu.firmwareBuildComplete', { "error": error } );
-  //   } );
-  // }, false);
-
-  // board.AddMethod('FlashFirmware', function( firmwareFile ) 
-  // {
-  //   debug( 'Flashing application: ' + firmwareFile );
-
-  //   // Close the bridge until done flashing
-  //   board.bridge.close();
-
-  //   var args = 
-  //   [
-  //     '-P',
-  //     '/dev/spidev1.0',
-  //     '-c',
-  //     'linuxspi',
-  //     '-vvv',
-  //     '-p',
-  //     'm2560',
-  //     '-U',
-  //     'flash:w:' + firmwareFile
-  //   ];
-
-  //   // Use avrdude to flash the AtMega2560
-  //   var promise = execFileAsync('avrdude', args);
-  //   var childProcess = promise.childProcess;
-
-  //   // Attach listeners
-  //   childProcess.stdout.on('data', function (stdout)
-  //   {
-  //     board.global.emit('mcu.firmwareFlashStd', data.toString('utf8') );
-  //   });
-
-  //   childProcess.stderr.on('data', function (stderr) 
-  //   {
-  //     board.global.emit('mcu.firmwareFlashErr', data.toString('utf8') );
-  //   });
-
-  //   // Execute flashing process
-  //   promise.then(function () 
-  //   { 
-  //     // Success
-  //     board.global.emit('mcu.firmwareFlashComplete', null );
-  //   })
-  //   .catch( function( error )
-  //   {
-  //     // Error
-  //     board.global.emit('mcu.firmwareFlashComplete', { "error": error } );
-  //   })
-  //   .then( function()
-  //   {
-  //     // Reconnect to the bridge regardless of success
-  //     board.bridge.connect();
-  //   })
-
-  // }, false);
 
   board.AddMethod('ResetMCU', function (path) 
   {
     // TODO
-    debug('Resetting MCU: ' + path);
-    board.bridge.close();
-
-    setTimeout(function () 
-    {
-      board.bridge.connect();
-    }, 1000);
   }, false);
 
-  // board.AddMethod('FlashESC', function () 
-  // {
-  //   debug( 'Flashing Afro ESCs' );
-
-  //   // TODO: Sort this out
-    
-  //   // Don't start the bridge back up on this command. Firmware needs to be flashed again
-  // }, false);
-
-  board.AddMethod('SendCommand', function (command) 
+  board.AddMethod('SendCommand', function( command ) 
   {
-    if (board.notSafeToControl()) 
+    if( board.notSafeToControl() ) 
     {
       return;
     }
 
-    board.bridge.write(command + ';');
+    board.bridge.write( command + ';' );
   }, false);
 
   board.AddMethod('SendMotorTest', function (port, starboard, vertical) 
@@ -416,7 +308,7 @@ var RegisterFunctions = function (board)
     // Close the bridge connection
     board.bridge.close();
     // Remove the safeCheck interval
-    board.safeCheck = {};
+    clearInterval( board.safeCheck );
   }, false);
 
   board.AddMethod('StartRawSerial', function () 

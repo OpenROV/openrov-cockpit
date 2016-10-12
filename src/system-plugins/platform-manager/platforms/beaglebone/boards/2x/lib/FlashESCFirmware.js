@@ -42,7 +42,7 @@ function Flash( onStdout, onStderr )
     })
     .then( function()
     {
-        var escFlasherArgs      = [ path.resolve( "./FlashESCS.sh" ) ];
+        var escFlasherArgs      = [ path.resolve( __dirname + "/FlashESCS.sh" ) ];
         var escFlasherPromise   = spawnAsync( 'bash', escFlasherArgs );
         var escFlasherProcess   = escFlasherPromise.childProcess;
 

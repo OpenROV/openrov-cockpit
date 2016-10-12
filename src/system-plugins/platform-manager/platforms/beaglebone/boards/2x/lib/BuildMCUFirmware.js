@@ -14,7 +14,7 @@ var opts =
     quiet: false,
     debug: 5,
     libs: ['/opt/openrov/arduino/hardware/openrov/avr/libraries'],
-    preproc: [ "VERSION_HASH=\"ver:<<{{0000000000000000000000000000000000000000}}>>;\""],
+    preproc: [],
     generateCode: true
 };
 

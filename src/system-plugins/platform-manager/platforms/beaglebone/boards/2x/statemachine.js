@@ -13,21 +13,19 @@ const escConfPath       = "/opt/openrov/system/config/esc.conf";
 const mcuLastBuildPath  = "/opt/openrov/system/config/lastBuildHash";
 const mcuBinPath        = "/opt/openrov/firmware/bin/2x/OpenROV2x.hex";
 
+// TODO: Make these emit events
+function log( data )
+{
+    console.log( "FIRMWARE UPDATE: " + data.toString('utf8').trim() );
+}
+
+function err( data )
+{
+    console.error( "FIRMWARE UPDATE: " + data.toString('utf8').trim() );
+}
 
 module.exports = function( board ) 
 {
-    // TODO: Make these emit events
-    function log( data )
-    {
-        console.log( "FIRMWARE UPDATE: " + data.toString('utf8').trim() );
-    }
-
-    function err( data )
-    {
-        console.error( "FIRMWARE UPDATE: " + data.toString('utf8').trim() );
-    }
-
-
     var fsm = StateMachine.create(
     {
         events: 
@@ -224,7 +222,7 @@ var getHashHandler = function getHashHandler(event, from, to)
     .catch( function( error )
     {
         err( "Failed to find hash file" );
-        
+
         // Move to failed state
         self._e_fail( error );
     });
@@ -232,7 +230,7 @@ var getHashHandler = function getHashHandler(event, from, to)
 
 var flashMCUHandler = function flashMCUHandler(event, from, to)
 {
-    log( "BOARD STATE: Flashing firmware..." );
+    log( "Flashing firmware..." );
 
     var self = this;
 
@@ -241,20 +239,20 @@ var flashMCUHandler = function flashMCUHandler(event, from, to)
     .then( function()
     {   
         // Success
-        log( "BOARD STATE: Flash succeeded" );
+        log( "Flash succeeded" );
         self._e_mcu_flash_complete();
     })
     .catch( function( error )
     {
         // Move to failed state
-        log( "BOARD STATE: Flash failed" );
+        log( "Flash failed" );
         self._e_fail( error );
     });
 }
 
 var verifyVersionHandler = function verifyVersionHandler(event, from, to)
 {
-    log( "BOARD STATE: Verifying MCU firmware against latest binary..." );
+    log( "Verifying MCU firmware against latest binary..." );
 
     var self = this;
 
@@ -269,8 +267,8 @@ var verifyVersionHandler = function verifyVersionHandler(event, from, to)
         // Send the version request command to the MCU
         self.board.bridge.write( "version();" );
 
-        log( "BOARD STATE: MCU reported hash: " + self.board.hashInfo.fromMCU );
-        log( "BOARD STATE: Hash from last build: " + self.board.hashInfo.fromBin );
+        log( "MCU reported hash: " + self.board.hashInfo.fromMCU );
+        log( "Hash from last build: " + self.board.hashInfo.fromBin );
 
         // Check for new hash info received from MCU
         if( self.board.hashInfo.fromMCU !== "" )
@@ -279,13 +277,13 @@ var verifyVersionHandler = function verifyVersionHandler(event, from, to)
             if( self.board.hashInfo.fromMCU == self.board.hashInfo.fromBin )
             {  
                 // Success
-                log( "BOARD STATE: MCU Firmware is up to date" );
+                log( "MCU Firmware is up to date" );
                 self._e_firmware_validated();
             }
             else
             {
                 // Version mismatch. Flash the latest firmware to the MCU
-                log( "BOARD STATE: MCU Firmware is out of date. Triggering flash." );
+                log( "MCU Firmware is out of date. Triggering flash." );
                 self._e_trigger_mcu_flash();
             }
         }
@@ -293,13 +291,13 @@ var verifyVersionHandler = function verifyVersionHandler(event, from, to)
         {
             // Call 5 times, once per 3 secs
             counter++;
-            log( "BOARD STATE: Verification attempt #" + counter );
+            log( "Verification attempt #" + counter );
             setTimeout( RequestHashInfo, 3000 );
         }
         else
         {
             // Never received hash info from MCU. Flash the latest firmware to the MCU
-            log( "BOARD STATE: No firmware detected. Triggering flash." );
+            log( "No firmware detected. Triggering flash." );
             self._e_trigger_mcu_flash();
         }
     };
@@ -309,12 +307,12 @@ var verifyVersionHandler = function verifyVersionHandler(event, from, to)
 
 var completeHandler = function completeHandler(event, from, to)
 {
-    log( "BOARD STATE: Auto-update process complete." );
+    log( "Auto-update process complete." );
 }
 
 var failHandler = function failHandler(event, from, to)
 {
-    log( "BOARD STATE: Auto-update process failed." );
+    log( "Auto-update process failed." );
 }
 
 var eFailHandler = function eFailHandler(event, from, to, msg) 

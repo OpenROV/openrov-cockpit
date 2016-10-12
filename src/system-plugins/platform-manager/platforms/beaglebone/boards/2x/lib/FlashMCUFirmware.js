@@ -9,7 +9,7 @@ function Flash( onStdout, onStderr )
 
     // Attach stdout and stderr listeners to the flashing process
     //flashProcess.stdout.on( 'data', onStdout );
-    flashProcess.stderr.on( 'data', onStderr );
+    //flashProcess.stderr.on( 'data', onStderr );
 
     return flashPromise;
 }

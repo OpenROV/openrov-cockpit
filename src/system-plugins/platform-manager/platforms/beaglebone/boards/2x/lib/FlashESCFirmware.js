@@ -35,7 +35,7 @@ function Flash( onStdout, onStderr )
 
         // Attach stdout and stderr listeners to the flashing process
         //loaderFlashProcess.stdout.on( 'data', onStdout );
-        loaderFlashProcess.stderr.on( 'data', onStderr );
+        //loaderFlashProcess.stderr.on( 'data', onStderr );
 
         // Execute the promise to spawn the flashing process
         return loaderFlashPromise;
@@ -48,7 +48,7 @@ function Flash( onStdout, onStderr )
 
         // Attach stdout and stderr listeners to the flashing process
         //escFlasherProcess.stdout.on( 'data', onStdout );
-        escFlasherProcess.stderr.on( 'data', onStderr );
+        //escFlasherProcess.stderr.on( 'data', onStderr );
 
         // Now, try five times to flash the ESCs, every 5 seconds
         return Retry( function(){ return escFlasherPromise; }, { max_tries: 5, interval: 1000 })

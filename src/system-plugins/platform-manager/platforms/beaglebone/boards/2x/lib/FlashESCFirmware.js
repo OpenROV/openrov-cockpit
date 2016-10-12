@@ -4,7 +4,7 @@ var Retry           = require( 'bluebird-retry' );
 var spawnAsync      = require( 'child-process-promise' ).spawn;
 var ArduinoBuilder  = require( 'ArduinoBuilder' );
 
-function Flash( onStdout, onStdErr )
+function Flash( onStdout, onStderr )
 {
     // Build options for the 2x Afro FlashLoader firmware
     var buildOpts = 
@@ -42,7 +42,7 @@ function Flash( onStdout, onStdErr )
     escFlasherProcess.stderr.on( 'data', onStderr );
 
     // Run build, flash, upload process
-    return ArduinoBuilder.BuildSketch( buildOpts, onStdout, onStdErr )
+    return ArduinoBuilder.BuildSketch( buildOpts, onStdout, onStderr )
     .then(function() 
     {
         // Execute the promise to spawn the flashing process

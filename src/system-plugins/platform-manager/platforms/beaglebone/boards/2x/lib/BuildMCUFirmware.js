@@ -18,9 +18,9 @@ var opts =
     generateCode: true
 };
 
-function Build( onStdout, onStdErr ) 
+function Build( onStdout, onStderr ) 
 {
-  return ArduinoBuilder.BuildSketch( opts, onStdout, onStdErr );
+  return ArduinoBuilder.BuildSketch( opts, onStdout, onStderr );
 }
 
 module.exports = Build;

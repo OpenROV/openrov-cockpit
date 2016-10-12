@@ -1,0 +1,57 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+
+<script>
+(function (window) {
+  'use strict';
+  //ensure the namespace exists in the window object
+  if(!(window.OROV)){window.OROV={}}
+  if(!(window.OROV.behaviors)){window.OROV.behaviors={}}  
+  var behaviors = window.OROV.behaviors;
+
+  window.OROV.behaviors.orovhorizon = {
+      properties: {
+        roll: {type: Number},
+        pitch: {type:Number},
+        depth: {type: Number},
+        thrust: {type: Number}
+      },
+      behaviors: [behaviors.oROVStandard],
+        registerEmitterHandlers: function(emitter){
+          var self = this;
+
+
+          //Bail out if the data has not changed
+          var lastData = {roll:0,pitch:0,depth:0,thrust:0};
+          var newDataRecieved = false;
+          emitter.on('plugin.navigationData.data',function(data){
+            if (lastData.roll == data.roll 
+                && lastData.pitch == data.pitch
+                && lastData.depth == data.depth
+                && lastData.thrust == data.thrust ) {return};
+            lastData = data;
+            newDataRecieved=true;
+          });
+
+          var updateData = function(){
+            if (newDataRecieved)
+            self.setData(lastData);
+            setTimeout(updateData.bind(self),75);
+          }
+          updateData();
+        },
+        attached: function () {
+
+        },
+        setData: function (data) {
+          var correctedData = {
+            roll: data.roll * Math.PI / 180,
+            pitch: data.pitch * Math.PI / 180,
+            altitude: data.depth,
+            speed: data.thrust
+          };
+          this.draw(correctedData);
+        }                  
+    }
+  })(window);
+</script>

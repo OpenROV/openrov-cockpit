@@ -1,6 +1,7 @@
 var EventEmitter = require('events').EventEmitter;
 var debug = require('debug')('bridge');
 
+
 // Encoding helper functions
 function encode( floatIn )
 {
@@ -285,10 +286,11 @@ function Bridge()
       currentHeading = 0;
     }
     // Generate pitch
-    currentPitch = 0.01 * (Math.floor(Math.random() * 201) - 100);
+    //p(t) = 90*sin(t)
+    currentPitch = 90*Math.sin(time);
     result += 'pitc:' + currentPitch + ';';
     // Generate roll
-    currentRoll = 0.03 * (Math.floor(Math.random() * 201) - 100);
+    currentRoll = Math.floor(Math.random()*91) - 45;
     result += 'roll:' + currentRoll + ';';
     // Generate battery tube 1 current
     rnd = (Math.random() * 20 - 10) / 100;

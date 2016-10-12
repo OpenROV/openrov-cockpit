@@ -9,7 +9,7 @@ var opts =
     fqbn: 'openrov:avr:mega:cpu=atmega2560',
     hardware: '/opt/openrov/arduino/hardware',
     tools: '/opt/openrov/arduino/hardware/tools',
-    warnings: 'all',
+    warnings: 'none',
     verbose: true,
     quiet: false,
     debug: 5,

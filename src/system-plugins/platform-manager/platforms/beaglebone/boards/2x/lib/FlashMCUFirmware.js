@@ -8,7 +8,7 @@ function Flash( onStdout, onStderr )
     var flashProcess  = flashPromise.childProcess;
 
     // Attach stdout and stderr listeners to the flashing process
-    flashProcess.stdout.on( 'data', onStdout );
+    //flashProcess.stdout.on( 'data', onStdout );
     flashProcess.stderr.on( 'data', onStderr );
 
     return flashPromise;

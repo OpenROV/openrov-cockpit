@@ -212,12 +212,23 @@ var getHashHandler = function getHashHandler(event, from, to)
     .then( function( hash )
     {
         log( "Hash in last build file: " + hash.trim() );
+
         self.board.hashInfo.fromBin = hash;
     })
     .then( function()
     {   
-        // Success
-        self._e_hash_obtained();
+        if( self.board.hashInfo.fromBin != "" )
+        {
+            // Success
+            self._e_hash_obtained();
+        }
+        else
+        {
+            err( "Hash was empty!" );
+
+            // Move to failed state
+            self._e_fail( error );
+        }
     })
     .catch( function( error )
     {

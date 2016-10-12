@@ -167,10 +167,14 @@ ArduinoBuilder.prototype.BuildSketch = function(options, onStdout, onStderr) {
         })
         .then( function()
         {
-            onStdout( "Writing hash: " + hash );
+            // Only write hash if building generated code
+            if( options.generateCode )
+            {
+                onStdout( "Writing hash: " + hash );
 
-            // Write the hash to file
-            return fs.writeFileAsync( "/opt/openrov/system/config/lastBuildHash", hash );
+                // Write the hash to file
+                return fs.writeFileAsync( "/opt/openrov/system/config/lastBuildHash", hash );
+            }
         })
         .then(function(firmwareFile) 
         {

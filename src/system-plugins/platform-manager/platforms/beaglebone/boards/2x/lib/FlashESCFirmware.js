@@ -25,31 +25,31 @@ function Flash( onStdout, onStderr )
         generateCode: false
     };
 
-    var loaderFlashArgs     = [ '-P', '/dev/spidev1.0', '-c', 'linuxspi', '-vvv', '-p', 'm2560', '-U', 'flash:w:/opt/openrov/firmware/bin/2x/ArduinoUSBLinker.hex' ];
-    var loaderFlashPromise  = spawnAsync('avrdude', loaderFlashArgs );
-    var loaderFlashProcess  = loaderFlashPromise.childProcess;
-
-    // Attach stdout and stderr listeners to the flashing process
-    loaderFlashProcess.stdout.on( 'data', onStdout );
-    loaderFlashProcess.stderr.on( 'data', onStderr );
-
-    var escFlasherArgs      = [ path.resolve( "./FlashESCS.sh" ) ];
-    var escFlasherPromise   = spawnAsync( 'bash', escFlasherArgs );
-    var escFlasherProcess   = escFlasherPromise.childProcess;
-
-    // Attach stdout and stderr listeners to the flashing process
-    escFlasherProcess.stdout.on( 'data', onStdout );
-    escFlasherProcess.stderr.on( 'data', onStderr );
-
     // Run build, flash, upload process
     return ArduinoBuilder.BuildSketch( buildOpts, onStdout, onStderr )
     .then(function() 
     {
+        var loaderFlashArgs     = [ '-P', '/dev/spidev1.0', '-c', 'linuxspi', '-vvv', '-p', 'm2560', '-U', 'flash:w:/opt/openrov/firmware/bin/2x/ArduinoUSBLinker.hex' ];
+        var loaderFlashPromise  = spawnAsync('avrdude', loaderFlashArgs );
+        var loaderFlashProcess  = loaderFlashPromise.childProcess;
+
+        // Attach stdout and stderr listeners to the flashing process
+        loaderFlashProcess.stdout.on( 'data', onStdout );
+        loaderFlashProcess.stderr.on( 'data', onStderr );
+
         // Execute the promise to spawn the flashing process
         return loaderFlashPromise;
     })
     .then( function()
     {
+        var escFlasherArgs      = [ path.resolve( "./FlashESCS.sh" ) ];
+        var escFlasherPromise   = spawnAsync( 'bash', escFlasherArgs );
+        var escFlasherProcess   = escFlasherPromise.childProcess;
+
+        // Attach stdout and stderr listeners to the flashing process
+        escFlasherProcess.stdout.on( 'data', onStdout );
+        escFlasherProcess.stderr.on( 'data', onStderr );
+
         // Now, try five times to flash the ESCs, every 5 seconds
         return Retry( function(){ return escFlasherPromise; }, { max_tries: 5, interval: 1000 })
     });

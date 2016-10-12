@@ -18,8 +18,7 @@ var opts =
                 '/opt/openrov/firmware/libraries'
               ],
     preproc:  [ 
-                "MCUARCH=MCUARCH_AVR",
-                "CONTROLLERBOARD=CONTROLLERBOARD_CB25"
+                "MCUARCH_AVR=1"
               ],
     generateCode: true
 };

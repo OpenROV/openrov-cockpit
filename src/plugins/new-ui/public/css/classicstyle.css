@@ -353,7 +353,7 @@ img.center {
 }
 
 #horizon {
-    opacity: 0.5;
+    opacity: 1.0;
     position: absolute;
     z-index: 3;
     top: 0px;

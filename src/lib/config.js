@@ -4,6 +4,11 @@
  * Configuration file.  Manage frame rate, port, etc.
  *
  */
+
+var log = require('debug')('log:system');
+var error = require('debug')('error:system');
+var debug = require('debug')('debug:system');
+
 var nconf = require('nconf');
 //Add your Mock objects here using this same naming convention of library-mock for the mock version.
 //be sure to add it to the expoft at the bottom of this file as well.
@@ -14,10 +19,10 @@ nconf.argv().env('__');
 try {
   nconf.use('file', { file: nconf.get('configfile') ? nconf.get('configfile') : '/etc/rovconfig.json' });
 } catch (err) {
-  console.log('Unable to load the configuration file, resetting to defaults');
-  console.log(err);
+  error('Unable to load the configuration file, resetting to defaults');
+  error(err);
 }
-console.dir(nconf.get());
+debug(nconf.get());
 nconf.env();
 //Also look for overrides in environment settings
 // Do not change these values in this file for an individual ROV, use the ./etc/rovconfig.json instead
@@ -53,10 +58,10 @@ nconf.defaults({
 function savePreferences() {
   nconf.save(function (err) {
     if (err) {
-      console.error(err.message);
+      error(err.message);
       return;
     }
-    console.log('Configuration saved successfully.');
+    debug('Configuration saved successfully.');
   });
 }
 var getLibPath = function (lib) {
@@ -85,4 +90,4 @@ module.exports = {
   savePreferences: savePreferences,
   systemDirectory: nconf.get('systemDirectory')
 };
-console.log('config', module.exports);
+debug('config', module.exports);

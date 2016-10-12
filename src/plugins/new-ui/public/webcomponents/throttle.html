@@ -26,6 +26,40 @@ TODO:  Change the interface for motors to -1/1 with deadzone accounted for to tr
         float: left;
       }
 
+      #leftThrottleRect {
+        fill: #fff9f9;
+        fill-opacity: 1;
+        stroke: none;
+
+        height: 163;
+
+        /*Hardware acceleration*/
+        translate3d(0,0,0);
+        transition-duration: 0.10s;
+        transformation-timing-function: ease-out;
+      }
+      #rightThrottleRect {
+        fill: #fff9f9;
+        fill-opacity: 1;
+        stroke: none;
+
+        /*Hardware acceleration*/
+        
+        translate3d(0,0,0);
+        transition-duration: 0.10s;
+        transformation-timing-function: ease-out;
+      }
+      
+      #throttle {
+        fill: #cccccc;
+        fill-opacity: 1;
+        stroke: none;
+
+        /*Hardware acceleration*/
+        translate3d(0,0,0);
+        transition-duration: 0.01s;
+      }
+
     </style>
   <template>
     <div id="container" class="center" style="">
@@ -69,15 +103,15 @@ TODO:  Change the interface for motors to -1/1 with deadzone accounted for to tr
                height="131.31982"
                x="2.6261578"
                y="341.21436"
-               id="rect3779"
-               style="fill:#ffffff;fill-opacity:1;stroke:none" />
+               id="leftThrottleRect"
+            />
             <rect
                width="20.440001"
                height="131.31982"
                x="84.551224"
                y="341.21436"
-               id="rect3781"
-               style="fill:#fff9f9;fill-opacity:1;stroke:none" />
+               id="rightThrottleRect"
+            />
           </g>
           <rect
              width="30.840309"
@@ -85,7 +119,7 @@ TODO:  Change the interface for motors to -1/1 with deadzone accounted for to tr
              x="38.606461"
              y="221.30832"
              id="throttle"
-             style="fill:#cccccc;fill-opacity:1;stroke:none" />
+           />
         </g>
         <path
            d="m 1.0500002,407.07541 104.9296498,0"
@@ -293,19 +327,19 @@ TODO:  Change the interface for motors to -1/1 with deadzone accounted for to tr
         var starboardMaxElement = $(this.$.starboard).find('#maxThrottle rect');
         //815 is the design height of the throttle SVG element, 200 the min height of the throttle display at power level 1
         var height = level.map(0, 5, 0, 815);
+        console.log("setPowerHeight: " , height);
         var y = 815 / 2 - height / 2;
-        portMaxElement.animate({
-          svgHeight: height,
-          svgY: y
-        }, 10);
-        verticalMaxElement.animate({
-          svgHeight: height,
-          svgY: y
-        }, 10);
-        starboardMaxElement.animate({
-          svgHeight: height,
-          svgY: y
-        }, 10);
+
+        //This will cause port vertical and starboard max throttles to change using css
+        portMaxElement.attr('height', height);
+        portMaxElement.attr('y', y);
+
+        verticalMaxElement.attr('height', height);
+        verticalMaxElement.attr('y', y);
+
+        starboardMaxElement.attr('height', height);
+        starboardMaxElement.attr('y', y);
+
         this.height = height;
       },
       setVertical: function (lift) {
@@ -321,19 +355,25 @@ TODO:  Change the interface for motors to -1/1 with deadzone accounted for to tr
         this.setElement(element, right);
       },
       setElement: function (element, value) {
-        var y;
-        // the min throttle height is 200, therefore we substract 100 px
-        var maxheight = 815;
-        var height = value.map(1000, 2000, 0 - maxheight, maxheight);
-        y = 815 / 2 - height;
-        if (height < 0) {
-          height = -1 * height;
+        
+        // Grab the current maximum drawn throttle value
+        var maxHeight = $(this.$.port).find('#maxThrottle rect').attr('height');
+
+        //Zero point as reported by the throttle value passed in is 1500
+        var height = maxHeight/2.0;
+        if( value == 1500 )
+        {
+          height = 0;
+        } 
+        
+        var y = 815 / 2 - height;
+        if( value < 1500 )
+        {
           y = 815 / 2;
         }
-        element.animate({
-          svgHeight: height,
-          svgY: y
-        }, 10);
+
+        element.attr('height', height);
+        element.attr('y', y);
       }
     });
   </script>

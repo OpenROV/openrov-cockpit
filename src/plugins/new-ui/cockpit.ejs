@@ -12,6 +12,7 @@
 <link rel="import" href="components/diagnostics/diagnostics.html">
 <link rel="import" href="components/video/orov-video.html">
 <link rel="import" href="components/navigation-data/orov-horizon.html">
+<link rel="import" href="components/navigation-data/attitude-indicator.html">
 <link rel="import" href="components/connection-health/orov-ping-graph.html">
 <link rel="import" href="components/internet-stream/orov-twitch-stream-status.html">
 <link rel="import" href="components/settings-manager/orov-settings-manager.html">
@@ -56,7 +57,7 @@
                     <div id='twitchembed' style='position:absolute; top:0px; left:0px; z-index:33;'></div>
                     <orov-twitch-stream-status style='position:absolute; top:0px; left:0px; z-index:33;' event-emitter="{{cockpitEventEmitter}}"></orov-twitch-stream-status>
 
-                    <orov-horizon id="horizon" style='position:absolute; top:0px; left:0px; z-index:33; width:100%; height:100%' event-emitter="{{cockpitEventEmitter}}"></orov-horizon>
+                    <attitude-indicator id="horizon" style='position:absolute; top:0px; left:0px; z-index:33; width:100%; height:100%' event-emitter="{{cockpitEventEmitter}}"></attitude-indicator>
                     <div style='position:absolute; top:0px; left:0px; z-index:33; display:flex'>
                         <orov-newui-time-slim id="time-item-collapsed" style="margin:5px" event-emitter="{{cockpitEventEmitter}}"></orov-newui-time-slim>
                         <orov-newui-power-slim id="power-item-collapsed" style="margin:5px" event-emitter="{{cockpitEventEmitter}}"></orov-newui-power-slim>

@@ -7,6 +7,21 @@
         width: 100%;
       }
 
+      #left {
+        /*Hardware acceleration*/
+        translate3d(0,0,0);
+
+        transition-duration: 0.1s;
+        transition-timing-function: ease-out;
+      }
+      #right {
+        /*Hardware acceleration*/
+        translate3d(0,0,0);
+
+        transition-duration: 0.1s;
+        transition-timing-function: ease-out;
+      }
+      
     </style>
   <template>
     <div id="batteryContainer">
@@ -200,11 +215,11 @@
 
         },
         setLeftBattery: function (current) {
-          this.setCurrent($(this.$.left), this.leftIndicator, current);
+          this.setCurrent(this.$.left, this.leftIndicator, current);
           this.leftCurrent = current;
         },
         setRightBattery: function (current) {
-          this.setCurrent($(this.$.right), this.rightIndicator, current);
+          this.setCurrent(this.$.right, this.rightIndicator, current);
           this.rightCurrent = current;
         },
         setCurrent: function (element, config, current) {
@@ -215,7 +230,8 @@
             this.set('current.min', current);
           }
           var val = current.map(this.current.min, this.current.max, config.Y.min, config.Y.max);
-          element.animate({ svgTransform: 'translate(' + config.X + ',' + val + ')' });
+          
+          element.style.transform=("translate3d(" + config.X + "px," + val + "px,0px )");
         },
         setVoltage: function (voltage) {
           voltage = parseFloat(voltage);

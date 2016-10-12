@@ -16,11 +16,6 @@
       float: none;
     }
 
-    #gyroIndicators {
-      /*start off without them displayed*/
-      display:none;
-    }
-
     #indicator {
       /*Hardware acceleration*/
       translate3d(0,0,0);
@@ -73,7 +68,7 @@
             <rect id="rect4953" transform="matrix(-0.70710678,-0.70710678,0.70710678,-0.70710678,472.5,1140.7159)" fill$="{{ options.bezel }}" height="30" width="10" y="96" x="467.5" />
             <rect id="rect4955" transform="matrix(-0.70710678,0.70710678,-0.70710678,-0.70710678,1140.7159,472.5)" fill$="{{ options.bezel }}" height="30" width="10" y="96" x="467.5" />
             <rect id="rect4957" transform="matrix(0.70710678,0.70710678,-0.70710678,0.70710678,472.5,-195.71591)" fill$="{{ options.bezel }}" height="30" width="10" y="96" x="467.5" />
-            <g id="compassIndicators" font-size="72px" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" style="word-spacing:0;letter-spacing:0;" letter-spacing="0" word-spacing="0" font-weight="bold">
+            <g id="compassIndicators" display$="{{ displayCompassIndicators(isCompass) }}" font-size="72px" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" style="word-spacing:0;letter-spacing:0;" letter-spacing="0" word-spacing="0" font-weight="bold">
               <text id="indicator_n" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" line-height="125%" y="90.702766" x="471.9191">{{__('N')}}</text>
               <text id="text4961" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(-1,0,0,-1,943.74133,945)" line-height="125%" y="80.803268" x="471.90582">{{__('S')}}</text>
               <text id="text4965" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(0,1,-1,0,0,0)" line-height="125%" y="-864.25293" x="471.84961">{{__('E')}}</text>
@@ -83,7 +78,7 @@
               <text id="text4973" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(-0.70710678,0.70710678,-0.70710678,-0.70710678,0,0)" line-height="125%" font-size="72px" y="-1060.8452" x="1.1167512">{{__('SE')}}</text>
               <text id="text4975" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(0.70710678,0.70710678,-0.70710678,0.70710678,0,0)" line-height="125%" font-size="72px" y="-391.12482" x="667.26764">{{__('NE')}}</text>
             </g>
-            <g id="gyroIndicators" font-size="72px" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" style="word-spacing:0;letter-spacing:0;" letter-spacing="0" word-spacing="0" font-weight="bold">
+            <g id="gyroIndicators" display$="{{ displayGyroIndicators(isCompass) }}" font-size="72px" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" style="word-spacing:0;letter-spacing:0;" letter-spacing="0" word-spacing="0" font-weight="bold">
               <text id="indicator_n" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" line-height="125%" y="60.702766" x="471.9191">{{__('0')}}</text>
               <text id="text4961" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(1,0,0,1,0,850)" line-height="125%" y="80.803268" x="471.90582">{{__('-180+')}}</text>
               <text id="text4965" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(1,0,0,1,460,-38)" line-height="125%" y="530" x="460">{{__('+90')}}</text>
@@ -200,35 +195,10 @@
           'heading.tap': 'toggleHeadingLock'
         },
         toggleMode: function(e) {
-
-          //This is a toggle
-          if(this.isCompass)
-          {            
-            //Hide the svg elements on the rose that show heading
-            $(this.$.compassIndicators).css({display:'none'});
-            $(this.$.gyroIndicators).css({display:'block'});
-            this.isCompass = false;
-          }
-          else
-          {
-            //Display svg elements on the rose that show heading
-            $(this.$.compassIndicators).css({display:'block'});
-            $(this.$.gyroIndicators).css({display:'none'});
-            this.isCompass = true;
-          }
-          
+          this.isCompass = !this.isCompass;
         },
         toggleHeadingLock: function(e) {
-          
-          //This is a toggle
-          if(this.$.headingLock)
-          {
-            this.$.headingLock = false;
-          }
-          else
-          {
-            this.$.headingLock = true;
-          }
+          this.$.headingLock = !this.$.headingLock;
         },
 
         behaviors: [namespace('behaviors').oROVStandard],
@@ -260,6 +230,30 @@
           this.setHeading(this.heading);
           this.setBearing(this.bearing);
           this.format(this.options);          
+        },
+        compassMode: function() {
+          if(this.isCompass) {
+            return "Compass";
+          }
+          else {
+            return "Gyro";
+          }
+        },
+        displayCompassIndicators: function(isCompass) {
+          if(this.isCompass) {
+            return "block";
+          }
+          else {
+            return "none";
+          }
+        },
+        displayGyroIndicators: function(isCompass) {
+          if(this.isCompass) {
+            return "none";
+          }
+          else {
+            return "block";
+          }
         },
         format: function(newOptions) {
           this.set('options.indicator', newOptions.indicator ? newOptions.indicator : this.options.indicator);
@@ -322,14 +316,6 @@
             rotateElement(this.$.bearing, bearingAngle, this.heading);
 
             this.target = undefined;
-          }
-        },
-        compassMode: function() {
-          if(this.isCompass) {
-            return "Compass";
-          }
-          else {
-            return "Gyro";
           }
         },
         pad: function(num, size) {

@@ -444,10 +444,12 @@ kbd.light, .light-keys kbd, .key.light, .light-keys .key {
                 },
                 SaveToCurrentSession: function(){
                     //And after updating the mapped setting for the current session, save them as well.
+                    var currentSettings = {name: "current-session"};
                     if (this.presets.some(function(item){return item.name=="current-session"})){
-                        this.eventEmitter.emit('plugin.inputConfigurator.savePreset', "current-session");  
+                        
+                        this.eventEmitter.emit('plugin.inputConfigurator.savePreset', currentSettings);  
                     } else {
-                        this.eventEmitter.emit('plugin.inputConfigurator.saveNewPreset', "current-session"); 
+                        this.eventEmitter.emit('plugin.inputConfigurator.saveNewPreset', currentSettings); 
                     }
                   
                 },

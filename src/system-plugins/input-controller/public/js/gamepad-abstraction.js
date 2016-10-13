@@ -20,6 +20,7 @@ inputController.GamepadAbstraction = function (cockpit) {
   };
   gamepad.bind(HTML5Gamepad.Event.BUTTON_DOWN, function (e) {
     var control = e.control;
+    console.log(control);
     if (gp.currentButton === undefined) {
       gp.currentButton = e.control;
     } else {

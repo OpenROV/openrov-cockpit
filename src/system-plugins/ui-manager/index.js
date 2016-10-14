@@ -109,6 +109,9 @@ UIManager.prototype.start = function start() {
       scripts: pathInfo.scripts,
       styles: pathInfo.styles,
       sysscripts: pathInfo.sysscripts,
+      webcomponents: pathInfo.webcomponents.filter(function(wcInfo){
+        return (wcInfo.path.indexOf('ui-manager/orov-widget-registry.html')==-1)
+      }),      
       config: self.deps.config,
       scriplet: scriplets.find(function (item) {
         return item.name == applet;

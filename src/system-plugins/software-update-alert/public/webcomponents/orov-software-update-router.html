@@ -1,0 +1,66 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<dom-module name="orov-software-update-router">
+  <style>
+  </style>
+  <template>
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        is: "orov-software-update-router",
+        properties: {
+            applet:{type:String,observer: '_overrideApplet',notify: true},
+            updateInProgress:{type:Boolean, observer:'_handleUpdateInProgress'},
+        },
+        behaviors: [namespace('behaviors').oROVStandard],
+        attached: function () {
+            this._originalApplet = 'cockpit';
+        },
+        registerEmitterHandlers: function(emitter){
+          var self = this;
+          emitter.withHistory.on("plugin.updateManager.status",function(status){
+              status.message;
+              status.progress;
+
+              switch(status.progress){
+                  case "InProgress":
+                    self.set('updateInProgress',true);
+                    self.set('applet','_updates');
+                  break;
+                  case "Complete":
+                    self.set('updateInProgress',false);
+                  break;
+                  case "Failed":
+                    //Leave it as update in profess until we get a complete, even if there was a failure
+                    //self.set('updateInProgress',false);
+                  break;
+                  default:
+                   throw new Error("plugin.updateManager.status.progress value of " + status.progress + " is invalid");
+              }
+          })
+        },
+        _overrideApplet: function(newvalue,oldvalue){
+            if ((this.updateInProgress) && (newvalue!=='_updates')){
+                this.set('applet','_updates');
+            }
+        },
+        _handleUpdateInProgress: function(newvalue,oldvalue){
+            var self=this;
+            if (newvalue){
+                if(this.applet){
+                    this._originalApplet = this.applet;
+                }
+                this.set('applet','_updates');
+            } else {
+                setTimeout(function(){
+                    self.set('applet',self._originalApplet);
+                },3000);
+            }
+        } 
+                        
+      })
+    })();
+  </script>
+
+</dom-module>

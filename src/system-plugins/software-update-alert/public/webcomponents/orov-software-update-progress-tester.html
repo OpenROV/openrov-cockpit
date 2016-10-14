@@ -1,0 +1,65 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<dom-module name="orov-software-update-progress-tester">
+  <style>
+  </style>
+  <template>
+    <div hidden$="!showButtons">
+    <button on-tap="_handleGoodTap">Simulate Normal FirmwareUpdate</button>
+    <button on-tap="_handleBadTap">Simualte Failed FirmwareUpdate</button>
+    </div>
+  </template>
+  <script>
+    (function(window) {
+      Polymer({
+        is: "orov-software-update-progress-tester",
+        properties: {
+          showButtons:{type:Boolean, value:function(){return false}}
+        },
+        behaviors: [namespace('behaviors').oROVStandard],
+        attached: function () {
+          window.OROV.simulate_firmwareUpdateGood = this._handleGoodTap.bind(this);
+          window.OROV.simulate_firmwareUpdateBad = this._handleBadTap.bind(this);
+        },
+        detached: function () {
+          delete window.OROV.simulate_firmwareUpdateGood;
+          delete window.OROV.simulate_firmwareUpdateBad;
+        },
+        registerEmitterHandlers: function(emitter){
+          var self = this;
+        },
+        _handleGoodTap:function(){
+          var emitter = this.eventEmitter;
+          emitter.emit("plugin.updateManager.status",{progress:"InProgress",message:"test"});
+          for (var i=0;i<100;i++){
+            setTimeout(function(i){
+              emitter.emit("plugin.updateManager.log","test " + i);
+            }.bind(this,i),i*50);
+          }
+          
+          setTimeout(function(){
+            emitter.emit("plugin.updateManager.status",{progress:"Complete",message:"done"});          
+          },100*50+100);
+        },
+        _handleBadTap:function(){
+          var emitter = this.eventEmitter;
+          emitter.emit("plugin.updateManager.status",{progress:"InProgress",message:"test"});
+          for (var i=0;i<100;i++){
+            setTimeout(function(i){
+              if ((i % 2) ==0){
+                emitter.emit("plugin.updateManager.error","test " + i);
+              } else {
+                emitter.emit("plugin.updateManager.log","test " + i);
+              }
+            }.bind(this,i),i*50);
+          }
+          
+          setTimeout(function(){
+            emitter.emit("plugin.updateManager.status",{progress:"Failed",message:"done"});          
+          },100*50+100);
+        }
+      })
+    })(window);
+  </script>
+
+</dom-module>

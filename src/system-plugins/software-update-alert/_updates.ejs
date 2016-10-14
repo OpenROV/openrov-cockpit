@@ -1,0 +1,21 @@
+<style>
+    #update-panel {
+        position:absolute;
+        top:0px;
+        left:0px;
+        width:100%;
+        height:100%;
+        z-index:9999;
+        background-color:white;
+        display:flex;
+        flex-direction: column;
+    }
+    body {
+        height:100%;
+    }
+</style>
+<div id="update-panel">
+<h4 style="flex: 0 0;">Updates in Progress</h4>
+<p>This feature is in Beta.  Anytime firmware for any of the MCUs on the system need to be updated, this screen will track the update.  When complete this screen will automatically redirect back to cockpit.  If the system failes to apply an updated you can use the retry button to try again.  The download button will download logs that can be submitted with a bug report.</p>
+<orov-software-update-progress style="flex: auto;" event-emitter="{{cockpitEventEmitter}}"></orov-software-update-progress>
+</div>

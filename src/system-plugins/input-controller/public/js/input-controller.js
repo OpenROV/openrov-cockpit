@@ -135,7 +135,7 @@
         }
       });
     });
-    self.controlsToRegister = [];
+    controlsToRegister.length = 0;
     if (doCheck) {
       self.checkDuplicates();
     }

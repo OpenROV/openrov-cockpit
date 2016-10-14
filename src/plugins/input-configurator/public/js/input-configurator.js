@@ -20,8 +20,11 @@
     var self = this;
 
     self.cockpit.on(plugin + '.updateBinding', function(arg, callback) {
-      var mapping = self.settings.currentMap.find(function(item) { return item.name == arg.name });
-      if (mapping) {
+      var mapping = self.settings.currentMap.find(function(item) { 
+        return item.name == arg.name; 
+      });
+
+      if( mapping ) {
         mapping.bindings = arg.bindings;
         self.savingSettings = true;
         self.cockpit.rov.emit('plugin.settings-manager.saveSettings', { inputConfigurator: self.settings }, function() {
@@ -30,7 +33,7 @@
         });
 
         // apply to inputConfigurator
-        //self.sendToInputController(mapping);
+        self.sendToInputController(mapping);
       }
       // else handle error?
     });

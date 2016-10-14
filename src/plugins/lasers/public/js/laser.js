@@ -1,27 +1,37 @@
 (function (window) {
   'use strict';
   var plugins = namespace('plugins');
-  plugins.Laser = function (cockpit) {
+
+  var Laser = function Laser(cockpit) {
+    console.log("Loading laser plugin.");
     var self = this;
     self.cockpit = cockpit;
-    this.laserState = { enabled: false };
+    
+    self.laserState = {
+      enabled: false
+    };
+
+    this.inputDefaults = [{
+      name: 'plugin.laser.Toggle',
+      description: 'Toggles the lasers on or off',
+      defaults:
+      {
+        keyboard: 'l',
+        gamepad: ''
+      },
+      down: function()
+      {
+        cockpit.rov.emit('plugin.laser.set', self.laserState.enabled == true ? 0 : 1);
+      }
+    }];
   };
+  
+  plugins.Laser = Laser;
+
   plugins.Laser.prototype.getTelemetryDefinitions = function getTelemetryDefinitions() {
     return [{
         name: 'claser',
         description: 'Scaling Laser power 0 to 255'
-      }];
-  };
-  plugins.Laser.prototype.inputDefaults = function inputDefaults() {
-    var cockpit = this.cockpit;
-    var self = this;
-    return [{
-        name: 'plugin.laser.Toggle',
-        description: 'Toggles the lasers on or off.',
-        defaults: { keyboard: 'l' },
-        down: function () {
-          cockpit.rov.emit('plugin.laser.set', self.laserState.enabled == true ? 0 : 1);
-        }
       }];
   };
   //This pattern will hook events in the cockpit and pull them all back

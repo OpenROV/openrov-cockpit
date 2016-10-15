@@ -24,6 +24,9 @@
     .list-container{
         height:90%;
     }
+    :host{
+        display:block;
+    }
   </style>
   <template>
       <div style="height:100%;width:100%;position:fixed;">
@@ -40,8 +43,8 @@
       </div>
       </paper-material>      
       <div class="buttons">
-          <paper-button on-tap="_handleRetry">Retry</paper-button>
-          <paper-button on-tap="_handleDownload">Download Logs</paper-button>
+          <paper-button disabled$="{{!_showRecoveryButtons(updateState)}}" on-tap="_handleRetry">Retry</paper-button>
+          <paper-button disabled$="{{!_showRecoveryButtons(updateState)}}" on-tap="_handleDownload">Download Logs</paper-button>
       </div>
       </div>
   </template>
@@ -52,7 +55,8 @@
         properties: {
             updateInProgress:{type:Boolean, observer:'_handleUpdateInProgress'},
             updateLog:{type:Array, value:function(){return [];}},
-            autoScroll:{type:Boolean, value: function(){return true}}
+            autoScroll:{type:Boolean, value: function(){return true}},
+            updateState:{type:String}
         },
         behaviors: [namespace('behaviors').oROVStandard],
         attached: function () {
@@ -60,9 +64,7 @@
         registerEmitterHandlers: function(emitter){
           var self = this;
           emitter.withHistory.on("plugin.updateManager.status",function(status){
-              status.message;
-              status.progress;
-
+              self.set('updateState',status.progress);
               switch(status.progress){
                   case "InProgress":
                     self.set('updateInProgress',true);
@@ -110,6 +112,9 @@
         },
         _handleDownload:function(){
             this.eventEmitter.emit("plugin.updateManager.download");
+        },
+        _showRecoveryButtons:function(updateState){
+            return updateState=="Failed";
         }
                         
       })

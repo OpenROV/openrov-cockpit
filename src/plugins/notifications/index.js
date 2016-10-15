@@ -58,7 +58,9 @@ class Notifications {
         this.listeners.settings.enable();
         this.listeners.peristentNotices.enable();
         this.listeners.clear.enable();
-        this.globalBus.emit("notification", "Notification service started");
+        if (process.env.NODE_ENV == "development") {
+          this.globalBus.emit("notification", "Notification service started");
+        }
     }
 
     // This is called when the plugin is disabled

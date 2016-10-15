@@ -65,7 +65,8 @@
                 description: 'Toggles the ROV lights on/off.',
                 defaults: 
                 { 
-                  keyboard: 'i' 
+                  keyboard: 'i',
+                  gamepad: '' 
                 },
                 down: function () 
                 {

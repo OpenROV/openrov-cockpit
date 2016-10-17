@@ -25,17 +25,21 @@
   }
   .detail{
     flex:8;
+    margin:10px;
   }
 </style>
 
 <paper-toast id="toast"></paper-toast>
 <div class="container">
+  <paper-material elevation="0" style="flex:1">    
   <paper-menu class="menu" att-for-selected="section-name" selected="{{currentSection}}" on-iron-select="_handleSectionSelect">
     <template is="dom-repeat" items="{{sections}}">
     <paper-item section-name$="{{item}}">{{__(item)}}</paper-item>
     </template>
   </paper-menu>  
-  <div class="detail" id="form2">
+  </paper-material>
+  <paper-material class="detail" elevation="1">  
+  <div id="form2">
     <json-schema-editor  id="jedit" on-changed="_handleJeditChange"
       class="no-mousetrap"
       disable_collapse="true"
@@ -44,6 +48,7 @@
       iconlib="fontawesome4webcomponent"
     >{{_jsonSchemaforSelection(currentSection)}}</json-schema-editor>       
   </div>
+  </paper-material>
 </div>
 
 </template>

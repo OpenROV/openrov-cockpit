@@ -25,7 +25,7 @@
     registerBaseEmitterHanlders: function(emitter){
       var self = this;
       emitter.withHistory.on('ui-manager-applets',function(applets){
-        self.set('applets',applets);
+        self.set('applets',applets.filter(function(item){return item.name.indexOf('_')!==0}));
       });
     },
     handleSelection: function(detail)

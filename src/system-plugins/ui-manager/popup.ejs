@@ -27,7 +27,7 @@ window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
 
   ga('create', 'UA-18444815-8', 'auto');
   ga('set', 'dimension1', '<%= theme %>');
-  
+
 ga('require', 'cleanUrlTracker');
 ga('require', 'eventTracker');
 ga('require', 'outboundLinkTracker');
@@ -99,8 +99,14 @@ ga('send', 'pageview');
   <body>
 <link rel="import" href="components/platinum-sw/platinum-sw-register.html">
 <link rel="import" href="components/platinum-sw/platinum-sw-cache.html">
+<link rel="import" href="components/ui-manager/orov-widget-registry.html">
+
+
 <!--TODO: Add logic to support either popout or popin(swapping) of applets-->
 <template id="t" is="dom-bind"  strip-whitespace>
+<orov-widget-registry event-emitter="{{cockpitEventEmitter}}">
+  <%=JSON.stringify(webcomponents);%>
+</orov-widget-registry>
 <script>
   ga('set', 'page', '<%= scriplet.name %>');
   ga('send', 'pageview');

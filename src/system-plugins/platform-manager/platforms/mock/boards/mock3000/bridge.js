@@ -1,5 +1,6 @@
 var EventEmitter = require('events').EventEmitter;
 var debug = require('debug')('bridge');
+var trace = require('debug')('trace:bridge');
 
 
 // Encoding helper functions
@@ -64,6 +65,13 @@ function Bridge()
         
         break;
       }
+
+      case 'ping': 
+      {
+        bridge.emitStatus(`pong:${commandParts[1]}`);
+        trace(`pong:${commandParts[1]}`);
+        break;
+      }      
 
       case 'lights_tpow': 
       {

@@ -23,9 +23,7 @@ class Notifications {
             settings: new Listener(self.globalBus, 'settings-change.notifications', true, function(settings) {
                 self.settings = settings.notifications;
                 self.initDB()
-                    .
-                then(self.announceNotices.bind(self));
-
+                .then(self.announceNotices.bind(self));
             }),
 
             peristentNotices: new Listener(self.globalBus, 'notification', false, function(notice) {

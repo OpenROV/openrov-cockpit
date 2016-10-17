@@ -252,6 +252,7 @@
       }
     }];
   };
+
   ROVpilot.prototype.altMenuDefaults = function altMenuDefaults() {
     var self = this;
     return [{
@@ -261,6 +262,7 @@
         }
       }];
   };
+  
   //This pattern will hook events in the cockpit and pull them all back
   //so that the reference to this instance is available for further processing
   ROVpilot.prototype.listen = function listen() {

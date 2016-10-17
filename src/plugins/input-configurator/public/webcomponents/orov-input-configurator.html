@@ -463,7 +463,15 @@ kbd.light, .light-keys kbd, .key.light, .light-keys .key {
                 },
                 onLoadPreset: function(e) {
                     var self = this;
-                    if (self.eventEmitter !== undefined) {
+                    if (self.eventEmitter !== undefined) 
+                    {
+                        if( !this.getCanLoadPreset(self.selectedPreset) )
+                        {
+                            console.log("Cannot load selected preset");
+                            console.log("Defaulting to OpenROV-Default");
+                            this.selectedPreset = 0;
+                        }
+
                         self.eventEmitter.emit('plugin.inputConfigurator.loadPreset', self.presets[self.selectedPreset],
                             function() {
                                 self.set('presetLoaded', true);
@@ -498,6 +506,12 @@ kbd.light, .light-keys kbd, .key.light, .light-keys .key {
                 onSavePreset: function() {
                     var self = this;
                     if (self.eventEmitter) {
+                        
+                        if(!this.getCanSavePreset(self.selectedPreset))
+                        {
+                            console.log("Cannot save selected preset. Defaulting to current-session");
+                            self.selectedPreset = 1;
+                        }
                         self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.presets[self.selectedPreset]);
                         self.set('saveNewPreset', false);
                     }

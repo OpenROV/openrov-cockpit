@@ -60,7 +60,10 @@
             is: 'orov-notifications',
             properties: {
                 notices: {
-                    type: Array
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
                 },
                 defaultPanel: {
                     type: String,

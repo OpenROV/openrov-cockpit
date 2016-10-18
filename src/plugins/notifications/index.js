@@ -1,6 +1,6 @@
-const log = require('Debug')('log:Notifications');
-const trace = require('Debug')('trace:Notifications');
-const debug = require('Debug')('debug:Notifications');
+const log = require('debug')('log:Notifications');
+const trace = require('debug')('trace:Notifications');
+const debug = require('debug')('debug:Notifications');
 const nedb = require('nedb');
 const path = require('path');
 const bluebird = require('bluebird');
@@ -23,13 +23,14 @@ class Notifications {
             settings: new Listener(self.globalBus, 'settings-change.notifications', true, function(settings) {
                 self.settings = settings.notifications;
                 self.initDB()
-                    .
-                then(self.announceNotices.bind(self));
-
+                .then(self.announceNotices.bind(self));
             }),
 
             peristentNotices: new Listener(self.globalBus, 'notification', false, function(notice) {
-                self.cockpitBus.emit('plugin.notification.notify', notice);
+                self.cockpitBus.emit('plugin.notification.notify', {
+                    timestamp: Date.now(),
+                    notice: notice
+                });
                 if (!self.db) {
                     return; //ignore persistening if the db is not ready
                 }
@@ -98,6 +99,10 @@ class Notifications {
     initDB() {
         var self = this;
         return bluebird.try(function() {
+            if (self.db){
+                //Only initialize once, changes to settings used by nedb will requires a process restart.
+                return;
+            }
             if (process.env.NODE_ENV == "development") {
                 self.db = new nedb();
                 bluebird.promisifyAll(self.db);

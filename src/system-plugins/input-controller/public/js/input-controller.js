@@ -17,32 +17,9 @@
     self.controllers.push(new inputController.Gamepad(cockpit));
 
     self.checkDuplicates = function () {
-      var commandBindings = [];
-      var duplicateInformation = [];
-      for (var command in self.registeredCommands) {
-        if (self.registeredCommands[command].active) {
-          for (var binding in self.registeredCommands[command].bindings) {
-            commandBindings.push({
-              value: binding + ':' + self.registeredCommands[command].bindings[binding],
-              name: self.registeredCommands[command].name
-            });
-          }
-        }
-      }
-      commandBindings.forEach(function (binding) {
-        commandBindings.forEach(function (checkBinding) {
-          if (binding === checkBinding)
-            return;
-          if (binding.value === checkBinding.value) {
-            duplicateInformation.push('Command name: \'' + binding.name + '\' Binding: ' + binding.value);
-          }
-        });
-      });
-      if (duplicateInformation.length > 0) {
-        self.cockpit.emit('plugin-input-controller-duplicates', duplicateInformation);
-        console.log('Found duplicate commands: \n' + duplicateInformation.join('\n'));
-      }
-    };
+      console.log("Checking for duplicates");
+    }
+
     return self;
   };
 
@@ -144,46 +121,111 @@
       }
     });
     
-    this.cockpit.on('InputController.register', function (controls, fn) {
+    //Register control callback
+    this.cockpit.on('InputController.register', function(controls, fn) 
+    {
+      //Check to make sure we got a valid controls handle
+      if( self.isUndefined(controls) )
+      {
+        console.error("Input Controller was asked to register an undefined control!");
+        return;
+      }
+
+      //Act on this request
       self.register(controls);
-      if (typeof fn == 'function') {
+
+      //If there is a function attached, call it
+      if( !self.isUndefined(fn) )
+      {
         fn();
       }
+
     });
-    this.cockpit.on('InputController.updateBinding', function(controls, fn) {
+
+    //Update binding callback
+    this.cockpit.on('InputController.updateBinding', function(controls, fn) 
+    {
+      //Check to make sure we got a valid controls handle
+      if( self.isUndefined(controls) )
+      {
+        console.error("Input Controller was asked to update the binding to an undefined control!");
+        return;
+      }
+
+      //Act on this request
       self.updateBinding(controls);
-      if (typeof(fn)=="function") {
+
+      //If there is a function attached, call it
+      if( !self.isUndefined(fn) )
+      {
         fn();
       }
     });
 
-    this.cockpit.on('InpitController.suspendAll', function(fn) {
-      self.model.commands.forEach(function(command) {
+    //Suspend all callback
+    this.cockpit.on('InpitController.suspendAll', function(fn) 
+    {
+      console.log("Suspending all inputs!");
+
+      self.model.commands.forEach(function(command) 
+      {
         self.suspend(command.name);
       });
-      if (fn) {fn();}
+
+      //If there is a function attached, call it
+      if( !self.isUndefined(fn) )
+      {
+        fn();
+      }
     });
 
-    this.cockpit.on('InpitController.resumeAll', function(fn) {
+    //Resume all callback
+    this.cockpit.on('InpitController.resumeAll', function(fn) 
+    {
+      console.log("Resuming all inputs");
+
+      //Create a handle to the commands
       var commands = self.model.commands;
-      self.model.commands = [];
-      commands.forEach(function(command) {
+
+      //And clear them out
+      self.model.commands.length = 0;
+
+      commands.forEach(function(command) 
+      {
         self.resume(command.name);
       });
-      if (fn) {fn();}
+
+      //If there is a function attached, call it
+      if( !self.isUndefined(fn) )
+      {
+        fn();
+      }
     });
 
-
+    //Plugin loaded callback?
     /* Crawl the plugins looking for those with settings definitions */
-    this.cockpit.loadedPlugins.forEach(function (plugin) {
-      if (plugin.inputDefaults !== undefined) {
-        if (typeof plugin.inputDefaults == 'function') {
+    this.cockpit.loadedPlugins.forEach(function(plugin) 
+    {
+
+      if( !self.isUndefined(plugin.inputDefaults) ) 
+      {
+        if (typeof plugin.inputDefaults === "function") 
+        {
+          //Use the function as registration
           self.register(plugin.inputDefaults());
-        } else {
+        } 
+        else 
+        {
           self.register(plugin.inputDefaults);
         }
       }
+      else
+      {
+        console.error(plugin, "Did not have valid inputDefaults!");
+        return;
+      }
     });
+    
   };
   inputController.InputController.prototype._register = function (control, doCheck) {
     var self = this;
@@ -290,21 +332,15 @@
 
   };
 
-  inputController.InputController.prototype.suspend = function(controlName) {
-    var self = this;
-    self.previouslyActiveCommands = self.model.commands
-      .filter(function(command) {return command.active});
-
-     self.controllers.forEach(function (controller) {
-       controller.reset();
-     });
+  //Currently these functions do not do anything becasue they cause an infinite loop
+  inputController.InputController.prototype.suspend = function(controlName) 
+  {
+    console.log("Suspend called for:", controlName);
   };
 
-  inputController.InputController.prototype.resume = function(controlName) {
-    var self = this;
-    self.previouslyActiveCommands.forEach(function(command) {
-      self.register(command);
-    })
+  inputController.InputController.prototype.resume = function(controlName) 
+  {
+    console.log("Resume called for:", controlName);
   };
 
 

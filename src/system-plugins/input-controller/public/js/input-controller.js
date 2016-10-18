@@ -8,8 +8,8 @@
       commands: [] 
     };
 
-    self.registerdCommands = {};
-    self.registerdControls = {};
+    self.registeredCommands = {};
+    self.registeredControls = {};
     
     // Add our known controllers
     self.controllers = [];
@@ -19,12 +19,12 @@
     self.checkDuplicates = function () {
       var commandBindings = [];
       var duplicateInformation = [];
-      for (var command in self.registerdCommands) {
-        if (self.registerdCommands[command].active) {
-          for (var binding in self.registerdCommands[command].bindings) {
+      for (var command in self.registeredCommands) {
+        if (self.registeredCommands[command].active) {
+          for (var binding in self.registeredCommands[command].bindings) {
             commandBindings.push({
-              value: binding + ':' + self.registerdCommands[command].bindings[binding],
-              name: self.registerdCommands[command].name
+              value: binding + ':' + self.registeredCommands[command].bindings[binding],
+              name: self.registeredCommands[command].name
             });
           }
         }
@@ -45,6 +45,9 @@
     };
     return self;
   };
+
+  //Helper function to check if an object is undefined
+  inputController.InputController.pro
 
   //Interface to internal registration of controls
   inputController.InputController.prototype.register = function(control) 
@@ -135,7 +138,7 @@
       if (aControl === undefined)
         return;
       var command = new inputController.Command(aControl);
-      self.registerdCommands[command.name] = command;
+      self.registeredCommands[command.name] = command;
       self.model.commands.push(command);
       self.cockpit.emit('InputController.registeredCommand', command);
       console.log('InputController: Registering control ' + command.name);
@@ -143,7 +146,7 @@
         if (command.active) {
           controller.register(command);
           for (var property in command.bindings) {
-            self.registerdControls[property + ':' + command.bindings[property]] = command;
+            self.registeredControls[property + ':' + command.bindings[property]] = command;
           }
         }
       });
@@ -158,11 +161,11 @@
     var controlsToRemove = [].concat(controlName);
     // controlName could be a single object or an array
     controlsToRemove.forEach(function (control) {
-      delete self.registerdCommands[control];
+      delete self.registeredCommands[control];
       for (var property in control.bindings) {
         //it is possible that a different control actually owns a particular binding
-        if (self.registerdControls[property + ':' + control.bindings[property]] === control) {
-          delete self.registerdControls[property + ':' + control.bindings[property]];
+        if (self.registeredControls[property + ':' + control.bindings[property]] === control) {
+          delete self.registeredControls[property + ':' + control.bindings[property]];
         }
       }
     });
@@ -170,8 +173,8 @@
       controller.reset();
     });
     var commandsToRegister = [];
-    for (var command in self.registerdCommands) {
-      commandsToRegister.push(self.registerdCommands[command]);
+    for (var command in self.registeredCommands) {
+      commandsToRegister.push(self.registeredCommands[command]);
     }
     self.model.commands.length = 0;
     self._register(commandsToRegister, false);
@@ -180,12 +183,12 @@
     var self = this;
     var controlsToActivate = [].concat(controlName);
     controlsToActivate.forEach(function (commandName) {
-      var command = self.registerdCommands[commandName];
+      var command = self.registeredCommands[commandName];
       command.replaced = [];
       for (var property in command.bindings) {
-        if (self.registerdControls[property + ':' + command.bindings[property]] !== undefined) {
-          console.log('There is a conflict with ' + self.registerdControls[property + ':' + command.bindings[property]].name);
-          command.replaced.push(self.registerdControls[property + ':' + command.bindings[property]]);
+        if (self.registeredControls[property + ':' + command.bindings[property]] !== undefined) {
+          console.log('There is a conflict with ' + self.registeredControls[property + ':' + command.bindings[property]].name);
+          command.replaced.push(self.registeredControls[property + ':' + command.bindings[property]]);
         }
       }
       command.active = true;
@@ -197,7 +200,7 @@
     var self = this;
     var controlsToDeactivate = [].concat(controlName);
     controlsToDeactivate.forEach(function (commandName) {
-      var command = self.registerdCommands[commandName];
+      var command = self.registeredCommands[commandName];
       if (command) {
         command.active = false;
         self.unregister(command);
@@ -218,7 +221,7 @@
     var controlsToUpdate = [].concat(controls);
     controlsToUpdate.forEach(function(control) {
       self.deactivate(control.name);
-      var command = self.registerdCommands[control.name];
+      var command = self.registeredCommands[control.name];
       if (command) {
         for(var property in command.bindings) {
             if (control.bindings[property] != undefined)
@@ -299,12 +302,12 @@
 //       var commandBindings = [];
 //       var duplicateInformation = [];
 
-//       for (var command in self.registerdCommands) {
-//         if (self.registerdCommands[command].active) {
-//           for (var binding in self.registerdCommands[command].bindings) {
+//       for (var command in self.registeredCommands) {
+//         if (self.registeredCommands[command].active) {
+//           for (var binding in self.registeredCommands[command].bindings) {
 //             commandBindings.push({
-//               value: binding + ':' + self.registerdCommands[command].bindings[binding],
-//               name: self.registerdCommands[command].name
+//               value: binding + ':' + self.registeredCommands[command].bindings[binding],
+//               name: self.registeredCommands[command].name
 //             });
 //           }
 //         }

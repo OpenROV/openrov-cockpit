@@ -99,9 +99,20 @@
 
   InputConfigurator.prototype.sendToInputController = function (mapping) {
     var self = this;
-    var control = { name: mapping.name, bindings: {}};
-    mapping.bindings.forEach(function(aBinding) { control.bindings[aBinding.name] = aBinding.binding })
-    self.cockpit.emit('InputController.updateBinding', control, function() {  console.log('done');  });
+
+    var control = { 
+      name: mapping.name, 
+      bindings: {}
+    };
+    
+    mapping.bindings.forEach(function(aBinding) {
+      control.bindings[aBinding.name] = aBinding.binding 
+    })
+    
+    console.log("Sending update binding call");
+    self.cockpit.emit('InputController.updateBinding', control, function() {  
+      console.log('done');  
+    });
   };
 
   InputConfigurator.prototype.loadSettings = function (settings, loaded) {
@@ -144,6 +155,7 @@
 
   InputConfigurator.prototype.loadDefaultMapping = function (callback) {
     var self = this;
+    console.log("THIS SUCKs");
     self.cockpit.emit('InputController.getCommands', function (commands) {
       var currentMap = commands.map(function (command) {
         var result = { name: command.name, bindings: [], description: command.description, defaults: command.defaults };

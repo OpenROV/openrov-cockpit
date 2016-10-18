@@ -3,13 +3,19 @@
   inputController.InputController = function (cockpit) {
     var self = this;
     self.cockpit = cockpit;
-    self.model = { commands: [] };
+    
+    self.model = { 
+      commands: [] 
+    };
+
     self.registerdCommands = {};
     self.registerdControls = {};
+    
+    // Add our known controllers
     self.controllers = [];
-    // add our known controllers
     self.controllers.push(new inputController.Keyboard(cockpit));
     self.controllers.push(new inputController.Gamepad(cockpit));
+
     self.checkDuplicates = function () {
       var commandBindings = [];
       var duplicateInformation = [];
@@ -39,11 +45,18 @@
     };
     return self;
   };
-  inputController.InputController.prototype.register = function (control) {
+
+  //Interface to internal registration of controls
+  inputController.InputController.prototype.register = function(control) 
+  {
+    //Check to make sure that we got a valid control to register
+    
     this._register(control, true);
   };
   
-  inputController.InputController.prototype.commands = function() {
+  //Interface to internal representation of commands
+  inputController.InputController.prototype.commands = function()
+  {
     return this.model.commands();
   };
 
@@ -93,7 +106,7 @@
 
     this.cockpit.on('InpitController.resumeAll', function(fn) {
       var commands = self.model.commands;
-      self.model.commands.length = 0;
+      self.model.commands = [];
       commands.forEach(function(command) {
         self.resume(command.name);
       });
@@ -135,7 +148,7 @@
         }
       });
     });
-    controlsToRegister.length = 0;
+    self.controlsToRegister = [];
     if (doCheck) {
       self.checkDuplicates();
     }
@@ -237,3 +250,400 @@
 
   window.Cockpit.plugins.push(inputController.InputController);
 }(window, document));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// (function (window, document) {
+//   var inputController = namespace('systemPlugin.inputController');
+//   inputController.InputController = function (cockpit) {
+    
+//     var self = this;
+//     self.cockpit = cockpit;
+    
+//     self.model = { 
+//       commands: [] 
+//     };
+    
+
+    
+//     self.registeredCommands = {};
+//     self.registeredControls = {};
+    
+//     //Add the known controllers
+//     self.controllers = [];
+//     self.controllers.push(new inputController.Keyboard(cockpit));
+//     self.controllers.push(new inputController.Gamepad(cockpit));
+
+
+//     /* Helper functions */
+
+//     //Checks if a parameter is undefined
+//     self.isParameterValid = function(param) {
+//       return (typeof param === "undefined");
+//     }
+
+//     self.checkDuplicates = function () {
+//       var commandBindings = [];
+//       var duplicateInformation = [];
+
+//       for (var command in self.registerdCommands) {
+//         if (self.registerdCommands[command].active) {
+//           for (var binding in self.registerdCommands[command].bindings) {
+//             commandBindings.push({
+//               value: binding + ':' + self.registerdCommands[command].bindings[binding],
+//               name: self.registerdCommands[command].name
+//             });
+//           }
+//         }
+//       }
+//       commandBindings.forEach(function (binding) {
+//         commandBindings.forEach(function (checkBinding) {
+//           if (binding === checkBinding)
+//             return;
+//           if (binding.value === checkBinding.value) {
+//             duplicateInformation.push('Command name: \'' + binding.name + '\' Binding: ' + binding.value);
+//           }
+//         });
+//       });
+//       if (duplicateInformation.length > 0) {
+//         self.cockpit.emit('plugin-input-controller-duplicates', duplicateInformation);
+//         console.log('Found duplicate commands: \n' + duplicateInformation.join('\n'));
+//       }
+//     };
+
+
+
+//     inputController.InputController.prototype.register = function (control) {
+//       this._register(control, true);
+//     };
+
+//     inputController.InputController.prototype.commands = function() {
+//       return this.model.commands();
+//     };
+
+//     /* Crawl the plugins looking for those with settings definitions */
+//     this.cockpit.loadedPlugins.forEach(function (plugin) {
+//       if (plugin.inputDefaults !== undefined) {
+//         if (typeof plugin.inputDefaults == 'function') {
+//           self.register(plugin.inputDefaults());
+//         } else {
+//           self.register(plugin.inputDefaults);
+//         }
+//       }
+//     });
+//     console.log("Registered inputmanager");
+//     console.log(self);
+//     return self;
+//   };
+
+//   inputController.isParameterValid= function(param) {
+//       return (typeof param === "undefined");
+//   };
+
+//   /* Listeners and callbacks */
+//   inputController.InputController.prototype.listen = function listen() 
+//   {
+//     var self = this;
+
+//     //Activate callback
+//     this.cockpit.on('InputController.activate', function(controls, fn) {
+//       console.log("InputController.activate called:", controls);
+
+//       if(!isParameterValid(controls))
+//       {
+//         console.error("Input Controller was asked to activate an undefined control!");
+//         return;
+//       }
+
+//       //Activate the control passed to the plugin
+//       self.activateControls(controls);
+      
+//       //If there is a function attached, activate it
+//       if(fn !== undefined)
+//       {
+//         fn();
+//       }
+//     });
+
+//     //Deactivate callback
+//     this.cockpit.on('InputController.deactivate', function(controls, fn) {
+//       console.log("InputController.deactivate called:", controls);
+
+//       if(!isParameterValid(controls))
+//       {
+//         console.error("Input Controller was asked to deactivate an undefined control!");
+//         return;
+//       }
+
+//       //deactivate the control passed to the plugin
+//       self.deactivateControl(controls);
+      
+//       //If there is a function attached, activate it
+//       if(fn !== undefined)
+//       {
+//         fn();
+//       }
+//     });
+
+//     //getCommands callback
+//     this.cockpit.on('InputController.getCommands', function(fn) {
+//       console.log("InputController.getCommands called.");
+      
+//       if(fn !== undefined)
+//       {
+//         //Return a clone of the commands so users cannot change things
+//         var commands = self.model.commands.map(function(command) {
+//           return {
+//             name: command.name,
+//             description: command.description,
+//             bindings: command.bindings,
+//             defaults: command.defaults
+//           }
+//         });
+
+//         //Call the attached functions
+//         fn(commands);
+//       }
+//       else
+//       {
+//         console.log("No function provided to InputController.getCommands");
+//         return;
+//       }
+
+//     });
+
+//     //Register callback
+//     this.cockpit.on('InputController.register', function(controls, fn) {
+//       console.log("InputController.register called:", controls);
+
+//       //Check to make sure we have a valid set of controls
+//       if(typeof controls === "undefined")
+//       {
+//         console.error("Input Controller was asked to register an undefined control!");
+//         return;
+//       }
+
+//       //Call the internal register function
+//       self.registerControl(controls);
+
+//       //If there is a function attached, activate it
+//       if(fn !== undefined)
+//       {
+//         fn();
+//       }
+//     });
+
+//     //Update bindings callback
+//     this.cockpit.on('InputController.updateBinding', function(controls, fn) {
+//       console.log("InputController.updateBinding called:", controls);
+
+//       //Check to make sure we have a valid set of controls
+//       if(typeof controls === "undefined")
+//       {
+//         console.error("Input Controller was asked to update the bindings to an undefined control!");
+//         return;
+//       }
+
+//       //Call the internal register function
+//       self.updateControlBinding(controls);
+
+//       //If there is a function attached, activate it
+//       if(fn !== undefined)
+//       {
+//         fn();
+//       }
+//     });
+
+//     //Suspend all callback
+//     this.cockpit.on('InputController.suspendAll', function(fn) {
+//       console.log("InputController.suspendAll called.");
+    
+//       //If there is a function attached, activate it
+//       if(fn !== undefined)
+//       {
+//         fn();
+//       }  
+//     });
+
+//     //Resume all callback
+//     this.cockpit.on('InputController.resumeAll', function(fn) {
+//       console.log("InputController.resumeAll called.");
+//     });
+//   };
+
+
+//   /*Member functions*/
+//   //Activates a specificed control
+//   inputController.InputController.prototype.activateControls = function(controls) {
+//     var self = this;
+//     console.log("InputController.activateControls called");
+
+//     //Check to make sure we have a valid set of controls
+//     if(typeof controls === "undefined")
+//     {
+//       console.error("InputController.activateControls() was asked to activate an undefined control!");
+//       return;
+//     }
+
+//     //The controls can be an array, so let's treat it as such
+//     var controlsToActivate = [].concat(controls);
+//     controlsToActivate.forEach(function(control) {
+
+//     });
+
+//   };
+
+//   //Updates the binding to a specificed control
+//   inputController.InputController.prototype.updateControlBinding = function(controls) {
+//     var self = this;
+
+//     //Make sure we got a valid control set
+//     if(typeof controls === "undefined")
+//     {
+//       console.error("Input Controller was asked to update bindings to an undefined control!");
+//       return;
+//     }
+
+//     console.log("Update binding for:", controls);
+
+//     //The controls can be an array, so let's treat it as such
+//     var controlsToUpdate = [].concat(controls);
+//     controlsToUpdate.forEach(function(control) {
+      
+//       //First, deactivate the current control
+//       self.deactivateControl(control);
+
+//       //Then, try to grab a handle to it
+//       var registeredControl = self.registeredControls[control.name];
+      
+//       if(typeof registeredControl === "undefined")
+//       {
+//         console.log("This control is not registered with us. Let's register it.");
+//         self.registerControl(control);
+//       }
+//       else
+//       {
+//         console.log("This control is already registered with us");
+//       }
+//     });
+
+//   };
+
+//   //Deactivates the specificed control
+//   inputController.InputController.prototype.deactivateControl = function(control) {
+//     var self = this;
+
+//     //Make sure we got a valid control set
+//     if(typeof control === "undefined")
+//     {
+//       console.error("Input Controller was asked to deactivate an undefined control!");
+//       return;
+//     }
+
+//     console.log("Deactivating control:", control);
+
+//     //Grab a handle to the internal representation of the control
+//     var registeredControl = self.registeredControls[control.name];
+    
+//     //Check if it is undefined
+//     if(typeof registeredControl === "undefined")
+//     {
+//       console.log("This control is undefined. This is not a problem, yet");
+//       return;
+//     }
+
+//     registeredControl.active = false;
+//     self.unregisterControl(registeredControl);
+//   };
+
+//   //Registers the control with us
+//   inputController.InputController.prototype.registerControl = function(control) {
+//     var self = this;
+
+//     //Make sure we got a valid control to register
+//     if(typeof control === "undefined")
+//     {
+//       console.error("Input Controller was asked to register an undefined control!");
+//       return;
+//     }
+
+//     console.log("Trying to register", control);
+
+//     //Create a new command
+//     //This can't be right? That is a whole lot of news
+//     var commandToAdd = new inputController.Command(control);
+//     commandToAdd.active = true;
+    
+//     //Add our newly created command to our local array
+//     self.registeredControls[commandToAdd.name] = commandToAdd;
+
+//     //And update our model that we give to users
+//     self.model.commands.push(commandToAdd);
+
+//     //Let the rest of cockpit know that we just registered a new command
+//     self.cockpit.emit('InputController.registeredCommand', commandToAdd);
+
+//     //For each of the controllers, update the bindings
+//     console.log("Registering:", commandToAdd);
+//     self.controllers.forEach(function(controller) {
+//       controller.register(commandToAdd);
+//     });
+
+//   };
+
+//   //Unregisters a control with us
+//   inputController.InputController.prototype.unregisterControl = function(control) {
+//     var self = this;
+
+//     //Make sure we got a valid control to register
+//     if(typeof control === "undefined")
+//     {
+//       console.error("Input Controller was asked to unregister an undefined control!");
+//       return;
+//     }
+
+//     //Remove it from the registered controls
+//     //Allegedly, an undefined is faster than a delete. So just undefine it
+//     var elementToRemove = control.name;
+//     self.registeredControls[elementToRemove] = undefined;
+
+//     //And remove it from the model
+//     $.each(self.model.commands, function(i) {
+//       if(self.model.commands[i].name === elementToRemove) {
+//           self.model.commands.splice(i,1);
+//           return false;
+//       }
+//     });
+//   };
+
+
+//   //Suspend a control
+//   inputController.InputController.prototype.suspend = function(control) {
+//     var self = this;
+
+//     console.log("Suspending:", control);
+//   }
+
+//   //Resume all operation
+//   inputController.InputController.prototype.resume = function(control) {
+//     var self = this;
+
+//     console.log("Resuming:", control);
+//   }
+
+
+//   window.Cockpit.plugins.push(inputController.InputController);
+// }(window, document));

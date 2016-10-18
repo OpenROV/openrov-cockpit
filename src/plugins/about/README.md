@@ -1,0 +1,1 @@
+This plugin enables the ability to report and dump information about the ROV that is useful in debugging issues.

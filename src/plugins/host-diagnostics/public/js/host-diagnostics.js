@@ -1,5 +1,6 @@
 (function (window, $, undefined) {
   'use strict';
+
   var HostDiagnostics;
   HostDiagnostics = function HostDiagnostics(cockpit) {
     console.log('Loading HostDiagnostics plugin in the browser.');
@@ -18,6 +19,7 @@
     this.cockpit.rov.onAny(function () {
       self.rov_events++;
     });
+
     setInterval(function () {
       self.cockpit.emit('plugin.host-diagnostics.event-counts', {
         cockpit: self.cockpit_events,
@@ -42,4 +44,6 @@
   HostDiagnostics.prototype.toggleDisplay = function toggleDisplay() {
   };
   window.Cockpit.plugins.push(HostDiagnostics);
+
+  
 }(window, jQuery));

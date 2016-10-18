@@ -36,7 +36,15 @@ var PluginLoader = function () {
       console.log('Loading ' + plugin + ' plugin.');
       var pluginInstance = null;
       return Promise.try(function () {
-        return require(path.join(dir, plugin))(plugin, deps);
+        var result;
+        try{
+          result= require(path.join(dir, plugin))(plugin, deps)
+        }
+        catch(ex){
+          console.log(JSON.stringify({message:ex.message,stack:ex.stack}));
+          throw ex;
+        };
+        return result;
       }).then(function (inst) {
         pluginInstance = inst;
         // Check to see if plugin's index.js was loaded
@@ -157,7 +165,8 @@ var PluginLoader = function () {
     }).catch(function (err) {
       // If a required subsection, rethrow error
       if (required) {
-        throw new Error('Error loading critical plugin section: ' + err.message);
+        throw err;
+//        throw new Error('Error loading critical plugin section: ' + JSON.stringify(err));
       } else {
         console.log('Error loading non-critical plugin section: ' + err.message);
       }

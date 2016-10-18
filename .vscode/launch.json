@@ -23,11 +23,12 @@
 				"CPU_MOCK": "123MOCK",
 				"GEO_MOCK": "true",
 				"MJPG_MOCK": "false",
-				"DEBUG": "bridge, mcu, cpu",
+				"DEBUG": "bridge, mcu, cpu, *:Notifications",
 				"port": 8080,
 				"configfile": "/tmp/rovconfig.json",
 				"plugins__ui-manager__selectedUI": "new-ui",
-				"pluginsDownloadDirectory": "/tmp/plugins"
+				"pluginsDownloadDirectory": "/tmp/plugins",
+				"DATADIR": "/tmp"
 			},
             "console": "internalConsole",			
 			"sourceMaps": false,

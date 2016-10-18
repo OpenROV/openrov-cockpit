@@ -1,0 +1,35 @@
+<style>
+    #update-panel {
+        position:absolute;
+        top:0px;
+        left:0px;
+        width:100%;
+        height:100%;
+        z-index:9999;
+        background-color:white;
+        display:flex;
+        flex-direction: column;
+    }
+    body {
+        height:100%;
+    }
+    .brand {
+        height:20px;
+        width:200px;
+        margin: 8px;
+    }
+    paper-material{
+        padding-bottom:3px;
+    }
+</style>
+<div id="update-panel">
+<div style="background-color:black;flex: 0 0; margin:3px; padding:3px; justify-content: flex-start; align-items: center; ">
+<img alt="OpenROV" src="themes/OpenROV/img/openrov.png" class="brand"><h4 style="color:white;float:right;">Updates in Progress</h4>
+</div>
+<paper-material elevation="1">
+<p>This feature is in Beta.  Anytime firmware for any of the MCUs on the system need to be updated, this screen will track the update.  When complete this screen will automatically redirect back to cockpit.  If the system failes to apply an updated you can use the retry button to try again.  The download button will download logs that can be submitted with a bug report.</p>
+</paper-material>
+<paper-material elevation="1">
+    <orov-software-update-progress style="flex: auto;" event-emitter="{{cockpitEventEmitter}}"></orov-software-update-progress>
+</paper-material>
+</div>

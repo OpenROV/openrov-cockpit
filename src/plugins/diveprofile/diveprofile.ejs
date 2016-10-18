@@ -1,0 +1,10 @@
+
+<link rel="import" href="components/paper-button/paper-button.html">
+<div class="settings-block">
+
+  <h4>{{__('Callibration')}}</h4>
+  
+ <!-- NOT ENABLED RIGHT NOW
+  <a href="#" class="btn btn-default" id="callibrate_compass">{{__('Callibrate Compass')}}</a>-->
+  <paper-button raised onclick="window.cockpit.emit('plugin.diveprofile.depth.zero')">{{__('Zero Depth')}}</paper-button>
+</div>

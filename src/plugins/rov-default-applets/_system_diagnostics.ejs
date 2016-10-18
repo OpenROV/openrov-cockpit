@@ -1,0 +1,50 @@
+<style>
+    paper-button {
+
+    }
+    paper-material{
+        margin-bottom:10px;
+        background-color:white;
+    }
+    .back-surface {
+        background-color:#f9f2f2;
+    }
+</style>
+<div class="back-surface">
+<paper-material  elevation="1">
+<fieldset>
+<legend>Micro Controller Diags:</legend>    
+<paper-button raised id="resetMCUButton" on-tap="_resetMCU">Reset MCU</paper-button>
+</fieldset>
+</paper-material>
+<script>
+var template = $('#t')[0];
+template._resetMCU = function(){
+    template.cockpitEventEmitter.emit("mcu.reset");
+}
+</script>
+
+<paper-material  elevation="1">
+<fieldset>
+<legend>Browser events:</legend>    
+<orov-events-graph event-emitter="{{cockpitEventEmitter}}"/>
+</fieldset>
+</paper-material>
+
+<paper-material  elevation="1">
+<fieldset>
+<legend>Browser responsiveness:</legend>   
+<p>This should ideally be at 30 fps which means the global thread loop is servicing our test timer on time.</p>
+    <javascript-latency style="height: 40px;display: block;"></javascript-latency>
+</fieldset>
+</paper-material>
+
+
+<paper-material  elevation="1">
+<fieldset>
+<legend>Simulate Conditions:</legend>  
+<orov-software-update-progress-tester  event-emitter="{{cockpitEventEmitter}}"></orov-software-update-progress-tester>
+</fieldset>
+</paper-material>
+</div>
+

@@ -72,7 +72,6 @@ ga('send', 'pageview');
 
   <script type='text/javascript' src="js/libs/eventemitter2.js"></script>
   <!--<script type='text/javascript' src="js/libs/bootstrap.min.js"></script>-->
-  <script type='text/javascript' src="components/bootstrap/dist/js/bootstrap.js"></script>
 
   <script type='text/javascript' src='js/libs/gamepad.js'></script>
   <script type='text/javascript' src='js/utilities.js'></script>
@@ -121,6 +120,9 @@ ga('send', 'pageview');
 <!-- Temporarily disabled pending solution for relative pathing -->
 <link rel="import" href="components/app-route/app-route.html">
 <link rel="import" href="components/app-route/app-location.html">
+<link rel="import" href="components/software-update-alert/orov-software-update-router.html">
+<orov-software-update-router event-emitter="{{cockpitEventEmitter}}" applet="{{routedata.page}}"></orov-software-update-router>
+
 <app-location use-hash-as-path url-space-regex="^/#/" route={{route}}></app-location>
 <app-route route="{{route}}" pattern="/:page" data={{routedata}} active="{{homeActive}}"></app-route>
 

@@ -1,0 +1,124 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+<link rel="import" href="../iron-list/iron-list.html">
+<link rel="import" href="../paper-material/paper-material.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<dom-module name="orov-software-update-progress">
+  <style>
+      iron-list {
+      min-height: 100px;
+      height:100%;
+    }    
+    .time{
+        color:grey;
+    }
+    .msg{
+        display:inline;
+    }
+    .msg .error{
+       color:red; 
+    }
+    .container {
+        height:80%;
+    }
+    .list-container{
+        height:90%;
+    }
+    :host{
+        display:block;
+    }
+  </style>
+  <template>
+      <div style="height:100%;width:100%;position:fixed;">
+      <paper-material class="container" elevation="1">
+      <h2>Log:</h2>
+      <div class="list-container">
+      <iron-list id="list" items="[[updateLog]]" as="item">
+            <template>
+            <div>
+                <span class="time">[ [[_formatTime(item.time)]] ]</span>&nbsp;<pre class="msg">[[item.msg]]</pre>
+            </div>
+            </template>         
+      </iron-list>
+      </div>
+      </paper-material>      
+      <div class="buttons">
+          <paper-button disabled$="{{!_showRecoveryButtons(updateState)}}" on-tap="_handleRetry">Retry</paper-button>
+          <paper-button disabled$="{{!_showRecoveryButtons(updateState)}}" on-tap="_handleDownload">Download Logs</paper-button>
+      </div>
+      </div>
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        is: "orov-software-update-progress",
+        properties: {
+            updateInProgress:{type:Boolean, observer:'_handleUpdateInProgress'},
+            updateLog:{type:Array, value:function(){return [];}},
+            autoScroll:{type:Boolean, value: function(){return true}},
+            updateState:{type:String}
+        },
+        behaviors: [namespace('behaviors').oROVStandard],
+        attached: function () {
+        },
+        registerEmitterHandlers: function(emitter){
+          var self = this;
+          emitter.withHistory.on("plugin.updateManager.status",function(status){
+              self.set('updateState',status.progress);
+              switch(status.progress){
+                  case "InProgress":
+                    self.set('updateInProgress',true);
+                    self.log(status.message);
+                  break;
+                  case "Complete":
+                    self.set('updateInProgress',false);
+                    self.log(status.message);                  
+                  break;
+                  case "Failed":
+                    self.set('updateInProgress',false);
+                    self.error(status.message);                      
+                  break;
+                  default:
+                   throw new Error("plugin.updateManager.status.progress value of " + status.progress + " is invalid");
+              }
+          })
+
+          emitter.on("plugin.updateManager.log",function(log){
+              self.log(log);
+          })
+
+          emitter.on("plugin.updateManager.error",function(error){
+              self.error(error);
+          })          
+
+        },
+        log: function(msg){
+            this.push('updateLog',{time:Date.now(),msg:msg});
+            if (this.autoScroll){
+                this.$.list.scrollToIndex(this.updateLog.length-1);
+            }
+        },
+        error: function(msg){
+            this.push('updateLog',{time:Date.now(),msg:msg});            
+        },
+        _handleUpdateInProgress: function(newvalue,oldvalue){
+            var self=this;
+        },
+        _formatTime:function(ms){
+            return new Date(ms).toLocaleTimeString()
+        },
+        _handleRetry:function(){
+            this.eventEmitter.emit("plugin.updateManager.retry");
+        },
+        _handleDownload:function(){
+            this.eventEmitter.emit("plugin.updateManager.download");
+        },
+        _showRecoveryButtons:function(updateState){
+            return updateState=="Failed";
+        }
+                        
+      })
+    })();
+  </script>
+
+</dom-module>

@@ -27,7 +27,10 @@ class Notifications {
             }),
 
             peristentNotices: new Listener(self.globalBus, 'notification', false, function(notice) {
-                self.cockpitBus.emit('plugin.notification.notify', notice);
+                self.cockpitBus.emit('plugin.notification.notify', {
+                    timestamp: Date.now(),
+                    notice: notice
+                });
                 if (!self.db) {
                     return; //ignore persistening if the db is not ready
                 }
@@ -96,6 +99,10 @@ class Notifications {
     initDB() {
         var self = this;
         return bluebird.try(function() {
+            if (self.db){
+                //Only initialize once, changes to settings used by nedb will requires a process restart.
+                return;
+            }
             if (process.env.NODE_ENV == "development") {
                 self.db = new nedb();
                 bluebird.promisifyAll(self.db);

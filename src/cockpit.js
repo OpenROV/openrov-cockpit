@@ -68,7 +68,10 @@ var mkdirpAsync = Promise.promisify(require('mkdirp'));
 
 // Setup required directories
 mkdirp(CONFIG.preferences.get('photoDirectory'));
-process.env.NODE_ENV = true;
+if (!process.env.NODE_ENV){
+  process.env.NODE_ENV = "production";
+}
+
 
 // NOTE: If you don't increase the default max listeners, you can get a potential memory leak warning
 var globalEventLoop = require('./static/js/eventEmitterStoreAndForward.js')(new EventEmitter2());

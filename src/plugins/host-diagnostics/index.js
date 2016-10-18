@@ -13,6 +13,28 @@ function HostDiagnostics(name, deps) {
         self.deps.globalEventLoop.emit('mcu.status',{cpu:v});
       });
     }, 1000); 
+
+
+    var blockDeltaMS = 10; //reporting threshold in ms 
+    var interval = 500;  // Check intervacl
+    var simpleMovingAverage = 0;
+    var smaSamples = 10.0;
+    var deltaMSprior = 0;
+    var intervalTimer = setInterval(function() {
+        var last = process.hrtime();          // replace Date.now()        
+        setImmediate(function() {
+            var delta = process.hrtime(last); // seconds,nanoseconds
+            var deltaMS = delta[0]*1000+delta[1]/1000000;
+            var deltaNS = delta[0]*1000000000+delta[1];
+            simpleMovingAverage += deltaMS/smaSamples - ((deltaMSprior)/smaSamples); 
+            deltaMSprior = deltaMS;
+            if (simpleMovingAverage > blockDeltaMS){
+                self.deps.globalEventLoop.emit("plugin.host-diagnostics.loopDelay", simpleMovingAverage);
+                self.deps.cockpit.emit("plugin.host-diagnostics.loopDelay", simpleMovingAverage);
+            }
+        });
+    }, interval);
+
 }
 module.exports = function (name, deps) {
   return new HostDiagnostics(name, deps);

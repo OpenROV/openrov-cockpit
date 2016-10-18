@@ -1,12 +1,10 @@
-const log = require('Debug')('log:about');
-const trace = require('Debug')('trace:about');
-const debug = require('Debug')('debug:about');
+const log = require('debug')('log:about');
+const trace = require('debug')('trace:about');
+const debug = require('debug')('debug:about');
 
 const bluebird = require('bluebird');
 const Listener = require('Listener');
 const execFile = require('child_process').execFile;
-//bluebird.promisify(execAsync);
-
 
 //private functions
 

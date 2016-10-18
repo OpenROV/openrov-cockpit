@@ -54,7 +54,7 @@ template._dumpReport = function(){
     template.cockpitEventEmitter.emit("plugin.about.dumpReport",function(report){
         var result = JSON.parse(report);
         result.browserString=navigator.userAgent;
-        result.timestamp=DateTime.now().toString();
+        result.timestamp=Date.now().toString();
         template.cockpitEventEmitter.emit("plugin.host-diagnostics.getbrowserlogs",function(logs){
             result.console=logs;
             report = JSON.stringify(result);

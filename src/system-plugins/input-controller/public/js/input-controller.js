@@ -47,46 +47,103 @@
   };
 
   //Helper function to check if an object is undefined
-  inputController.InputController.pro
+  inputController.InputController.prototype.isUndefined = function(param)
+  {
+    return(typeof param === "undefined");
+  }
 
   //Interface to internal registration of controls
   inputController.InputController.prototype.register = function(control) 
   {
     //Check to make sure that we got a valid control to register
+    if( this.isUndefined(control) )
+    {
+      console.error("Input Controller was asked to register an undefined control!");
+      return;
+    }
     
     this._register(control, true);
   };
   
-  //Interface to internal representation of commands
+  //Returns a clone of the internal representation of commands
   inputController.InputController.prototype.commands = function()
   {
     return this.model.commands();
   };
 
-  inputController.InputController.prototype.listen = function listen() {
+  //Listeners
+  inputController.InputController.prototype.listen = function listen() 
+  {
     var self = this;
-    this.cockpit.on('InputController.activate', function (controls, fn) {
+    
+    //Activate callback
+    this.cockpit.on('InputController.activate', function (controls, fn) 
+    {
+      //Check to make sure that we got a valid control
+      if( self.isUndefined(controls) )
+      {
+        console.error("Input Controller was asked to activate an undefined control!");
+        return;
+      }
+
+      //Act on this request
       self.acticate(controls);
-      if (fn !== undefined) {
+
+      //If there is a function attached, call it
+      if( !self.isUndefined(fn) )
+      {
         fn();
       }
     });
-    this.cockpit.on('InputController.deactivate', function (controls, fn) {
+
+    //Deactivate callback
+    this.cockpit.on('InputController.deactivate', function(controls, fn) 
+    {
+      
+      //Check to make sure that we got a valid control
+      if( self.isUndefined(controls) )
+      {
+        console.error("Input Controller was asked to deactivate an undefined control!");
+        return;
+      }
+
+      //Act on this request
       self.deactivate(controls);
-      if (fn !== undefined) {
+
+      //If there is a function attached, call it
+      if( !self.isUndefined(fn) )
+      {
         fn();
       }
     });
-    this.cockpit.on('InputController.getCommands',function(fn){
-      if (fn!==undefined){
-          // returning a clone of the commands so users can't just change things.
-          // To update a command send a InputController.updateBinding(controls) message.
-          var commands = self.model.commands.map(function(command) {
-            return { name: command.name, description: command.description, bindings: command.bindings, defaults: command.defaults }
-          });
-          fn(commands);
+
+    //Get commands callback
+    this.cockpit.on('InputController.getCommands', function(fn)
+    {
+      
+      //Check if the function is valid and then act on the request
+      if( !self.isUndefined(fn) )
+      {
+        //Return a clone of the commands
+        var commands = self.model.commands.map(function(command) {
+          return {
+            name: command.name,
+            description: command.description,
+            bindings: command.bindings,
+            defaults: command.defaults
+          }
+        });
+
+        //Call the attached function
+        fn(commands);
+      }
+      else
+      {
+        console.error("Input Controller was asked to return a list of commands, but no function was attached to process the commands");
+        return;
       }
     });
+    
     this.cockpit.on('InputController.register', function (controls, fn) {
       self.register(controls);
       if (typeof fn == 'function') {

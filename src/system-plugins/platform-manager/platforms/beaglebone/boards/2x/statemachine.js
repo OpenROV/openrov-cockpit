@@ -39,7 +39,7 @@ module.exports = function( board )
     {
         var self = this;
 
-        status( "Checking ESCs...", Progress.InProgress );
+        status( "Checking ESCs...", "InProgress" );
 
         // Check to see if ESCs have been flashed before by testing the existence of esc.conf
         fs.statAsync( escConfPath )
@@ -61,7 +61,7 @@ module.exports = function( board )
     {
         var self = this;
 
-        status( "Flashing ESCs...", Progress.InProgress );
+        status( "Flashing ESCs...", "InProgress" );
 
         // First, disconnect the bridge
         self.board.bridge.close();
@@ -97,7 +97,7 @@ module.exports = function( board )
     {
         var self = this;
 
-        status( "Checking if firmware already built...", Progress.InProgress );
+        status( "Checking if firmware already built...", "InProgress" );
 
         // Check to see if ESCs have been flashed before by testing the existence of esc.conf
         fs.statAsync( mcuBinPath )
@@ -117,7 +117,7 @@ module.exports = function( board )
 
     function buildFirmwareHandler(event, from, to)
     {
-        status( "Building firmware...", Progress.InProgress );
+        status( "Building firmware...", "InProgress" );
 
         var self = this;
 
@@ -139,7 +139,7 @@ module.exports = function( board )
 
     function getHashHandler(event, from, to)
     {
-        status( "Fetching firmware hash...", Progress.InProgress );
+        status( "Fetching firmware hash...", "InProgress" );
 
         var self = this;
 
@@ -177,7 +177,7 @@ module.exports = function( board )
 
     function flashMCUHandler(event, from, to)
     {
-        status( "Flashing MCU firmware...", Progress.InProgress );
+        status( "Flashing MCU firmware...", "InProgress" );
 
         var self = this;
 
@@ -199,7 +199,7 @@ module.exports = function( board )
 
     function verifyVersionHandler(event, from, to)
     {
-        status( "Checking current firmware against latest...", Progress.InProgress );
+        status( "Checking current firmware against latest...", "InProgress" );
 
         var self = this;
 
@@ -254,12 +254,12 @@ module.exports = function( board )
 
     function completeHandler(event, from, to)
     {
-        status( "Firmware up to date!", Progress.Complete );
+        status( "Firmware up to date!", "Complete" );
     }
 
     function failHandler(event, from, to)
     {
-        status( "Firmware update failed!", Progress.Failed );
+        status( "Firmware update failed!", "Failed" );
     }
 
     function eFailHandler(event, from, to, msg) 

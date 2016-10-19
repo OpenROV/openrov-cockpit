@@ -17,8 +17,8 @@ function Bridge() {
       autoOpen: true
     });
     
-    var ReadLine = SerialPort.parsers.ReadLine;
-    var parser =serialPort.pipe(ReadLine({delimiter: '\r\n'}));    
+    var Readline = SerialPort.parsers.Readline;
+    var parser =serialPort.pipe(Readline({delimiter: '\r\n'}));    
 
     serialPort.on('open', function () {
       serialConnected = true;

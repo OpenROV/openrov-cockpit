@@ -2,6 +2,7 @@
   'use strict';
   var ROVpilotWire;
   ROVpilotWire = function ROVpilotWire(cockpit) {
+    var self = this;
     console.log('Loading ROVpilot-Wire plugin in the browser.');
     // Instance variables
     this.cockpit = cockpit;
@@ -13,30 +14,40 @@
     this.headingHold_state = {};
     this.headingHold_desiredOn = false;
     this.depthHold_desiredOn = false;
-    //defaults
-    this.settings = { controlResetsSetPoint: false };
-  };
-  ROVpilotWire.prototype.inputDefaults = function inputDefaults() {
-    var self = this;
-    return [
-      {
-        name: 'rovPilot.toggleHeadingHold',
-        description: 'Toggles the heading hold on/off',
-        defaults: { keyboard: 'm' },
-        down: function () {
-          self.cockpit.emit('plugin.rovpilot.headingHold.set-enabled', !self.headingHold_state.enabled);
-        }
+    
+    //Defaults
+    this.settings = { 
+      controlResetsSetPoint: false 
+    };
+
+    this.inputDefaults = [{
+      name: 'rovPilot.toggleHeadingHold',
+      description: 'Toggles the heading hold on/off',
+      defaults: 
+      { 
+        keyboard: 'm', 
+        gamepad: ''
       },
+      down: function()
       {
+        self.cockpit.emit('plugin.rovpilot.headingHold.set-enabled', !self.headingHold_state.enabled)
+      }
+    },
+    {
         name: 'rovPilot.toggleDepthHold',
         description: 'Toggles the depth hold on/off',
-        defaults: { keyboard: 'n' },
-        down: function () {
+        defaults: 
+        { 
+          keyboard: 'n',
+          gamepad: '' 
+        },
+        down: function () 
+        {
           self.cockpit.emit('plugin.rovpilot.depthHold.set-enabled', !self.depthHold_state.enabled);
         }
-      }
-    ];
+    }];
   };
+
   ROVpilotWire.prototype.altMenuDefaults = function altMenuDefaults() {
     var self = this;
     return [

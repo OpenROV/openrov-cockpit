@@ -155,7 +155,6 @@
 
   InputConfigurator.prototype.loadDefaultMapping = function (callback) {
     var self = this;
-    console.log("THIS SUCKs");
     self.cockpit.emit('InputController.getCommands', function (commands) {
       var currentMap = commands.map(function (command) {
         var result = { name: command.name, bindings: [], description: command.description, defaults: command.defaults };

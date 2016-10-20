@@ -18,7 +18,46 @@
 
     self.checkDuplicates = function () {
       console.log("Checking for duplicates");
-    }
+
+      var commandBindings = [];
+      var duplicateInformation = [];
+
+      //Iterate through our current registered commands and populate a list of current bindings
+      for(var command in self.registeredCommands)
+      {
+        if(command.active)
+        {
+          for(var binding in command.bindings)
+          {
+            commandBindings.push({
+              value: binding + ':' + command.bindings[binding],
+              name: command.name
+            });
+          }
+        }
+      }
+
+      //Now, iterate through that binding list and check for duplicates
+      commandBindings.forEach(function(binding) {
+        commandBindings.forEach(function(checkBinding) {
+          if(binding === checkBinding)
+          {
+            return;
+          }
+          if(binding.value === checkBinding.value)
+          {
+            duplicateInformation.push('Command name: \'' + binding.name + '\' Binding: ' + binding.value);
+          }
+        });
+      });
+
+      //If we found duplicates, let everyone know about it
+      if(duplicateInformation.length > 0)
+      {
+        self.cockpit.emit('plugin-input-controller-duplicates', duplicateInformation);
+        console.log('Found duplicate commands: \n' + duplicateInformation.join('\n'));
+      }
+    };
 
     return self;
   };
@@ -202,7 +241,7 @@
       }
     });
 
-    //Plugin loaded callback?
+    //Plugin loaded callback
     /* Crawl the plugins looking for those with settings definitions */
     this.cockpit.loadedPlugins.forEach(function(plugin) 
     {
@@ -221,115 +260,221 @@
       }
       else
       {
-        console.error(plugin, "Did not have valid inputDefaults!");
+        console.log(plugin, "Did not have valid inputDefaults!");
         return;
       }
     });
-    
+
   };
-  inputController.InputController.prototype._register = function (control, doCheck) {
+
+  //Member register function
+  inputController.InputController.prototype._register = function(controlsIn, doCheck) 
+  {
     var self = this;
-    if (control === undefined)
+    
+    //Check to make sure we got a valid controls handle
+    if( self.isUndefined(controlsIn) )
+    {
+      console.error("Input Controller was asked to register the binding to an undefined control!");
       return;
-    var controlsToRegister = [].concat(control);
-    // control can be a single object or an array
-    controlsToRegister.forEach(function (aControl) {
-      if (aControl === undefined)
+    }
+
+    //Controls can be a single object or an array, so let's treat it as such
+    var controlsToRegister = [].concat(controlsIn);
+    controlsToRegister.forEach(function(control) 
+    {
+      //Check to make sure we got a valid controls handle
+      if( self.isUndefined(control) )
+      {
+        console.error("Input Controller was asked to register an undefined control!");
         return;
-      var command = new inputController.Command(aControl);
+      }
+
+      //Create a new command with the control we were passed
+      var command = new inputController.Command(control);
+
+      //Update our internal map of commands to reflect the newly registered command
       self.registeredCommands[command.name] = command;
+      
+      //Also update our internal model of commands
       self.model.commands.push(command);
+
+      //Let the rest of cockpit know that we just registered a command
       self.cockpit.emit('InputController.registeredCommand', command);
       console.log('InputController: Registering control ' + command.name);
-      self.controllers.forEach(function (controller) {
-        if (command.active) {
+
+      //Iterate through our input controllers (i.e. keyboard and gamepad) and register this command with them
+      self.controllers.forEach(function(controller) 
+      {
+        //If this is an active command
+        if(command.active) 
+        {
+          //Register it with the controller
           controller.register(command);
-          for (var property in command.bindings) {
+          for (var property in command.bindings) 
+          {
             self.registeredControls[property + ':' + command.bindings[property]] = command;
           }
         }
       });
+
     });
+
     self.controlsToRegister = [];
-    if (doCheck) {
+
+    //If the caller wants to check for duplicates, do it
+    if(doCheck) 
+    {
       self.checkDuplicates();
     }
   };
-  inputController.InputController.prototype.unregister = function (controlName) {
+
+
+  //Member unregister function
+  inputController.InputController.prototype.unregister = function(controls) 
+  {
     var self = this;
-    var controlsToRemove = [].concat(controlName);
-    // controlName could be a single object or an array
-    controlsToRemove.forEach(function (control) {
-      delete self.registeredCommands[control];
-      for (var property in control.bindings) {
+    
+    //Check to make sure we got a valid controls handle
+    if( self.isUndefined(controls) )
+    {
+      console.error("Input Controller was asked to unregister an undefined control!");
+      return;
+    }
+    var controlsToRemove = [].concat(controls);
+
+    controlsToRemove.forEach(function (control) 
+    {
+      //self.registeredCommands[control.name] = undefined;
+      for (var property in control.bindings)
+      {
         //it is possible that a different control actually owns a particular binding
-        if (self.registeredControls[property + ':' + control.bindings[property]] === control) {
+        if (self.registeredControls[property + ':' + control.bindings[property]] === control)
+        {
           delete self.registeredControls[property + ':' + control.bindings[property]];
         }
       }
     });
+
     self.controllers.forEach(function (controller) {
       controller.reset();
     });
+
     var commandsToRegister = [];
-    for (var command in self.registeredCommands) {
+    for (var command in self.registeredCommands) 
+    {
       commandsToRegister.push(self.registeredCommands[command]);
     }
+
     self.model.commands.length = 0;
     self._register(commandsToRegister, false);
   };
-  inputController.InputController.prototype.activate = function (controlName) {
+
+  //Member activation function
+  inputController.InputController.prototype.activate = function(controlNames) 
+  {
     var self = this;
-    var controlsToActivate = [].concat(controlName);
-    controlsToActivate.forEach(function (commandName) {
-      var command = self.registeredCommands[commandName];
+
+    //Check to make sure we got a valid controls handle
+    if( self.isUndefined(controlNames) )
+    {
+      console.error("Input Controller was asked to activate an undefined control!");
+      return;
+    }
+
+    //Controls can be a single object or an array, so let's treat it as such
+    var controlsToActivate = [].concat(controlNames);
+    controlsToActivate.forEach(function(control) 
+    {
+      //Get a handle to the command
+      var command = self.registeredCommands[control];
+
+      //Clear the replaced field of the command
       command.replaced = [];
-      for (var property in command.bindings) {
-        if (self.registeredControls[property + ':' + command.bindings[property]] !== undefined) {
+
+      //Check for conflicts?
+      for (var property in command.bindings) 
+      {
+        if (self.registeredControls[property + ':' + command.bindings[property]] !== undefined) 
+        {
           console.log('There is a conflict with ' + self.registeredControls[property + ':' + command.bindings[property]].name);
           command.replaced.push(self.registeredControls[property + ':' + command.bindings[property]]);
         }
       }
+
+      //Activate the command
       command.active = true;
+
+      //And register it
       self._register(command, false);
       console.log('activated command ' + command.name);
     });
   };
-  inputController.InputController.prototype.deactivate = function (controlName) {
+
+  //Member deactivate function
+  inputController.InputController.prototype.deactivate = function(controlNames) 
+  {
     var self = this;
-    var controlsToDeactivate = [].concat(controlName);
-    controlsToDeactivate.forEach(function (commandName) {
-      var command = self.registeredCommands[commandName];
-      if (command) {
+
+    //Check to make sure we got a valid controls handle
+    if( self.isUndefined(controlNames) )
+    {
+      console.error("Input Controller was asked to deactivate an undefined control!");
+      return;
+    }
+
+    var controlsToDeactivate = [].concat(controlNames);
+    controlsToDeactivate.forEach(function(control) 
+    {
+      var command = self.registeredCommands[control];
+
+      if(command) 
+      {
         command.active = false;
         self.unregister(command);
-        command.replaced.forEach(function(oldcommand){
+
+        command.replaced.forEach(function(oldcommand)
+        {
           self._register(oldcommand, false);
           console.log('re-activated ' + oldcommand.name);
         });
+
         command.replaced = [];
         console.log('Deactivated command ' + command.name);
       }
     });
   };
 
-  inputController.InputController.prototype.updateBinding = function(controls) {
+  //Member updateBinding function
+  inputController.InputController.prototype.updateBinding = function(controlsIn) 
+  {
     var self = this;
-    if (controls === undefined)
+
+    //Check to make sure we got a valid controls handle
+    if( self.isUndefined(controlsIn) )
+    {
+      console.error("Input Controller was asked to update bindings for an undefined control!");
       return;
-    var controlsToUpdate = [].concat(controls);
-    controlsToUpdate.forEach(function(control) {
+    }
+
+    var controlsToUpdate = [].concat(controlsIn);
+    controlsToUpdate.forEach(function(control) 
+    {
       self.deactivate(control.name);
       var command = self.registeredCommands[control.name];
-      if (command) {
-        for(var property in command.bindings) {
+      if (command) 
+      {
+        for(var property in command.bindings) 
+        {
             if (control.bindings[property] != undefined)
-            command.bindings[property] = control.bindings[property];
+            {
+              command.bindings[property] = control.bindings[property];
+            }
         }
         self.activate(control.name);
       }
-    });
 
+    });
   };
 
   //Currently these functions do not do anything becasue they cause an infinite loop

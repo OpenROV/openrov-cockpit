@@ -45,7 +45,7 @@
         registerEmitterHandlers: function(emitter){
           var self = this;
           emitter.withHistory.on('plugin.cameraServo.currentPos',function(angle){
-            self.servoAngle = angle;
+            self.servoAngle = -angle;
           });
         }
       })

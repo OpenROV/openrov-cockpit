@@ -111,7 +111,7 @@
             this.eventEmitter.emit("plugin.updateManager.retry");
         },
         _handleDownload:function(){
-            this.eventEmitter.emit("plugin.updateManager.download");
+            this.eventEmitter.emit("plugin.about.downloadSystemInformation");
         },
         _showRecoveryButtons:function(updateState){
             return updateState=="Failed";

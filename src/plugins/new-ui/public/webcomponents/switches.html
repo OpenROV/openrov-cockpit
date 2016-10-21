@@ -71,6 +71,35 @@
         </content>
   </template>
   <script>
+
+    //Helper functions to cleanly register and unregister event listeners 
+    function registerEventListener(obj, params) {
+      if(typeof obj._eventListeners == 'undefined')
+      {
+        obj._eventListeners = [];
+      }
+
+      obj.addEventListener(params.event, params.callback);
+
+      var eventListeners = obj._eventListeners;
+      eventListeners.push(params);
+      obj._eventListeners = eventListeners;
+    }
+    function unRegisterAllEventListeners(obj) {
+      if(typeof obj._eventListeners == 'undefined' || obj._eventListeners.length == 0)
+      {
+        return;
+      }
+
+      for(var i = 0, len = obj._eventListeners.length; i < len; i++) 
+      {
+        var e = obj._eventListeners[i];
+        obj.removeEventListener(e.event, e.callback);
+      }
+
+      obj._eventListeners = [];
+    }
+
     (function () {
       Polymer({
         is: 'orov-newui-switches',

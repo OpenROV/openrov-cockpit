@@ -25,12 +25,11 @@
       //Add it to the map
       self.presets.set("OpenROV Preset", self.openrovPreset);
 
-      //Function to crawl all of the plugins to find their defaults
-
+      //Function to crawl all of the plugins that loaded before us to find their defaults
+      self.loadPluginDefaults();
     };
 
     //Member functions
-
 
     listen()
     {
@@ -40,11 +39,32 @@
         self.loadPluginDefaults();
       });
 
-      this.cockpit.on('plugin.inputController.defaults', function(e) {
-        console.log("Got Defaults!");
-        console.log(e);
+      this.cockpit.on('plugin.inputController.defaults', function(defaults) {
+        self.register(defaults);
       });
 
+    };
+
+    loadPluginDefaults()
+    {
+      var self = this;
+
+      self.cockpit.loadedPlugins.forEach( function(plugin) {
+        if(plugin.inputDefaults !== null)
+        {
+          self.register(plugin.inputDefaults);
+        }
+      });
+    };
+
+    register(input)
+    {
+      if(input == null)
+      {
+        console.error("Tried to register an undefined input!");
+        return;
+      }
+      console.log("Registering a plugin:", input);
     };
 
 

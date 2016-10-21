@@ -25,6 +25,15 @@
             this.cockpit.on("mcu.reset",function(){
                 self.rov.emit("mcu.ResetMCU");              
             })
+            this.cockpit.on("mcu.FlashESCs",function(){
+                self.rov.emit("mcu.FlashESCs");              
+            })
+            this.cockpit.on("mcu.RebuildMCUFirmware",function(){
+                self.rov.emit("mcu.RebuildMCUFirmware");              
+            })
+            this.cockpit.on("mcu.UpdateFirmware",function(){
+                self.rov.emit("mcu.UpdateFirmware");              
+            })                                    
         }
     }
 

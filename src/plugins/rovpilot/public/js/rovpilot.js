@@ -187,6 +187,23 @@
       }
     },
     {
+      name: 'rovPilot.moveDown',
+      description: 'Bring the ROV deeper (down)',
+      defaults:
+      {
+        keyboard: 'ctrl',
+        gamepad: ''
+      },
+      down: function()
+      {
+        rov.cockpit.emit('plugin.rovpilot.setLift', 1);
+      },
+      up: function()
+      {
+        rov.cockpit.emit('plugin.rovpilot.setLift', 0);
+      }
+    },
+    {
       name: 'rovPilot.powerLevel1',
       description: 'Set the power level of the ROV to level 1',
       defaults:

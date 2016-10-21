@@ -505,14 +505,16 @@ kbd.light, .light-keys kbd, .key.light, .light-keys .key {
                 },
                 onSavePreset: function() {
                     var self = this;
-                    if (self.eventEmitter) {
+                    self.eventEmitter.emit('plugin.inputController.debug');
+                    if (!self.eventEmitter) {
                         
                         if(!this.getCanSavePreset(self.selectedPreset))
                         {
                             console.log("Cannot save selected preset. Defaulting to current-session");
                             self.selectedPreset = 1;
                         }
-                        self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.presets[self.selectedPreset]);
+                        //self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.presets[self.selectedPreset]);
+                        
                         self.set('saveNewPreset', false);
                     }
                 },

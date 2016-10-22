@@ -1,13 +1,8 @@
 /*jshint esnext:true */
 (function (window, document) {
-  // These constants map to the arduino device.h file's constants for capabilities of the ROV
-  const LIGHTS_CAPABLE = 1;
-  const CALIBRATION_LASERS_CAPABLE = 2;
-  const CAMERA_MOUNT_1_AXIS_CAPABLE = 3;
-  const COMPASS_CAPABLE = 4;
-  const ORIENTATION_CAPABLE = 5;
-  const DEPTH_CAPABLE = 6;
+
   var hostname = document.location.hostname ? document.location.hostname : 'localhost';
+  
   //Cockpit is inheriting from EventEmitter2.
   //http://stackoverflow.com/questions/3900168/how-to-make-a-javascript-singleton-with-a-constructor-without-using-return
   var Cockpit = function Cockpit(csocket) {
@@ -20,7 +15,6 @@
     this.rov = csocket;
     this.storeAndForward = new window.EventEmiiterStoreAndForward(this);
     this.sendUpdateEnabled = true;
-    this.capabilities = 0;
     this.loadedPlugins = [];
     this.loadUiTheme(function () {
       self.loadPlugins();
@@ -30,15 +24,11 @@
   };
   Cockpit.prototype = new EventEmitter2();
   Cockpit.prototype.constructor = Cockpit;
+
   Cockpit.prototype.listen = function listen() {
     var cockpit = this;
-    cockpit.rov.on('mcu.rovsys', function (data) {
-      console.log('got RovSys update from Arduino');
-      if ('capabilities' in data) {
-        cockpit.capabilities = data.capabilities;
-      }
-    });
   };
+
   Cockpit.prototype.loadUiTheme = function (done) {
     done();
     return;

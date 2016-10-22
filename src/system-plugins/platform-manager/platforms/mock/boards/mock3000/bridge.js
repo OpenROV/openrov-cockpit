@@ -133,13 +133,6 @@ function Bridge()
         bridge.emitStatus('camServ_spd:' + speed );
         break;
       }
-
-      case 'rcap': 
-      {
-        bridge.emitStatus('CAPA:255');
-        debug('CAPA:255');
-        break;
-      }
       
       case 'eligt': 
       {

@@ -4,8 +4,10 @@ function readyAyeReady(name, deps) {
   this.deps = deps;
   var self = this;
   //rovsys comes up when arduino starts
-  deps.globalEventLoop.on('mcu.rovsys', function (s) {
-    if (!done) {
+  deps.globalEventLoop.on('mcu.rovsys', function (s) 
+  {
+    if (!done) 
+    {
       console.log('The ROV is ready!.');
       setLight('12.5');
       deps.globalEventLoop.emit('plugin.systemPower.powerOffESCs');
@@ -15,6 +17,7 @@ function readyAyeReady(name, deps) {
       done = true;
     }
   });
+
   // send the light command initially and then cylcle through the lights
   var setLight = function (light) {
     var cmd = 'ligt(' + light + ')';

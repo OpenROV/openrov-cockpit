@@ -279,20 +279,20 @@ function Bridge()
     var rnd = (Math.random() * 20 - 10) / 100;
     currentDepth += currentDepth * rnd;
     currentDepth = Math.min(Math.max(currentDepth, 1), 100);
-    result += 'deep:' + currentDepth + ';';
+    result += 'depth_d:' + currentDepth + ';';
     // Generate heading
     currentHeading += 5;
-    result += 'hdgd:' + currentHeading + ';';
+    result += 'imu_y:' + currentHeading + ';';
     if (currentHeading >= 360) {
       currentHeading = 0;
     }
     // Generate pitch
     //p(t) = 90*sin(t)
     currentPitch = 90*Math.sin(time);
-    result += 'pitc:' + currentPitch + ';';
+    result += 'imu_p:' + currentPitch + ';';
     // Generate roll
     currentRoll = Math.floor(Math.random()*91) - 45;
-    result += 'roll:' + currentRoll + ';';
+    result += 'imu_r:' + currentRoll + ';';
     // Generate battery tube 1 current
     rnd = (Math.random() * 20 - 10) / 100;
     current += current * rnd;

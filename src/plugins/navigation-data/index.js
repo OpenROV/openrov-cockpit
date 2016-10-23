@@ -9,22 +9,33 @@
         depth: 0,
         heading: 0
       };
+
+    // Encoding helper functions
+    function encode( floatIn )
+    {
+        return parseInt( floatIn * 1000 );
+    }
+
+    function decode( intIn )
+    {
+        return ( intIn * 0.001 );
+    }
       
     // Arduino
     deps.globalEventLoop.on('mcu.status', function (status)
     {
       if ('depth_d' in status) {
-        navdata.depth = status.depth_d;
+        navdata.depth = decode( status.depth_d );
       }
       if ('imu_p' in status) {
-        navdata.pitch = status.imu_p;
+        navdata.pitch = decode( status.imu_p );
       }
       if ('imu_r' in status) {
-        navdata.roll = status.imu_r;
+        navdata.roll = decode( status.imu_r );
       }
       if ('imu_y' in status) {
-        navdata.yaw = status.imu_y;
-        navdata.heading = status.imu_y;
+        navdata.yaw = decode( status.imu_y );
+        navdata.heading = decode( status.imu_y );
       }
       if ('fthr' in status) {
         navdata.thrust = status.fthr;

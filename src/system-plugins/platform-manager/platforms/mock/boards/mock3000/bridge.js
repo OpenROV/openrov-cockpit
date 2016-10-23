@@ -273,26 +273,38 @@ function Bridge()
     var status = reader.parseStatus(data);
     bridge.emit('status', status);
   };
+
+  // Encoding helper functions
+  function encode( floatIn )
+  {
+      return parseInt( floatIn * 1000 );
+  }
+
+  function decode( intIn )
+  {
+      return ( intIn * 0.001 );
+  }
+
   bridge.emitNavData = function () {
     var result = '';
     // Generate depth
     var rnd = (Math.random() * 20 - 10) / 100;
     currentDepth += currentDepth * rnd;
     currentDepth = Math.min(Math.max(currentDepth, 1), 100);
-    result += 'depth_d:' + currentDepth + ';';
+    result += 'depth_d:' + encode( currentDepth ) + ';';
     // Generate heading
     currentHeading += 5;
-    result += 'imu_y:' + currentHeading + ';';
+    result += 'imu_y:' + encode( currentHeading ) + ';';
     if (currentHeading >= 360) {
       currentHeading = 0;
     }
     // Generate pitch
     //p(t) = 90*sin(t)
     currentPitch = 90*Math.sin(time);
-    result += 'imu_p:' + currentPitch + ';';
+    result += 'imu_p:' + encode( currentPitch ) + ';';
     // Generate roll
     currentRoll = Math.floor(Math.random()*91) - 45;
-    result += 'imu_r:' + currentRoll + ';';
+    result += 'imu_r:' + encode( currentRoll )+ ';';
     // Generate battery tube 1 current
     rnd = (Math.random() * 20 - 10) / 100;
     current += current * rnd;

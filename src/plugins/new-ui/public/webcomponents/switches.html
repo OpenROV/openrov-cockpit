@@ -71,6 +71,35 @@
         </content>
   </template>
   <script>
+
+    //Helper functions to cleanly register and unregister event listeners 
+    function registerEventListener(obj, params) {
+      if(typeof obj._eventListeners == 'undefined')
+      {
+        obj._eventListeners = [];
+      }
+
+      obj.addEventListener(params.event, params.callback);
+
+      var eventListeners = obj._eventListeners;
+      eventListeners.push(params);
+      obj._eventListeners = eventListeners;
+    }
+    function unRegisterAllEventListeners(obj) {
+      if(typeof obj._eventListeners == 'undefined' || obj._eventListeners.length == 0)
+      {
+        return;
+      }
+
+      for(var i = 0, len = obj._eventListeners.length; i < len; i++) 
+      {
+        var e = obj._eventListeners[i];
+        obj.removeEventListener(e.event, e.callback);
+      }
+
+      obj._eventListeners = [];
+    }
+
     (function () {
       Polymer({
         is: 'orov-newui-switches',
@@ -84,13 +113,26 @@
         },
         __oncontentLoaded: function(){
           var self=this;
+
           this.set("_coveredControls",Polymer.dom(this).children.filter(function(item){return item.collectionDomElement==undefined}));
-          //TODO: on detach, remove the listeners
+          
           Polymer.dom(self).children.forEach(function(control){
-            control.addEventListener('switched',function(e){
-              self._swapStateClasses(self.$$("#"+control.shortName),e.detail);
-            })
+
+            registerEventListener(control, {
+              event: 'switched',
+              callback: function(e) {
+                self._swapStateClasses(self.$$("#"+control.shortName),e.detail);
+              }
+            });
+
             control.style.display="none";
+          });
+        },
+        detached: function() {
+          var self = this;
+
+          Polymer.dom(self).children.forEach(function(control) {
+            unRegisterAllEventListeners(control);
           });
         },
         _getClasses:function(state){

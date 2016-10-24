@@ -34,7 +34,7 @@
         },
         behaviors: [namespace('behaviors').oROVStandard],
         _servoAngleChanged: function(){
-          var newvalue='rotate('+ this.servoAngle +'deg)';
+          var newvalue='rotate('+ -this.servoAngle +'deg)';
           this.$.servoTiltImage.style['-webkit-transform'] = newvalue;
           this.$.servoTiltImage.style['-moz-transform'] = newvalue;
           this.$.servoTiltImage.style['transform'] = newvalue;
@@ -45,7 +45,7 @@
         registerEmitterHandlers: function(emitter){
           var self = this;
           emitter.withHistory.on('plugin.cameraServo.currentPos',function(angle){
-            self.servoAngle = -angle;
+            self.servoAngle = angle;
           });
         }
       })

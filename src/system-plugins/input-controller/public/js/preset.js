@@ -64,6 +64,7 @@
                 //Add the binding
                 addBinding(self.controllers, binding);
             });
+            
         };
 
         removeController(controllerName)
@@ -93,6 +94,8 @@
             //Iterate through the provided controllers
             input.bindings.forEach(function(binding) {
                 
+                //And remove it from the corresponding controller Map
+                self.controllers.get(binding.controller).delete(binding.input);
             });
         }
     };

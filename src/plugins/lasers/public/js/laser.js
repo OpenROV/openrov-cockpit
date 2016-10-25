@@ -14,16 +14,32 @@
     this.inputDefaults = [{
       name: 'plugin.laser.Toggle',
       description: 'Toggles the lasers on or off',
-      defaults:
-      {
-        keyboard: 'l',
-        gamepad: ''
-      },
-      down: function()
-      {
-        cockpit.rov.emit('plugin.laser.set', self.laserState.enabled == true ? 0 : 1);
-      }
+      bindings:
+      [
+        {
+          controller: 'keyboard',
+          input:'l',
+          actions:
+          [
+            {
+              down: function() {
+                cockpit.rov.emit('plugin.laser.set', self.laserState.enabled == true ? 0 : 1);
+              }
+            }
+          ]
+        },
+        {
+          controller: 'gamepad',
+          input: undefined,
+          actions: undefined         
+        }
+      ]
     }];
+
+    //Emit to the controller that we are loaded
+    setTimeout(function() {
+        cockpit.emit('plugin.inputController.defaults', self.inputDefaults);
+    }, 5000 );    
   };
   
   plugins.Laser = Laser;

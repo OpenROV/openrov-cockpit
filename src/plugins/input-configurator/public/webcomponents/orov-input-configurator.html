@@ -1,5 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
 
+<link rel="import" href="../iron-collapse/iron-collapse.html">
 <link rel="import" href="../paper-slider/paper-slider.html">
 <link rel="import" href="../paper-menu/paper-menu.html">
 <link rel="import" href="../paper-menu/paper-submenu.html">
@@ -8,9 +9,9 @@
 
 <dom-module name="orov-input-configurator">
     <style>
-
         paper-item:hover {
             cursor: pointer;
+            background: aliceblue
         }
 
     </style>
@@ -18,31 +19,51 @@
     <template>
         <h4>Input Configuration</h4>
         <paper-menu>
+            
             <paper-submenu>
                 <paper-item class="menu-trigger">Keyboard</paper-item>
                 <paper-menu class="menu-content">
-                <paper-item>Topic 1</paper-item>
-                <paper-item>Topic 2</paper-item>
-                <paper-item>Topic 3</paper-item>
+                <template is="dom-repeat" items="{{keyboard}}">
+                    <paper-item>Key: {{item.key}} Binding: {{item.binding}}</paper-item>
+                </template>
                 </paper-menu>
             </paper-submenu>
+
             <paper-submenu>
                 <paper-item class="menu-trigger">Gamepad</paper-item>
                 <paper-menu class="menu-content">
-                <paper-item>Fave 1</paper-item>
-                <paper-item>Fave 2</paper-item>
+                <template is="dom-repeat" items="{{gamepad}}">
+                    <paper-item>
+                        Key: {{item.key}} Binding: {{item.binding}}
+                    </paper-item>
+                </template>
                 </paper-menu>
             </paper-submenu>
+
         </paper-menu>
+
     </template>
 
     <script>
         (function() {
-        Polymer({
-            is:'orov-input-configurator',
-            properties: {
-            }
-        })
+            Polymer({
+                is:'orov-input-configurator',
+                ready: function()
+                {
+                    this.gamepad = [
+                        {key: 'A', binding: 'record'},
+                        {key: 'B', binding: 'move'},
+                        {key: 'X', binding: 'stop'}
+                    ];
+
+                    this.keyboard = [
+                        {key: 'g', binding: 'record'},
+                        {key: 'i', binding: 'move'},
+                        {key: 'l', binding: 'stop'}
+                    ]
+                    
+                }
+            });
         })();
     </script>
 </dom-module>

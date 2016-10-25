@@ -53,7 +53,6 @@
         //Add it to the map
         self.presets.set("OpenROVDefault", self.openrovPreset);
 
-
         return true;
       }
       else
@@ -76,6 +75,9 @@
         defaults.forEach(function(input){
           self.register(input);
         });
+
+        self.keyboard.registerPreset(self.presets.get(self.currentPreset).controllers[0]);
+        self.keyboard.unregister({key:'a'});
 
       });
 

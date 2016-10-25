@@ -16,6 +16,7 @@
   ],
   "dependencies": {
     "iron-list": "polymerelements/iron-list#^1.3.1",
+    "iron-collapse": "polymerelements/iron-collapse#^1.2.1",
     "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^1.2.1",
     "paper-spinner": "PolymerElements/paper-spinner#^1.2.0",
     "paper-checkbox": "PolymerElements/paper-checkbox#^1.4.0",

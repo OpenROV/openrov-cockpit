@@ -43,12 +43,32 @@
             var controller = 
             {
                 name: controllerName,
-                bindings: new Map()
+                keys: []
             }
 
             //Add to our existing list
             this.controllers.push(controller);
         };
+
+        addInput(input)
+        {
+            var self = this;
+            //Make sure we got a valid input
+            if(input == null)
+            {
+                console.error("Tried to add an undefined input to preset:", this.name);
+                return;
+            }
+
+            //Go through the controllers for this input
+            input.bindings.forEach(function(binding) {
+
+                //Add the binding
+                addBinding(self.controllers, binding);
+            });
+
+            console.log(self.controllers);
+        }
 
         removeController(controllerName)
         {
@@ -75,6 +95,56 @@
     };
 
     //Private helper functions
+    function addBinding(controllers, binding)
+    {
+        //Make sure we get a valid binding
+        if(binding == null)
+        {
+            console.error("Tried to add an undefined binding");
+            return;
+        }
+
+        //Check to see if the controller is registered
+        var controllerToAddBinding = undefined;
+        controllers.forEach(function(controller) {
+            if(controller.name == binding.controller)
+            {
+                controllerToAddBinding = controller;
+            }
+        });
+
+        if(controllerToAddBinding == null)
+        {
+            console.error("Controller:", binding.controller, "is not registered with preset");
+            return
+        }
+
+        //Check to see if the key is registered
+        var keyIsRegistered = false;
+        controllerToAddBinding.keys.forEach(function(key) {
+            if(key.name = binding.controller.key)
+            {
+                console.log("Key Exists");
+                keyIsRegistered = true;
+            }
+        });
+
+        var newBinding = 
+        {
+            key: binding.key,
+            actions: binding.actions
+        }
+
+        if(!keyIsRegistered)
+        {
+            controllerToAddBinding.keys.push(newBinding);
+        }
+        else
+        {
+            console.error("This key is already registered for this controller!");
+        }
+    }
+
     function controllerExists(controllers, key)
     {
         return controllers.some( function(controller) {
@@ -102,6 +172,6 @@
     };
 
     var systemPlugins = namespace('systemPlugin');
-    systemPlugins.InputController.Preset = Preset;
+    systemPlugins.inputController.Preset = Preset;
 
 })();

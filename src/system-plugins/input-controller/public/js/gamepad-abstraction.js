@@ -3,8 +3,8 @@
 //
 //Requires the https://github.com/kallaspriit/HTML5-JavaScript-Gamepad-Controller-Library
 //library.
-var inputController = namespace('systemPlugin.inputController');
-inputController.GamepadAbstraction = function (cockpit) {
+var InputController = namespace('systemPlugin.InputController');
+InputController.GamepadAbstraction = function (cockpit) {
   var gamepad = new HTML5Gamepad();
   var gp = {
       cockpit: cockpit,

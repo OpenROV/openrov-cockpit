@@ -1,8 +1,10 @@
 //  <script type="text/javascript" src="components/mousetrap/mousetrap.js"></script> <!--for gamepad-abstraction -->
 loadScript('components/mousetrap-js/mousetrap.js');
+
 var inputController = namespace('systemPlugin.inputController');
 inputController.Keyboard = function (cockpit) {
   var self = this;
+
   stopCallback = function (e, element) {
     // if the element has the class "mousetrap" then no need to stop
     if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
@@ -17,6 +19,7 @@ inputController.Keyboard = function (cockpit) {
     console.log('moustrap:default');
     return false;
   };
+
   self.register = function (control) {
     if (typeof Mousetrap == 'undefined') {
       setTimeout(self.register.bind(this, control), 500);
@@ -49,14 +52,17 @@ inputController.Keyboard = function (cockpit) {
       }
     }
   };
+
   self.reset = function () {
     Mousetrap.reset();
   };
+
   self.unregister = function (control) {
     var key = control.bindings.keyboard;
     if (key !== undefined) {
       Mousetrap.unbind(key);
     }
   };
+  
   return self;
 };

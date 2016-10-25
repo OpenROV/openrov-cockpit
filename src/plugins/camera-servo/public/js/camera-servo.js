@@ -18,67 +18,104 @@
             self.currentStep = 0;   // Alternative representation of targetPos
             self.stepMap = {};      // Automatically generated mapping of integer "steps" to target positions
 
-            // Setup input handlers
-            // this.inputDefaults = [{
-            //     name: 'plugin.cameraServo.stepNegative',
-            //     description: 'Point the camera further down.',
-            //     defaults: 
-            //     {
-            //         keyboard: 'z',
-            //         gamepad: 'A'
-            //     },
-            //     down: function() 
-            //     {
-            //         cockpit.emit( 'plugin.cameraServo.stepNegative' );
-            //     }
-            // }, 
-            // {
-            //     name: 'plugin.cameraServo.stepCenter',
-            //     description: 'Return camera to center position',
-            //     defaults: 
-            //     {
-            //         keyboard: 'a',
-            //         gamepad: 'B'
-            //     },
-            //     down: function() 
-            //     {
-            //         cockpit.emit( 'plugin.cameraServo.center' );
-            //     }
-            // }, 
-            // {
-            //     name: 'plugin.cameraServo.stepPositive',
-            //     description: 'Point the camera further up.',
-            //     defaults: 
-            //     {
-            //         keyboard: 'q',
-            //         gamepad: 'Y'
-            //     },
-            //     down: function()
-            //     {
-            //         cockpit.emit( 'plugin.cameraServo.stepPositive' );
-            //     }
-            // }];
-
-            this.inputDefaults = [{
-                name: 'plugin.cameraServo.stepPositive',
-                description: 'Points the camera further down',              
-                bindings:
-                [
-                    {
-                        controller: 'keyboard',
-                        key: 'q'
-                    },
-                    {
-                        controller: 'gamepad',
-                        key: 'Y'
-                    }
-                ],
-                
-                down: function()
+            this.inputDefaults = [
                 {
-                    cockpit.emit( 'plugin.cameraServo.stepPositive' );
+                    name: 'plugin.cameraServo.stepPositive',
+                    description: 'Points the camera further down',
+                    bindings:
+                    [
+                        {
+                            controller: 'keyboard',
+                            key: 'q',
+                            actions: [
+                                {
+                                    down: function()
+                                    {
+                                        cockpit.emit('plugin.cameraServo.stepPositive');
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            controller: 'gamepad',
+                            key: 'Y',
+                                                    
+                            actions: [
+                                {
+                                    down: function()
+                                    {
+                                        cockpit.emit('plugin.cameraServo.stepPositive');
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    name: 'plugin.cameraServo.stepCenter',
+                    description: 'Return camera to center position',
+                    bindings:
+                    [
+                        {
+                            controller: 'keyboard',
+                            key: 'a',
+                            actions: [
+                                {
+                                    down: function()
+                                    {
+                                        cockpit.emit('plugin.cameraServo.center');
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            controller: 'gamepad',
+                            key: 'B',
+                                                    
+                            actions: [
+                                {
+                                    down: function()
+                                    {
+                                        cockpit.emit('plugin.cameraServo.center');
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    name: 'plugin.cameraServo.stepNegative',
+                    description: 'Point the camera further down.',
+                    bindings:
+                    [
+                        {
+                            controller: 'keyboard',
+                            key: 'z',
+                            actions: [
+                                {
+                                    down: function()
+                                    {
+                                        cockpit.emit('plugin.cameraServo.stepNegative');
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            controller: 'gamepad',
+                            key: 'A',
+                                                    
+                            actions: [
+                                {
+                                    down: function()
+                                    {
+                                        cockpit.emit('plugin.cameraServo.stepNegative');
+                                    }
+                                }
+                            ]
+                        }
+                    ]
                 }
-            }];
+            ];
 
             //Emit to the controller that we are loaded
             setTimeout(function() {

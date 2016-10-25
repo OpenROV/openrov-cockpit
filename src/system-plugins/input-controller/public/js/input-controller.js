@@ -1,78 +1,184 @@
 (function(window, document) 
 {
   'use strict';
-  class InputController
+
+  
+  loadScript('components/mousetrap-js/mousetrap.js');
+
+  var inputController = namespace('systemPlugin.inputController');
+  inputController.InputController = class InputController
   {
     constructor(cockpit)
     {
       console.log("Starting Input Controller");
+      this.cockpit = cockpit;
+      this.currentPreset = "OpenROVDefault";
 
-      var self = this;
-      self.cockpit = cockpit;
-      
-      //Data structure to hold our presets on the browser side
-      //key: "preset-name" value: ["controller1", "controller2", ..., "controllerN"]
-      //where controller is, for example, keyboard
-      self.presets = new Map();
-
-      //The OpenROV default mapping preset. Defined by crawling the plugins
-      self.openrovPreset = new InputController.Preset("OpenROV Preset");
-
-      //Add our default controllers
-      self.openrovPreset.addController("keyboard");
-      self.openrovPreset.addController("gamepad");
-
-      //Add it to the map
-      self.presets.set("OpenROV Preset", self.openrovPreset);
-
-      //Function to crawl all of the plugins that loaded before us to find their defaults
-      self.loadPluginDefaults();
+      this.deferSetupForMousetrap();
     };
 
-    //Member functions
+    deferSetupForMousetrap()
+    {
+        var self = this;
 
+        if( self.setup() == false )
+        {
+          // Call timeout again
+          setTimeout( self.deferSetupForMousetrap.bind( self ), 1000 );
+        }
+    }
+
+    setup()
+    {
+      var self = this;
+
+      if (typeof Mousetrap !== "undefined")
+      {
+        self.controllers = [];
+        //Data structure to hold our presets on the browser side
+        //key: "preset-name" value: ["controller1", "controller2", ..., "controllerN"]
+        //where controller is, for example, keyboard
+        self.presets = new Map();
+
+        //The OpenROV default mapping preset. Defined by crawling the plugins
+        self.openrovPreset = new inputController.Preset("OpenROV Preset");
+
+        //Add our default controllers
+        self.openrovPreset.addController("keyboard");
+        self.keyboard = new Keyboard(cockpit);
+
+        self.openrovPreset.addController("gamepad");
+        self.gamepad = new Gamepad(cockpit);
+
+        //Add it to the map
+        self.presets.set("OpenROVDefault", self.openrovPreset);
+
+
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+
+    //Member functions
     listen()
     {
       var self = this;
 
       this.cockpit.on('plugin.inputController.debug', function() {
-        self.loadPluginDefaults();
+        
       });
 
       this.cockpit.on('plugin.inputController.defaults', function(defaults) {
-        self.register(defaults);
+        
+        defaults.forEach(function(input){
+          self.register(input);
+        });
+
       });
 
-    };
-
-    loadPluginDefaults()
-    {
-      var self = this;
-
-      self.cockpit.loadedPlugins.forEach( function(plugin) {
-        if(plugin.inputDefaults !== null)
-        {
-          self.register(plugin.inputDefaults);
-        }
-      });
     };
 
     register(input)
     {
+      var self = this;
+
       if(input == null)
       {
         console.error("Tried to register an undefined input!");
         return;
       }
-      console.log("Registering a plugin:", input);
+      console.log("Registering an input:", input);
+
+      var newInput = new inputController.Input(input);
+      self.presets.get(self.currentPreset).addInput(newInput);
     };
-
-
   }
 
-  // Add plugin to the window object and add it to the plugins list
-  var systemPlugins = namespace('systemPlugin');
-  systemPlugins.InputController = InputController;
-  window.Cockpit.plugins.push( systemPlugins.InputController );
+  /*Gamepad abstraction*/
+  class Gamepad
+  {
+    constructor(cockpit)
+    {
+      console.log("Starting gamepad abstraction");
+      var gamepadHardware = new HTML5Gamepad();
 
+    };
+  };
+
+  /*Keyboard abstraction*/
+  class Keyboard
+  {
+    constructor(cockpit)
+    {
+      var self = this;
+
+      console.log("Started keyboard abstraction");
+    };
+
+    register(key)
+    {
+      if(key == null)
+      {
+        console.error("Tried to register an undefined key from Mousetrap");
+        return;
+      }
+      console.log("Registering:", key, "with Mousetrap");
+      
+      //Register actions
+      key.actions.forEach(function(action) {
+        //Up binding
+        if(action.up !== null)
+        {
+          Mousetrap.bind(key.key, function() {
+            action.up();
+            return false;
+          });
+        }
+
+        //Down Binding
+        if(action.down !== null)
+        {
+          Mousetrap.bind(key.key, function() {
+            action.down();
+            return false;
+          });
+        }
+      });
+    };
+
+    registerPreset(preset)
+    {
+
+      //Preset for a keyboard controller object
+      var self = this;
+
+      preset.keys.forEach(function(key) {
+        self.register(key);
+      });
+    }
+
+    reset()
+    {
+      console.log("Resetting keyboard interface");
+      Mousetrap.reset();
+    };
+
+    unregister(key)
+    {
+      if(key == null)
+      {
+        console.error("Tried to unregister an undefined key from Mousetrap");
+        return;
+      }
+
+      console.log("Unregistering:", key.key, "from Mousetrap");
+      Mousetrap.unbind(key.key);
+    };
+
+  };
+
+  window.Cockpit.plugins.push(inputController.InputController);
 }(window, document));

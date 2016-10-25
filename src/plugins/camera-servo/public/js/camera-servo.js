@@ -18,8 +18,7 @@
             self.currentStep = 0;   // Alternative representation of targetPos
             self.stepMap = {};      // Automatically generated mapping of integer "steps" to target positions
 
-            this.inputDefaults = [
-                {
+            this.inputDefaults = [{
                     name: 'plugin.cameraServo.stepPositive',
                     description: 'Points the camera further down',
                     bindings:

@@ -35,16 +35,29 @@
     this.inputDefaults = [{
       name: 'blackbox.record',
       description: 'Start recording the telemetry data.',
-      defaults:
-      {
-        keyboard: 'r',
-        gamepad: ''
-      },
-      down: function()
-      {
-        self.toggleRecording();
-      }
+      bindings:
+      [
+        {
+          controller: 'keyboard',
+          input: 'r',
+          actions: [
+            {
+              down: function() {
+                self.toggleRecording();
+              }
+            }
+          ]
+        },
+        {
+          controller: 'gamepad',
+          input: undefined,
+          actions: undefined
+        }
+      ]
     }];
+    setTimeout(function() {
+        cockpit.emit('plugin.inputController.defaults', self.inputDefaults);
+    }, 5000 );
   };
 
   plugins.Blackbox = Blackbox;

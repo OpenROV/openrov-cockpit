@@ -183,11 +183,64 @@
   {
     constructor(cockpit)
     {
-      console.log("Starting gamepad abstraction")
-      var gamepadHardware = new HTML5Gamepad();
+      var self = this;
+      console.log("Starting gamepad abstraction");
+      
+      self.assignments = new Map();
+      self.cockpit = cockpit;
+      self.gamepadHardware = new HTML5Gamepad();
+      
+      self.currentTime = new Date();
 
-      var assignments = new Map();
+      //Ignore until time
+      self.ignoreInputUntil = 0;
+
+      //Bindings
+      self.gamepadHardware.bind(HTML5Gamepad.Event.AXIS_CHANGED, function(e) {
+        if(self.currentTime.getTime() < self.ignoreInputUntil)
+        {
+          //Avoids inacurrate readings when the gamepad has just been connected
+          return;
+        }
+        var axis = self.assignments.get(e.axis);
+      });
+
+      self.gamepadHardware.bind(HTML5Gamepad.Event.BUTTON_DOWN, function(e) {
+        var control = e.control;
+        
+        if(self.assignments.has(control))
+        {
+          var button = self.assignments.get(control);
+          button[0].down();
+        }
+      });
+
+      self.gamepadHardware.bind(HTML5Gamepad.Event.BUTTON_UP, function(e) {
+        var control = 
+      });
+
+      self.gamepadHardware.bind(HTML5Gamepad.Event.CONNECTED, function(device) {
+        self.ignoreInputUntil = self.currentTime + 1000;
+        console.log("Gamepad connected", device);
+      });
+
+      self.gamepadHardware.bind(HTML5Gamepad.Event.DISCONNECTED, function(device) {
+        console.log("Gamepad disconnected", device);
+      });
+
+      self.gamepadHardware.bind(HTML5Gamepad.Event.UNSUPPORTED, function(device) {
+        console.error("Gamepad unsupported", device);
+      });
+
+
+      if(!self.gamepadHardware.init())
+      {
+        console.error("Your browser doesn't support gamepads");
+        return;
+      }
+
     };
+
   };
 
   /*Gamepad interface*/
@@ -198,7 +251,6 @@
       console.log("Starting gamepad interface");
       
       var self = this;
-
       self.gamepadAbstraction = new GamepadAbstraction(cockpit);
     };
 
@@ -212,14 +264,12 @@
       }
 
       console.log("Registering:", key, "to gamepad");
-
+      self.gamepadAbstraction.assignments.set(key, actions);
     }
 
     reset()
     {
       console.log("Resetting gamepad");
-
-
     }
     unregister(key, actions)
     {

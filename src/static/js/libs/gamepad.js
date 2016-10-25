@@ -562,12 +562,12 @@
     if (this.gamepads.length > 0) {
       this._fire(Gamepad.Event.TICK, this.gamepads);
     }
-    //window.requestAnimationFrame(function() {
-    //	self._update();
-    //});
-    setTimeout(function () {
-      self._update();
-    }, 100);
+    window.requestAnimationFrame(function() {
+    	self._update();
+    });
+    // setTimeout(function () {
+    //   self._update();
+    // }, 100);
   };
   /**
  * Updates webkit platform gamepads.

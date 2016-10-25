@@ -1,8 +1,6 @@
 (function(window, document) 
 {
   'use strict';
-
-  
   loadScript('components/mousetrap-js/mousetrap.js');
 
   var inputController = namespace('systemPlugin.inputController');
@@ -89,7 +87,6 @@
           self.register(input, self.currentPreset);
         });
 
-        self.registerPreset(self.currentPreset);
       });
     };
 
@@ -107,7 +104,6 @@
       console.log("Registering an input:", input, "to preset:", preset);
 
       self.registerInputWithPreset(input, preset);
-
       self.registerInputWithHardware(input);
     };
 
@@ -151,8 +147,15 @@
         value.forEach(function(actions, input) {
           hardware.register(input, actions);
         });
+      }); 
+    };
+
+    resetControllers()
+    {
+      var self = this;
+      self.controllers.forEach(function(controller) {
+        controller.reset();
       });
-      
     }
 
     //Unregistration of a single input
@@ -253,7 +256,7 @@
 
       if(!self.gamepadHardware.init())
       {
-        console.error("Your browser doesn't support gamepads");
+        console.error("Your browser doesn't support this gamepad");
         return;
       }
 
@@ -281,15 +284,33 @@
         return;
       }
 
-      console.log("Registering:", key, "to gamepad");
+      console.log("Registering input:", key, "to gamepad");
       self.gamepadAbstraction.assignments.set(key, actions);
+    };
+
+    registerPreset(preset)
+    {
+      var self = this;
+
+      if(preset == null)
+      {
+        console.error("Tried to register an undefined preset with gamepad");
+        return;
+      }
+
+      var gamepadPreset = preset.controllers.get("gamepad");
+      gamepadPreset.forEach(function(value, key) {
+        self.register(key, value);
+      });
     }
 
     reset()
     {
+      var self = this;
+
       console.log("Resetting gamepad");
       self.gamepadAbstraction.assignments.clear();
-    }
+    };
     unregister(key, actions)
     {
       var self = this;
@@ -301,7 +322,7 @@
 
       console.log("Unregistering:", key, "from gamepad");
       self.gamepadAbstraction.assignments.delete(key);
-    }
+    };
   };
 
   /*Keyboard Interface*/

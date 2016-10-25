@@ -86,10 +86,6 @@
           self.register(input);
         });
 
-        console.log(self.presets.get(self.currentPreset));
-        self.keyboard.registerPreset(self.presets.get(self.currentPreset));
-        self.keyboard.unregister({key:'a'});
-
       });
     };
 
@@ -107,10 +103,9 @@
       console.log("Registering an input:", input, "to preset:", self.currentPreset);
 
       //Before we create a new object, make sure that it doesn't already exists
-      // self.presets.
-
+      var currentPreset = self.presets.get(self.currentPreset);
       var newInput = new inputController.Input(input);
-      self.presets.get(self.currentPreset).addInput(newInput);
+      currentPreset.addInput(newInput);
     };
   }
 

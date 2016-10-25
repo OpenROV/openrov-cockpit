@@ -64,26 +64,7 @@
                 //Add the binding
                 addBinding(self.controllers, binding);
             });
-
-            console.log(self.controllers);
         };
-
-        doesInputExist(input)
-        {
-            var self = this;
-
-            //Make sure we got a valid input
-            if(input == null)
-            {
-                console.error("Tried to check if an undefined input exists!");
-                return;
-            }
-
-            var inputController = input.controller;
-
-            //Check this controller for this input
-
-        }
 
         removeController(controllerName)
         {
@@ -97,6 +78,23 @@
             //Remove the controller from the list
             this.controllers.delete(controllerName);
         };
+
+        removeInput(input)
+        {
+            var self = this;
+
+            //Make sure this is valid
+            if(input == null)
+            {
+                console.error("Tried to remove an undefined input from preset:", this.name);
+                return;
+            }
+
+            //Iterate through the provided controllers
+            input.bindings.forEach(function(binding) {
+                
+            });
+        }
     };
 
     //Private helper functions

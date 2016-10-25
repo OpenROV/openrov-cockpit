@@ -170,12 +170,9 @@
       
       //Before we create a new object, make sure that it doesn't already exists
       var currentPreset = self.presets.get(preset);
-      console.log(currentPreset);
       currentPreset.removeInput(input);
     };
   }
-
-
 
   //Helper classes
   /*Gamepad abstraction*/
@@ -202,7 +199,16 @@
           //Avoids inacurrate readings when the gamepad has just been connected
           return;
         }
-        var axis = self.assignments.get(e.axis);
+        var axis = e.axis;
+
+        if(self.assignments.has(axis))
+        {
+          var assignment = self.assignments.get(axis);
+          if(typeof assignment[0].axis == 'function')
+          {
+            assignment[0].axis(e.value);
+          }
+        }
       });
 
       self.gamepadHardware.bind(HTML5Gamepad.Event.BUTTON_DOWN, function(e) {
@@ -211,12 +217,24 @@
         if(self.assignments.has(control))
         {
           var button = self.assignments.get(control);
-          button[0].down();
+          if(typeof button[0].down == 'function')
+          {
+            button[0].down();
+          }
         }
       });
 
       self.gamepadHardware.bind(HTML5Gamepad.Event.BUTTON_UP, function(e) {
-        var control = 
+        var control = e.control;
+
+        if(self.assignments.has(control))
+        {
+          var button = self.assignments.get(control);
+          if(typeof button[0].up == 'function')
+          {
+            button[0].up();
+          }
+        }
       });
 
       self.gamepadHardware.bind(HTML5Gamepad.Event.CONNECTED, function(device) {
@@ -270,6 +288,7 @@
     reset()
     {
       console.log("Resetting gamepad");
+      self.gamepadAbstraction.assignments.clear();
     }
     unregister(key, actions)
     {
@@ -280,7 +299,8 @@
         return;
       }
 
-      console.log("Unregistering:", key, "to gamepad");
+      console.log("Unregistering:", key, "from gamepad");
+      self.gamepadAbstraction.assignments.delete(key);
     }
   };
 

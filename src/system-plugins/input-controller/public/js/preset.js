@@ -18,7 +18,7 @@
 
             //Initialize the controller handle
             //This is where users can add a controller handle
-            self.controllers = [];
+            self.controllers = new Map();
         };
 
         //Preset Member functions
@@ -39,20 +39,18 @@
             }
 
             console.log("Adding controller:", controllerName, "to preset:", this.name);
+            
             //Adds a controller to the array of avaiable controllers to bind 
-            var controller = 
-            {
-                name: controllerName,
-                keys: []
-            }
+            var inputs = new Map();
 
             //Add to our existing list
-            this.controllers.push(controller);
+            this.controllers.set(controllerName, inputs);
         };
 
         addInput(input)
         {
             var self = this;
+
             //Make sure we got a valid input
             if(input == null)
             {
@@ -68,6 +66,23 @@
             });
 
             console.log(self.controllers);
+        };
+
+        doesInputExist(input)
+        {
+            var self = this;
+
+            //Make sure we got a valid input
+            if(input == null)
+            {
+                console.error("Tried to check if an undefined input exists!");
+                return;
+            }
+
+            var inputController = input.controller;
+
+            //Check this controller for this input
+
         }
 
         removeController(controllerName)
@@ -80,17 +95,7 @@
             }
 
             //Remove the controller from the list
-            //TODO: Surely there is a more idiomatic way
-            var result = getIndex(this.controllers, controllerName);
-            if(result.success)
-            {
-                this.controllers.splice([result.index], 1);
-            }
-            else
-            {
-                console.log("Could not find controller:", controllerName, "in preset:", this.name);
-                return;
-            }
+            this.controllers.delete(controllerName);
         };
     };
 
@@ -105,70 +110,29 @@
         }
 
         //Check to see if the controller is registered
-        var controllerToAddBinding = undefined;
-        controllers.forEach(function(controller) {
-            if(controller.name == binding.controller)
-            {
-                controllerToAddBinding = controller;
-            }
-        });
-
-        if(controllerToAddBinding == null)
+        if(!controllers.has(binding.controller))
         {
-            console.error("Controller:", binding.controller, "is not registered with preset");
-            return
+            console.error("Controller:", binding.controller, "is not registered with preset!");
+            return;
         }
 
         //Check to see if the key is registered
-        var keyIsRegistered = false;
-        controllerToAddBinding.keys.forEach(function(key) {
-            if(key.name = binding.controller.key)
-            {
-                console.log("Key Exists");
-                keyIsRegistered = true;
-            }
-        });
-
-        var newBinding = 
+        var controller = controllers.get(binding.controller);
+        if(controller.has(binding.input))
         {
-            key: binding.key,
-            actions: binding.actions
-        }
-
-        if(!keyIsRegistered)
-        {
-            controllerToAddBinding.keys.push(newBinding);
+            console.log("Key:", binding.input, "already exists");
+            return;
         }
         else
         {
-            console.error("This key is already registered for this controller!");
+            //Add the new binding
+            controller.set(binding.input, binding.actions);
         }
     }
 
     function controllerExists(controllers, key)
     {
-        return controllers.some( function(controller) {
-            return key == controller.name;
-        });
-    };
-
-    function getIndex(array, key)
-    {
-        var index;
-        for(var i = 0; i < array.length; ++i)
-        {
-            if(array[i].name == key)
-            {
-                return {
-                    success: true,
-                    index: i
-                }
-            }
-        }
-        return {
-            success: false,
-            index: null
-        }
+        return controllers.has(key);
     };
 
     var systemPlugins = namespace('systemPlugin');

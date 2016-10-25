@@ -26,7 +26,7 @@
                     [
                         {
                             controller: 'keyboard',
-                            key: 'q',
+                            input: 'q',
                             actions: [
                                 {
                                     down: function()
@@ -38,7 +38,7 @@
                         },
                         {
                             controller: 'gamepad',
-                            key: 'Y',
+                            input: 'Y',
                                                     
                             actions: [
                                 {
@@ -58,7 +58,7 @@
                     [
                         {
                             controller: 'keyboard',
-                            key: 'a',
+                            input: 'a',
                             actions: [
                                 {
                                     down: function()
@@ -70,7 +70,7 @@
                         },
                         {
                             controller: 'gamepad',
-                            key: 'B',
+                            input: 'B',
                                                     
                             actions: [
                                 {
@@ -90,7 +90,7 @@
                     [
                         {
                             controller: 'keyboard',
-                            key: 'z',
+                            input: 'z',
                             actions: [
                                 {
                                     down: function()
@@ -102,8 +102,7 @@
                         },
                         {
                             controller: 'gamepad',
-                            key: 'A',
-                                                    
+                            input: 'A',                  
                             actions: [
                                 {
                                     down: function()

@@ -72,17 +72,29 @@
 
       this.cockpit.on('plugin.inputController.defaults', function(defaults) {
         
+        //Listen for plugins asking to register their default input configurations
+
+        //Make sure we got a valid input
+        if(defaults == null)
+        {
+          console.error("A plugin tried to register undefined defaults!");
+          return;
+        }
+
+        //This can be an array of inputs, treat it as such
         defaults.forEach(function(input){
           self.register(input);
         });
 
-        self.keyboard.registerPreset(self.presets.get(self.currentPreset).controllers[0]);
+        console.log(self.presets.get(self.currentPreset));
+        self.keyboard.registerPreset(self.presets.get(self.currentPreset));
         self.keyboard.unregister({key:'a'});
 
       });
-
     };
 
+    //Registration of a single input
+    //This function will register an input with the current preset
     register(input)
     {
       var self = this;
@@ -92,13 +104,19 @@
         console.error("Tried to register an undefined input!");
         return;
       }
-      console.log("Registering an input:", input);
+      console.log("Registering an input:", input, "to preset:", self.currentPreset);
+
+      //Before we create a new object, make sure that it doesn't already exists
+      // self.presets.
 
       var newInput = new inputController.Input(input);
       self.presets.get(self.currentPreset).addInput(newInput);
     };
   }
 
+
+
+  //Helper classes
   /*Gamepad abstraction*/
   class Gamepad
   {
@@ -120,7 +138,7 @@
       console.log("Started keyboard abstraction");
     };
 
-    register(key)
+    register(key, actions)
     {
       if(key == null)
       {
@@ -130,11 +148,11 @@
       console.log("Registering:", key, "with Mousetrap");
       
       //Register actions
-      key.actions.forEach(function(action) {
+      actions.forEach(function(action) {
         //Up binding
         if(action.up !== null)
         {
-          Mousetrap.bind(key.key, function() {
+          Mousetrap.bind(key, function() {
             action.up();
             return false;
           });
@@ -143,7 +161,7 @@
         //Down Binding
         if(action.down !== null)
         {
-          Mousetrap.bind(key.key, function() {
+          Mousetrap.bind(key, function() {
             action.down();
             return false;
           });
@@ -157,9 +175,11 @@
       //Preset for a keyboard controller object
       var self = this;
 
-      preset.keys.forEach(function(key) {
-        self.register(key);
+      var keyboardPreset = preset.controllers.get("keyboard");
+      keyboardPreset.forEach(function(value, key) {
+        self.register(key, value);
       });
+
     }
 
     reset()

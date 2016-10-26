@@ -350,15 +350,32 @@
       console.log("Started keyboard abstraction");
     };
 
+    //Prevents registration of uninteded key presses
+
+
     register(key, actions)
     {
+      if(Mousetrap.modified == undefined) 
+      {
+
+        var orgStopCalback = Mousetrap.prototype.stopCallback;
+        Mousetrap.prototype.stopCallback = function (e, element, combo, sequence) 
+        {
+          if ((' ' + element.className + ' ').indexOf(' no-mousetrap ') > -1) {
+            return true;
+          }
+          return orgStopCalback.call(this, e, element, combo, sequence);
+        };
+        Mousetrap.modified = true;
+      }
+
       if(key == null)
       {
         console.error("Tried to register an undefined key from Mousetrap");
         return;
       }
+
       console.log("Registering:", key, "with Mousetrap");
-      
       //Register actions
       actions.forEach(function(action) {
         //Up binding

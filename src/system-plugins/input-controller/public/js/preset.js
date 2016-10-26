@@ -67,6 +67,16 @@
             
         };
 
+        makeCopy(presetName)
+        {
+            var self = this;
+            var presetOut;
+
+            presetOut = new inputController.Preset(presetName);
+            presetOut.controllers = self.controllers;
+            return presetOut;
+        }
+
         removeController(controllerName)
         {
             //Make sure we got a valid controller

@@ -20,32 +20,48 @@
       controlResetsSetPoint: false 
     };
 
-    this.inputDefaults = [{
+    this.inputDefaults = [
+    {
       name: 'rovPilot.toggleHeadingHold',
       description: 'Toggles the heading hold on/off',
-      defaults: 
-      { 
-        keyboard: 'm', 
-        gamepad: ''
-      },
-      down: function()
-      {
-        self.cockpit.emit('plugin.rovpilot.headingHold.set-enabled', !self.headingHold_state.enabled)
-      }
+      bindings:
+      [
+        {
+          controller: 'keyboard',
+          input: 'm',
+          actions:
+          [
+            {
+              down: function() {
+                self.cockpit.emit('plugin.rovpilot.headingHold.set-enabled', !self.headingHold_state.enabled);
+              }
+            }
+          ]
+        }
+      ]
     },
     {
-        name: 'rovPilot.toggleDepthHold',
-        description: 'Toggles the depth hold on/off',
-        defaults: 
-        { 
-          keyboard: 'n',
-          gamepad: '' 
-        },
-        down: function () 
+      name: 'rovPilot.toggleDepthHold',
+      description: 'Toggles the depth hold on/off',
+      bindings:
+      [
         {
-          self.cockpit.emit('plugin.rovpilot.depthHold.set-enabled', !self.depthHold_state.enabled);
+          controller: 'keyboard',
+          input: 'n',
+          actions:
+          [
+            {
+              down: function() {
+                self.cockpit.emit('plugin.rovpilot.depthHold.set-enabled', !self.depthHold_state.enabled);
+              }
+            }
+          ]
         }
-    }];
+      ]
+    }];   
+    
+    //If this was loaded after the input manager, let it know we are ready to be loaded
+    cockpit.emit('plugin.inputController.defaults', self.inputDefaults);
   };
 
   ROVpilotWire.prototype.altMenuDefaults = function altMenuDefaults() {

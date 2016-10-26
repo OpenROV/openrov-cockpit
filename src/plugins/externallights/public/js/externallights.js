@@ -32,7 +32,7 @@
             }
 
             // Setup input handlers
-            this.inputDefaults = [
+            self.inputDefaults = [
             {
                 name: 'plugin.externalLights.stepPositive',
                 description: 'Makes the ROV external lights brighter.',

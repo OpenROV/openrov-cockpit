@@ -362,21 +362,21 @@
       //Register actions
       actions.forEach(function(action) {
         //Up binding
-        if(action.up !== null)
+        if(action.up !== undefined)
         {
           Mousetrap.bind(key, function() {
             action.up();
             return false;
-          });
+          }, 'keyup');
         }
 
         //Down Binding
-        if(action.down !== null)
+        if(action.down !== undefined)
         {
           Mousetrap.bind(key, function() {
             action.down();
             return false;
-          });
+          }, 'keydown');
         }
       });
     };

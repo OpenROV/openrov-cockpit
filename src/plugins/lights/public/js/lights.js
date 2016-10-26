@@ -107,7 +107,7 @@
                         [
                             {
                                 down: function() {
-                                    cockpit.emit( 'plugin.lights.stepNegative' );
+                                    cockpit.emit( 'plugin.lights.toggle' );
                                 }
                             }
                         ]

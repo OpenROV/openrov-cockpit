@@ -47,11 +47,6 @@
               }
             }
           ]
-        },
-        {
-          controller: 'gamepad',
-          input: undefined,
-          actions: undefined
         }
       ]
     }];

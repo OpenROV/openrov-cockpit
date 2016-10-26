@@ -54,6 +54,20 @@
         //Add it to the map
         self.presets.set("OpenROVDefault", self.openrovPreset);
 
+        //If plugins have loaded before us, let's get their defaults
+        self.cockpit.loadedPlugins.forEach(function(plugin) {
+          if(plugin.inputDefaults !== undefined)
+          {
+            //Do not support functions. Probably should
+            if(typeof plugin.inputDefaults !== 'function')
+            {
+              plugin.inputDefaults.forEach(function(input) {
+                self.register(input, self.currentPreset);
+              });
+            }
+          }
+        })
+
         return true;
       }
       else
@@ -87,6 +101,7 @@
           self.register(input, self.currentPreset);
         });
 
+        console.log(self.presets.get(self.currentPreset));
       });
     };
 

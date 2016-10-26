@@ -32,45 +32,66 @@
             }
 
             // Setup input handlers
-            this.inputDefaults = 
-            [
-              {
+            this.inputDefaults = [
+            {
                 name: 'plugin.externalLights.stepPositive',
                 description: 'Makes the ROV external lights brighter.',
-                defaults: 
-                {
-                  keyboard: '=',
-                },
-                down: function () 
-                {
-                  cockpit.emit( 'plugin.externalLights.stepPositive' );
-                }
-              },
-              {
+                bindings:
+                [
+                    {
+                        controller: 'keyboard',
+                        input: '=',
+                        actions:
+                        [
+                            {
+                                down: function() {
+                                    cockpit.emit( 'plugin.externalLights.stepPositive' );
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
                 name: 'plugin.externalLights.stepNegative',
                 description: 'Makes the ROV external lights dimmer.',
-                defaults: 
-                {
-                  keyboard: '-',
-                },
-                down: function () 
-                {
-                  cockpit.emit( 'plugin.externalLights.stepNegative' );
-                }
-              },
-              {
+                bindings:
+                [
+                    {
+                        controller: 'keyboard',
+                        input: '-',
+                        actions:
+                        [
+                            {
+                                down: function() {
+                                    cockpit.emit( 'plugin.externalLights.stepNegative' );
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
                 name: 'plugin.externalLights.toggle',
-                description: 'Toggles the ROV external lights on/off.',
-                defaults: 
-                { 
-                  keyboard: '0' 
-                },
-                down: function () 
-                {
-                  cockpit.emit( 'plugin.externalLights.toggle' );
-                }
-              }
-            ];
+                description: 'Toggles the ROV external lights.',
+                bindings:
+                [
+                    {
+                        controller: 'keyboard',
+                        input: '0',
+                        actions:
+                        [
+                            {
+                                down: function() {
+                                    cockpit.emit( 'plugin.externalLights.toggle' );
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }];
+            //If this was loaded after the input manager, let it know we are ready to be loaded
+            cockpit.emit('plugin.inputController.defaults', self.inputDefaults);
         };
 
         updateFromStep()

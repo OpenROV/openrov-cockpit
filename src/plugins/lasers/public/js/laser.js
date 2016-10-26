@@ -10,7 +10,7 @@
     self.laserState = {
       enabled: false
     };
-
+    
     this.inputDefaults = [{
       name: 'plugin.laser.Toggle',
       description: 'Toggles the lasers on or off',
@@ -27,19 +27,12 @@
               }
             }
           ]
-        },
-        {
-          controller: 'gamepad',
-          input: undefined,
-          actions: undefined         
         }
       ]
     }];
 
-    //Emit to the controller that we are loaded
-    setTimeout(function() {
-        cockpit.emit('plugin.inputController.defaults', self.inputDefaults);
-    }, 5000 );    
+    //If this was loaded after the input manager, let it know we are ready to be loaded
+    cockpit.emit('plugin.inputController.defaults', self.inputDefaults);
   };
   
   plugins.Laser = Laser;

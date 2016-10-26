@@ -27,11 +27,15 @@
     :host{
         display:block;
     }
+    paper-material{
+        margin:4px;
+    }
   </style>
   <template>
       <div style="height:100%;width:100%;position:fixed;">
+      <h2>Firmware Update Status: {{_lastStatusMessage}}</h2>
       <paper-material class="container" elevation="1">
-      <h2>Log:</h2>
+      <h4>Details:</h4>
       <div class="list-container">
       <iron-list id="list" items="[[updateLog]]" as="item">
             <template>
@@ -69,6 +73,7 @@
                   case "InProgress":
                     self.set('updateInProgress',true);
                     self.log(status.message);
+                    self._lastStatusMessage = status.message;
                   break;
                   case "Complete":
                     self.set('updateInProgress',false);

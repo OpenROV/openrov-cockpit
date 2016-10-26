@@ -17,6 +17,10 @@ module.exports = function( board )
 {
     const Progress = Object.freeze( { "InProgress":1, "Complete":2, "Failed":3 } );
 
+    function notify(message){
+        board.global.emit("notification",message);
+    }
+
     function status( message, progress )
     {
         board.global.emit( "plugin.updateManager.status", { message: message.toString(), progress: progress } );
@@ -211,6 +215,14 @@ module.exports = function( board )
 
         var RequestHashInfo = function()
         {
+            // Make sure the serial port is open
+            if (!self.board.bridge.isConnected())
+            {
+                console.log("Serial Port not connected.. opening and retrying in 300ms");
+                self.board.bridge.connect();
+                setTimeout(RequestHashInfo.bind(this),300);
+                return;
+            }
             // Send the version request command to the MCU
             self.board.bridge.write( "version();" );
 
@@ -255,11 +267,13 @@ module.exports = function( board )
     function completeHandler(event, from, to)
     {
         status( "Firmware up to date!", "Complete" );
+        notify( "Firmware update applied");
     }
 
     function failHandler(event, from, to)
     {
         status( "Firmware update failed!", "Failed" );
+        notify( "Firmware update failed");
     }
 
     function eFailHandler(event, from, to, msg) 
@@ -301,7 +315,7 @@ module.exports = function( board )
         callbacks: 
         {
             // State handlers - We allow states to handle their own transitions to ensure consistency
-            on_e_init: escCheckHandler,
+            onchecking_escs: escCheckHandler,
             onflashing_escs: flashESCHandler,
             onchecking_bin: checkBinHandler,
             onbuilding_firmware: buildFirmwareHandler,

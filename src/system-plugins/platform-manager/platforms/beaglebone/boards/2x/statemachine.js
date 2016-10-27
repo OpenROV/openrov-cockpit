@@ -266,21 +266,22 @@ module.exports = function( board )
 
     function resetMCUHandler(event, from, to)
     {
+        console.log( "test" );
         status( "Resetting MCU...", "InProgress" );
 
         var self = this;
 
-        return ResetMCU()
-            .then( function()
-            {
-                self._e_mcu_reset_complete();
-            } )
-            .catch( function( error )
-            {
-                // Move to failed state
-                log( "Reset failed" );
-                self._e_fail( error );
-            });
+        ResetMCU()
+        .then( function()
+        {
+            self._e_mcu_reset_complete();
+        } )
+        .catch( function( error )
+        {
+            // Move to failed state
+            log( "Reset failed" );
+            self._e_fail( error );
+        });
     }
 
     function completeHandler(event, from, to)

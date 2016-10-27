@@ -23,7 +23,7 @@
 <script>
 var template = $('#t')[0];
 template._resetMCU = function(){
-    template.cockpitEventEmitter.emit("mcu.reset");
+    template.cockpitEventEmitter.emit("mcu.ResetMCU");
 }
 template._flashESCs = function(){
     template.cockpitEventEmitter.emit("mcu.FlashESCs");

@@ -102,6 +102,7 @@
         });
 
         console.log(self.presets.get(self.currentPreset));
+        self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset));
       });
     };
 

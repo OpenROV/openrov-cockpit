@@ -57,12 +57,12 @@
                 console.error("Tried to add an undefined input to preset:", this.name);
                 return;
             }
-
+            
             //Go through the controllers for this input
             input.bindings.forEach(function(binding) {
 
                 //Add the binding
-                addBinding(self.controllers, binding);
+                addBinding(self.controllers, input.name, binding);
             });
             
         };
@@ -111,7 +111,7 @@
     };
 
     //Private helper functions
-    function addBinding(controllers, binding)
+    function addBinding(controllers, name, binding)
     {
         //Make sure we get a valid binding
         if(binding == null)
@@ -137,7 +137,12 @@
         else
         {
             //Add the new binding
-            controller.set(binding.input, binding.actions);
+            var value = {
+                inputName: name,
+                actions: binding.actions
+            };
+
+            controller.set(binding.input, value);
         }
     }
 

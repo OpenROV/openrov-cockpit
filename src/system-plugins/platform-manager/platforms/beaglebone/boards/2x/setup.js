@@ -166,7 +166,8 @@ var RegisterFunctions = function (board)
 
   board.AddMethod('ResetMCU', function (path) 
   {
-    
+    // Trigger an MCU reset
+    board.fsm._e_trigger_mcu_reset_user();
   }, false);
 
   board.AddMethod('FlashESCs', function (path) 

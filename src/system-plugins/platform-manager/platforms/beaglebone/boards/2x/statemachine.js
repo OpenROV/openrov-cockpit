@@ -2,12 +2,12 @@ const path              = require('path');
 const Promise           = require('bluebird');
 const retry             = require('bluebird-retry');
 const fs                = Promise.promisifyAll(require('fs-extra'));
-const execFileAsync     = require('child-process-promise').execFile;
 const StateMachine      = require('javascript-state-machine');
 
 const BuildMCUFirmware  = require( "./lib/BuildMCUFirmware.js" );
 const FlashMCUFirmware  = require( "./lib/FlashMCUFirmware.js" );
 const FlashESCFirmware  = require( "./lib/FlashESCFirmware.js" );
+const ResetMCU          = require( "./lib/ResetMCU.js" );
 
 const escConfPath       = "/opt/openrov/system/config/esc.conf";
 const mcuLastBuildPath  = "/opt/openrov/system/config/lastBuildHash";
@@ -264,6 +264,23 @@ module.exports = function( board )
         RequestHashInfo();
     }
 
+    function resetMCUHandler(event, from, to)
+    {
+        status( "Resetting MCU...", "InProgress" );
+
+        return ResetMCU()
+            .then( function()
+            {
+                _e_mcu_reset_complete();
+            } )
+            .catch( function( error )
+            {
+                // Move to failed state
+                log( "Reset failed" );
+                self._e_fail( error );
+            });
+    }
+
     function completeHandler(event, from, to)
     {
         status( "Firmware up to date!", "Complete" );
@@ -301,15 +318,16 @@ module.exports = function( board )
             { name: '_e_trigger_mcu_flash',             from: 'verify_version',                     to: 'flashing_mcu' },
             { name: '_e_mcu_flash_complete',            from: 'flashing_mcu',                       to: 'verify_version' },
             { name: '_e_firmware_validated',            from: 'verify_version',                     to: 'complete' },
+            { name: '_e_mcu_reset_complete',            from: 'resetting_mcu',                      to: 'complete' },
 
             // User events (can only be used from the complete state)
             { name: '_e_trigger_esc_flash_user',        from: 'complete',                           to: 'flashing_escs' },
             { name: '_e_trigger_firmware_build_user',   from: 'complete',                           to: 'building_firmware' },
             { name: '_e_trigger_mcu_flash_user',        from: 'complete',                           to: 'flashing_mcu' },
+            { name: '_e_trigger_mcu_reset_user',        from: 'complete',                           to: 'resetting_mcu,' },
             { name: '_e_reset',                         from: ['complete', 'failed'],               to: 'checking_escs' },
 
             { name: '_e_fail',                          from: '*',                                  to: 'failed' }
-            
         ],
 
         callbacks: 
@@ -322,6 +340,7 @@ module.exports = function( board )
             onflashing_mcu: flashMCUHandler,
             onget_hash: getHashHandler,
             onverify_version: verifyVersionHandler,
+            onresetting_mcu: resetMCUHandler,
             oncomplete: completeHandler,
             onfailed: failHandler,
 

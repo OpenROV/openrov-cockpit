@@ -179,7 +179,7 @@ var RegisterFunctions = function (board)
   {
     // Trigger a rebuild and reflash of the MCU firmware
     board.fsm._e_trigger_firmware_build_user();
-  }, false);
+  }, false); 
 
   board.AddMethod('UpdateFirmware', function (path) 
   {

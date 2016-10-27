@@ -28,7 +28,7 @@ BoardInterface.prototype.LoadPinMap = function (board) {
       return board;
     }
   });
-};
+}; 
 BoardInterface.prototype.LoadInterface = function (board) {
   console.log('BOARD: Loading board interface...');
   require('./boards/' + board.info.productId + '/setup.js')(board.targetBoard);

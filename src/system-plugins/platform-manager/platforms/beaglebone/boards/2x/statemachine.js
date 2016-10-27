@@ -268,10 +268,12 @@ module.exports = function( board )
     {
         status( "Resetting MCU...", "InProgress" );
 
+        var self = this;
+
         return ResetMCU()
             .then( function()
             {
-                _e_mcu_reset_complete();
+                self._e_mcu_reset_complete();
             } )
             .catch( function( error )
             {

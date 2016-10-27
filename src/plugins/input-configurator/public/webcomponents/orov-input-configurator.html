@@ -141,7 +141,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <template is="dom-repeat" items="{{inputs}}">
+                        <template is="dom-repeat" items="{{_mapToArray(inputs)}}">
                             <tr>
                                 <td>{{__(item.name)}}</td>
                                 <td><kbd class="light" on-tap="_handleKeyboardChange">{{item.bindings.keyboard}}&nbsp;</kbd></td>
@@ -169,9 +169,7 @@
                 is: "orov-input-configurator",
                 properties: {
                     inputs: {
-                        type: Array,
-                        value: [],
-                        observer: 'inputsChanged'
+                        type: Map
                     }
                 },
                 behaviors: [namespace('behaviors').oROVStandard],
@@ -184,9 +182,28 @@
                         var newInputs = [];
                         
                         //Iterate through the controllers
-                        preset.controllers.forEach(function(value, key) {
+                        preset.controllers.forEach(function(inputs, controller) {
                             
-                            var controller = key;
+                            //Iterate through the inputs for this controller
+                            inputs.forEach(function(value, input) {
+                                
+                                //Check if this input is already registered with our map
+                                if(inputs.has(input.inputName))
+                                {
+                                    //Update it
+                                    var updatedValue = {
+                                        name: input.inputName,
+                                        bindings:
+                                        {
+                                            
+                                        }
+                                    }
+                                    var inputToUpdate = inputs.get(input.inputName);
+                                    
+                                };
+                            })
+
+
                             value.forEach(function(input, key){
                                 var output = 
                                 {
@@ -223,6 +240,39 @@
 
                     //If sucessful, open up the toast
                     this.openUpdatePresetToast();
+                },
+
+                _mapToArray: function(inputs) {
+                    //Converts a js Map object to an array
+                    var returnArray = [];
+
+                    inputs.forEach(function(value, key) {
+                        
+                        var input = {
+                            name: key,
+                            bindings: {
+                                keyboard: undefined,
+                                gamepad: undefined
+                            },
+                            description: description
+                        };
+
+                        //If it has keyboard bindings, add it
+                        if(value.bindings.keyboard !== undefined)
+                        {
+                            input.bindings.keyboard = value.bindings.keyboard;
+                        }
+
+                        //If it has gamepad bindings, add it
+                        if(value.bindings.gamepad !== undefined)
+                        {
+                            input.bindings.keybgamepadoard = value.bindings.gamepad;
+                        }
+
+                        returnArray.push(input);
+                    });
+
+                    return returnArray;
                 }
 
 

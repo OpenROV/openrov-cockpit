@@ -41,7 +41,7 @@
         
         .container {
             overflow-y: auto;
-            height: 200px;
+            height: 500px;
         }
         
         section {
@@ -120,13 +120,7 @@
 
         <p>
             To change a control mapping, click on the control
-        </p>
-
-        <paper-tabs selected="0">
-            <paper-tab>Tab One</paper-tab>
-            <paper-tab>Tab Two</paper-tab>
-        </paper-tabs>
-        
+        </p>        
         <section class="">      
             <div class="container">
                 <table>
@@ -193,9 +187,22 @@
                         preset.controllers.forEach(function(value, key) {
                             
                             var controller = key;
-                            console.log(controller);
-                        });
+                            value.forEach(function(input, key){
+                                var output = 
+                                {
+                                    name: input.inputName,
+                                    bindings:
+                                    {
+                                        keyboard: key,
+                                        gamepad: key
+                                    },
+                                    description: input.inputName
+                                };
 
+                                newInputs.push(output);
+                            });
+                        });
+                        self.inputsChanged(newInputs);
                     });
                 },
 

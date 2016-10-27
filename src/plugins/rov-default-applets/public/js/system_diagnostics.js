@@ -22,7 +22,7 @@
                 }];
             };
 
-            this.cockpit.on("mcu.reset",function(){
+            this.cockpit.on("mcu.ResetMCU",function(){
                 self.rov.emit("mcu.ResetMCU");              
             })
             this.cockpit.on("mcu.FlashESCs",function(){

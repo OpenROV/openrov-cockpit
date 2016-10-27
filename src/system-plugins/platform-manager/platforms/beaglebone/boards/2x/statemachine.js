@@ -327,7 +327,7 @@ module.exports = function( board )
             { name: '_e_trigger_esc_flash_user',        from: 'complete',                           to: 'flashing_escs' },
             { name: '_e_trigger_firmware_build_user',   from: 'complete',                           to: 'building_firmware' },
             { name: '_e_trigger_mcu_flash_user',        from: 'complete',                           to: 'flashing_mcu' },
-            { name: '_e_trigger_mcu_reset_user',        from: 'complete',                           to: 'resetting_mcu,' },
+            { name: '_e_trigger_mcu_reset_user',        from: 'complete',                           to: 'resetting_mcu' },
             { name: '_e_reset',                         from: ['complete', 'failed'],               to: 'checking_escs' },
 
             { name: '_e_fail',                          from: '*',                                  to: 'failed' }

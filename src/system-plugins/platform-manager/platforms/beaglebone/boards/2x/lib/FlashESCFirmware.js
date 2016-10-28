@@ -47,8 +47,8 @@ function Flash( onStdout, onStderr )
         var escFlasherProcess   = escFlasherPromise.childProcess;
 
         // Attach stdout and stderr listeners to the flashing process
-        //escFlasherProcess.stdout.on( 'data', onStdout );
-        //escFlasherProcess.stderr.on( 'data', onStderr );
+        escFlasherProcess.stdout.on( 'data', onStdout );
+        escFlasherProcess.stderr.on( 'data', onStderr );
 
         // Now, try five times to flash the ESCs, every 5 seconds
         return Retry( function(){ return escFlasherPromise; }, { max_tries: 5, interval: 1000 })

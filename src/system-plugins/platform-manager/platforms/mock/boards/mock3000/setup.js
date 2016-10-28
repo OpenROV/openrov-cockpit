@@ -142,6 +142,10 @@ var RegisterFunctions = function(board) {
         board.bridge.write(command + ';');
     }, false);
 
+    board.cockpit.on("mcu.SendCommand",function( commandIn ){
+        board.global.emit("mcu.SendCommand", commandIn );
+    });
+
     board.AddMethod('SendMotorTest', function(port, starboard, vertical) {
         // The 1 bypasses motor smoothing
         var command = 'go(' + board.physics.mapRawMotor(port) + ',' + board.physics.mapRawMotor(vertical) + ',' + board.physics.mapRawMotor(starboard) + ',1)';

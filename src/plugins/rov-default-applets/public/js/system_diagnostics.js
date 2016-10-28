@@ -33,6 +33,12 @@
             })
             this.cockpit.on("mcu.UpdateFirmware",function(){
                 self.rov.emit("mcu.UpdateFirmware");              
+            })
+
+            // Command in form of: "commandName( params )"
+            this.cockpit.on("mcu.SendCommand", function( commandIn )
+            {
+                self.rov.emit("mcu.SendCommand", commandIn );
             })                                    
         }
     }

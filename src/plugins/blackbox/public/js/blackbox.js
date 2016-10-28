@@ -50,9 +50,9 @@
         }
       ]
     }];
-    setTimeout(function() {
-        cockpit.emit('plugin.inputController.defaults', self.inputDefaults);
-    }, 5000 );
+
+    //If this was loaded after the input manager, let it know we are ready to be loaded
+    cockpit.emit('plugin.inputController.defaults', self.inputDefaults);
   };
 
   plugins.Blackbox = Blackbox;

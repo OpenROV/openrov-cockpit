@@ -64,6 +64,9 @@
           }
         });
 
+        //Tell everyone else we got presets to use
+        self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset));
+        
         return true;
       }
       else
@@ -81,7 +84,7 @@
         console.log(e);
       });
 
-      this.cockpit.on('plugin.inputController.defaults', function(defaults) {
+      this.cockpit.rov.on('plugin.inputController.defaults', function(defaults) {
         
         //Listen for plugins asking to register their default input configurations
 
@@ -92,12 +95,8 @@
           return;
         }
 
-        //This can be an array of inputs, treat it as such
-        defaults.forEach(function(input){
-          self.register(input, self.currentPreset);
-        });
+        self.register(input, self.currentPreset);
 
-        console.log(self.presets.get(self.currentPreset));
         self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset));
       });
 
@@ -105,6 +104,7 @@
 
         if(self.presets !== undefined)
         {
+          console.log(self.presets.get(self.currentPreset));
           self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset));
         }
         

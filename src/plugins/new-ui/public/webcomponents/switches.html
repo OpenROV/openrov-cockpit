@@ -109,6 +109,7 @@
         __oncontentLoaded: function(){
           var self=this;
           this.set("_coveredControls",Polymer.dom(this).children.filter(function(item){return item.collectionDomElement==undefined}));
+
           Polymer.dom(self).children.forEach(function(control){
             registerEventListener( control, { event: 'switched', callback: function(e){     
               self._swapStateClasses(self.$$("#"+control.shortName),e.detail);
@@ -116,6 +117,7 @@
 
             control.style.display="none";
           });
+          
         },
         detached: function() {
           var self=this;

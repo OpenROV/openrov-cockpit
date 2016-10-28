@@ -68,6 +68,11 @@
             --paper-spinner-stroke-width: 4px;
         }
 
+        #duplicateInputToast {
+            --paper-toast-background-color: red;
+            --paper-toast-color: white;
+        }
+
 
         /**
         * KEYS.css
@@ -153,7 +158,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <template is="dom-repeat" items="{{_presetToArray(preset)}}">
+                        <template is="dom-repeat" items="[[presetArray]]">
                             <tr>
                                 <td>{{__(item.name)}}</td>
                                 <td><kbd class="light" on-tap="_handleKeyboardChange">{{item.bindings.keyboard}}&nbsp;</kbd></td>
@@ -180,12 +185,16 @@
 
             <div class="buttons">
                 <paper-button hidden$={{isListeningToKeyboard}} on-click="_handleKeyboardFocus">{{__('Enter a different key')}}</paper-button>
+                <paper-button on-tap="handleClearKeyboardBinding" dialog-confirm>{{__('clear binding')}}</paper-button>
+                <paper-button dialog-confirm disabled$={{!isValidKeyboardReplacement}} on-click="handleKeyboardBindingChange"> {{__('Replace binding')}}</paper-button>
                 <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
             </div>
         </paper-dialog>
 
         <paper-button raised on-click="updatePreset">Update Preset</paper-button>
-        <paper-toast id="updatePresetToast" text="Updated Preset!"></paper-toast>
+        <paper-toast id="updatePresetToast" text="Updated preset!"></paper-toast>
+        <paper-toast id="clearedInputToast" text="Cleared input!"></paper-toast>
+        <paper-toast id="duplicateInputToast" class="fit-bottom" text="Duplicated Inputs!"></paper-toast>
 
     </template>
     
@@ -208,9 +217,19 @@
                         type: Map
                     },
 
+                    presetArray: {
+                        type: Array,
+                        value: undefined
+                    },
+
                     selectedItem: {
                         type: Object,
                         value: undefined
+                    },
+
+                    isValidKeyboardReplacement: {
+                        type: Boolean,
+                        value: false
                     }
                 },
 
@@ -234,9 +253,11 @@
 
                     emitter.on('plugin.inputController.updatedPreset', this.presetFunction );
                 },
+                
                 detached: function(){
                     this.eventEmitter.off('plugin.inputController.updatedPreset',this.presetFunction)
                 },
+
                 attached: function() {
                     var self = this;
 
@@ -251,7 +272,39 @@
                 {
                     this.inputs = inputs;
                 },
+
+                checkForKeyboardDuplicates: function() {
+                    var self = this;
+
+                    //If there is no array present to check with, return
+                    if(self.presetArray == undefined || self.candidateBinding == undefined)
+                    {
+                        return;
+                    }
+
+                    //Check if this is a valid binding
+                    var isDuplicate = self.presetArray.some(function(element, index, array) {
+                        return element.bindings.keyboard == self.candidateBinding;
+                    });
+
+                    if( isDuplicate )
+                    {
+                        self.openDuplicateInputToast();
+                        
+                    }
+                    else
+                    {
+                        console.log("Good");
+                        self.isValidKeyboardReplacement = true;
+                    }
+                },
+
+                openDuplicateInputToast: function() {
+                    this.$.duplicateInputToast.open();
+                },
+
                 openUpdatePresetToast: function() {
+                    
                     this.$.updatePresetToast.open();
                 },
                 onKeyboardModalClosed : function() {
@@ -270,11 +323,46 @@
                     var self = this;
                     //Actually update the preset with the input controller
                     console.log("Updating the preset with input controller");
-                    
+
+                                        
                     //If sucessful, open up the toast
                     this.openUpdatePresetToast();
                 },
+                handleClearKeyboardBinding: function() {
+                    var self = this;
 
+                    //Clear the input from our presets
+                    console.log(self.selectedItem);
+
+                    //Format in a way that the input controller expects
+                    var clearedInput = {
+                        name: self.selectedItem.name,
+                        description: self.selectedItem.description,
+                        bindings: [
+                        {
+                            controller: "keyboard",
+                            input: undefined
+                        },                 
+                        {
+                            controller: "gamepad",
+                            input: self.selectedItem.bindings.gamepad
+                        }]
+                    };
+
+                    //Let the input controller know
+                    self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
+
+                    this.$.clearedInputToast.open();
+                },
+                handleKeyboardBindingChange: function() {
+                    var self = this;
+
+                    //Replace the selected item's keyboard binding with the selected binding
+                    var replacedInput = self.selectedItem;
+                    replacedInput.bindings.keyboard = self.candidateBinding;
+
+                    this.openUpdatePresetToast();
+                },
                 _handleKeyboardChange: function(e) {
                     var self = this;
                     var inputPressed = e.model.item;
@@ -286,18 +374,23 @@
                 _handleKeyboardFocus: function(e) {
                     var self = this;
 
+                    //Reset our state
                     self.isListeningToKeyboard = true;
+                    self.candidateBinding = undefined;
+                    self.isValidKeyboardReplacement = false;
+
                     Mousetrap.record( function(sequence) {
-
                         console.log('You pressed: ' + sequence.join(' '));
-
                         self.isListeningToKeyboard = false;
                         self.candidateBinding = sequence.join(' ');
-                    });
 
+                        //Check to see if this is a valid replacement binding for the keyboard
+                        self.checkForKeyboardDuplicates();
+                    });
                 },
 
                 _presetToArray: function(preset) {
+                    var self = this;
                     //Converts a js Map object to an array
                     var arrayPreset = [];
 
@@ -334,6 +427,8 @@
                         };
                         arrayPreset.push(arrayInput);
                     });
+
+                    self.presetArray = arrayPreset;
                     return arrayPreset;
                 }
             })

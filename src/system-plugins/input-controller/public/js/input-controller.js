@@ -109,7 +109,74 @@
         }
         
       });
+
+      this.cockpit.on('plugin.inputController.updateInput', function(input) {
+
+        //Try to update that input
+        self.updateInput(input, self.currentPreset);
+      });
+
+      this.cockpit.on('plugin.inputController.unregisterInput', function(input) {
+
+        //Try to update that input
+        self.unregisterInput(input, self.currentPreset);
+      });
+
     };
+
+    unregisterInput(input, preset)
+    {
+      var self = this;
+
+      if(input == null)
+      {
+        console.error("Tried to update a null input");
+        return;
+      }
+
+      var currentPreset = self.presets.get(preset);
+
+      //Unregister the input with hardware
+      var previousBindings = currentPreset.inputs.get(input.name).bindings;
+      previousBindings.forEach(function(binding) {
+        
+        if(binding.input !== undefined)
+        {
+          var controller = self.controllers.get(binding.controller);
+          controller.unregister(binding.input, binding.actions);
+        }
+      });
+
+     
+      //Update the input with the preset
+      currentPreset.updateInput(input);1
+      //Let everyone know we just updated
+      self.cockpit.emit('plugin.inputController.updatedPreset', currentPreset);
+
+
+    };
+
+    updateInput(input, preset)
+    {
+      var self = this;
+
+      if(input == null)
+      {
+        console.error("Tried to update a null input");
+        return;
+      }
+
+      //Update the input with the preset
+      var currentPreset = self.presets.get(preset);
+      currentPreset.updateInput(input);
+
+      //Update the input with hardware
+      
+      //Let everyone know we just updated
+      self.cockpit.emit('plugin.inputController.updatedPreset', currentPreset);
+
+    };
+
 
     //Registration of a single input
     //This function will register an input with the passed preset
@@ -122,6 +189,7 @@
         console.error("Tried to register an undefined input!");
         return;
       }
+
       console.log("Registering an input:", input, "to preset:", preset);
 
       self.registerInputWithPreset(input, preset);
@@ -145,7 +213,17 @@
       var self = this;
 
       var currentPreset = self.presets.get(preset);
-      currentPreset.addInput(input);
+
+      //If this preset already exists, just update the preset
+      if(currentPreset.inputs.has(input.name))
+      {
+        console.log("Input:", input.name, "already is registered with preset:", currentPreset.name);
+      }
+      else
+      {
+        currentPreset.addInput(input);
+      }
+      
     };
 
     //Registration of a preset with hardware interfaces
@@ -382,26 +460,53 @@
       }
 
       console.log("Registering:", key, "with Mousetrap");
-      //Register actions
-      actions.forEach(function(action) {
-        //Up binding
+
+      //Register actions, used for unbinding as well
+      var mousetrapActions = {
+        down: undefined,
+        up: undefined
+      };
+
+      actions.forEach(function(action){
         if(action.up !== undefined)
         {
-          Mousetrap.bind(key, function() {
-            action.up();
-            return false;
-          }, 'keyup');
+          mousetrapActions.up = action.up;
         }
 
-        //Down Binding
         if(action.down !== undefined)
         {
-          Mousetrap.bind(key, function() {
-            action.down();
-            return false;
-          }, 'keydown');
+          mousetrapActions.down = action.down;
         }
       });
+
+      if(mousetrapActions.up !== undefined)
+      {
+        Mousetrap.bind(key, mousetrapActions.up, 'keyup');
+      }
+      if(mousetrapActions.down !== undefined)
+      {
+        Mousetrap.bind(key, mousetrapActions.down, 'keydown');
+      }
+      
+      // actions.forEach(function(action) {
+      //   //Up binding
+      //   if(action.up !== undefined)
+      //   {
+      //     Mousetrap.bind(key, function() {
+      //       action.up();
+      //       return false;
+      //     }, 'keyup');
+      //   }
+
+      //   //Down Binding
+      //   if(action.down !== undefined)
+      //   {
+      //     Mousetrap.bind(key, function() {
+      //       action.down();
+      //       return false;
+      //     }, 'keydown');
+      //   }
+      // });
     };
 
     registerPreset(preset)
@@ -423,7 +528,7 @@
       Mousetrap.reset();
     };
 
-    unregister(key)
+    unregister(key, actions)
     {
       if(key == null)
       {
@@ -431,8 +536,29 @@
         return;
       }
 
-      console.log("Unregistering:", key.key, "from Mousetrap");
-      Mousetrap.unbind(key.key);
+      console.log("Unregistering:", key, "from Mousetrap");
+      // actions.forEach(function(action) {
+      //   //Up binding
+      //   if(action.up !== undefined)
+      //   {
+      //     Mousetrap.unbind(key, function() {
+      //       action.up();
+      //       return false;
+      //     }, 'keyup');
+      //   }
+
+      //   //Down Binding
+      //   if(action.down !== undefined)
+      //   {
+      //     Mousetrap.unbind(key, function() {
+      //       action.down();
+      //       return false;
+      //     }, 'keydown');
+      //   }
+      // });
+      Mousetrap.unbind(key, 'keyup');
+      Mousetrap.unbind(key, 'keydown');
+
     };
 
   };

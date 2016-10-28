@@ -70,6 +70,22 @@
             console.log("Removing input:", input.name, "from preset:", self.name);
             self.inputs.delete(input.name);
         }
+
+        updateInput(input)
+        {
+            var self = this;
+
+            //If this input exists update it
+            if(self.inputs.has(input.name))
+            {
+                self.inputs.set(input.name, input);
+            }
+            else
+            {
+                console.log("Tried to update an input that doesn't exist with this preset. Adding it");
+                self.addInput(input);
+            }
+        }
     };
 
     var systemPlugins = namespace('systemPlugin');

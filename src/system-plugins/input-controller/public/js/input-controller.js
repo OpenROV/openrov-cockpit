@@ -34,24 +34,20 @@
       {
         self.controllers = new Map();
         //Data structure to hold our presets on the browser side
-        //key: "preset-name" value: ["controller1", "controller2", ..., "controllerN"]
-        //where controller is, for example, keyboard
+        //key: "preset-name" value: ["preset1", "preset2", ..., "presetN"]
         self.presets = new Map();
 
         //The OpenROV default mapping preset. Defined by crawling the plugins
         self.openrovPreset = new inputController.Preset("OpenROV Preset");
 
         //Add our default controllers
-        self.openrovPreset.addController("keyboard");
         self.keyboard = new Keyboard(cockpit);
         self.controllers.set("keyboard", self.keyboard);
 
-
-        self.openrovPreset.addController("gamepad");
         self.gamepad = new Gamepad(cockpit);
         self.controllers.set("gamepad", self.gamepad);
 
-        //Add it to the map
+        //Add the default preset to the map
         self.presets.set("OpenROVDefault", self.openrovPreset);
 
         //If plugins have loaded before us, let's get their defaults
@@ -81,8 +77,8 @@
     {
       var self = this;
 
-      this.cockpit.on('plugin.inputController.debug', function() {
-        
+      this.cockpit.on('plugin.inputController.debug', function(e) {
+        console.log(e);
       });
 
       this.cockpit.on('plugin.inputController.defaults', function(defaults) {
@@ -103,6 +99,15 @@
 
         console.log(self.presets.get(self.currentPreset));
         self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset));
+      });
+
+      this.cockpit.on('plugin.inputController.sendPreset', function() {
+
+        if(self.presets !== undefined)
+        {
+          self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset));
+        }
+        
       });
     };
 

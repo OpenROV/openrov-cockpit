@@ -39,14 +39,18 @@
             background-color: #dddddd;
         }
         
-        .container {
-            overflow-y: auto;
-            height: 500px;
+        #tableContainer {
+            overflow: auto;
+            height: 400px;
         }
         
         section {
             position: relative;
             border: 1px solid #000;
+        }
+
+        #stickyHeader {
+            background-color: white;
         }
 
         paper-button {
@@ -122,10 +126,10 @@
             To change a control mapping, click on the control
         </p>        
         <section class="">      
-            <div class="container">
+            <div id="tableContainer">
                 <table>
-                    <thead>
-                        <tr class="header">
+                    <thead id="stickyHeader">
+                        <tr>
                             <th>
                                 <div>{{__('Command')}}</div>
                             </th>
@@ -141,7 +145,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <template is="dom-repeat" items="{{_mapToArray(inputs)}}">
+                        <template is="dom-repeat" items="{{_presetToArray(preset)}}">
                             <tr>
                                 <td>{{__(item.name)}}</td>
                                 <td><kbd class="light" on-tap="_handleKeyboardChange">{{item.bindings.keyboard}}&nbsp;</kbd></td>
@@ -168,63 +172,35 @@
             Polymer({
                 is: "orov-input-configurator",
                 properties: {
-                    inputs: {
+                    preset: {
                         type: Map
                     }
                 },
+
                 behaviors: [namespace('behaviors').oROVStandard],
+                listeners:
+                {
+                    'tableContainer.scroll': 'tableContainerScroll'
+                },
+
+
                 registerEmitterHandlers: function(emitter) {
                     var self = this;
                     emitter.on('plugin.inputController.updatedPreset', function(preset) {
                         console.log("Got a new preset:", preset);
 
-                        //Clear the original array
-                        var newInputs = [];
-                        
-                        //Iterate through the controllers
-                        preset.controllers.forEach(function(inputs, controller) {
-                            
-                            //Iterate through the inputs for this controller
-                            inputs.forEach(function(value, input) {
-                                
-                                //Check if this input is already registered with our map
-                                if(inputs.has(input.inputName))
-                                {
-                                    //Update it
-                                    var updatedValue = {
-                                        name: input.inputName,
-                                        bindings:
-                                        {
-                                            
-                                        }
-                                    }
-                                    var inputToUpdate = inputs.get(input.inputName);
-                                    
-                                };
-                            })
+                        //Set this to our current preset on the input Configurator
+                        self.preset = preset;
 
-
-                            value.forEach(function(input, key){
-                                var output = 
-                                {
-                                    name: input.inputName,
-                                    bindings:
-                                    {
-                                        keyboard: key,
-                                        gamepad: key
-                                    },
-                                    description: input.inputName
-                                };
-
-                                newInputs.push(output);
-                            });
-                        });
-                        self.inputsChanged(newInputs);
+                        //Update the UI to reflect this
+                        self._presetToArray(self.preset);
                     });
                 },
 
                 attached: function() {
-                    
+                    var self = this;
+                    //Tell the input controller we want presets
+                    self.eventEmitter.emit('plugin.inputController.sendPreset');
                 },
                 inputsChanged: function(inputs)
                 {
@@ -234,48 +210,62 @@
                     this.$.updatePresetToast.open();
                 },
 
+                tableContainerScroll: function() {
+                    var self = this;
+
+                    /*CSS way to do sticky headers*/
+                    var translate = "translate(0," + self.$.tableContainer.scrollTop + "px)";
+                    self.$.stickyHeader.style.transform = translate;
+                },
+
                 updatePreset: function() {
+                    var self = this;
                     //Actually update the preset with the input controller
                     console.log("Updating the preset with input controller");
-
+                    
                     //If sucessful, open up the toast
                     this.openUpdatePresetToast();
                 },
 
-                _mapToArray: function(inputs) {
+                _presetToArray: function(preset) {
                     //Converts a js Map object to an array
-                    var returnArray = [];
+                    var arrayPreset = [];
 
-                    inputs.forEach(function(value, key) {
+                    //Iterate through the preset MAP to create an array for the dom element
+                    preset.inputs.forEach( function(value, input) {
                         
-                        var input = {
-                            name: key,
-                            bindings: {
-                                keyboard: undefined,
-                                gamepad: undefined
-                            },
-                            description: description
+                        var binding = {
+                            keyboard: undefined,
+                            gamepad: undefined
                         };
-
-                        //If it has keyboard bindings, add it
-                        if(value.bindings.keyboard !== undefined)
+                        
+                        //Register Keyboard control bindings
+                        var keyboardBinding = value.bindings.find( function(binding) {
+                            return binding.controller == "keyboard";
+                        });
+                        if(keyboardBinding !== undefined)
                         {
-                            input.bindings.keyboard = value.bindings.keyboard;
+                            binding.keyboard = keyboardBinding.input;
                         }
 
-                        //If it has gamepad bindings, add it
-                        if(value.bindings.gamepad !== undefined)
+                        //Register Gamepad control bindings
+                        var gamepadBinding = value.bindings.find( function(binding) {
+                            return binding.controller == "gamepad";
+                        });
+                        if(gamepadBinding !== undefined)
                         {
-                            input.bindings.keybgamepadoard = value.bindings.gamepad;
+                            binding.gamepad = gamepadBinding.input;
                         }
 
-                        returnArray.push(input);
+                        var arrayInput = {
+                            name: value.name,
+                            description: value.description,
+                            bindings: binding
+                        };
+                        arrayPreset.push(arrayInput);
                     });
-
-                    return returnArray;
+                    return arrayPreset;
                 }
-
-
             })
         })();
     </script>

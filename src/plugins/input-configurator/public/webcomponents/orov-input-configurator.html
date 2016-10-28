@@ -7,6 +7,7 @@
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-spinner/paper-spinner.html">
 <link rel="import" href="../paper-spinner/paper-spinner-lite.html">
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../paper-tabs/paper-tabs.html">
@@ -60,6 +61,14 @@
         paper-tab {
             background-color:#0D47A1;
         }
+
+        paper-spinner {
+            top: 2em;
+            left: 4em;
+            --paper-spinner-stroke-width: 4px;
+        }
+
+
         /**
         * KEYS.css
         *
@@ -83,7 +92,7 @@
             -webkit-border-radius: .3em;
             border-radius: .3em;
             border: none;
-            cursor: default;
+            cursor: pointer;
             -moz-user-select: none;
             -webkit-user-select: none;
             user-select: none;
@@ -121,7 +130,6 @@
 
         <!-- TODO: Properly implement language formatting -->
         <h2>Input Configurator: BETA</h2>
-
         <p>
             To change a control mapping, click on the control
         </p>        
@@ -158,6 +166,24 @@
             </div>
         </section>
 
+
+        <paper-dialog id="keyboardModal" modal on-iron-overlay-closed="onKeyboardModalClosed" on-iron-overlay-opened="_handleKeyboardFocus">
+            <h1>Enter a new key binding</h1>
+            <h3>
+                {{__('Current Mapping')}}: <kbd class="light">{{selectedItem.bindings.keyboard}}</kbd>
+                <paper-spinner active={{isListeningToKeyboard}}></paper-spinner>
+            </h3>
+            
+            <h3>
+                {{__('Candidate Mapping')}}: <kbd class="light"> {{candidateBinding}} </kbd>
+            </h3>
+
+            <div class="buttons">
+                <paper-button hidden$={{isListeningToKeyboard}} on-click="_handleKeyboardFocus">{{__('Enter a different key')}}</paper-button>
+                <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
+            </div>
+        </paper-dialog>
+
         <paper-button raised on-click="updatePreset">Update Preset</paper-button>
         <paper-toast id="updatePresetToast" text="Updated Preset!"></paper-toast>
 
@@ -173,8 +199,18 @@
             Polymer({
                 is: "orov-input-configurator",
                 properties: {
+                    candidateBinding: {
+                        type: Object,
+                        value: undefined
+                    },
+
                     preset: {
                         type: Map
+                    },
+
+                    selectedItem: {
+                        type: Object,
+                        value: undefined
                     }
                 },
 
@@ -218,6 +254,9 @@
                 openUpdatePresetToast: function() {
                     this.$.updatePresetToast.open();
                 },
+                onKeyboardModalClosed : function() {
+
+                },
 
                 tableContainerScroll: function() {
                     var self = this;
@@ -234,6 +273,28 @@
                     
                     //If sucessful, open up the toast
                     this.openUpdatePresetToast();
+                },
+
+                _handleKeyboardChange: function(e) {
+                    var self = this;
+                    var inputPressed = e.model.item;
+                    self.selectedItem = inputPressed;
+                    
+                    this.$.keyboardModal.open();
+                },
+
+                _handleKeyboardFocus: function(e) {
+                    var self = this;
+
+                    self.isListeningToKeyboard = true;
+                    Mousetrap.record( function(sequence) {
+
+                        console.log('You pressed: ' + sequence.join(' '));
+
+                        self.isListeningToKeyboard = false;
+                        self.candidateBinding = sequence.join(' ');
+                    });
+
                 },
 
                 _presetToArray: function(preset) {

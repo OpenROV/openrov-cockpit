@@ -54,7 +54,7 @@
             presetOut = new inputController.Preset(presetName);
             presetOut.controllers = self.controllers;
             return presetOut;
-        }
+        };
 
         removeInput(input)
         {
@@ -69,7 +69,7 @@
 
             console.log("Removing input:", input.name, "from preset:", self.name);
             self.inputs.delete(input.name);
-        }
+        };
 
         updateInput(input)
         {
@@ -78,14 +78,46 @@
             //If this input exists update it
             if(self.inputs.has(input.name))
             {
-                self.inputs.set(input.name, input);
+                //Grab the input
+                var existingInput = self.inputs.get(input.name);
+
+                existingInput.bindings.forEach(function(binding) {
+                    if(binding.controller == input.controller)
+                    {
+                        binding.input = input.input;
+                    }
+                });
             }
             else
             {
                 console.log("Tried to update an input that doesn't exist with this preset. Adding it");
                 self.addInput(input);
             }
-        }
+        };
+        
+        unregisterInput(input)
+        {
+            var self = this;
+
+            //If this input exists update it
+            if(self.inputs.has(input.name))
+            {
+                //Set this binding to undefined
+                var unregisteredInput = self.inputs.get(input.name);
+                
+                unregisteredInput.bindings.forEach(function(binding) {
+                    if(binding.controller == input.controller)
+                    {
+                        binding.input = undefined;
+                    }
+                });
+            }
+            else
+            {
+                console.error("Tried to unregister an input that doesn't exist with this preset.");
+                return;
+            }
+        };
     };
 
     var systemPlugins = namespace('systemPlugin');

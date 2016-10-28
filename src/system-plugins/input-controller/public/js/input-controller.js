@@ -137,27 +137,26 @@
       var currentPreset = self.presets.get(preset);
 
       //Unregister the input with hardware
-      var previousBindings = currentPreset.inputs.get(input.name).bindings;
-      previousBindings.forEach(function(binding) {
-        
-        if(binding.input !== undefined)
-        {
-          var controller = self.controllers.get(binding.controller);
-          controller.unregister(binding.input, binding.actions);
-        }
-      });
+      var controller = self.controllers.get(input.controller);
+      controller.unregister(input.input);
 
-     
       //Update the input with the preset
-      currentPreset.updateInput(input);1
+      currentPreset.unregisterInput(input);
+      
       //Let everyone know we just updated
       self.cockpit.emit('plugin.inputController.updatedPreset', currentPreset);
-
-
     };
 
     updateInput(input, preset)
     {
+      /*For updates, we expect data to look like this
+        updatedInput {
+          name: String,
+          controller: String,
+          input: String 
+        }
+      */
+
       var self = this;
 
       if(input == null)
@@ -166,12 +165,22 @@
         return;
       }
 
+      //The preset we are using
+      var currentPreset = self.presets.get(preset);
+
+      //The hardware we are interacting with
+      var controller = self.controllers.get(input.controller);
+
+
+      //Update the input with the hardware
+      //We need a handle on what the previous input key was, so let's get it
+      var previousInput = currentPreset.inputs.get(input.name);
+      controller.update(previousInput, input);
+
       //Update the input with the preset
       var currentPreset = self.presets.get(preset);
       currentPreset.updateInput(input);
 
-      //Update the input with hardware
-      
       //Let everyone know we just updated
       self.cockpit.emit('plugin.inputController.updatedPreset', currentPreset);
 
@@ -487,26 +496,6 @@
       {
         Mousetrap.bind(key, mousetrapActions.down, 'keydown');
       }
-      
-      // actions.forEach(function(action) {
-      //   //Up binding
-      //   if(action.up !== undefined)
-      //   {
-      //     Mousetrap.bind(key, function() {
-      //       action.up();
-      //       return false;
-      //     }, 'keyup');
-      //   }
-
-      //   //Down Binding
-      //   if(action.down !== undefined)
-      //   {
-      //     Mousetrap.bind(key, function() {
-      //       action.down();
-      //       return false;
-      //     }, 'keydown');
-      //   }
-      // });
     };
 
     registerPreset(preset)
@@ -537,28 +526,26 @@
       }
 
       console.log("Unregistering:", key, "from Mousetrap");
-      // actions.forEach(function(action) {
-      //   //Up binding
-      //   if(action.up !== undefined)
-      //   {
-      //     Mousetrap.unbind(key, function() {
-      //       action.up();
-      //       return false;
-      //     }, 'keyup');
-      //   }
-
-      //   //Down Binding
-      //   if(action.down !== undefined)
-      //   {
-      //     Mousetrap.unbind(key, function() {
-      //       action.down();
-      //       return false;
-      //     }, 'keydown');
-      //   }
-      // });
       Mousetrap.unbind(key, 'keyup');
       Mousetrap.unbind(key, 'keydown');
+    };
 
+    update(previousInput, currentInput)
+    {
+      var self = this;
+
+      //Unregister from the current settings
+      var previousKeyboardBinding = undefined;
+      previousInput.bindings.forEach(function(binding) {
+        if(binding.controller == "keyboard")
+        {
+          previousKeyboardBinding = binding;
+        }
+      });
+      self.unregister(previousKeyboardBinding.input);
+
+      //And update with the newest bindings
+      self.register(currentInput.input, previousKeyboardBinding.actions);
     };
 
   };

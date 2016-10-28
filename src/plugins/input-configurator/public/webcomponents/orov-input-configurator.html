@@ -11,6 +11,7 @@
 <link rel="import" href="../paper-spinner/paper-spinner-lite.html">
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../paper-tabs/paper-tabs.html">
+<link rel="import" href="../neon-animation/neon-animation.html">
 
 <dom-module name="orov-input-configurator">
 
@@ -172,8 +173,8 @@
         </section>
 
 
-        <paper-dialog id="keyboardModal" modal on-iron-overlay-closed="onKeyboardModalClosed" on-iron-overlay-opened="_handleKeyboardFocus">
-            <h1>Enter a new key binding</h1>
+        <paper-dialog id="keyboardModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation" on-iron-overlay-closed="onKeyboardModalClosed" on-iron-overlay-opened="handleKeyboardFocus">
+            <h1>Keyboard mapping</h1>
             <h3>
                 {{__('Current Mapping')}}: <kbd class="light">{{selectedItem.bindings.keyboard}}</kbd>
                 <paper-spinner active={{isListeningToKeyboard}}></paper-spinner>
@@ -184,17 +185,19 @@
             </h3>
 
             <div class="buttons">
-                <paper-button hidden$={{isListeningToKeyboard}} on-click="_handleKeyboardFocus">{{__('Enter a different key')}}</paper-button>
-                <paper-button on-tap="handleClearKeyboardBinding" dialog-confirm>{{__('clear binding')}}</paper-button>
-                <paper-button dialog-confirm disabled$={{!isValidKeyboardReplacement}} on-click="handleKeyboardBindingChange"> {{__('Replace binding')}}</paper-button>
+                <paper-button on-click="handleKeyboardRemapping"> {{__('Remap')}}</paper-button>
+                <paper-button on-tap="handleClearKeyboardBinding" dialog-confirm>{{__('Clear')}}</paper-button>
+                <paper-button disabled$={{isValidKeyboardReplacement}}>Clear conflicting binding</paper-button>
                 <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
             </div>
+
         </paper-dialog>
 
         <paper-button raised on-click="updatePreset">Update Preset</paper-button>
         <paper-toast id="updatePresetToast" text="Updated preset!"></paper-toast>
         <paper-toast id="clearedInputToast" text="Cleared input!"></paper-toast>
-        <paper-toast id="duplicateInputToast" class="fit-bottom" text="Duplicated Inputs!"></paper-toast>
+        
+        <paper-toast id="duplicateInputToast" class="fit-bottom" text="Duplicate found."></paper-toast>
 
     </template>
     
@@ -213,6 +216,11 @@
                         value: undefined
                     },
 
+                    conflictingBinding: {
+                        type: Object,
+                        value: undefined
+                    },
+
                     preset: {
                         type: Map
                     },
@@ -227,9 +235,14 @@
                         value: undefined
                     },
 
-                    isValidKeyboardReplacement: {
+                    isListeningToKeyboard: {
                         type: Boolean,
                         value: false
+                    },
+
+                    isValidKeyboardReplacement: {
+                        type: Boolean,
+                        value: true
                     }
                 },
 
@@ -290,13 +303,33 @@
                     if( isDuplicate )
                     {
                         self.openDuplicateInputToast();
-                        
+                        self.isValidKeyboardReplacement = false;                       
                     }
                     else
                     {
-                        console.log("Good");
                         self.isValidKeyboardReplacement = true;
+                        self.updateKeyboardInput();
                     }
+                },
+                updateKeyboardInput: function() {
+                    var self = this;
+
+                    var updatedInput = {
+                        name: self.selectedItem.name,
+                        controller: "keyboard",
+                        input: self.candidateBinding 
+                    };
+
+                    console.log("Updated:", updatedInput);
+                    self.eventEmitter.emit('plugin.inputController.updateInput', updatedInput);
+
+                    //Open the update toast
+                    self.$.updatePresetToast.open();
+
+
+
+                    //And close the modal
+                    self.$.keyboardModal.close();
                 },
 
                 openDuplicateInputToast: function() {
@@ -304,8 +337,8 @@
                 },
 
                 openUpdatePresetToast: function() {
-                    
-                    this.$.updatePresetToast.open();
+                    var self = this;
+                    self.$.updatePresetToast.open();
                 },
                 onKeyboardModalClosed : function() {
 
@@ -337,16 +370,8 @@
                     //Format in a way that the input controller expects
                     var clearedInput = {
                         name: self.selectedItem.name,
-                        description: self.selectedItem.description,
-                        bindings: [
-                        {
-                            controller: "keyboard",
-                            input: undefined
-                        },                 
-                        {
-                            controller: "gamepad",
-                            input: self.selectedItem.bindings.gamepad
-                        }]
+                        controller: "keyboard",
+                        input: self.selectedItem.bindings.keyboard
                     };
 
                     //Let the input controller know
@@ -361,7 +386,7 @@
                     var replacedInput = self.selectedItem;
                     replacedInput.bindings.keyboard = self.candidateBinding;
 
-                    this.openUpdatePresetToast();
+                    self.openUpdatePresetToast();
                 },
                 _handleKeyboardChange: function(e) {
                     var self = this;
@@ -370,14 +395,11 @@
                     
                     this.$.keyboardModal.open();
                 },
-
-                _handleKeyboardFocus: function(e) {
+                handleKeyboardRemapping: function() {
                     var self = this;
 
-                    //Reset our state
+                    //Start listening for keyboard inputs
                     self.isListeningToKeyboard = true;
-                    self.candidateBinding = undefined;
-                    self.isValidKeyboardReplacement = false;
 
                     Mousetrap.record( function(sequence) {
                         console.log('You pressed: ' + sequence.join(' '));
@@ -387,6 +409,17 @@
                         //Check to see if this is a valid replacement binding for the keyboard
                         self.checkForKeyboardDuplicates();
                     });
+
+                },
+
+
+                handleKeyboardFocus: function(e) {
+                    var self = this;
+
+                    //Reset our state
+                    self.isListeningToKeyboard = false;
+                    self.candidateBinding = undefined;
+                    self.isValidKeyboardReplacement = true;
                 },
 
                 _presetToArray: function(preset) {

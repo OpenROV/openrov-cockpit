@@ -36,7 +36,7 @@
     {
       name: 'blackbox.record',
       description: 'Start recording the telemetry data.',
-      controllers: new Map([["keyboard", "q"]]),
+      controllers: new Map([["keyboard", "r"]]),
       actions:
       {
         down: function() {

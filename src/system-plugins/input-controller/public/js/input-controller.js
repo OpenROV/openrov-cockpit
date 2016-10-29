@@ -317,9 +317,9 @@
         if(self.assignments.has(axis))
         {
           var assignment = self.assignments.get(axis);
-          if(typeof assignment[0].axis == 'function')
+          if(typeof assignment.axis == 'function')
           {
-            assignment[0].axis(e.value);
+            assignment.axis(e.value);
           }
         }
       });
@@ -330,9 +330,9 @@
         if(self.assignments.has(control))
         {
           var button = self.assignments.get(control);
-          if(typeof button[0].down == 'function')
+          if(typeof button.down == 'function')
           {
-            button[0].down();
+            button.down();
           }
         }
       });
@@ -343,9 +343,9 @@
         if(self.assignments.has(control))
         {
           var button = self.assignments.get(control);
-          if(typeof button[0].up == 'function')
+          if(typeof button.up == 'function')
           {
-            button[0].up();
+            button.up();
           }
         }
       });
@@ -492,12 +492,12 @@
       console.log("Registering:", key, "with Mousetrap");
 
       //Register actions, used for unbinding as well
-      if(actions.up !== null)
+      if(actions.up !== undefined)
       {
         Mousetrap.bind(key, actions.up, 'keyup');
       }
 
-      if(actions.down !== null)
+      if(actions.down !== undefined)
       {
         Mousetrap.bind(key, actions.down, 'keydown');
       }

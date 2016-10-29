@@ -610,21 +610,15 @@
                         };
                         
                         //Register Keyboard control bindings
-                        var keyboardBinding = value.bindings.find( function(binding) {
-                            return binding.controller == "keyboard";
-                        });
-                        if(keyboardBinding !== undefined)
+                        if(value.controllers.has('keyboard'))
                         {
-                            binding.keyboard = keyboardBinding.input;
+                            binding.keyboard = value.controllers.get('keyboard');
                         }
 
                         //Register Gamepad control bindings
-                        var gamepadBinding = value.bindings.find( function(binding) {
-                            return binding.controller == "gamepad";
-                        });
-                        if(gamepadBinding !== undefined)
+                        if(value.controllers.has('gamepad'))
                         {
-                            binding.gamepad = gamepadBinding.input;
+                            binding.gamepad = value.controllers.get('gamepad');
                         }
 
                         var arrayInput = {

@@ -52,7 +52,7 @@
     {
         name: 'rovPilot.moveForward',
         description: 'Set throttle forward',
-        controllers: new Map([["keyboard", "q"]]),
+        controllers: new Map([["keyboard", "up"]]),
         actions:
         {
           down: function() {

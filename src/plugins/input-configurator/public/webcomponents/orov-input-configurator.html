@@ -226,7 +226,7 @@
                 </paper-dropdown-menu> 
                 <paper-checkbox disabled>{{__('invert')}}</paper-checkbox>       
             </div>
-            <paper-button disabled$={{isValidGamepadReplacement}} on-tap="handleClearConflictingKeyboardBinding">Clear conflicting binding</paper-button>
+            <paper-button disabled$={{isValidGamepadReplacement}} on-tap="handleClearConflictingGamepadBinding">Clear conflicting binding</paper-button>
             <paper-button on-tap="handleClearGamepadBinding" dialog-confirm>{{__('Clear')}}</paper-button>
             <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
         </paper-dialog>
@@ -430,7 +430,7 @@
 
                 openUpdatePresetToast: function() {
                     var self = this;
-                    self.$.updatePresetToast.open();
+                    self.$.updatedPresetToast.open();
                 },
                 onKeyboardModalClosed : function() {
 
@@ -516,7 +516,26 @@
                     
                     self.updateKeyboardInput();
 
-                    this.$.clearedInputToast.open();
+                    self.openUpdatePresetToast();
+                },
+
+                handleClearConflictingGamepadBinding: function() {
+                    var self = this;
+                    console.log("Clearing:",self.conflictingBinding);
+
+                    //Format in a way that the input controller expects
+                    var clearedInput = {
+                        name: self.conflictingBinding.name,
+                        controller: "gamepad",
+                        input: self.conflictingBinding.bindings.gamepad
+                    };
+
+                    //Let the input controller know
+                    self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
+
+                    self.updateGamepadInput();
+
+                    self.openUpdatePresetToast();
                 },
 
                 handleKeyboardBindingChange: function() {

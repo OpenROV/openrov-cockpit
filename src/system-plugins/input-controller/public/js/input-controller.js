@@ -439,15 +439,10 @@
       var self = this;
 
       //unregister from the current settings
-      var previousGamepadBinding = undefined;
-      previousInput.bindings.forEach(function(binding) {
-        if(binding.controller == "gamepad")
-        {
-          previousGamepadBinding = binding;
-          self.unregister(previousGamepadBinding.input);
-        }
-      });
-      
+      if(previousInput.controllers.has('gamepad'))
+      {
+        self.unregister(previousInput.controllers.get('gamepad'));
+      }      
       
       //And update with the newest bindings
       self.register(currentInput.input, previousInput.actions);
@@ -501,9 +496,6 @@
       {
         Mousetrap.bind(key, actions.down, 'keydown');
       }
-      var callbacks = Mousetrap.getCallbacks();
-      console.log(callbacks);
-
     };
 
     registerPreset(preset)

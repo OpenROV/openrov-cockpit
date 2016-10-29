@@ -15,13 +15,50 @@
 <fieldset>
 <legend>Micro Controller Diags:</legend>    
 <paper-button raised id="resetMCUButton" on-tap="_resetMCU">Reset MCU</paper-button>
+<paper-button raised id="flashESCsButton" on-tap="_flashESCs">Flash ESCs</paper-button>
+<paper-button raised id="rebuildMCUFirmwareButton" on-tap="_rebuildMCUFirmware">Rebuild MCU Firmware</paper-button>
+<paper-button raised id="applyAllFirmwareUpdatesButton" on-tap="_applyAllFirmwareUpdates">Check For Updates</paper-button>
+
+<paper-button raised id="closeBridge" on-tap="_closeBridge">Close Serial Port</paper-button>
+<paper-button raised id="openBridge" on-tap="_openBridge">Open Serial Port</paper-button>
+<paper-button raised id="sendCommand" on-tap="_sendCommand">Send Command</paper-button>
+<paper-input id="commandToSend"></paper-input>
+
+
 </fieldset>
 </paper-material>
+
 <script>
 var template = $('#t')[0];
+
 template._resetMCU = function(){
-    template.cockpitEventEmitter.emit("mcu.reset");
+    template.cockpitEventEmitter.emit("mcu.ResetMCU");
 }
+template._flashESCs = function(){
+    template.cockpitEventEmitter.emit("mcu.FlashESCs");
+}
+template._rebuildMCUFirmware = function(){
+    template.cockpitEventEmitter.emit("mcu.RebuildMCUFirmware");
+}
+template._applyAllFirmwareUpdates = function(){
+    template.cockpitEventEmitter.emit("mcu.UpdateFirmware");
+}
+
+template._closeBridge = function()
+{
+    template.cockpitEventEmitter.emit("mcu.StopSerial");
+}
+template._openBridge = function()
+{
+    template.cockpitEventEmitter.emit("mcu.StartSerial");
+}
+
+template._sendCommand = function()
+{
+    var commandIn = $('#commandToSend')[0].value;
+    template.cockpitEventEmitter.emit("mcu.SendCommand", commandIn );
+}
+
 </script>
 
 <paper-material  elevation="1">

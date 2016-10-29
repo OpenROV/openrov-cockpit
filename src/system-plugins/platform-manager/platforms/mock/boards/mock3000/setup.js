@@ -10,11 +10,9 @@ var debug = {};
 var SetupBoardInterface = function(board) {
     debug = board.debug;
     // Decorate the MCU interface with board specific properties
-    board.physics = new ArduinoHelper()
-        .physics;
+    board.physics = new ArduinoHelper().physics;
     board.bridge = new Hardware();
     board.firmwareVersion = 0;
-    board.Capabilities = 0;
     board.statusdata = {};
 
     board.hashInfo = {
@@ -25,12 +23,9 @@ var SetupBoardInterface = function(board) {
     board.settingsCollection = {
         smoothingIncriment: 0,
         deadZone_min: 0,
-        deadZone_max: 0,
-        water_type: 0
+        deadZone_max: 0
     };
-    board.rovsys = {
-        capabilities: 0
-    };
+
     // ------------------------------------------------
     // Setup private board methods
 
@@ -40,10 +35,6 @@ var SetupBoardInterface = function(board) {
         return false;
     };
 
-    board.requestCapabilities = function() {
-        var command = 'rcap();';
-        board.bridge.write(command);
-    };
     board.requestSettings = function() {
         //todo: Move to a settings manager
         var command = 'reportSetting();';
@@ -53,16 +44,13 @@ var SetupBoardInterface = function(board) {
     };
     // TODO: Move the water setting to diveprofile
     board.updateSetting = function() {
-        function watertypeToflag(type) {
-            if (type == 'fresh') {
-                return 0;
-            }
-            return 1;
-        }
         // This is the multiplier used to make the motor act linear fashion.
         // For example: the props generate twice the thrust in the positive direction than the negative direction.
         // To make it linear we have to multiply the negative direction * 2.
-        var command = 'updateSetting(' + board.vehicleConfig.preferences.get('smoothingIncriment') + ',' + board.vehicleConfig.preferences.get('deadzone_neg') + ',' + board.vehicleConfig.preferences.get('deadzone_pos') + ',' + watertypeToflag(board.vehicleConfig.preferences.get('plugin:diveprofile:water-type')) + ');';
+        var command = 'updateSetting('
+            + board.vehicleConfig.preferences.get('smoothingIncriment') + ',' 
+            + board.vehicleConfig.preferences.get('deadzone_neg') + ',' 
+            + board.vehicleConfig.preferences.get('deadzone_pos') + ');';
         board.bridge.write(command);
     };
     // ------------------------------------------------
@@ -102,16 +90,9 @@ var SetupBoardInterface = function(board) {
             board.settingsCollection.smoothingIncriment = setparts[0];
             board.settingsCollection.deadZone_min = setparts[1];
             board.settingsCollection.deadZone_max = setparts[2];
-            board.settingsCollection.water_type = setparts[3];
             board.global.emit(board.interface + '.firmwareSettingsReported', board.settingsCollection);
         }
-        // Capability report
-        if ('CAPA' in status) {
-            var s = board.rovsys;
-            s.capabilities = parseInt(status.CAPA);
-            board.Capabilities = s.capabilities;
-            board.global.emit(board.interface + '.rovsys', s);
-        }
+
         // Command request
         if ('cmd' in status) {
             // Re-emit all commands except ping
@@ -123,10 +104,8 @@ var SetupBoardInterface = function(board) {
         if ('log' in status) {}
         // Initial boot notification
         if ('boot' in status) {
-            board.Capabilities = 0;
             board.updateSetting();
             board.requestSettings();
-            board.requestCapabilities();
         }
     });
     // ------------------------------------------------
@@ -147,24 +126,7 @@ var RegisterFunctions = function(board) {
         debug('MCU Interface initialized!');
         board.global.emit('mcu.StartSerial');
     }, false);
-    // board.AddMethod('FlashFirmware', function(file) {
-    //     debug('Flashing firmware: ' + file);
-    //     board.bridge.close();
-    //     board.global.emit('mcu.firmwareFlashStatus', 'flashing');
-    //     setTimeout(function() {
-    //         board.global.emit('mcu.firmwareFlashStatus', 'success');
-    //         board.bridge.connect();
-    //     }, 3000);
-    // }, false);
-    // board.AddMethod('DumpFirmware', function(path) {
-    //     debug('Dumping firmware to: ' + path);
-    //     board.bridge.close();
-    //     board.global.emit('mcu.firmwareDumpStatus', 'dumping');
-    //     setTimeout(function() {
-    //         board.global.emit('mcu.firmwareDumpStatus', 'success');
-    //         board.bridge.connect();
-    //     }, 3000);
-    // }, false);
+
     board.AddMethod('ResetMCU', function(path) {
         debug('Resetting MCU: ' + path);
         board.bridge.close();
@@ -172,26 +134,24 @@ var RegisterFunctions = function(board) {
             board.bridge.connect();
         }, 1000);
     }, false);
-    // board.AddMethod('FlashESC', function() {
-    //     debug('Flashing ESCs');
-    //     board.bridge.close();
-    //     board.global.emit('mcu.escFlashStatus', 'flashing');
-    //     setTimeout(function() {
-    //         board.global.emit('mcu.escFlashStatus', 'success');
-    //         board.bridge.connect();
-    //     }, 3000);
-    // }, false);
+
     board.AddMethod('SendCommand', function(command) {
         if (board.notSafeToControl()) {
             return;
         }
         board.bridge.write(command + ';');
     }, false);
+
+    board.cockpit.on("mcu.SendCommand",function( commandIn ){
+        board.global.emit("mcu.SendCommand", commandIn );
+    });
+
     board.AddMethod('SendMotorTest', function(port, starboard, vertical) {
         // The 1 bypasses motor smoothing
         var command = 'go(' + board.physics.mapRawMotor(port) + ',' + board.physics.mapRawMotor(vertical) + ',' + board.physics.mapRawMotor(starboard) + ',1)';
         board.bridge.write(command + ';');
     }, false);
+
     board.AddMethod('RegisterPassthrough', function(config) {
         if (config) {
             if (!config.messagePrefix) {
@@ -228,10 +188,11 @@ var RegisterFunctions = function(board) {
             }
         }
     }, false);
+
     board.AddMethod('StartSerial', function() {
         // Connect to the MCU
         board.bridge.connect();
-        // Every few seconds we check to see if capabilities or settings changes on the arduino.
+        // Every few seconds we check to see if settings changes on the arduino.
         // This handles the cases where we have garbled communication or a firmware update of the arduino.
         board.safeCheck = setInterval(function() {
             if (board.notSafeToControl() === false) {
@@ -239,18 +200,20 @@ var RegisterFunctions = function(board) {
             }
             board.updateSetting();
             board.requestSettings();
-            board.requestCapabilities();
         }, 1000);
     }, false);
+
     board.AddMethod('StopSerial', function() {
         // Close the bridge connection
         board.bridge.close();
         // Remove the safeCheck interval
         board.safeCheck = {};
     }, false);
+
     board.AddMethod('StartRawSerial', function() {
         board.bridge.startRawSerialData();
     }, false);
+    
     board.AddMethod('StopRawSerial', function() {
         board.bridge.stopRawSerialData();
     }, false);

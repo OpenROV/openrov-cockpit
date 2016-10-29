@@ -22,9 +22,24 @@
                 }];
             };
 
-            this.cockpit.on("mcu.reset",function(){
+            this.cockpit.on("mcu.ResetMCU",function(){
                 self.rov.emit("mcu.ResetMCU");              
             })
+            this.cockpit.on("mcu.FlashESCs",function(){
+                self.rov.emit("mcu.FlashESCs");              
+            })
+            this.cockpit.on("mcu.RebuildMCUFirmware",function(){
+                self.rov.emit("mcu.RebuildMCUFirmware");              
+            })
+            this.cockpit.on("mcu.UpdateFirmware",function(){
+                self.rov.emit("mcu.UpdateFirmware");              
+            })
+
+            // Command in form of: "commandName( params )"
+            this.cockpit.on("mcu.SendCommand", function( commandIn )
+            {
+                self.rov.emit("mcu.SendCommand", commandIn );
+            })                                    
         }
     }
 

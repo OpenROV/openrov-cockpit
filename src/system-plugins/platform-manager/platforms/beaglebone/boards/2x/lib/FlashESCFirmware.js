@@ -16,7 +16,7 @@ function Flash( onStdout, onStderr )
         fqbn: 'openrov:avr:mega:cpu=atmega2560',
         hardware: '/opt/openrov/arduino/hardware',
         tools: '/opt/openrov/arduino/hardware/tools',
-        warnings: 'all',
+        warnings: 'none',
         verbose: true,
         quiet: false,
         debug: 5,
@@ -34,8 +34,8 @@ function Flash( onStdout, onStderr )
         var loaderFlashProcess  = loaderFlashPromise.childProcess;
 
         // Attach stdout and stderr listeners to the flashing process
-        //loaderFlashProcess.stdout.on( 'data', onStdout );
-        //loaderFlashProcess.stderr.on( 'data', onStderr );
+        loaderFlashProcess.stdout.on( 'data', onStdout );
+        loaderFlashProcess.stderr.on( 'data', onStderr );
 
         // Execute the promise to spawn the flashing process
         return loaderFlashPromise;
@@ -47,8 +47,8 @@ function Flash( onStdout, onStderr )
         var escFlasherProcess   = escFlasherPromise.childProcess;
 
         // Attach stdout and stderr listeners to the flashing process
-        //escFlasherProcess.stdout.on( 'data', onStdout );
-        //escFlasherProcess.stderr.on( 'data', onStderr );
+        escFlasherProcess.stdout.on( 'data', onStdout );
+        escFlasherProcess.stderr.on( 'data', onStderr );
 
         // Now, try five times to flash the ESCs, every 5 seconds
         return Retry( function(){ return escFlasherPromise; }, { max_tries: 5, interval: 1000 })

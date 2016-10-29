@@ -97,8 +97,8 @@
             type: Array,
             value: function(){
               return [
-                ['orov-time', 'cpuusage', 'deep','deep','container','container','container'],
-                ['servo','hdgd', 'deep', 'deep','container','container','container'],
+                ['orov-time', 'cpuusage', 'depth_d','depth_d','container','container','container'],
+                ['servo','imu_y', 'depth_d', 'depth_d','container','container','container'],
                 ['FMEM','LIGPE0', 'temp', 'temp','container','container','container'],
                 ['vout','btti','BT1I','BT2I','SC1I','SC2I','SC3I'],
                 ['BRDI','BRDV','AVCC','LIGPE0','ESCP','I2CP','LIGP'],
@@ -114,7 +114,7 @@
                  'orov-time':{
                    title: 'Time'
                  },
-                 'deep':{
+                 'depth_d':{
                     attr:{
                       min: 0.1,
                       max: 5,
@@ -197,7 +197,7 @@
                  'container':{
                     title : 'ROV Camera',
                     type : 'container',
-                    value : ['cam1','orov-horizon','deep' ]
+                    value : ['cam1','orov-horizon','depth_d' ]
                  }
               };
             }

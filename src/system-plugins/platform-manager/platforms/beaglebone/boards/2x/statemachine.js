@@ -2,12 +2,12 @@ const path              = require('path');
 const Promise           = require('bluebird');
 const retry             = require('bluebird-retry');
 const fs                = Promise.promisifyAll(require('fs-extra'));
-const execFileAsync     = require('child-process-promise').execFile;
 const StateMachine      = require('javascript-state-machine');
 
 const BuildMCUFirmware  = require( "./lib/BuildMCUFirmware.js" );
 const FlashMCUFirmware  = require( "./lib/FlashMCUFirmware.js" );
 const FlashESCFirmware  = require( "./lib/FlashESCFirmware.js" );
+const ResetMCU          = require( "./lib/ResetMCU.js" );
 
 const escConfPath       = "/opt/openrov/system/config/esc.conf";
 const mcuLastBuildPath  = "/opt/openrov/system/config/lastBuildHash";
@@ -16,6 +16,10 @@ const mcuBinPath        = "/opt/openrov/firmware/bin/2x/OpenROV2x.hex";
 module.exports = function( board ) 
 {
     const Progress = Object.freeze( { "InProgress":1, "Complete":2, "Failed":3 } );
+
+    function notify(message){
+        board.global.emit("notification",message);
+    }
 
     function status( message, progress )
     {
@@ -211,6 +215,14 @@ module.exports = function( board )
 
         var RequestHashInfo = function()
         {
+            // Make sure the serial port is open
+            if (!self.board.bridge.isConnected())
+            {
+                console.log("Serial Port not connected.. opening and retrying in 300ms");
+                self.board.bridge.connect();
+                setTimeout(RequestHashInfo.bind(this),300);
+                return;
+            }
             // Send the version request command to the MCU
             self.board.bridge.write( "version();" );
 
@@ -252,14 +264,36 @@ module.exports = function( board )
         RequestHashInfo();
     }
 
+    function resetMCUHandler(event, from, to)
+    {
+        console.log( "test" );
+        status( "Resetting MCU...", "InProgress" );
+
+        var self = this;
+
+        ResetMCU()
+        .then( function()
+        {
+            self._e_mcu_reset_complete();
+        } )
+        .catch( function( error )
+        {
+            // Move to failed state
+            log( "Reset failed" );
+            self._e_fail( error );
+        });
+    }
+
     function completeHandler(event, from, to)
     {
         status( "Firmware up to date!", "Complete" );
+        notify( "Firmware update applied");
     }
 
     function failHandler(event, from, to)
     {
         status( "Firmware update failed!", "Failed" );
+        notify( "Firmware update failed");
     }
 
     function eFailHandler(event, from, to, msg) 
@@ -287,27 +321,29 @@ module.exports = function( board )
             { name: '_e_trigger_mcu_flash',             from: 'verify_version',                     to: 'flashing_mcu' },
             { name: '_e_mcu_flash_complete',            from: 'flashing_mcu',                       to: 'verify_version' },
             { name: '_e_firmware_validated',            from: 'verify_version',                     to: 'complete' },
+            { name: '_e_mcu_reset_complete',            from: 'resetting_mcu',                      to: 'complete' },
 
             // User events (can only be used from the complete state)
             { name: '_e_trigger_esc_flash_user',        from: 'complete',                           to: 'flashing_escs' },
             { name: '_e_trigger_firmware_build_user',   from: 'complete',                           to: 'building_firmware' },
             { name: '_e_trigger_mcu_flash_user',        from: 'complete',                           to: 'flashing_mcu' },
+            { name: '_e_trigger_mcu_reset_user',        from: 'complete',                           to: 'resetting_mcu' },
             { name: '_e_reset',                         from: ['complete', 'failed'],               to: 'checking_escs' },
 
             { name: '_e_fail',                          from: '*',                                  to: 'failed' }
-            
         ],
 
         callbacks: 
         {
             // State handlers - We allow states to handle their own transitions to ensure consistency
-            on_e_init: escCheckHandler,
+            onchecking_escs: escCheckHandler,
             onflashing_escs: flashESCHandler,
             onchecking_bin: checkBinHandler,
             onbuilding_firmware: buildFirmwareHandler,
             onflashing_mcu: flashMCUHandler,
             onget_hash: getHashHandler,
             onverify_version: verifyVersionHandler,
+            onresetting_mcu: resetMCUHandler,
             oncomplete: completeHandler,
             onfailed: failHandler,
 

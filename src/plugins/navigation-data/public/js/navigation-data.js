@@ -8,23 +8,19 @@
   plugins.NavigatoinData.prototype.getTelemetryDefinitions = function getTelemetryDefinitions() {
     return [
       {
-        name: 'hdgd',
-        description: 'Heading in degrees 0 to 360'
-      },
-      {
-        name: 'deep',
+        name: 'depth_d',
         description: 'Depth in meters'
       },
       {
-        name: 'pitc',
+        name: 'imu_p',
         description: 'Pitch in degrees -180 to 180'
       },
       {
-        name: 'roll',
+        name: 'imu_r',
         description: 'Roll in degrees -90 to 90'
       },
       {
-        name: 'yaw',
+        name: 'imu_y',
         description: 'Heading in degrees -180 to 180'
       },
       {

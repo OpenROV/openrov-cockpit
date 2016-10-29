@@ -11,6 +11,11 @@ function Bridge() {
   var uartBaud = 115200;
   var serialPort = {};
   var lastWriteTime = new Date();
+  
+ bridge.isConnected = function(){
+   return serialConnected;
+ }
+  
  bridge.connect = function () {
     serialPort = new SerialPort(uartPath, {
       baudRate: uartBaud,
@@ -75,14 +80,17 @@ function Bridge() {
     emitRawSerial = false;
   };
   bridge.close = function () {
+    if (!serialConnected){
+      return;
+    }
     serialConnected = false;
     //This code is a work around for a race condition in the serial port code https://github.com/voodootikigod/node-serialport/issues/241#issuecomment-43058353
     var sp = serialPort;
     serialPort.flush(function (err) {
-      setTimeout(function () {
+    //  setTimeout(function () {
         sp.close(function (err) {
         });
-      }, 10);
+    //  }, 10);
     });
   };
   // Listen for firmware settings updates

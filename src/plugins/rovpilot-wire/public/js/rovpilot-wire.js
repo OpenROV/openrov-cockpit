@@ -21,44 +21,28 @@
     };
 
     this.inputDefaults = [
-    {
-      name: 'rovPilot.toggleHeadingHold',
-      description: 'Toggles the heading hold on/off',
-      bindings:
-      [
+      {
+        name: 'rovPilot.toggleHeadingHold',
+        description: 'Toggles the heading hold on/off',
+        controllers: new Map([["keyboard", "m"]]),
+        actions:
         {
-          controller: 'keyboard',
-          input: 'm',
-          actions:
-          [
-            {
-              down: function() {
-                self.cockpit.emit('plugin.rovpilot.headingHold.set-enabled', !self.headingHold_state.enabled);
-              }
-            }
-          ]
+          down: function() {
+            self.cockpit.emit('plugin.rovpilot.headingHold.set-enabled', !self.headingHold_state.enabled);
+          }
         }
-      ]
-    },
-    {
-      name: 'rovPilot.toggleDepthHold',
-      description: 'Toggles the depth hold on/off',
-      bindings:
-      [
+      },
+      {
+        name: 'rovPilot.toggleDepthHold',
+        description: 'Toggles the depth hold on/off',
+        controllers: new Map([["keyboard", "n"]]),
+        actions:
         {
-          controller: 'keyboard',
-          input: 'n',
-          actions:
-          [
-            {
-              down: function() {
-                self.cockpit.emit('plugin.rovpilot.depthHold.set-enabled', !self.depthHold_state.enabled);
-              }
-            }
-          ]
+          down: function() {
+            self.cockpit.emit('plugin.rovpilot.depthHold.set-enabled', !self.depthHold_state.enabled);
+          }
         }
-      ]
-    }];   
+      }];   
     
     //If this was loaded after the input manager, let it know we are ready to be loaded
     cockpit.emit('plugin.inputController.defaults', self.inputDefaults);

@@ -351,7 +351,6 @@
                     if( isDuplicate )
                     {
                         self.openDuplicateInputToast();
-                        
                         self.isValidKeyboardReplacement = false;                       
                     }
                     else
@@ -476,7 +475,7 @@
                         input: self.selectedItem.bindings.keyboard
                     };
 
-                    //Let the input controller know
+                    //Let the input controller know the new configurations
                     self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
 
                     this.$.clearedInputToast.open();
@@ -514,6 +513,8 @@
 
                     //Let the input controller know
                     self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
+                    
+                    self.updateKeyboardInput();
 
                     this.$.clearedInputToast.open();
                 },

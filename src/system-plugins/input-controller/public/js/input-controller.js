@@ -501,6 +501,8 @@
       {
         Mousetrap.bind(key, actions.down, 'keydown');
       }
+      var callbacks = Mousetrap.getCallbacks();
+      console.log(callbacks);
 
     };
 
@@ -530,28 +532,22 @@
         console.error("Tried to unregister an undefined key from Mousetrap");
         return;
       }
-
-      console.log("Unregistering:", key, "from Mousetrap");
-      Mousetrap.unbind(key, 'keyup');
       Mousetrap.unbind(key, 'keydown');
+      Mousetrap.unbind(key, 'keyup');
     };
 
     update(previousInput, currentInput)
     {
       var self = this;
 
-      //Unregister from the current settings
-      var previousKeyboardBinding = undefined;
-      previousInput.bindings.forEach(function(binding) {
-        if(binding.controller == "keyboard")
-        {
-          previousKeyboardBinding = binding;
-        }
-      });
-      self.unregister(previousKeyboardBinding.input);
+      //Unregister from the current settings, if necessar
+      if(previousInput.controllers.has('keyboard'))
+      {
+        self.unregister(previousInput.controllers.get('keyboard'));
+      }
 
       //And update with the newest bindings
-      self.register(currentInput.input, previousKeyboardBinding.actions);
+      self.register(currentInput.input, previousInput.actions);
     };
 
   };

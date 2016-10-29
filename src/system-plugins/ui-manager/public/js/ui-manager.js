@@ -22,8 +22,8 @@
     };
     //    template.routedata = {page: 'cockpit'}
     if (window.location.hash == '') {
-     // window.location.replace('#/cockpit');
-      window.location.replace('#/about');
+      window.location.replace('#/cockpit');
+      //window.location.replace('#/about');
     }
     this.registerEventListeners(this.cockpit, this.rov);    
 

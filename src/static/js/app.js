@@ -63,8 +63,10 @@ $(function () {
   }
   e = new window.EventEmiiterStoreAndForward(e, cacheSeed);
   var cockpit = new Cockpit(e);
+  var template = $('#t')[0];
+  //template.cockpitEventEmitter = cockpit;
   window.cockpit = cockpit;
-  $('#t')[0].rovOnline = false;
+  template.rovOnline = false;
   if (mc !== null) {
     loadScript('js/missioncontrol.js');
     //$.getScript('js/missioncontrol.js');

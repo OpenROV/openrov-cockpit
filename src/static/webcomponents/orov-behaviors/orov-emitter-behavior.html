@@ -27,6 +27,9 @@
       console.log('oROV Emitter Behavior for ', this, 'enabled!');
     },
     _registerTreeOfListeners: function(root,emitter){
+      if (!root){
+        return;
+      }
       var self=this;
       if(emitter == undefined){
         return;

@@ -1,4 +1,10 @@
 (function (window, document) {
+  var log,trace,log_debug;
+  $.getScript('components/visionmedia-debug/dist/debug.js', function () {  
+    log = debug('input-controlller:log');
+    trace = debug('input-controlller:trace') 
+    log_debug = debug('input-controlller:debug')   
+  });
   var inputController = namespace('systemPlugin.inputController');
   inputController.InputController = function (cockpit) {
     var self = this;
@@ -34,7 +40,7 @@
       });
       if (duplicateInformation.length > 0) {
         self.cockpit.emit('plugin-input-controller-duplicates', duplicateInformation);
-        console.log('Found duplicate commands: \n' + duplicateInformation.join('\n'));
+        trace('Found duplicate commands: \n' + duplicateInformation.join('\n'));
       }
     };
     return self;
@@ -125,7 +131,7 @@
       self.registerdCommands[command.name] = command;
       self.model.commands.push(command);
       self.cockpit.emit('InputController.registeredCommand', command);
-      console.log('InputController: Registering control ' + command.name);
+      trace('InputController: Registering control ' + command.name);
       self.controllers.forEach(function (controller) {
         if (command.active) {
           controller.register(command);
@@ -171,13 +177,13 @@
       command.replaced = [];
       for (var property in command.bindings) {
         if (self.registerdControls[property + ':' + command.bindings[property]] !== undefined) {
-          console.log('There is a conflict with ' + self.registerdControls[property + ':' + command.bindings[property]].name);
+          trace('There is a conflict with ' + self.registerdControls[property + ':' + command.bindings[property]].name);
           command.replaced.push(self.registerdControls[property + ':' + command.bindings[property]]);
         }
       }
       command.active = true;
       self._register(command, false);
-      console.log('activated command ' + command.name);
+      trace('activated command ' + command.name);
     });
   };
   inputController.InputController.prototype.deactivate = function (controlName) {
@@ -190,10 +196,10 @@
         self.unregister(command);
         command.replaced.forEach(function(oldcommand){
           self._register(oldcommand, false);
-          console.log('re-activated ' + oldcommand.name);
+          trace('re-activated ' + oldcommand.name);
         });
         command.replaced = [];
-        console.log('Deactivated command ' + command.name);
+        trace('Deactivated command ' + command.name);
       }
     });
   };

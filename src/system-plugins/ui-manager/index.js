@@ -77,6 +77,8 @@ UIManager.prototype.start = function start() {
       theme: theme
     });
   });
+
+
   this.deps.app.get('/popup', function (req, res) {
     var theme = self.deps.config.preferences.get('plugins:ui-manager').selectedUI;
     var ua = req.header('user-agent');
@@ -120,6 +122,96 @@ UIManager.prototype.start = function start() {
       theme: theme
     });
   });
+
+  this.deps.app.get('/all_imports.html', function (req, res) {
+    var theme = self.deps.config.preferences.get('plugins:ui-manager').selectedUI;
+    var ua = req.header('user-agent');
+    // Check the user-agent string to identyfy the device. 
+    if (/mobile|iphone|ipod|android|blackberry|opera|mini|windows\sce|palm|smartphone|iemobile|ipad|android|android 3.0|xoom|sch-i800|playbook|tablet|kindle/i.test(ua)) {
+      theme = 'mobile-ui';
+    }
+    //You can override the theme by passing theme=<themename> in the query string
+    if (req.query && req.query.theme) {
+      theme = req.query.theme;
+    }
+    var applet;
+    if (req.query && req.query.app) {
+      applet = req.query.app;
+    }
+    theme = theme === undefined ? 'new-ui' : theme;
+    var scriplets = self.getAppletsByTheme(self.getApplets(), theme);
+    //TODO: Add theme to the message so you can differentiate the applets by theme
+    //and ignore if it is not the theme you are using.
+    //TODO: Look for applet.ejs.disable in a theme to remove the applet option.
+    self.deps.cockpit.emit('ui-manager-applets', scriplets.filter(function (item) {
+      return [
+        'footer',
+        'header',
+        'head'
+      ].indexOf(item.name) == -1;
+    }));
+    res.render(__dirname + '/all_imports.ejs', {
+      title: 'OpenROV ROV Cockpit',
+      scripts: pathInfo.scripts,
+      styles: pathInfo.styles,
+      sysscripts: pathInfo.sysscripts,
+      webcomponents: pathInfo.webcomponents.filter(function(wcInfo){
+        return (wcInfo.path.indexOf('ui-manager/orov-widget-registry.html')==-1)
+      }),      
+      config: self.deps.config,
+      scriplet: scriplets.find(function (item) {
+        return item.name == applet;
+      }),
+      scriplets: scriplets,
+      theme: theme
+    });
+  });
+
+  this.deps.app.get('/all_scripts.html', function (req, res) {
+    var theme = self.deps.config.preferences.get('plugins:ui-manager').selectedUI;
+    var ua = req.header('user-agent');
+    // Check the user-agent string to identyfy the device. 
+    if (/mobile|iphone|ipod|android|blackberry|opera|mini|windows\sce|palm|smartphone|iemobile|ipad|android|android 3.0|xoom|sch-i800|playbook|tablet|kindle/i.test(ua)) {
+      theme = 'mobile-ui';
+    }
+    //You can override the theme by passing theme=<themename> in the query string
+    if (req.query && req.query.theme) {
+      theme = req.query.theme;
+    }
+    var applet;
+    if (req.query && req.query.app) {
+      applet = req.query.app;
+    }
+    theme = theme === undefined ? 'new-ui' : theme;
+    var scriplets = self.getAppletsByTheme(self.getApplets(), theme);
+    //TODO: Add theme to the message so you can differentiate the applets by theme
+    //and ignore if it is not the theme you are using.
+    //TODO: Look for applet.ejs.disable in a theme to remove the applet option.
+    self.deps.cockpit.emit('ui-manager-applets', scriplets.filter(function (item) {
+      return [
+        'footer',
+        'header',
+        'head'
+      ].indexOf(item.name) == -1;
+    }));
+    res.render(__dirname + '/all_scripts.ejs', {
+      title: 'OpenROV ROV Cockpit',
+      scripts: pathInfo.scripts,
+      styles: pathInfo.styles,
+      sysscripts: pathInfo.sysscripts,
+      webcomponents: pathInfo.webcomponents.filter(function(wcInfo){
+        return (wcInfo.path.indexOf('ui-manager/orov-widget-registry.html')==-1)
+      }),      
+      config: self.deps.config,
+      scriplet: scriplets.find(function (item) {
+        return item.name == applet;
+      }),
+      scriplets: scriplets,
+      theme: theme
+    });
+  });
+
+
 };
 UIManager.prototype.getAppletsByTheme = function getAppletsByTheme(applets, theme) {
   //This overrides any applet with those in the theme folder

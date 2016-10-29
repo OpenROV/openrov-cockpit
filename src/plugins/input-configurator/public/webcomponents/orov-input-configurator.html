@@ -137,7 +137,7 @@
         <!-- TODO: Properly implement language formatting -->
         <h2>Input Configurator: BETA</h2>
         <p>
-            To change a control mapping, click on the control
+            To change a control, click on the coressponding controller button in the table below
         </p>        
         <section class="">      
             <div id="tableContainer">
@@ -174,7 +174,9 @@
 
 
         <paper-dialog id="keyboardModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation" on-iron-overlay-closed="onKeyboardModalClosed" on-iron-overlay-opened="handleKeyboardFocus">
-            <h1>Keyboard mapping</h1>
+            <h1>Keyboard mapping: {{selectedItem.name}}</h1>
+            <p> Click REMAP and then enter the desired key to set this control </p>
+            <p> Click CLEAR to remove inputs associated with this command </p>
             <h3>
                 {{__('Current Mapping')}}: <kbd class="light">{{selectedItem.bindings.keyboard}}</kbd>
                 <paper-spinner active={{isListeningToKeyboard}}></paper-spinner>
@@ -193,7 +195,10 @@
         </paper-dialog>
 
         <paper-dialog id="gamepadModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation" on-iron-overlay-closed="onGamepadModalClosed" on-iron-overlay-opened="handleGamepadFocus">
-            <h1>Gamepad mapping</h1>
+            <h1>Gamepad mapping: {{selectedItem.name}}</h1>
+            <p> Choose a control from the dropdown to remap this command to </p>
+            <p> Click CLEAR to remove inputs associated with this command </p>
+
             <h3>
                 {{__('Current Mapping')}}: <kbd>{{selectedItem.bindings.gamepad}}</kbd>
             </h3>
@@ -588,9 +593,7 @@
                 //Handle the selection for the gamepad
                 handleGamepadRemapping: function(e) {
                     var self = this;
-                    console.log(e);
-                    console.log(self.candidateBinding);
-
+ 
                     if(self.candidateBinding == null)
                     {
                         self.handleClearGamepadBinding();

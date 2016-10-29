@@ -430,6 +430,24 @@
       console.log("Unregistering:", key, "from gamepad");
       self.gamepadAbstraction.assignments.delete(key);
     };
+    
+    update(previousInput, currentInput)
+    {
+      var self = this;
+
+      //unregister from the current settings
+      var previousGamepadBinding = undefined;
+      previousInput.bindings.forEach(function(binding) {
+        if(binding.controller == "gamepad")
+        {
+          previousGamepadBinding = binding;
+        }
+      });
+      self.unregister(previousGamepadBinding.input);
+      
+      //And update with the newest bindings
+      self.register(currentInput.input, previousGamepadBinding.actions);
+    };
   };
 
   /*Keyboard Interface*/

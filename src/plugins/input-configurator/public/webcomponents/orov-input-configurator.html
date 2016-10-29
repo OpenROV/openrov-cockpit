@@ -162,8 +162,8 @@
                         <template is="dom-repeat" items="[[presetArray]]">
                             <tr>
                                 <td>{{__(item.name)}}</td>
-                                <td><kbd class="light" on-tap="_handleKeyboardChange">{{item.bindings.keyboard}}&nbsp;</kbd></td>
-                                <td><kbd on-tap="_handleGamepadChange">{{item.bindings.gamepad}}&nbsp;</kbd></td>
+                                <td><kbd class="light" on-tap="handleKeyboardChange">{{item.bindings.keyboard}}&nbsp;</kbd></td>
+                                <td><kbd on-tap="handleGamepadChange">{{item.bindings.gamepad}}&nbsp;</kbd></td>
                                 <td>{{__(item.description)}}</td>
                             </tr>
                         </template>
@@ -190,12 +190,53 @@
                 <paper-button disabled$={{isValidKeyboardReplacement}} on-tap="handleClearConflictingKeyboardBinding">Clear conflicting binding</paper-button>
                 <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
             </div>
-
         </paper-dialog>
+
+        <paper-dialog id="gamepadModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation" on-iron-overlay-closed="onGamepadModalClosed" on-iron-overlay-opened="handleGamepadFocus">
+            <h1>Gamepad mapping</h1>
+            <h3>
+                {{__('Current Mapping')}}: <kbd>{{selectedItem.bindings.gamepad}}</kbd>
+            </h3>
+
+            <div>
+                <paper-dropdown-menu id="candidategamepad" label="gamepad control">
+                    <paper-listbox class="dropdown-content" attr-for-selected="value" selected="{{candidateBinding}}" on-iron-select="handleGamepadRemapping">
+                        <paper-item value="A">{{__('A')}}</paper-item>
+                        <paper-item value="B">{{__('B')}}</paper-item>
+                        <paper-item value="X">{{__('X')}}</paper-item>
+                        <paper-item value="Y">{{__('Y')}}</paper-item>
+                        <paper-item value="LB">{{__('LB')}}</paper-item>
+                        <paper-item value="RB">{{__('RB')}}</paper-item>
+                        <paper-item value="LEFT_TRIGGER">{{__('LEFT_TRIGGER')}}</paper-item>
+                        <paper-item value="RIGHT_TRIGGER">{{__('RIGHT_TRIGGER')}}</paper-item>
+                        <paper-item value="LEFT_STICK">{{__('LEFT_STICK')}}</paper-item>
+                        <paper-item value="RIGHT_STICK">{{__('RIGHT_STICK')}}</paper-item>
+                        <paper-item value="START">{{__('START')}}</paper-item>
+                        <paper-item value="BACK">{{__('BACK')}}</paper-item>
+                        <paper-item value="HOME">{{__('HOME')}}</paper-item>
+                        <paper-item value="DPAD_UP">{{__('DPAD_UP')}}</paper-item>
+                        <paper-item value="DPAD_DOWN">{{__('DPAD_DOWN')}}</paper-item>
+                        <paper-item value="DPAD_LEFT">{{__('DPAD_LEFT')}}</paper-item>
+                        <paper-item value="DPAD_RIGHT">{{__('DPAD_RIGHT')}}</paper-item>
+                        <paper-item value="LEFT_STICK_X">{{__('LEFT_STICK_X')}}</paper-item>
+                        <paper-item value="LEFT_STICK_Y">{{__('LEFT_STICK_Y')}}</paper-item>
+                        <paper-item value="RIGHT_STICK_X">{{__('RIGHT_STICK_X')}}</paper-item>
+                        <paper-item value="RIGHT_STICK_Y">{{__('RIGHT_STICK_Y')}}</paper-item>
+                    </paper-listbox>
+                </paper-dropdown-menu> 
+                <paper-checkbox disabled>{{__('invert')}}</paper-checkbox>       
+            </div>
+            <paper-button disabled$={{isValidGamepadReplacement}} on-tap="handleClearConflictingKeyboardBinding">Clear conflicting binding</paper-button>
+            <paper-button on-tap="handleClearGamepadBinding" dialog-confirm>{{__('Clear')}}</paper-button>
+            <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
+        </paper-dialog>
+
+
 
         <paper-button raised on-click="resetPreset">Reset Preset</paper-button>
 
         <paper-toast id="doesNotWorkToast" text="Functionality doesn't exist...yet"></paper-toast>
+        <paper-toast id="updatedPresetToast" text="Updated Preset!"></paper-toast>
         <paper-toast id="clearedInputToast" text="Cleared input!"></paper-toast>
         <paper-toast id="duplicateInputToast" class="fit-bottom" text="Duplicate found."></paper-toast>
 
@@ -241,6 +282,11 @@
                     },
 
                     isValidKeyboardReplacement: {
+                        type: Boolean,
+                        value: true
+                    },
+
+                    isValidGamepadReplacement: {
                         type: Boolean,
                         value: true
                     }
@@ -314,6 +360,33 @@
                         self.updateKeyboardInput();
                     }
                 },
+
+                checkForGamepadDuplicates: function() {
+                    var self = this;
+
+                    if(self.presetArray == undefined || self.candidateBinding == undefined)
+                    {
+                        return;
+                    }
+
+                    //Check if this is a valid binding
+                    var isDuplicate = self.presetArray.some(function(element, index, array) {
+                        self.conflictingBinding = element;
+                        return element.bindings.gamepad == self.candidateBinding;
+                    });
+
+                    if(isDuplicate)
+                    {
+                        self.openDuplicateInputToast();
+                        self.isValidGamepadReplacement = false;                       
+                    }
+                    else
+                    {
+                        self.isValidGamepadReplacement = true;
+                        self.updateGamepadInput();
+                    }
+                },
+
                 updateKeyboardInput: function() {
                     var self = this;
 
@@ -327,10 +400,29 @@
                     self.eventEmitter.emit('plugin.inputController.updateInput', updatedInput);
 
                     //Open the update toast
-                    self.$.updatePresetToast.open();
+                    self.$.updatedPresetToast.open();
 
                     //And close the modal
                     self.$.keyboardModal.close();
+                },
+
+                updateGamepadInput: function() {
+                    var self = this;
+
+                    var updatedInput = {
+                        name: self.selectedItem.name,
+                        controller: "gamepad",
+                        input: self.candidateBinding 
+                    };
+
+                    console.log("Updated:", updatedInput);
+                    self.eventEmitter.emit('plugin.inputController.updateInput', updatedInput);
+
+                    //Open the update toast
+                    self.$.updatedPresetToast.open();
+
+                    //And close the modal
+                    self.$.gamepadModal.close();
                 },
 
                 openDuplicateInputToast: function() {
@@ -342,6 +434,9 @@
                     self.$.updatePresetToast.open();
                 },
                 onKeyboardModalClosed : function() {
+
+                },
+                onGamepadModalClosed : function() {
 
                 },
 
@@ -387,6 +482,24 @@
                     this.$.clearedInputToast.open();
                 },
 
+                handleClearGamepadBinding: function() {
+                    var self = this;
+
+                    //Clear the input from our presets
+                    console.log("Clearing:",self.selectedItem);
+
+                    //Format in a way that the input controller expects
+                    var clearedInput = {
+                        name: self.selectedItem.name,
+                        controller: "gamepad",
+                        input: self.selectedItem.bindings.gamepad
+                    };
+
+                    //Let the input controller know
+                    self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
+                    this.$.clearedInputToast.open();
+                },
+
                 handleClearConflictingKeyboardBinding: function() {
                     var self = this;
 
@@ -414,13 +527,57 @@
 
                     self.openUpdatePresetToast();
                 },
-                _handleKeyboardChange: function(e) {
+                
+
+                //User has clicked a keyboard symbol
+                handleKeyboardChange: function(e) {
                     var self = this;
                     var inputPressed = e.model.item;
                     self.selectedItem = inputPressed;
                     
                     this.$.keyboardModal.open();
                 },
+
+                //Keyboard modal has opened
+                handleKeyboardFocus: function(e) {
+                    var self = this;
+
+                    //Reset our state
+                    self.isListeningToKeyboard = false;
+                    self.candidateBinding = undefined;
+                    self.isValidKeyboardReplacement = true;
+                },
+
+                //User has clicked a gamepad symbol
+                handleGamepadChange: function(e) {
+                    var self = this;
+                    var inputPressed = e.model.item;
+                    self.selectedItem = inputPressed;
+                    
+                    this.$.gamepadModal.open();
+                },
+
+                //Gamepad modal has opened
+                handleGamepadFocus: function(e) {
+                    var self = this;
+
+                    //Reset our state
+                    self.isValidGamepadReplacement = true;
+                },
+
+                //Handle the selection for the gamepad
+                handleGamepadRemapping: function(e) {
+                    var self = this;
+                    console.log(e);
+                    console.log(self.candidateBinding);
+
+                    if(self.candidateBinding == null)
+                    {
+                        self.handleClearGamepadBinding();
+                    }
+                    self.checkForGamepadDuplicates();
+                },
+
                 handleKeyboardRemapping: function() {
                     var self = this;
 
@@ -438,15 +595,6 @@
 
                 },
 
-
-                handleKeyboardFocus: function(e) {
-                    var self = this;
-
-                    //Reset our state
-                    self.isListeningToKeyboard = false;
-                    self.candidateBinding = undefined;
-                    self.isValidKeyboardReplacement = true;
-                },
 
                 _presetToArray: function(preset) {
                     var self = this;

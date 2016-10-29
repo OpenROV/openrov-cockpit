@@ -32,23 +32,17 @@
     this.otherBuffer = [];
     this.sessions_cache = [];
 
-    this.inputDefaults = [{
+    this.inputDefaults = [
+    {
       name: 'blackbox.record',
       description: 'Start recording the telemetry data.',
-      bindings:
-      [
-        {
-          controller: 'keyboard',
-          input: 'r',
-          actions: [
-            {
-              down: function() {
-                self.toggleRecording();
-              }
-            }
-          ]
+      controllers: new Map([["keyboard", "q"]]),
+      actions:
+      {
+        down: function() {
+          self.toggleRecording();
         }
-      ]
+      }
     }];
 
     //If this was loaded after the input manager, let it know we are ready to be loaded

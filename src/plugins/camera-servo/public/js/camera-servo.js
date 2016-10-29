@@ -18,105 +18,49 @@
             self.currentStep = 0;   // Alternative representation of targetPos
             self.stepMap = {};      // Automatically generated mapping of integer "steps" to target positions
 
-            this.inputDefaults = [{
+            this.inputDefaults = [
+                {
                     name: 'plugin.cameraServo.stepPositive',
                     description: 'Points the camera further down',
-                    bindings:
-                    [
-                        {
-                            controller: 'keyboard',
-                            input: 'q',
-                            actions: [
-                                {
-                                    down: function()
-                                    {
-                                        cockpit.emit('plugin.cameraServo.stepPositive');
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            controller: 'gamepad',
-                            input: 'Y',
-                                                    
-                            actions: [
-                                {
-                                    down: function()
-                                    {
-                                        cockpit.emit('plugin.cameraServo.stepPositive');
-                                    }
-                                }
-                            ]
+                    controllers: new Map([
+                        ["keyboard", "q"],
+                        ["gamepad", "Y"]]),
+                    actions:
+                    {
+                        down: function() {
+                            cockpit.emit('plugin.cameraServo.stepPositive');
                         }
-                    ]
+                    }
                 },
                 {
                     name: 'plugin.cameraServo.stepCenter',
                     description: 'Return camera to center position',
-                    bindings:
-                    [
-                        {
-                            controller: 'keyboard',
-                            input: 'a',
-                            actions: [
-                                {
-                                    down: function()
-                                    {
-                                        cockpit.emit('plugin.cameraServo.center');
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            controller: 'gamepad',
-                            input: 'B',
-                                                    
-                            actions: [
-                                {
-                                    down: function()
-                                    {
-                                        cockpit.emit('plugin.cameraServo.center');
-                                    }
-                                }
-                            ]
+                    controllers: new Map([
+                        ["keyboard", "a"],
+                        ["gamepad", "B"]]),
+                    actions:
+                    {
+                        down: function() {
+                            cockpit.emit('plugin.cameraServo.center');
                         }
-                    ]
+                    }
                 },
                 {
                     name: 'plugin.cameraServo.stepNegative',
                     description: 'Point the camera further down.',
-                    bindings:
-                    [
-                        {
-                            controller: 'keyboard',
-                            input: 'z',
-                            actions: [
-                                {
-                                    down: function()
-                                    {
-                                        cockpit.emit('plugin.cameraServo.stepNegative');
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            controller: 'gamepad',
-                            input: 'A',                  
-                            actions: [
-                                {
-                                    down: function()
-                                    {
-                                        cockpit.emit('plugin.cameraServo.stepNegative');
-                                    }
-                                }
-                            ]
+                    controllers: new Map([
+                        ["keyboard", "z"],
+                        ["gamepad", "A"]]),
+                    actions:
+                    {
+                        down: function() {
+                            cockpit.emit('plugin.cameraServo.stepNegative');
                         }
-                    ]
-                }
-            ];
+                    }
+                }];
 
-        //If this was loaded after the input manager, let it know we are ready to be loaded
-        cockpit.emit('plugin.inputController.defaults', self.inputDefaults);
+            //If this was loaded after the input manager, let it know we are ready to be loaded
+            cockpit.emit('plugin.inputController.defaults', self.inputDefaults);
         };
 
         

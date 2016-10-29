@@ -36,83 +36,37 @@
             {
                 name: 'plugin.lights.stepPositive',
                 description: 'Makes the ROV lights brighter.',
-                bindings: 
-                [
-                    {
-                        controller: 'keyboard',
-                        input: 'p',
-                        actions:
-                        [
-                            {
-                                down: function() {
-                                    cockpit.emit( 'plugin.lights.stepPositive' );
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        controller: 'gamepad',
-                        input: 'DPAD_UP',
-                        actions:
-                        [
-                            {
-                                down: function() {
-                                    cockpit.emit( 'plugin.lights.stepPositive' );
-                                }
-                            }
-                        ]                            
+                controllers: new Map([["keyboard", 'p'],
+                                     ["gamepad", 'DPAD_UP']]),
+                actions:
+                {
+                    down: function() {
+                        cockpit.emit( 'plugin.lights.stepPositive' );
                     }
-                ]
+                }
             },
             {
                 name: 'plugin.lights.stepNegative',
                 description: 'Makes the ROV lights dimmer.',
-                bindings: 
-                [
-                    {
-                        controller: 'keyboard',
-                        input: 'o',
-                        actions:
-                        [
-                            {
-                                down: function() {
-                                    cockpit.emit( 'plugin.lights.stepNegative' );
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        controller: 'gamepad',
-                        input: 'DPAD_DOWN',
-                        actions:
-                        [
-                            {
-                                down: function() {
-                                    cockpit.emit( 'plugin.lights.stepNegative' );
-                                }
-                            }
-                        ]                            
+                controllers: new Map([["keyboard", 'o'],
+                                     ["gamepad", 'DPAD_DOWN']]),
+                actions:
+                {
+                    down: function() {
+                        cockpit.emit( 'plugin.lights.stepNegative' );
                     }
-                ]
-            },  
+                }
+            },
             {
                 name: 'plugin.lights.toggle',
                 description: 'Toggles the ROV lights on/off.',
-                bindings: 
-                [
-                    {
-                        controller: 'keyboard',
-                        input: 'i',
-                        actions:
-                        [
-                            {
-                                down: function() {
-                                    cockpit.emit( 'plugin.lights.toggle' );
-                                }
-                            }
-                        ]
+                controllers: new Map([["keyboard", 'i']]),
+                actions:
+                {
+                    down: function() {
+                        cockpit.emit( 'plugin.lights.toggle' );
                     }
-                ]
+                }
             }];
 
             //If this was loaded after the input manager, let it know we are ready to be loaded

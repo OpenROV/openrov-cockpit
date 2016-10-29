@@ -36,59 +36,35 @@
             {
                 name: 'plugin.externalLights.stepPositive',
                 description: 'Makes the ROV external lights brighter.',
-                bindings:
-                [
-                    {
-                        controller: 'keyboard',
-                        input: '=',
-                        actions:
-                        [
-                            {
-                                down: function() {
-                                    cockpit.emit( 'plugin.externalLights.stepPositive' );
-                                }
-                            }
-                        ]
+                controllers: new Map([["keyboard", "="]]),                
+                actions:
+                {
+                    down: function() {
+                        cockpit.emit( 'plugin.externalLights.stepPositive' );
                     }
-                ]
+                }
             },
             {
                 name: 'plugin.externalLights.stepNegative',
                 description: 'Makes the ROV external lights dimmer.',
-                bindings:
-                [
-                    {
-                        controller: 'keyboard',
-                        input: '-',
-                        actions:
-                        [
-                            {
-                                down: function() {
-                                    cockpit.emit( 'plugin.externalLights.stepNegative' );
-                                }
-                            }
-                        ]
+                controllers: new Map([["keyboard", "-"]]),                
+                actions:
+                {
+                    down: function() {
+                        cockpit.emit( 'plugin.externalLights.stepNegative' );
                     }
-                ]
+                }
             },
             {
                 name: 'plugin.externalLights.toggle',
                 description: 'Toggles the ROV external lights.',
-                bindings:
-                [
-                    {
-                        controller: 'keyboard',
-                        input: '0',
-                        actions:
-                        [
-                            {
-                                down: function() {
-                                    cockpit.emit( 'plugin.externalLights.toggle' );
-                                }
-                            }
-                        ]
+                controllers: new Map([["keyboard", "0"]]),                
+                actions:
+                {
+                    down: function() {
+                        cockpit.emit( 'plugin.externalLights.toggle');
                     }
-                ]
+                }
             }];
             //If this was loaded after the input manager, let it know we are ready to be loaded
             cockpit.emit('plugin.inputController.defaults', self.inputDefaults);

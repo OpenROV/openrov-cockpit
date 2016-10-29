@@ -43,7 +43,7 @@
             {
                 //If it doesn't exist on our map, add it!
                 self.inputs.set(input.name, input);
-            }            
+            }           
         };
 
         makeCopy(presetName)
@@ -81,12 +81,8 @@
                 //Grab the input
                 var existingInput = self.inputs.get(input.name);
 
-                existingInput.bindings.forEach(function(binding) {
-                    if(binding.controller == input.controller)
-                    {
-                        binding.input = input.input;
-                    }
-                });
+                //Update the controller
+                existingInput.controllers.set(input.controller, input.input);
             }
             else
             {
@@ -104,13 +100,7 @@
             {
                 //Set this binding to undefined
                 var unregisteredInput = self.inputs.get(input.name);
-                
-                unregisteredInput.bindings.forEach(function(binding) {
-                    if(binding.controller == input.controller)
-                    {
-                        binding.input = undefined;
-                    }
-                });
+                unregisteredInput.controllers.delete(input.controller);
             }
             else
             {

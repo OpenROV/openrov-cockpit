@@ -149,12 +149,13 @@
 
     updateInput(input, preset)
     {
-      /*For updates, we expect data to look like this
-        updatedInput {
-          name: String,
-          controller: String,
-          input: String 
-        }
+      /*
+        For updates, we expect data to look like this
+          updatedInput {
+            name: String,
+            controller: String,
+            input: String 
+          }
       */
 
       var self = this;
@@ -209,10 +210,12 @@
       var self = this;
 
       //iterate through controllers associated with the input
-      input.bindings.forEach(function(binding) {
+      input.controllers.forEach(function(value, controller) {
+        
         //Grab the hardware interface and add the binding
-        var controller = self.controllers.get(binding.controller);
-        controller.register(binding.input, binding.actions);
+        var hardware = self.controllers.get(controller);
+        hardware.register(value, input.actions);
+
       });
     };
 
@@ -441,12 +444,13 @@
         if(binding.controller == "gamepad")
         {
           previousGamepadBinding = binding;
+          self.unregister(previousGamepadBinding.input);
         }
       });
-      self.unregister(previousGamepadBinding.input);
+      
       
       //And update with the newest bindings
-      self.register(currentInput.input, previousGamepadBinding.actions);
+      self.register(currentInput.input, previousInput.actions);
     };
   };
 
@@ -488,31 +492,16 @@
       console.log("Registering:", key, "with Mousetrap");
 
       //Register actions, used for unbinding as well
-      var mousetrapActions = {
-        down: undefined,
-        up: undefined
-      };
-
-      actions.forEach(function(action){
-        if(action.up !== undefined)
-        {
-          mousetrapActions.up = action.up;
-        }
-
-        if(action.down !== undefined)
-        {
-          mousetrapActions.down = action.down;
-        }
-      });
-
-      if(mousetrapActions.up !== undefined)
+      if(actions.up !== null)
       {
-        Mousetrap.bind(key, mousetrapActions.up, 'keyup');
+        Mousetrap.bind(key, actions.up, 'keyup');
       }
-      if(mousetrapActions.down !== undefined)
+
+      if(actions.down !== null)
       {
-        Mousetrap.bind(key, mousetrapActions.down, 'keydown');
+        Mousetrap.bind(key, actions.down, 'keydown');
       }
+
     };
 
     registerPreset(preset)

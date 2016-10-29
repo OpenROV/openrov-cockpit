@@ -16,22 +16,14 @@
             this.inputDefaults = [{
                 name: 'plugin.example.sayHello',
                 description: 'Invoke the node plugins sayHello() API',
-                bindings: 
-                [
-                    {
-                        controller: 'keyboard',
-                        input: 'alt+0',
-                        actions:
-                        [
-                            {
-                                down: function() {
-                                    //Emit the sayHello locally
-                                    cockpit.emit('plugin.example.sayHello');
-                                }
-                            }
-                        ]
+                controllers: new Map([["keyboard", "alt+0"]]),
+                actions:
+                {
+                    down: function() {
+                        //Emit the sayHello locally
+                        cockpit.emit('plugin.example.sayHello');
                     }
-                ]
+                }
               }];
 
               //If this was loaded after the input manager, let it know we are ready to be loaded

@@ -14,21 +14,13 @@
     this.inputDefaults = [{
       name: 'plugin.laser.Toggle',
       description: 'Toggles the lasers on or off',
-      bindings:
-      [
-        {
-          controller: 'keyboard',
-          input:'l',
-          actions:
-          [
-            {
-              down: function() {
-                cockpit.rov.emit('plugin.laser.set', self.laserState.enabled == true ? 0 : 1);
-              }
-            }
-          ]
+      controllers: new Map([["keyboard", "l"]]),    
+      actions:
+      {
+        down: function() {
+          cockpit.rov.emit('plugin.laser.set', self.laserState.enabled == true ? 0 : 1);
         }
-      ]
+      }
     }];
 
     //If this was loaded after the input manager, let it know we are ready to be loaded

@@ -98,7 +98,9 @@
     var self = this;
     var control = { name: mapping.name, bindings: {}};
     mapping.bindings.forEach(function(aBinding) { control.bindings[aBinding.name] = aBinding.binding })
-    self.cockpit.emit('InputController.updateBinding', control, function() {  console.log('done');  });
+    self.cockpit.emit('InputController.updateBinding', control, function() { 
+      // console.log('done');  
+    });
   };
 
   InputConfigurator.prototype.loadSettings = function (settings, loaded) {

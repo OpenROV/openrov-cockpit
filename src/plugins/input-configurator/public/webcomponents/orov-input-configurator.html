@@ -187,16 +187,16 @@
             <div class="buttons">
                 <paper-button on-click="handleKeyboardRemapping"> {{__('Remap')}}</paper-button>
                 <paper-button on-tap="handleClearKeyboardBinding" dialog-confirm>{{__('Clear')}}</paper-button>
-                <paper-button disabled$={{isValidKeyboardReplacement}}>Clear conflicting binding</paper-button>
+                <paper-button disabled$={{isValidKeyboardReplacement}} on-tap="handleClearConflictingKeyboardBinding">Clear conflicting binding</paper-button>
                 <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
             </div>
 
         </paper-dialog>
 
-        <paper-button raised on-click="updatePreset">Update Preset</paper-button>
-        <paper-toast id="updatePresetToast" text="Updated preset!"></paper-toast>
+        <paper-button raised on-click="resetPreset">Reset Preset</paper-button>
+
+        <paper-toast id="doesNotWorkToast" text="Functionality doesn't exist...yet"></paper-toast>
         <paper-toast id="clearedInputToast" text="Cleared input!"></paper-toast>
-        
         <paper-toast id="duplicateInputToast" class="fit-bottom" text="Duplicate found."></paper-toast>
 
     </template>
@@ -281,6 +281,7 @@
                     }
                     
                 },
+
                 inputsChanged: function(inputs)
                 {
                     this.inputs = inputs;
@@ -297,12 +298,14 @@
 
                     //Check if this is a valid binding
                     var isDuplicate = self.presetArray.some(function(element, index, array) {
+                        self.conflictingBinding = element;
                         return element.bindings.keyboard == self.candidateBinding;
                     });
 
                     if( isDuplicate )
                     {
                         self.openDuplicateInputToast();
+                        
                         self.isValidKeyboardReplacement = false;                       
                     }
                     else
@@ -326,8 +329,6 @@
                     //Open the update toast
                     self.$.updatePresetToast.open();
 
-
-
                     //And close the modal
                     self.$.keyboardModal.close();
                 },
@@ -342,6 +343,12 @@
                 },
                 onKeyboardModalClosed : function() {
 
+                },
+
+                resetPreset: function() {
+                    var self = this;
+
+                    self.$.doesNotWorkToast.open();
                 },
 
                 tableContainerScroll: function() {
@@ -365,7 +372,7 @@
                     var self = this;
 
                     //Clear the input from our presets
-                    console.log(self.selectedItem);
+                    console.log("Clearing:",self.selectedItem);
 
                     //Format in a way that the input controller expects
                     var clearedInput = {
@@ -379,6 +386,25 @@
 
                     this.$.clearedInputToast.open();
                 },
+
+                handleClearConflictingKeyboardBinding: function() {
+                    var self = this;
+
+                    console.log("Clearing:",self.conflictingBinding);
+                    
+                    //Format in a way that the input controller expects
+                    var clearedInput = {
+                        name: self.conflictingBinding.name,
+                        controller: "keyboard",
+                        input: self.conflictingBinding.bindings.keyboard
+                    };
+
+                    //Let the input controller know
+                    self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
+
+                    this.$.clearedInputToast.open();
+                },
+
                 handleKeyboardBindingChange: function() {
                     var self = this;
 

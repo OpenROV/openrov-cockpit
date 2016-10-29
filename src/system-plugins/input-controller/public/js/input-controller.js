@@ -11,6 +11,7 @@
       console.log("Starting Input Controller");
       this.cockpit = cockpit;
       this.currentPreset = "OpenROVDefault";
+      
 
       this.deferSetupForMousetrap();
     };
@@ -66,7 +67,6 @@
 
         //Tell everyone else we got presets to use
         self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset));
-        
         return true;
       }
       else
@@ -183,7 +183,6 @@
 
       //Let everyone know we just updated
       self.cockpit.emit('plugin.inputController.updatedPreset', currentPreset);
-
     };
 
 

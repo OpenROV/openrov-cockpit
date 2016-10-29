@@ -6,7 +6,7 @@
     <!-- The following viewport code is intended to fullscreen the cockpit and prevent scrolling -->
     <!--meta id="Viewport" name="viewport" width="initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"-->
     <!--<script type='text/javascript' src="bower_components/jquery/dist/jquery.min.js"></script>-->
-    <script type='text/javascript' src="components/jquery/dist/jquery.js"></script>
+    <script type='text/javascript' src="components/jquery/dist/jquery.js"></script>    
     <!--script type='text/javascript' src="components/jquery-ui/jquery-ui.min.js"></script-->
     <title><%= title %></title>
     <%
@@ -24,6 +24,11 @@
 
 
 <script>
+  //Prevent jquery from breaking caching
+  $.ajaxSetup({
+    cache: true
+  });
+    
 window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
 
   ga('create', 'UA-18444815-8', 'auto');

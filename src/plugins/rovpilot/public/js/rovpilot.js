@@ -51,6 +51,7 @@
     self.inputDefaults = [
     {
         name: 'rovPilot.moveForward',
+        shortName: "Move forward",
         description: 'Set throttle forward',
         controllers: new Map([["keyboard", "up"]]),
         actions:
@@ -65,6 +66,7 @@
     },
     {
         name: 'rovPilot.moveBackwards',
+        shortName: "Move backwards",
         description: 'Set throttle backwards (aft)',
         controllers: new Map([["keyboard", "down"]]),
         actions:
@@ -79,6 +81,7 @@
     },
     {
         name: 'rovPilot.moveThrottle',
+        shortName: "Command throttle with gamepad thumbsticks",
         description: 'Set throttle via axis input',
         controllers: new Map([["gamepad", "LEFT_STICK_Y"]]),
         actions:
@@ -90,6 +93,7 @@
     },
     {
         name: 'rovPilot.moveYaw',
+        shortName: "Command yaw with gamepad thumbsticks",
         description: 'Turn the ROV via the axis input',
         controllers: new Map([["gamepad", "LEFT_STICK_X"]]),
         actions:
@@ -101,6 +105,7 @@
     },
     {
         name: 'rovPilot.moveLeft',
+        shortName: "Move left",
         description: 'Turn the ROV via the axis input',
         controllers: new Map([["keyboard", "left"]]),
         actions:
@@ -115,6 +120,7 @@
     },
     {
         name: 'rovPilot.moveRight',
+        shortName: "Move right",
         description: 'Turn the ROV to the starboard (right) side',
         controllers: new Map([["keyboard", "right"]]),
         actions:
@@ -129,6 +135,7 @@
     },
     {
         name: 'rovPilot.moveLift',
+        shortName: "Command depth with gamepad thumbsticks",
         description: 'Bring the ROV shallower or deeper via axis input.',
         controllers: new Map([["gamepad", "RIGHT_STICK_Y"]]),
         actions:
@@ -140,6 +147,7 @@
     },
     {
         name: 'rovPilot.moveUp',
+        shortName: "Ascend",
         description: 'Bring the ROV shallower (up)',
         controllers: new Map([["keyboard", "shift"]]),
         actions:
@@ -154,6 +162,7 @@
     },
     {
         name: 'rovPilot.moveDown',
+        shortName: "Descend",
         description: 'Bring the ROV deeper (down)',
         controllers: new Map([["keyboard", "ctrl"]]),
         actions:
@@ -168,6 +177,7 @@
     },
     {
         name: 'rovPilot.powerLevel1',
+        shortName: "Power Level 1",
         description: 'Set the power level of the ROV to level 1',
         controllers: new Map([["keyboard", "1"]]),
         actions:
@@ -179,6 +189,7 @@
     },
     {
         name: 'rovPilot.powerLevel2',
+        shortName: "Power Level 2",
         description: 'Set the power level of the ROV to level 2',
         controllers: new Map([["keyboard", "2"]]),
         actions:
@@ -190,6 +201,7 @@
     },
       {
         name: 'rovPilot.powerLevel3',
+        shortName: "Power Level 3",
         description: 'Set the power level of the ROV to level 3',
         controllers: new Map([["keyboard", "3"]]),
         actions:
@@ -201,6 +213,7 @@
     },
     {
         name: 'rovPilot.powerLevel4',
+        shortName: "Power Level 4",
         description: 'Set the power level of the ROV to level 4',
         controllers: new Map([["keyboard", "4"]]),
         actions:
@@ -212,6 +225,7 @@
     },
     {
         name: 'rovPilot.powerLevel5',
+        shortName: "Power Level 5",
         description: 'Set the power level of the ROV to level 5',
         controllers: new Map([["keyboard", "5"]]),
         actions:

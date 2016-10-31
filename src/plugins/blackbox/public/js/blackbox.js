@@ -35,6 +35,7 @@
     this.inputDefaults = [
     {
       name: 'blackbox.record',
+      shortName: "Toggle Blackbox recording",
       description: 'Start recording the telemetry data.',
       controllers: new Map([["keyboard", "r"]]),
       actions:

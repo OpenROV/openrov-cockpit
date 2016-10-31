@@ -13,6 +13,7 @@
     
     this.inputDefaults = [{
       name: 'plugin.laser.Toggle',
+      shortName: "Toggle Lasers",
       description: 'Toggles the lasers on or off',
       controllers: new Map([["keyboard", "l"]]),    
       actions:

@@ -35,6 +35,7 @@
             self.inputDefaults = [
             {
                 name: 'plugin.externalLights.stepPositive',
+                shortName: "Increase External Light Brightness",
                 description: 'Makes the ROV external lights brighter.',
                 controllers: new Map([["keyboard", "="]]),                
                 actions:
@@ -46,6 +47,7 @@
             },
             {
                 name: 'plugin.externalLights.stepNegative',
+                shortName: "Decrease External Light Brightness",
                 description: 'Makes the ROV external lights dimmer.',
                 controllers: new Map([["keyboard", "-"]]),                
                 actions:
@@ -57,6 +59,7 @@
             },
             {
                 name: 'plugin.externalLights.toggle',
+                shortName: "Toggle External Light",
                 description: 'Toggles the ROV external lights.',
                 controllers: new Map([["keyboard", "0"]]),                
                 actions:

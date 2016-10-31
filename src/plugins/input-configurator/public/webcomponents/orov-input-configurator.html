@@ -48,7 +48,7 @@
         
         #tableContainer {
             overflow: auto;
-            height: 400px;
+            height: 100%;
         }
 
         #duplicateInputToast {
@@ -143,21 +143,16 @@
                             </th>
                             <th>
                                 <div>{{__('Description')}}</div>
-                            </th> 
-                            <th>
-                                <div>{{__('Emitter Name')}}</div>
-                            </th>
-           
+                            </th>           
                         </tr>
                     </thead>
                     <tbody>
                         <template is="dom-repeat" items="[[presetArray]]">
                             <tr>
-                                <td>Toggle Telemetry Recording</td>
+                                <td>{{item.shortName}}</td>
                                 <td><kbd class="light" on-tap="handleKeyboardChange">{{item.bindings.keyboard}}&nbsp;</kbd></td>
                                 <td><kbd on-tap="handleGamepadChange">{{item.bindings.gamepad}}&nbsp;</kbd></td>
                                 <td>{{__(item.description)}}</td>
-                                <td>{{__(item.name)}}</td>
                             </tr>
                         </template>
                     </tbody>
@@ -202,7 +197,7 @@
             <p> {{__('Choose a control from the dropdown to remap this command to')}} </p>
             <p> {{__('Click CLEAR to remove inputs associated with this command')}} </p>
 
-            <h3>dialog-confirm
+            <h3>
                 {{__('Current Mapping')}}: <kbd>{{selectedItem.bindings.gamepad}}</kbd>
             </h3>
 
@@ -470,7 +465,6 @@
                     
                 },
                 
-
                 //Function to achieve the sticky table headers with pure CSS.
                 tableContainerScroll: function() {
                     var self = this;
@@ -648,6 +642,7 @@
                         }
 
                         var arrayInput = {
+                            shortName: value.shortName,
                             name: value.name,
                             description: value.description,
                             bindings: binding

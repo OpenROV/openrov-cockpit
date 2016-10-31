@@ -28,7 +28,7 @@
   $.ajaxSetup({
     cache: true
   });
-    
+
 window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
 
   ga('create', 'UA-18444815-8', 'auto');
@@ -72,6 +72,7 @@ ga('send', 'pageview');
       eventLabel:  err.filename + ':  ' + err.lineno  
     });
   });  
+
 </script>
 
   <script type='text/javascript' src="js/libs/eventemitter2.js"></script>
@@ -117,7 +118,7 @@ ga('send', 'pageview');
       opacity: 0;
       will-change: opacity;
       z-index: 9000;
-      background: url(...) no-repeat;
+      background: url("") no-repeat;
       background-color: #E53935;
     }
 #loader-wrapper {
@@ -266,13 +267,34 @@ ga('send', 'pageview');
   </div>
 <link rel="import" href="components/platinum-sw/platinum-sw-register.html">
 <link rel="import" href="components/platinum-sw/platinum-sw-cache.html">
+<link rel="import" href="components/platinum-sw/platinum-sw-fetch.html">
+<link rel="import" href="components/platinum-sw/platinum-sw-import-script.html">
 <link rel="import" href="components/terms-of-use/terms-of-use.html">
 <!--TODO: Add logic to support either popout or popin(swapping) of applets-->
 <template id="t" is="dom-bind"  strip-whitespace>
- <terms-of-use style="z-index:9999;display:block;position:absolute;width:100%;heigh:100%;"></terms-of-use> 
-<platinum-sw-register auto-register reload-on-install state="{{pswstate}}">
-  <platinum-sw-offline-analytics></platinum-sw-offline-analytics>  
-  <platinum-sw-cache default-cache-strategy="networkFirst"></platinum-sw-cache>
+ <terms-of-use style="z-index:9999;display:block;position:absolute;width:100%;heigh:100%;"></terms-of-use>
+                                                
+
+  <!--
+    TODO: Occasionally see a `Uncaught (in promise) DOMException: Entry was not found.` error that has to do with
+    the system trying to open the cache.  Suspect the logic to expire the cache with a new sw-script is putting
+    the name or access of the cache in limbo while the install is taking place.
+    --> 
+  <!-- pattern for custom fetch handler from: https://codelabs.developers.google.com/codelabs/polymer-offline-weather/index.html?index=..%2F..%2Findex#6 -->
+<platinum-sw-register auto-register skipWaiting clients-claim reload-on-install state="{{pswstate}}">
+  <platinum-sw-import-script href="/system-plugin/ui-manager/js/nocache-fetch-handler.js"></platinum-sw-import-script>
+  <platinum-sw-import-script href="/system-plugin/ui-manager/js/cache-ignoreParameters-handler.js"></platinum-sw-import-script>
+  <platinum-sw-offline-analytics></platinum-sw-offline-analytics>
+  <platinum-sw-fetch handler="dontCacheHandler"
+                 path="/cockpitsocket(.*)"></platinum-sw-fetch> 
+  <platinum-sw-fetch handler="dontCacheHandler"
+                 path="/peerview(.*)"></platinum-sw-fetch>                     
+  <platinum-sw-fetch handler="cacheIgnoreParametersHandler"
+                 path="/"></platinum-sw-fetch>
+  <platinum-sw-fetch handler="dontCacheHandler"
+                 path="/client/BWcCxwJdMnHP7Y3pKCNtbp5IA6o5lKlb(.*)"
+                 origin="https://cdn.auth0.com"></platinum-sw-fetch>                                                              
+  <platinum-sw-cache default-cache-strategy="fastest" precache='["/js/replay.js"]'></platinum-sw-cache>
 </platinum-sw-register>
 
 <!-- Temporarily disabled pending solution for relative pathing -->

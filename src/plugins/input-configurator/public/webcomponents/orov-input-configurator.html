@@ -10,22 +10,27 @@
 <link rel="import" href="../paper-spinner/paper-spinner.html">
 <link rel="import" href="../paper-spinner/paper-spinner-lite.html">
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
-<link rel="import" href="../paper-tabs/paper-tabs.html">
 <link rel="import" href="../neon-animation/neon-animation.html">
 
 <dom-module name="orov-input-configurator">
 
     <style type="text/css">
-        .successfullySaved {
-            opacity: 1;
+                
+        paper-button {
+            margin-top: 2em;
         }
-        
-        .successfullySaved.hide {
-            opacity: 0;
-            display: block;
-            transition: opacity 1.5s ease-out;
+
+        paper-spinner {
+            top: 2em;
+            left: 4em;
+            --paper-spinner-stroke-width: 4px;
         }
-        
+
+        section {
+            position: relative;
+            border: 1px solid #000;
+        }
+
         table {
             border-collapse: collapse;
             width: 100%;
@@ -45,35 +50,15 @@
             overflow: auto;
             height: 400px;
         }
-        
-        section {
-            position: relative;
-            border: 1px solid #000;
-        }
-
-        #stickyHeader {
-            background-color: white;
-        }
-
-        paper-button {
-            margin-top: 2em;
-        }
-
-        paper-tab {
-            background-color:#0D47A1;
-        }
-
-        paper-spinner {
-            top: 2em;
-            left: 4em;
-            --paper-spinner-stroke-width: 4px;
-        }
 
         #duplicateInputToast {
             --paper-toast-background-color: red;
             --paper-toast-color: white;
         }
 
+        #stickyHeader {
+            background-color: white;
+        }
 
         /**
         * KEYS.css
@@ -134,10 +119,10 @@
 
     <template>
 
-        <!-- TODO: Properly implement language formatting -->
-        <h2>Input Configurator: BETA</h2>
+        
+        <h2>{{__('Input Configurator')}}</h2>
         <p>
-            To change a control, click on the coressponding controller button in the table below
+            {{__('Click on the button you want to change in the table below')}}
         </p>        
         <section class="">      
             <div id="tableContainer">
@@ -174,9 +159,9 @@
 
 
         <paper-dialog id="keyboardModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation" on-iron-overlay-closed="onKeyboardModalClosed" on-iron-overlay-opened="handleKeyboardFocus">
-            <h1>Keyboard mapping: {{selectedItem.name}}</h1>
-            <p> Click REMAP and then enter the desired key to set this control </p>
-            <p> Click CLEAR to remove inputs associated with this command </p>
+            <h1> {{__('Keyboard mapping:')}} {{selectedItem.name}} </h1>
+            <p> {{__('Click REMAP and then enter the desired key to set this control')}} </p>
+            <p> {{__('Click CLEAR to remove inputs associated with this command')}} </p>
             <h3>
                 {{__('Current Mapping')}}: <kbd class="light">{{selectedItem.bindings.keyboard}}</kbd>
                 <paper-spinner active={{isListeningToKeyboard}}></paper-spinner>
@@ -189,15 +174,15 @@
             <div class="buttons">
                 <paper-button on-click="handleKeyboardRemapping"> {{__('Remap')}}</paper-button>
                 <paper-button on-tap="handleClearKeyboardBinding" dialog-confirm>{{__('Clear')}}</paper-button>
-                <paper-button disabled$={{isValidKeyboardReplacement}} on-tap="handleClearConflictingKeyboardBinding">Clear conflicting binding</paper-button>
+                <paper-button disabled$={{isValidKeyboardReplacement}} on-tap="handleClearConflictingKeyboardBinding"> {{__('Clear conflicting binding')}} </paper-button>
                 <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
             </div>
         </paper-dialog>
 
         <paper-dialog id="gamepadModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation" on-iron-overlay-closed="onGamepadModalClosed" on-iron-overlay-opened="handleGamepadFocus">
-            <h1>Gamepad mapping: {{selectedItem.name}}</h1>
-            <p> Choose a control from the dropdown to remap this command to </p>
-            <p> Click CLEAR to remove inputs associated with this command </p>
+            <h1>{{__('Gamepad mapping:')}} {{selectedItem.name}}</h1>
+            <p> {{__('Choose a control from the dropdown to remap this command to')}} </p>
+            <p> {{__('Click CLEAR to remove inputs associated with this command')}} </p>
 
             <h3>
                 {{__('Current Mapping')}}: <kbd>{{selectedItem.bindings.gamepad}}</kbd>
@@ -228,17 +213,16 @@
                         <paper-item value="RIGHT_STICK_X">{{__('RIGHT_STICK_X')}}</paper-item>
                         <paper-item value="RIGHT_STICK_Y">{{__('RIGHT_STICK_Y')}}</paper-item>
                     </paper-listbox>
-                </paper-dropdown-menu> 
-                <paper-checkbox disabled>{{__('invert')}}</paper-checkbox>       
+                </paper-dropdown-menu>      
             </div>
-            <paper-button disabled$={{isValidGamepadReplacement}} on-tap="handleClearConflictingGamepadBinding">Clear conflicting binding</paper-button>
+            <paper-button disabled$={{isValidGamepadReplacement}} on-tap="handleClearConflictingGamepadBinding">{{__('Clear conflicting binding')}}</paper-button>
             <paper-button on-tap="handleClearGamepadBinding" dialog-confirm>{{__('Clear')}}</paper-button>
             <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
         </paper-dialog>
 
 
 
-        <paper-button raised on-click="resetPreset">Reset Preset</paper-button>
+        <paper-button raised on-click="resetPreset">{{__('Reset Preset')}}</paper-button>
 
         <paper-toast id="doesNotWorkToast" text="Functionality doesn't exist...yet"></paper-toast>
         <paper-toast id="updatedPresetToast" text="Updated Preset!"></paper-toast>
@@ -463,7 +447,6 @@
                     //Actually update the preset with the input controller
                     console.log("Updating the preset with input controller");
 
-                                        
                     //If sucessful, open up the toast
                     this.openUpdatePresetToast();
                 },

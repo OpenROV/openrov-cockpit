@@ -299,17 +299,15 @@
                     }
                 },
                 
-
                 behaviors: [namespace('behaviors').oROVStandard],
-                listeners:
-                {
+
+                listeners: {
                     'tableContainer.scroll': 'tableContainerScroll'
                 },
 
                 registerEmitterHandlers: function(emitter) {
                     var self = this;
                     this.presetFunction = function(preset) {
-                        console.log("Got a preset:", preset);
 
                         //Set this to our current preset on the input Configurator
                         self.preset = preset;
@@ -334,10 +332,6 @@
                         self.eventEmitter.emit('plugin.inputController.sendPreset');
                     }
                     
-                },
-
-                getElement: function(ele) {
-                    return this.querySelector(ele);
                 },
 
                 checkForKeyboardDuplicates: function() {
@@ -479,7 +473,7 @@
                     var self = this;
 
                     //Clear the input from our presets
-                    console.log("Clearing:",self.selectedItem);
+                    console.log("Clearing:", self.selectedItem);
 
                     //Format in a way that the input controller expects
                     var clearedInput = {
@@ -499,7 +493,7 @@
                     var self = this;
 
                     //Clear the input from our presets
-                    console.log("Clearing:",self.selectedItem);
+                    console.log("Clearing:", self.selectedItem);
 
                     //Format in a way that the input controller expects
                     var clearedInput = {
@@ -516,7 +510,7 @@
                 handleClearConflictingKeyboardBinding: function() {
                     var self = this;
 
-                    console.log("Clearing:",self.conflictingBinding);
+                    console.log("Clearing:", self.conflictingBinding);
                     
                     //Format in a way that the input controller expects
                     var clearedInput = {
@@ -605,7 +599,6 @@
                     self.isListeningToKeyboard = true;
 
                     Mousetrap.record( function(sequence) {
-                        console.log('You pressed: ' + sequence.join(' '));
                         self.isListeningToKeyboard = false;
                         self.candidateBinding = sequence.join(' ');
 

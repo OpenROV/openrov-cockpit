@@ -80,14 +80,9 @@
     {
       var self = this;
 
-      this.cockpit.on('plugin.inputController.debug', function(e) {
-        console.log(e);
-      });
-
-      this.cockpit.rov.on('plugin.inputController.defaults', function(defaults) {
+      this.cockpit.on('plugin.inputController.defaults', function(defaults) {
         
         //Listen for plugins asking to register their default input configurations
-
         //Make sure we got a valid input
         if(defaults == null)
         {
@@ -108,6 +103,10 @@
           self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset));
         }
         
+      });
+
+      this.cockpit.on('plugin.inputController.resetControllers', function() {
+        self.resetControllers();
       });
 
       this.cockpit.on('plugin.inputController.updateInput', function(input) {
@@ -149,15 +148,6 @@
 
     updateInput(input, preset)
     {
-      /*
-        For updates, we expect data to look like this
-          updatedInput {
-            name: String,
-            controller: String,
-            input: String 
-          }
-      */
-
       var self = this;
 
       if(input == null)
@@ -237,32 +227,10 @@
       
     };
 
-    //Registration of a preset with hardware interfaces
-    registerPreset(preset)
-    {
-      var self = this;
-
-      if(preset == null)
-      {
-        console.error("Tried to register an undefined preset!");
-        return;
-      }
-
-      //Iterate through the list of hardware controllers
-      var currentPreset = self.presets.get(preset);
-      currentPreset.controllers.forEach(function(value, controller) {
-        
-        var hardware = self.controllers.get(controller);
-        //Iterate through the inputs for this controller
-        value.forEach(function(actions, input) {
-          hardware.register(input, actions);
-        });
-      }); 
-    };
-
     resetControllers()
     {
       var self = this;
+      
       self.controllers.forEach(function(controller) {
         controller.reset();
       });
@@ -398,22 +366,6 @@
       self.gamepadAbstraction.assignments.set(key, actions);
     };
 
-    registerPreset(preset)
-    {
-      var self = this;
-
-      if(preset == null)
-      {
-        console.error("Tried to register an undefined preset with gamepad");
-        return;
-      }
-
-      var gamepadPreset = preset.controllers.get("gamepad");
-      gamepadPreset.forEach(function(value, key) {
-        self.register(key, value);
-      });
-    }
-
     reset()
     {
       var self = this;
@@ -421,6 +373,7 @@
       console.log("Resetting gamepad");
       self.gamepadAbstraction.assignments.clear();
     };
+    
     unregister(key, actions)
     {
       var self = this;

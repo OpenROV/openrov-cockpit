@@ -46,16 +46,6 @@
             }           
         };
 
-        makeCopy(presetName)
-        {
-            var self = this;
-            var presetOut;
-
-            presetOut = new inputController.Preset(presetName);
-            presetOut.controllers = self.controllers;
-            return presetOut;
-        };
-
         removeInput(input)
         {
             var self = this;

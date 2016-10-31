@@ -143,16 +143,21 @@
                             </th>
                             <th>
                                 <div>{{__('Description')}}</div>
-                            </th>            
+                            </th> 
+                            <th>
+                                <div>{{__('Emitter Name')}}</div>
+                            </th>
+           
                         </tr>
                     </thead>
                     <tbody>
                         <template is="dom-repeat" items="[[presetArray]]">
                             <tr>
-                                <td>{{__(item.name)}}</td>
+                                <td>Toggle Telemetry Recording</td>
                                 <td><kbd class="light" on-tap="handleKeyboardChange">{{item.bindings.keyboard}}&nbsp;</kbd></td>
                                 <td><kbd on-tap="handleGamepadChange">{{item.bindings.gamepad}}&nbsp;</kbd></td>
                                 <td>{{__(item.description)}}</td>
+                                <td>{{__(item.name)}}</td>
                             </tr>
                         </template>
                     </tbody>
@@ -167,19 +172,29 @@
             <p> {{__('Click CLEAR to remove inputs associated with this command')}} </p>
             <h3>
                 {{__('Current Mapping')}}: <kbd class="light">{{selectedItem.bindings.keyboard}}</kbd>
-                <paper-spinner active={{isListeningToKeyboard}}></paper-spinner>
+                <paper-spinner active={{isListeningToKeyboard}} text="Waiting for keyboard input"></paper-spinner>
             </h3>
             
             <h3>
-                {{__('Remap to:')}}: <kbd class="light"> {{candidateBinding}} </kbd>
+                {{__('Remap to')}}: <kbd class="light"> {{candidateBinding}} </kbd>
             </h3>
 
             <div class="buttons">
                 <paper-button on-click="handleKeyboardRemapping"> {{__('Remap')}}</paper-button>
                 <paper-button on-tap="handleClearKeyboardBinding" dialog-confirm>{{__('Clear')}}</paper-button>
-                <paper-button disabled$={{isValidKeyboardReplacement}} on-tap="handleClearConflictingKeyboardBinding"> {{__('Clear conflicting binding')}} </paper-button>
+                <paper-button disabled$={{isValidKeyboardReplacement}} on-tap="openClearKeyboardDuplicateWarning"> {{__('Clear conflicting binding')}} </paper-button>
                 <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
             </div>
+
+            <paper-dialog id="clearKeyboardDuplicateWarningModal">
+                <h2>{{__('Are you sure?')}}</h2>
+                <p>{{__('Confirming this will clear the binding to ')}} <b>{{conflictingBinding.name}}</b>  {{__(' and set ')}} <kbd>{{candidateBinding}}</kbd> {{__(' as the binding to ')}} <b>{{selectedItem.name}}</b> </p>
+                <div class="buttons">
+                    <paper-button dialog-confirm on-tap="handleClearConflictingKeyboardBinding" class="green-button">{{__('Confirm')}}</paper-button>
+                    <paper-button dialog-dismiss>{{__('Decline')}}</paper-button>
+                </div>
+            </paper-dialog>
+
         </paper-dialog>
 
         <paper-dialog id="gamepadModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation" on-iron-overlay-closed="onGamepadModalClosed" on-iron-overlay-opened="handleGamepadFocus">
@@ -187,7 +202,7 @@
             <p> {{__('Choose a control from the dropdown to remap this command to')}} </p>
             <p> {{__('Click CLEAR to remove inputs associated with this command')}} </p>
 
-            <h3>
+            <h3>dialog-confirm
                 {{__('Current Mapping')}}: <kbd>{{selectedItem.bindings.gamepad}}</kbd>
             </h3>
 
@@ -218,16 +233,16 @@
                     </paper-listbox>
                 </paper-dropdown-menu>      
             </div>
-            <paper-button disabled$={{isValidGamepadReplacement}} on-tap="openClearDuplicateWarningToast">{{__('Clear conflicting binding')}}</paper-button>
+            <paper-button disabled$={{isValidGamepadReplacement}} on-tap="openClearGamepadDuplicateWarning">{{__('Clear conflicting binding')}}</paper-button>
             <paper-button on-tap="handleClearGamepadBinding" dialog-confirm>{{__('Clear')}}</paper-button>
             <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
             
             <paper-dialog id="clearGamepadDuplicateWarningModal">
                 <h2>{{__('Are you sure?')}}</h2>
-                <p>{{__('Confirming this will set ')}} <kbd>{{candidateBinding}}</kbd>  {{__(' as the binding to ')}} <b>{{selectedItem.name}}</b> {{__(' and clear the binding to')}} <b>{{conflictingBinding.name}}</b> </p>
+                <p>{{__('Confirming this will clear the binding to ')}} <b>{{conflictingBinding.name}}</b>  {{__(' and set ')}} <kbd>{{candidateBinding}}</kbd> {{__(' as the binding to ')}} <b>{{selectedItem.name}}</b> </p>
                 <div class="buttons">
-                    <paper-button on-tap="handleClearConflictingGamepadBinding" class="green-button">{{__('Confirm')}}</paper-button>
-                    <paper-button dialog-dismiss>Decline</paper-button>
+                    <paper-button dialog-confirm on-tap="handleClearConflictingGamepadBinding" class="green-button">{{__('Confirm')}}</paper-button>
+                    <paper-button dialog-dismiss>{{__('Decline')}}</paper-button>
                 </div>
             </paper-dialog>
 
@@ -397,7 +412,7 @@
                     self.eventEmitter.emit('plugin.inputController.updateInput', updatedInput);
 
                     //Open the update toast
-                    self.$.updatedPresetToast.open();
+                    self.openUpdatePresetToast();
 
                     //And close the modal
                     self.$.keyboardModal.close();
@@ -416,7 +431,7 @@
                     self.eventEmitter.emit('plugin.inputController.updateInput', updatedInput);
 
                     //Open the update toast
-                    self.$.updatedPresetToast.open();
+                    self.openUpdatePresetToast();
 
                     //And close the modal
                     self.$.gamepadModal.close();
@@ -426,13 +441,20 @@
                     this.$.duplicateInputToast.open();
                 },
 
-                openClearDuplicateWarningToast: function() {
+                openClearGamepadDuplicateWarning: function() {
                     var self = this;
-                    this.$.clearGamepadDuplicateWarningModal.open();
+                    self.$.clearGamepadDuplicateWarningModal.open();
+                },
+
+                openClearKeyboardDuplicateWarning: function() {
+                    var self = this;
+                    self.$.clearKeyboardDuplicateWarningModal.open();
                 },
 
                 openUpdatePresetToast: function() {
                     var self = this;
+
+                    self.candidateBinding = undefined;
                     self.$.updatedPresetToast.open();
                 },
 
@@ -551,7 +573,6 @@
 
                     //Reset our state
                     self.isListeningToKeyboard = false;
-                    self.candidateBinding = undefined;
                     self.isValidKeyboardReplacement = true;
                 },
 

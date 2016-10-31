@@ -220,11 +220,6 @@
             <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
         </paper-dialog>
 
-
-
-        <paper-button raised on-click="resetPreset">{{__('Reset Preset')}}</paper-button>
-
-        <paper-toast id="doesNotWorkToast" text="Functionality doesn't exist...yet"></paper-toast>
         <paper-toast id="updatedPresetToast" text="Updated Preset!"></paper-toast>
         <paper-toast id="clearedInputToast" text="Cleared input!"></paper-toast>
         <paper-toast id="duplicateInputToast" class="fit-bottom" text="Duplicate found."></paper-toast>
@@ -296,7 +291,7 @@
                         self.preset = preset;
 
                         //Update the UI to reflect this
-                        self._presetToArray(self.preset);
+                        self.presetToArray(self.preset);
                     }.bind(this);
 
                     emitter.on('plugin.inputController.updatedPreset', this.presetFunction );
@@ -315,11 +310,6 @@
                         self.eventEmitter.emit('plugin.inputController.sendPreset');
                     }
                     
-                },
-
-                inputsChanged: function(inputs)
-                {
-                    this.inputs = inputs;
                 },
 
                 checkForKeyboardDuplicates: function() {
@@ -421,19 +411,21 @@
                     var self = this;
                     self.$.updatedPresetToast.open();
                 },
+
+                //Reset the candidateBinding on keyboard modal closed
                 onKeyboardModalClosed : function() {
-
-                },
-                onGamepadModalClosed : function() {
-
-                },
-
-                resetPreset: function() {
                     var self = this;
-
-                    self.$.doesNotWorkToast.open();
+                    self.candidateBinding = undefined;
                 },
+                
+                //Reset the candidateBinding on gamepad modal closed
+                onGamepadModalClosed : function() {
+                    var self = this;
+                    self.candidateBinding = undefined;
+                },
+                
 
+                //Function to achieve the sticky table headers with pure CSS.
                 tableContainerScroll: function() {
                     var self = this;
 
@@ -442,14 +434,7 @@
                     self.$.stickyHeader.style.transform = translate;
                 },
 
-                updatePreset: function() {
-                    var self = this;
-                    //Actually update the preset with the input controller
-                    console.log("Updating the preset with input controller");
-
-                    //If sucessful, open up the toast
-                    this.openUpdatePresetToast();
-                },
+                //Handles clearing an existing keyboard command
                 handleClearKeyboardBinding: function() {
                     var self = this;
 
@@ -469,6 +454,7 @@
                     this.$.clearedInputToast.open();
                 },
 
+                //Handles clearing an existing gamepad command
                 handleClearGamepadBinding: function() {
                     var self = this;
 
@@ -524,18 +510,7 @@
                     self.updateGamepadInput();
 
                     self.openUpdatePresetToast();
-                },
-
-                handleKeyboardBindingChange: function() {
-                    var self = this;
-
-                    //Replace the selected item's keyboard binding with the selected binding
-                    var replacedInput = self.selectedItem;
-                    replacedInput.bindings.keyboard = self.candidateBinding;
-
-                    self.openUpdatePresetToast();
-                },
-                
+                },             
 
                 //User has clicked a keyboard symbol
                 handleKeyboardChange: function(e) {
@@ -601,8 +576,8 @@
 
                 },
 
-
-                _presetToArray: function(preset) {
+                //Converts a preset object(hash map) to a consumable array for the input configurator
+                presetToArray: function(preset) {
                     var self = this;
                     //Converts a js Map object to an array
                     var arrayPreset = [];

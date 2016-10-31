@@ -60,6 +60,9 @@
             background-color: white;
         }
 
+        .green-button {
+            color: #34A853;
+        }
         /**
         * KEYS.css
         *
@@ -168,7 +171,7 @@
             </h3>
             
             <h3>
-                {{__('Candidate Mapping')}}: <kbd class="light"> {{candidateBinding}} </kbd>
+                {{__('Remap to:')}}: <kbd class="light"> {{candidateBinding}} </kbd>
             </h3>
 
             <div class="buttons">
@@ -215,15 +218,25 @@
                     </paper-listbox>
                 </paper-dropdown-menu>      
             </div>
-            <paper-button disabled$={{isValidGamepadReplacement}} on-tap="handleClearConflictingGamepadBinding">{{__('Clear conflicting binding')}}</paper-button>
+            <paper-button disabled$={{isValidGamepadReplacement}} on-tap="openClearDuplicateWarningToast">{{__('Clear conflicting binding')}}</paper-button>
             <paper-button on-tap="handleClearGamepadBinding" dialog-confirm>{{__('Clear')}}</paper-button>
             <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
+            
+            <paper-dialog id="clearGamepadDuplicateWarningModal">
+                <h2>{{__('Are you sure?')}}</h2>
+                <p>{{__('Confirming this will set ')}} <kbd>{{candidateBinding}}</kbd>  {{__(' as the binding to ')}} <b>{{selectedItem.name}}</b> {{__(' and clear the binding to')}} <b>{{conflictingBinding.name}}</b> </p>
+                <div class="buttons">
+                    <paper-button on-tap="handleClearConflictingGamepadBinding" class="green-button">{{__('Confirm')}}</paper-button>
+                    <paper-button dialog-dismiss>Decline</paper-button>
+                </div>
+            </paper-dialog>
+
         </paper-dialog>
+
 
         <paper-toast id="updatedPresetToast" text="Updated Preset!"></paper-toast>
         <paper-toast id="clearedInputToast" text="Cleared input!"></paper-toast>
         <paper-toast id="duplicateInputToast" class="fit-bottom" text="Duplicate found."></paper-toast>
-
     </template>
     
     <script src="MouseTrapExtension.js"></script>
@@ -275,6 +288,7 @@
                         value: true
                     }
                 },
+                
 
                 behaviors: [namespace('behaviors').oROVStandard],
                 listeners:
@@ -312,6 +326,10 @@
                     
                 },
 
+                getElement: function(ele) {
+                    return this.querySelector(ele);
+                },
+
                 checkForKeyboardDuplicates: function() {
                     var self = this;
 
@@ -329,8 +347,8 @@
 
                     if( isDuplicate )
                     {
-                        self.openDuplicateInputToast();
                         self.isValidKeyboardReplacement = false;                       
+                        self.openDuplicateInputToast();
                     }
                     else
                     {
@@ -364,6 +382,7 @@
                         self.updateGamepadInput();
                     }
                 },
+                
 
                 updateKeyboardInput: function() {
                     var self = this;
@@ -407,6 +426,11 @@
                     this.$.duplicateInputToast.open();
                 },
 
+                openClearDuplicateWarningToast: function() {
+                    var self = this;
+                    this.$.clearGamepadDuplicateWarningModal.open();
+                },
+
                 openUpdatePresetToast: function() {
                     var self = this;
                     self.$.updatedPresetToast.open();
@@ -415,13 +439,13 @@
                 //Reset the candidateBinding on keyboard modal closed
                 onKeyboardModalClosed : function() {
                     var self = this;
-                    self.candidateBinding = undefined;
+                    
                 },
                 
                 //Reset the candidateBinding on gamepad modal closed
                 onGamepadModalClosed : function() {
                     var self = this;
-                    self.candidateBinding = undefined;
+                    
                 },
                 
 

@@ -90,7 +90,7 @@
           return;
         }
 
-        self.register(input, self.currentPreset);
+        self.register(defaults, self.currentPreset);
 
         self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset));
       });

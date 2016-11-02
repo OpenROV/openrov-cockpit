@@ -2,6 +2,7 @@
   'use strict';
   var ROVpilotWire;
   ROVpilotWire = function ROVpilotWire(cockpit) {
+    var self = this;
     console.log('Loading ROVpilot-Wire plugin in the browser.');
     // Instance variables
     this.cockpit = cockpit;
@@ -13,30 +14,42 @@
     this.headingHold_state = {};
     this.headingHold_desiredOn = false;
     this.depthHold_desiredOn = false;
-    //defaults
-    this.settings = { controlResetsSetPoint: false };
-  };
-  ROVpilotWire.prototype.inputDefaults = function inputDefaults() {
-    var self = this;
-    return [
+    
+    //Defaults
+    this.settings = { 
+      controlResetsSetPoint: false 
+    };
+
+    this.inputDefaults = [
       {
         name: 'rovPilot.toggleHeadingHold',
+        shortName: "Toggle Heading Hold",
         description: 'Toggles the heading hold on/off',
-        defaults: { keyboard: 'm' },
-        down: function () {
-          self.cockpit.emit('plugin.rovpilot.headingHold.set-enabled', !self.headingHold_state.enabled);
+        controllers: new Map([["keyboard", "m"]]),
+        actions:
+        {
+          down: function() {
+            self.cockpit.emit('plugin.rovpilot.headingHold.set-enabled', !self.headingHold_state.enabled);
+          }
         }
       },
       {
         name: 'rovPilot.toggleDepthHold',
+        shortName: "Toggle Depth Hold",
         description: 'Toggles the depth hold on/off',
-        defaults: { keyboard: 'n' },
-        down: function () {
-          self.cockpit.emit('plugin.rovpilot.depthHold.set-enabled', !self.depthHold_state.enabled);
+        controllers: new Map([["keyboard", "n"]]),
+        actions:
+        {
+          down: function() {
+            self.cockpit.emit('plugin.rovpilot.depthHold.set-enabled', !self.depthHold_state.enabled);
+          }
         }
-      }
-    ];
+      }];   
+    
+    //If this was loaded after the input manager, let it know we are ready to be loaded
+    cockpit.emit('plugin.inputController.defaults', self.inputDefaults);
   };
+
   ROVpilotWire.prototype.altMenuDefaults = function altMenuDefaults() {
     var self = this;
     return [

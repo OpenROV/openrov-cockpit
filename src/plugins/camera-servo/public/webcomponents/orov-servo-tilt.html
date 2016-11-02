@@ -34,7 +34,10 @@
         },
         behaviors: [namespace('behaviors').oROVStandard],
         _servoAngleChanged: function(){
+          
+          //For some reason, the camera icon rotates opposite to the value we expect. Correct for it here with the negative
           var newvalue='rotate('+ -this.servoAngle +'deg)';
+          
           this.$.servoTiltImage.style['-webkit-transform'] = newvalue;
           this.$.servoTiltImage.style['-moz-transform'] = newvalue;
           this.$.servoTiltImage.style['transform'] = newvalue;

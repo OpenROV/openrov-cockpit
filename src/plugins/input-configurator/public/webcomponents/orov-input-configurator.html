@@ -7,247 +7,251 @@
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-spinner/paper-spinner.html">
 <link rel="import" href="../paper-spinner/paper-spinner-lite.html">
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../neon-animation/neon-animation.html">
 
 <dom-module name="orov-input-configurator">
 
     <style type="text/css">
-        .successfullySaved {
-            opacity: 1;
+                
+        paper-button {
+            margin-top: 2em;
         }
-        
-        .successfullySaved.hide {
-            opacity: 0;
-            display: block;
-            transition: opacity 1.5s ease-out;
+
+        paper-spinner {
+            top: 2em;
+            left: 4em;
+            --paper-spinner-stroke-width: 4px;
         }
-        
-        td,
-        th {
-            border-bottom: 1px solid #eee;
-            padding: 10px 25px;
-        }
-        
-        th {
-            height: 0;
-            line-height: 0;
-            padding-top: 0;
-            padding-bottom: 0;
-            border: none;
-            white-space: nowrap;
-        }
-        
-        th div {
-            position: absolute;
-            padding: 9px 25px;
-            top: 0;
-            margin-left: -25px;
-            line-height: normal;
-        }
-        
-        th:first-child div {
-            border: none;
-        }
-        
-        .container {
-            overflow-y: auto;
-            height: 200px;
-        }
-        
+
         section {
             position: relative;
             border: 1px solid #000;
-            padding-top: 37px;
         }
 
-/**
- * KEYS.css
- *
- * A simple stylesheet for rendering beautiful keyboard-style elements.
- *
- * Author:  Michael Hüneburg
- * Website: http://michaelhue.com/keyscss
- * License: MIT License (see LICENSE.txt)
- */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
 
-/* Base style, essential for every key. */
-kbd, .key {
-	display: inline;
-	display: inline-block;
-	min-width: 1em;
-	padding: .2em .3em;
-	font: normal .85em/1 "Lucida Grande", Lucida, Arial, sans-serif;
-	text-align: center;
-	text-decoration: none;
-	-moz-border-radius: .3em;
-	-webkit-border-radius: .3em;
-	border-radius: .3em;
-	border: none;
-	cursor: default;
-	-moz-user-select: none;
-	-webkit-user-select: none;
-	user-select: none;
-}
-kbd[title], .key[title] {
-	cursor: help;
-}
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
 
-/* Dark style for display on light background. This is the default style. */
-kbd, kbd.dark, .dark-keys kbd, .key, .key.dark, .dark-keys .key {
-	background: rgb(80, 80, 80);
-	background: -moz-linear-gradient(top, rgb(60, 60, 60), rgb(80, 80, 80));
-	background: -webkit-gradient(linear, left top, left bottom, from(rgb(60, 60, 60)), to(rgb(80, 80, 80)));
-	color: rgb(250, 250, 250);
-	text-shadow: -1px -1px 0 rgb(70, 70, 70);
-	-moz-box-shadow: inset 0 0 1px rgb(150, 150, 150), inset 0 -.05em .4em rgb(80, 80, 80), 0 .1em 0 rgb(30, 30, 30), 0 .1em .1em rgba(0, 0, 0, .3);
-	-webkit-box-shadow: inset 0 0 1px rgb(150, 150, 150), inset 0 -.05em .4em rgb(80, 80, 80), 0 .1em 0 rgb(30, 30, 30), 0 .1em .1em rgba(0, 0, 0, .3);
-	box-shadow: inset 0 0 1px rgb(150, 150, 150), inset 0 -.05em .4em rgb(80, 80, 80), 0 .1em 0 rgb(30, 30, 30), 0 .1em .1em rgba(0, 0, 0, .3);
-}
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+        
+        #tableContainer {
+            overflow: auto;
+            height: 100%;
+        }
 
-/* Light style for display on dark background. */
-kbd.light, .light-keys kbd, .key.light, .light-keys .key {
-	background: rgb(250, 250, 250);
-	background: -moz-linear-gradient(top, rgb(210, 210, 210), rgb(255, 255, 255));
-	background: -webkit-gradient(linear, left top, left bottom, from(rgb(210, 210, 210)), to(rgb(255, 255, 255)));
-	color:  rgb(50, 50, 50);
-	text-shadow: 0 0 2px rgb(255, 255, 255);
-	-moz-box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
-	-webkit-box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
-	box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
-}        
+        #duplicateInputToast {
+            --paper-toast-background-color: red;
+            --paper-toast-color: white;
+        }
+
+        #stickyHeader {
+            background-color: white;
+        }
+
+        .green-button {
+            color: #34A853;
+        }
+        /**
+        * KEYS.css
+        *
+        * A simple stylesheet for rendering beautiful keyboard-style elements.
+        *
+        * Author:  Michael Hüneburg
+        * Website: http://michaelhue.com/keyscss
+        * License: MIT License (see LICENSE.txt)
+        */
+
+        /* Base style, essential for every key. */
+        kbd, .key {
+            display: inline;
+            display: inline-block;
+            min-width: 1em;
+            padding: .2em .3em;
+            font: normal .85em/1 "Lucida Grande", Lucida, Arial, sans-serif;
+            text-align: center;
+            text-decoration: none;
+            -moz-border-radius: .3em;
+            -webkit-border-radius: .3em;
+            border-radius: .3em;
+            border: none;
+            cursor: pointer;
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        kbd[title], .key[title] {
+            cursor: help;
+        }
+
+        /* Dark style for display on light background. This is the default style. */
+        kbd, kbd.dark, .dark-keys kbd, .key, .key.dark, .dark-keys .key {
+            background: rgb(80, 80, 80);
+            background: -moz-linear-gradient(top, rgb(60, 60, 60), rgb(80, 80, 80));
+            background: -webkit-gradient(linear, left top, left bottom, from(rgb(60, 60, 60)), to(rgb(80, 80, 80)));
+            color: rgb(250, 250, 250);
+            text-shadow: -1px -1px 0 rgb(70, 70, 70);
+            -moz-box-shadow: inset 0 0 1px rgb(150, 150, 150), inset 0 -.05em .4em rgb(80, 80, 80), 0 .1em 0 rgb(30, 30, 30), 0 .1em .1em rgba(0, 0, 0, .3);
+            -webkit-box-shadow: inset 0 0 1px rgb(150, 150, 150), inset 0 -.05em .4em rgb(80, 80, 80), 0 .1em 0 rgb(30, 30, 30), 0 .1em .1em rgba(0, 0, 0, .3);
+            box-shadow: inset 0 0 1px rgb(150, 150, 150), inset 0 -.05em .4em rgb(80, 80, 80), 0 .1em 0 rgb(30, 30, 30), 0 .1em .1em rgba(0, 0, 0, .3);
+        }
+
+        /* Light style for display on dark background. */
+        kbd.light, .light-keys kbd, .key.light, .light-keys .key {
+            background: rgb(250, 250, 250);
+            background: -moz-linear-gradient(top, rgb(210, 210, 210), rgb(255, 255, 255));
+            background: -webkit-gradient(linear, left top, left bottom, from(rgb(210, 210, 210)), to(rgb(255, 255, 255)));
+            color:  rgb(50, 50, 50);
+            text-shadow: 0 0 2px rgb(255, 255, 255);
+            -moz-box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
+            -webkit-box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
+            box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
+        }        
     </style>
+
     <template>
-        <h2 style="display:inline">{{__('Input configurator BETA')}}</h2>
-        <div style="float:right">
-                <label class="prefix" for="find">{{__('Find')}}:</label>
-                <input id="find" type="text" value="{{find::input}}" />
-        </div>
+
+        
+        <h2>{{__('Input Configurator')}}</h2>
         <p>
-            {{__('To change control mapping click on the control to change.')}}
-        </p>
-  <section class="">      
-  <div class="container">
-        <table>
-        <thead>
-            <tr class="header">
-            <th>
-                <div>{{__('Command')}}</div>
-            </th>
-            <th>
-                <div>{{__('KBD')}}</div>
-            </th>
-            <th>
-                <div>{{__('GMP')}}</div>
-            </th>
-            <th>
-                <div>{{__('Description')}}</div>
-            </th>            
-            </tr>
-        </thead>
-    <tbody>
-        <template is="dom-repeat" items="[[commands]]">
-            <tr>
-                <td>{{__(item.name)}}</td>
-                <td><kbd class="light" on-tap="_handleKeyboardChange">{{item.bindings.keyboard}}&nbsp;</kbd></td>
-                <td><kbd on-tap="_handleGamepadChange">{{item.bindings.gamepad}}&nbsp;</kbd></td>
-                <td>{{__(item.description)}}</td>
-            </tr>
-        </template>
-    </tbody>
-    </table>
-    </div>
-    </section>
-
-<paper-dialog id="keyboardmodal" modal on-iron-overlay-closed="_onkeyboardModalClosed" on-iron-overlay-opened="_handleKeyBoardFocus">
-    <label for="keyboard">{{__('Type the key or sequence of keys to use')}}:</label>
-    <br>
-    <label>{{__('Current Mapping')}}: <kbd>{{selectedItem.bindings.keyboard}}</kbd></label>
-    <paper-spinner-lite active$={{_isLIsteningForKeyBoardBinding}}></paper-spinner-lite>
-        <h1>{{_candidateBinding}}</h1>
-        <label hidden$={{_noConflictWithCandidate(_candidateBinding,selectedItem.bindings.keyboard)}}>{{__('Keybinding already in use')}}</label>
-    </div>
-  <div class="buttons">
-    <paper-button hidden$={{_noConflictWithCandidate(_candidateBinding,selectedItem.bindings.keyboard)}} dialog-confirm>{{__('replace conflicting binding')}}</paper-button>
-    <paper-button hidden$={{_isLIsteningForKeyBoardBinding}} on-click="_handleKeyBoardFocus">{{__('enter different key')}}</paper-button>
-    <paper-button on-tap="_handleClearBinding" dialog-confirm>{{__('clear binding')}}</paper-button>
-    <paper-button dialog-confirm disabled$={{!_isValidReplacementBinding('keyboard',_candidateBinding,selectedItem.bindings.keyboard)}} on-click="handleKeyBoardFocuse">{{__('accept')}}</paper-button>
-    <paper-button dialog-dismiss>{{__('cancel')}}</paper-button>
-  </div>
-</paper-dialog>
-
-<paper-dialog id="gamepadmodal" modal on-iron-overlay-closed="_ongamepadModalClosed">
-    <label for="gamepad">{{__('Gamepad')}}:</label>
-    <div>
-        <paper-dropdown-menu id="candidategamepad" label="gamepad control">
-            <paper-listbox class="dropdown-content" attr-for-selected="value" selected="{{_candidateBinding}}" on-iron-select="_handleCanidateGamePadSelected">
-                <paper-item value=""></paper-item>
-                <paper-item value="A">{{__('A')}}</paper-item>
-                <paper-item value="B">{{__('B')}}</paper-item>
-                <paper-item value="X">{{__('X')}}</paper-item>
-                <paper-item value="Y">{{__('Y')}}</paper-item>
-                <paper-item value="LB">{{__('LB')}}</paper-item>
-                <paper-item value="RB">{{__('RB')}}</paper-item>
-                <paper-item value="LEFT_TRIGGER">{{__('LEFT_TRIGGER')}}</paper-item>
-                <paper-item value="RIGHT_TRIGGER">{{__('RIGHT_TRIGGER')}}</paper-item>
-                <paper-item value="LEFT_STICK">{{__('LEFT_STICK')}}</paper-item>
-                <paper-item value="RIGHT_STICK">{{__('RIGHT_STICK')}}</paper-item>
-                <paper-item value="START">{{__('START')}}</paper-item>
-                <paper-item value="BACK">{{__('BACK')}}</paper-item>
-                <paper-item value="DPAD_UP">{{__('DPAD_UP')}}</paper-item>
-                <paper-item value="DPAD_DOWN">{{__('DPAD_DOWN')}}</paper-item>
-                <paper-item value="DPAD_LEFT">{{__('DPAD_LEFT')}}</paper-item>
-                <paper-item value="DPAD_RIGHT">{{__('DPAD_RIGHT')}}</paper-item>
-                <paper-item value="HOME">{{__('HOME')}}</paper-item>
-                <paper-item value="LEFT_STICK_X">{{__('LEFT_STICK_X')}}</paper-item>
-                <paper-item value="LEFT_STICK_Y">{{__('LEFT_STICK_Y')}}</paper-item>
-                <paper-item value="RIGHT_STICK_X">{{__('RIGHT_STICK_X')}}</paper-item>
-                <paper-item value="RIGHT_STICK_Y">{{__('RIGHT_STICK_Y')}}</paper-item>
-            </paper-listbox>
-        </paper-dropdown-menu> 
-        <paper-checkbox disabled>{{__('invert')}}</paper-checkbox>       
-    </div>
-
-  <div class="buttons">
-    <paper-button hidden$={{_noConflictWithCandidateGP(_candidateBinding,selectedItem.bindings.gamepad)}} dialog-confirm>{{__('replace conflicting binding')}}</paper-button>
-    <paper-button dialog-confirm disabled$={{!_isValidReplacementBinding('gamepad',_candidateBinding,selectedItem.bindings.gamepad)}} on-click="handleGamePadFocus">{{__('accept')}}</paper-button>
-    <paper-button dialog-dismiss>{{__('cancel')}}</paper-button>
-  </div>
-</paper-dialog>
-
-<paper-dialog id="savenewpresetmodal" modal>
-        <paper-input label="preset name" floatingLabel value="{{newPresetName}}"></paper-input>
-        <button on-tap="onSaveNewPreset" dialog-confirm type="button" class="button">{{__('Save')}}</button>
-        <button dialog-dismiss type="button" class="button">{{__('Cancel')}}</button>
-</paper-dialog>
-    <div class="row full-width">
-        <div class="small-12 columns">
-            <div class="small-8 columns">
-                <paper-dropdown-menu id="preset" label="Presets">
-                    <paper-listbox class="dropdown-content" selected="{{selectedPreset}}">
-                        <template is="dom-repeat" items="{{presets}}" as="p">
-                                <paper-item>{{p.name}}</paper-item>
-                            </template>
-                    </paper-listbox>
-                </paper-dropdown-menu>
-                <button on-tap="onLoadPreset" type="button" class$="button {{ getClass(canLoadPreset,'', 'secondary disabled') }}">{{__('Load')}}</button>
-                <button on-tap="onSavePreset" type="button" class$="button {{ getClass(canSavePreset, '', 'secondary disabled') }}">{{__('Save')}}</button>
-                <button on-tap="onDeletePreset" type="button" class$="button {{ getClass(canSavePreset, '', 'secondary disabled') }}">{{__('Delete')}}</button>
-                <button on-tap="onWantSavePreset" type="button" class$="button {{ getClass(saveNewPreset, 'secondary disabled') }}">{{__('New')}}</button>
-
-                <div class$="successfullySaved {{ getClass(presetLoaded, '', 'hide') }}">
-                    <div data-alert class="alert-box success">
-                        {{__('Loaded!')}}
-                    </div>
-                </div>
+            {{__('Click on the button you want to change in the table below')}}
+        </p>        
+        <section class="">      
+            <div id="tableContainer">
+                <table>
+                    <thead id="stickyHeader">
+                        <tr>
+                            <th>
+                                <div>{{__('Command')}}</div>
+                            </th>
+                            <th>
+                                <div>{{__('Keyboard')}}</div>
+                            </th>
+                            <th>
+                                <div>{{__('Gamepad')}}</div>
+                            </th>
+                            <th>
+                                <div>{{__('Description')}}</div>
+                            </th>           
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template is="dom-repeat" items="[[presetArray]]">
+                            <tr>
+                                <td>{{item.shortName}}</td>
+                                <td><kbd class="light" on-tap="handleKeyboardChange">{{item.bindings.keyboard}}&nbsp;</kbd></td>
+                                <td><kbd on-tap="handleGamepadChange">{{item.bindings.gamepad}}&nbsp;</kbd></td>
+                                <td>{{__(item.description)}}</td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
             </div>
-        </div>
-    </div>
+        </section>
 
 
+        <paper-dialog id="keyboardModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation" on-iron-overlay-closed="onKeyboardModalClosed" on-iron-overlay-opened="handleKeyboardFocus">
+            <h1> {{__('Keyboard mapping:')}} {{selectedItem.name}} </h1>
+            <p> {{__('Click REMAP and then enter the desired key to set this control')}} </p>
+            <p> {{__('Click CLEAR to remove inputs associated with this command')}} </p>
+            <h3>
+                {{__('Current Mapping')}}: <kbd class="light">{{selectedItem.bindings.keyboard}}</kbd>
+                <paper-spinner active={{isListeningToKeyboard}} text="Waiting for keyboard input"></paper-spinner>
+            </h3>
+            
+            <h3>
+                {{__('Remap to')}}: <kbd class="light"> {{candidateBinding}} </kbd>
+            </h3>
+
+            <div class="buttons">
+                <paper-button on-click="handleKeyboardRemapping"> {{__('Remap')}}</paper-button>
+                <paper-button on-tap="handleClearKeyboardBinding" dialog-confirm>{{__('Clear')}}</paper-button>
+                <paper-button disabled$={{isValidKeyboardReplacement}} on-tap="openClearKeyboardDuplicateWarning"> {{__('Clear conflicting binding')}} </paper-button>
+                <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
+            </div>
+
+            <paper-dialog id="clearKeyboardDuplicateWarningModal">
+                <h2>{{__('Are you sure?')}}</h2>
+                <p>{{__('Confirming this will clear the binding to ')}} <b>{{conflictingBinding.name}}</b>  {{__(' and set ')}} <kbd>{{candidateBinding}}</kbd> {{__(' as the binding to ')}} <b>{{selectedItem.name}}</b> </p>
+                <div class="buttons">
+                    <paper-button dialog-confirm on-tap="handleClearConflictingKeyboardBinding" class="green-button">{{__('Confirm')}}</paper-button>
+                    <paper-button dialog-dismiss>{{__('Decline')}}</paper-button>
+                </div>
+            </paper-dialog>
+
+        </paper-dialog>
+
+        <paper-dialog id="gamepadModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation" on-iron-overlay-closed="onGamepadModalClosed" on-iron-overlay-opened="handleGamepadFocus">
+            <h1>{{__('Gamepad mapping:')}} {{selectedItem.name}}</h1>
+            <p> {{__('Choose a control from the dropdown to remap this command to')}} </p>
+            <p> {{__('Click CLEAR to remove inputs associated with this command')}} </p>
+
+            <h3>
+                {{__('Current Mapping')}}: <kbd>{{selectedItem.bindings.gamepad}}</kbd>
+            </h3>
+
+            <div>
+                <paper-dropdown-menu id="candidategamepad" label="gamepad control">
+                    <paper-listbox class="dropdown-content" attr-for-selected="value" selected="{{candidateBinding}}" on-iron-select="handleGamepadRemapping">
+                        <paper-item value="A">{{__('A')}}</paper-item>
+                        <paper-item value="B">{{__('B')}}</paper-item>
+                        <paper-item value="X">{{__('X')}}</paper-item>
+                        <paper-item value="Y">{{__('Y')}}</paper-item>
+                        <paper-item value="LB">{{__('LB')}}</paper-item>
+                        <paper-item value="RB">{{__('RB')}}</paper-item>
+                        <paper-item value="LEFT_TRIGGER">{{__('LEFT_TRIGGER')}}</paper-item>
+                        <paper-item value="RIGHT_TRIGGER">{{__('RIGHT_TRIGGER')}}</paper-item>
+                        <paper-item value="LEFT_STICK">{{__('LEFT_STICK')}}</paper-item>
+                        <paper-item value="RIGHT_STICK">{{__('RIGHT_STICK')}}</paper-item>
+                        <paper-item value="START">{{__('START')}}</paper-item>
+                        <paper-item value="BACK">{{__('BACK')}}</paper-item>
+                        <paper-item value="HOME">{{__('HOME')}}</paper-item>
+                        <paper-item value="DPAD_UP">{{__('DPAD_UP')}}</paper-item>
+                        <paper-item value="DPAD_DOWN">{{__('DPAD_DOWN')}}</paper-item>
+                        <paper-item value="DPAD_LEFT">{{__('DPAD_LEFT')}}</paper-item>
+                        <paper-item value="DPAD_RIGHT">{{__('DPAD_RIGHT')}}</paper-item>
+                        <paper-item value="LEFT_STICK_X">{{__('LEFT_STICK_X')}}</paper-item>
+                        <paper-item value="LEFT_STICK_Y">{{__('LEFT_STICK_Y')}}</paper-item>
+                        <paper-item value="RIGHT_STICK_X">{{__('RIGHT_STICK_X')}}</paper-item>
+                        <paper-item value="RIGHT_STICK_Y">{{__('RIGHT_STICK_Y')}}</paper-item>
+                    </paper-listbox>
+                </paper-dropdown-menu>      
+            </div>
+            <paper-button disabled$={{isValidGamepadReplacement}} on-tap="openClearGamepadDuplicateWarning">{{__('Clear conflicting binding')}}</paper-button>
+            <paper-button on-tap="handleClearGamepadBinding" dialog-confirm>{{__('Clear')}}</paper-button>
+            <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
+            
+            <paper-dialog id="clearGamepadDuplicateWarningModal">
+                <h2>{{__('Are you sure?')}}</h2>
+                <p>{{__('Confirming this will clear the binding to ')}} <b>{{conflictingBinding.name}}</b>  {{__(' and set ')}} <kbd>{{candidateBinding}}</kbd> {{__(' as the binding to ')}} <b>{{selectedItem.name}}</b> </p>
+                <div class="buttons">
+                    <paper-button dialog-confirm on-tap="handleClearConflictingGamepadBinding" class="green-button">{{__('Confirm')}}</paper-button>
+                    <paper-button dialog-dismiss>{{__('Decline')}}</paper-button>
+                </div>
+            </paper-dialog>
+
+        </paper-dialog>
+
+
+        <paper-toast id="updatedPresetToast" text="Updated Preset!"></paper-toast>
+        <paper-toast id="clearedInputToast" text="Cleared input!"></paper-toast>
+        <paper-toast id="duplicateInputToast" class="fit-bottom" text="Duplicate found."></paper-toast>
     </template>
+    
     <script src="MouseTrapExtension.js"></script>
     <script>
+        
         (function() {
 
             var keyboardMap = ["", "", "", "CANCEL", "", "", "HELP", "", "BACK_SPACE", "TAB", "", "", "CLEAR", "ENTER", "RETURN", "", "SHIFT", "CTRL", "ALT", "PAUSE", "CAPSLOCK", "KANA", "EISU", "JUNJA", "FINAL", "HANJA", "", "ESC", "CONVERT", "NONCONVERT", "ACCEPT", "MODECHANGE", "SPACE", "PAGE_UP", "PAGE_DOWN", "END", "HOME", "LEFT", "UP", "RIGHT", "DOWN", "SELECT", "PRINT", "EXECUTE", "PRINTSCREEN", "INSERT", "DELETE", "", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", ";", "LESS_THAN", "=", "GREATER_THAN", "QUESTION_MARK", "AT", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "WIN", "", "CONTEXT_MENU", "", "SLEEP", "NUMPAD0", "NUMPAD1", "NUMPAD2", "NUMPAD3", "NUMPAD4", "NUMPAD5", "NUMPAD6", "NUMPAD7", "NUMPAD8", "NUMPAD9", "MULTIPLY", "ADD", "SEPARATOR", "SUBTRACT", "DECIMAL", "DIVIDE", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "F13", "F14", "F15", "F16", "F17", "F18", "F19", "F20", "F21", "F22", "F23", "F24", "", "", "", "", "", "", "", "", "NUM_LOCK", "SCROLL_LOCK", "WIN_OEM_FJ_JISHO", "WIN_OEM_FJ_MASSHOU", "WIN_OEM_FJ_TOUROKU", "WIN_OEM_FJ_LOYA", "WIN_OEM_FJ_ROYA", "", "", "", "", "", "", "", "", "", "CIRCUMFLEX", "EXCLAMATION", "\"", "#", "$", "%", "&", "_", "(", ")", "*", "+", "|", "HYPHEN_MINUS", "{", "}", "~", "", "", "", "", "VOLUME_MUTE", "VOLUME_DOWN", "VOLUME_UP", "", "", ";", "=", ",", "-", ".", "/", "`", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "[", "\\", "]", "'", "", "META", "ALTGR", "", "WIN_ICO_HELP", "WIN_ICO_00", "", "WIN_ICO_CLEAR", "", "", "WIN_OEM_RESET", "WIN_OEM_JUMP", "WIN_OEM_PA1", "WIN_OEM_PA2", "WIN_OEM_PA3", "WIN_OEM_WSCTRL", "WIN_OEM_CUSEL", "WIN_OEM_ATTN", "WIN_OEM_FINISH", "WIN_OEM_COPY", "WIN_OEM_AUTO", "WIN_OEM_ENLW", "WIN_OEM_BACKTAB", "ATTN", "CRSEL", "EXSEL", "EREOF", "PLAY", "ZOOM", "", "PA1", "WIN_OEM_CLEAR", ""];
@@ -255,435 +259,392 @@ kbd.light, .light-keys kbd, .key.light, .light-keys .key {
             Polymer({
                 is: "orov-input-configurator",
                 properties: {
-                    find: {
-                        type: String,
-                        value: '',
-                        observer: 'findChanged'
-                    },
-                    commands: {
-                        type: Array,
-                        value: []
-                    },
-                    unfilteredCommands: {
-                        type: Array,
-                        value: []
-                    },
-                    prests: {
-                        type: Array,
-                        value: []
-                    },
-                    selectedPreset: {
+                    candidateBinding: {
                         type: Object,
-                        value: -1,
-                        observer: 'selectedPresetChanged'
+                        value: undefined
                     },
-                    presetLoaded: {
-                        type: Boolean,
-                        value: false
+
+                    conflictingBinding: {
+                        type: Object,
+                        value: undefined
                     },
+
+                    preset: {
+                        type: Map
+                    },
+
+                    presetArray: {
+                        type: Array,
+                        value: undefined
+                    },
+
                     selectedItem: {
                         type: Object,
-                        value: undefined,
-                        observer: ''
+                        value: undefined
                     },
-                    keyboardDuplicates: {
-                        type: Array,
-                        value: []
-                    },
-                    gamepadDuplicates: {
-                        type: Array,
-                        value: []
-                    },
-                    duplicates: {
-                        type: Boolean,
-                        computed: 'hasDuplicates(keyboardDuplicates.*, gamepadDuplicates.*)'
-                    },
-                    successfullySaved: {
+
+                    isListeningToKeyboard: {
                         type: Boolean,
                         value: false
                     },
-                    saveNewPreset: {
+
+                    isValidKeyboardReplacement: {
                         type: Boolean,
-                        value: false
+                        value: true
                     },
-                    canSavePreset: {
+
+                    isValidGamepadReplacement: {
                         type: Boolean,
-                        computed: 'getCanSavePreset(selectedPreset)'
-                    },
-                    canLoadPreset: {
-                        type: Boolean,
-                        computed: 'getCanLoadPreset(selectedPreset)'
-                    },
+                        value: true
+                    }
                 },
+                
                 behaviors: [namespace('behaviors').oROVStandard],
+
+                listeners: {
+                    'tableContainer.scroll': 'tableContainerScroll'
+                },
+
+                registerEmitterHandlers: function(emitter) {
+                    var self = this;
+                    this.presetFunction = function(preset) {
+
+                        //Set this to our current preset on the input Configurator
+                        self.preset = preset;
+
+                        //Update the UI to reflect this
+                        self.presetToArray(self.preset);
+                    }.bind(this);
+
+                    emitter.on('plugin.inputController.updatedPreset', this.presetFunction );
+                },
+                
+                detached: function(){
+                    this.eventEmitter.off('plugin.inputController.updatedPreset',this.presetFunction)
+                },
 
                 attached: function() {
                     var self = this;
-                    if (this.eventEmitter !== undefined) {
-                        this.eventEmitter.emit('InpitController.suspendAll')
+
+                    //Tell the input controller we want presets with a recurrent function 
+                    if(self.presets == undefined)
+                    {
+                        self.eventEmitter.emit('plugin.inputController.sendPreset');
                     }
+                    
                 },
-                detached: function() {
-                    if (this.eventEmitter !== undefined) {
-                        this.eventEmitter.emit('InpitController.resumeAll')
-                    }
-                },
-                registerEmitterHandlers: function(emitter) {
+
+                checkForKeyboardDuplicates: function() {
                     var self = this;
 
-                    emitter.withHistory.on('plugin.inputConfigurator.currentMap.update', function(keyMap) {
-                        self.unfilteredCommands = keyMap.map(function(mapping) { // map from array to object 
-                            var result = {
-                                name: mapping.name,
-                                description: mapping.description ? mapping.description : '',
-                                bindings: {},
-                                defaults: mapping.defaults
-                            };
-                            mapping.bindings.forEach(function(binding) {
-                                result.bindings[binding.name] = binding.binding;
-                            });
-                            return result;
-                        });
-                        self.updateCommands();
-                    });
-
-                    emitter.withHistory.on('plugin.inputConfigurator.presets.update', function(presets) {
-                        self.presets = presets;
-                    });
-
-                    emitter.on('InputController.registeredCommand', function(command) {
-                        var index=self.commands.findIndex(function(item){
-                            return item.name==command.name
-                        })
-                        if (index==null){
-                            self.push('commands', command);
-                        } else {
-                            self.set(`command.${index}`,command)
-                        }
-                    });
-
-                    var checkForGamepadDuplicate = function(button) {
-                        self.gamepadDuplicates = [];
-                        self.unfilteredCommands.forEach(function(command) {
-                            if (command.bindings.gamepad === button && command != self.selectedItem) {
-                                self.push('gamepadDuplicates', command);
-                            }
-                        });
-                    }
-
-                    //TODO Add dupplicates handling!
-                    emitter.on('systemPlugin.inputController.gamepad.buttonDown', function(button) {
-                        if (self.selectedItem) {
-                            checkForGamepadDuplicate(button);
-                            self.set('selectedItem.bindings.gamepad', button);
-                            // $(self.$.gamepad).val(button);   
-                        }
-                    });
-
-                    emitter.on('systemPlugin.inputController.gamepad.axisChanged', function(axis) {
-                        if (self.selectedItem) {
-                            checkForGamepadDuplicate(axis);
-                            self.set('selectedItem.bindings.gamepad', axis);
-                            //$(self.$.gamepad).val(axis);   
-                        }
-                    });
-                },
-                enable: function(e) {},
-                disable: function(e) {},
-
-                selectedItemChanged: function() {
-                    if (this.selectedItem) {
-                        //  $(this.$.keyboard).val(this.selectedItem.bindings.keyboard);
-                        //  $(this.$.gamepad).val(this.selectedItem.bindings.gamepad);
-                        this.keyboardDuplicates = [];
-                    }
-                },
-
-                selectedPresetChanged: function() {
-                    if (this.selectedPreset >= 0) {
-                        console.log(this.presets[this.selectedPreset].name);
-                    }
-                },
-
-                findChanged: function() {
-                    this.updateCommands();
-                },
-
-                commandsChanged: function() {
-                    var self = this;
-                    self.selectedItem = undefined;
-                },
-
-                updateActiveMapping: function(command) {
-                    var self = this;
-                    /*            if (this.selectedItem) {
-                                    this.selectedItem.bindings.keyboard = $(this.$.keyboard).val();
-                                    this.selectedItem.bindings.gamepad = $(this.$.gamepad).val();
-                                }
-                    */
-                    if (this.eventEmitter !== undefined) {
-                        var arg = {
-                            name: command.name,
-                            bindings: [{
-                                name: 'keyboard',
-                                binding: command.bindings.keyboard
-                            }, {
-                                name: 'gamepad',
-                                binding: command.bindings.gamepad
-                            }, ]
-                        };
-
-                        this.eventEmitter.emit('plugin.inputConfigurator.updateBinding', arg, function() {
-                            self.set('successfullySaved', true);
-                            self.async(function() {
-                                self.set('successfullySaved', false);
-                            }, 2000);
-    
-                        });
-                    }
-                },
-                SaveToCurrentSession: function(){
-                    //And after updating the mapped setting for the current session, save them as well.
-                    if (this.presets.some(function(item){return item.name=="current-session"})){
-                        this.eventEmitter.emit('plugin.inputConfigurator.savePreset', "current-session");  
-                    } else {
-                        this.eventEmitter.emit('plugin.inputConfigurator.saveNewPreset', "current-session"); 
-                    }
-                  
-                },
-                onLoadPreset: function(e) {
-                    var self = this;
-                    if (self.eventEmitter !== undefined) {
-                        self.eventEmitter.emit('plugin.inputConfigurator.loadPreset', self.presets[self.selectedPreset],
-                            function() {
-                                self.set('presetLoaded', true);
-                                self.async(function() {
-                                    self.set('presetLoaded', false);
-                                }, 2000);
-                            });
-                    }
-                },
-
-                onDeletePreset: function() {
-                    var self = this;
-                    if (self.eventEmitter !== undefined) {
-                        self.eventEmitter.emit('plugin.inputConfigurator.deletePreset', self.presets[self.selectedPreset], function() {
-                            self.set('selectedPreset', -1);
-                        });
-                    }
-                },
-
-                onWantSavePreset: function() {
-                    this.set('saveNewPreset', true);
-                    this.$.savenewpresetmodal.open();
-                },
-
-                onSaveNewPreset: function() {
-                    var self = this;
-                    if (self.eventEmitter) {
-                        self.eventEmitter.emit('plugin.inputConfigurator.saveNewPreset', self.newPresetName);
-                        self.set('saveNewPreset', false);
-                    }
-                },
-                onSavePreset: function() {
-                    var self = this;
-                    if (self.eventEmitter) {
-                        self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.presets[self.selectedPreset]);
-                        self.set('saveNewPreset', false);
-                    }
-                },
-
-                getClass: function(duplicates, duplicateClass, nonDuplicateClass) {
-                    if (duplicates) {
-                        return duplicateClass;
-                    }
-                    return nonDuplicateClass ? nonDuplicateClass : '';
-                },
-
-                onReset: function() {
-                    if (this.selectedItem) {
-                        // $(this.$.keyboard).val(this.selectedItem.defaults.keyboard);
-                        this.set('selectedItem.bindings.keyboard', this.selectedItem.defaults.keyboard == undefined ? null : this.selectedItem.defaults.keyboard);
-                        // $(this.$.gamepad).val(this.selectedItem.defaults.gamepad);
-                        this.set('selectedItem.bindings.gamepad', this.selectedItem.defaults.gamepad == undefined ? null : this.selectedItem.defaults.gamepad);
-                        this.keyboardDuplicates = [];
-                        this.gamepadDuplicates = [];
-                    }
-                },
-
-                getClassInCaseOfDuplicates: function(list, duplicateClass, nonDuplicateClass) {
-                    if (list.base.length > 0) {
-                        return duplicateClass;
-                    }
-                    return nonDuplicateClass ? nonDuplicateClass : '';
-                },
-                hasDuplicates: function(keyboadDuplicates, gamepadDuplicates) {
-                    return keyboadDuplicates.base.length > 0 || gamepadDuplicates.base.length > 0;
-                },
-
-                getClassForItem: function(item, selected) {
-                    return selected ? 'currentItem' : '';
-                },
-                showEditor: function(selectedItem) {
-                    return selectedItem === null ? 'hidden' : '';
-                },
-                getCanSavePreset: function(selectedPreset) {
-                    var self = this;
-                    if (selectedPreset >= 0) {
-                        var preset = self.presets[selectedPreset];
-                        return preset.default === undefined || preset.default === false;
-                    }
-                    return false;
-                },
-                getCanLoadPreset: function(selectedPreset) {
-                    var self = this;
-                    return (selectedPreset >= 0);
-                },
-                updateCommands: function() {
-                    var self = this;
-                    var filtered = this.unfilteredCommands;
-                    if (this.find.length > 0) {
-                        filtered =
-                            this.unfilteredCommands.filter(function(item) {
-                                var search = self.find.toLowerCase();
-                                var nameContains = item.name.toLowerCase().indexOf(search) >= 0;
-                                var descContains = item.description.toLowerCase().indexOf(search) >= 0;
-                                return nameContains || descContains;
-                            });
-                    } else {
-                        self.commands = self.unfilteredCommands;
+                    //If there is no array present to check with, return
+                    if(self.presetArray == undefined || self.candidateBinding == undefined)
+                    {
                         return;
                     }
-                    var newCommands = [];
-                    if (filtered) {
-                        filtered.forEach(function(item) {
-                            newCommands.push(item);
-                        });
+
+                    //Check if this is a valid binding
+                    var isDuplicate = self.presetArray.some(function(element, index, array) {
+                        self.conflictingBinding = element;
+                        return element.bindings.keyboard == self.candidateBinding;
+                    });
+
+                    if( isDuplicate )
+                    {
+                        self.isValidKeyboardReplacement = false;                       
+                        self.openDuplicateInputToast();
                     }
-                    self.commands = newCommands;
+                    else
+                    {
+                        self.isValidKeyboardReplacement = true;
+                        self.updateKeyboardInput();
+                    }
+                },
+
+                checkForGamepadDuplicates: function() {
+                    var self = this;
+
+                    if(self.presetArray == undefined || self.candidateBinding == undefined)
+                    {
+                        return;
+                    }
+
+                    //Check if this is a valid binding
+                    var isDuplicate = self.presetArray.some(function(element, index, array) {
+                        self.conflictingBinding = element;
+                        return element.bindings.gamepad == self.candidateBinding;
+                    });
+
+                    if(isDuplicate)
+                    {
+                        self.openDuplicateInputToast();
+                        self.isValidGamepadReplacement = false;                       
+                    }
+                    else
+                    {
+                        self.isValidGamepadReplacement = true;
+                        self.updateGamepadInput();
+                    }
                 },
                 
-                _handleKeyBoardFocus: function(e) {
-                    var self = this;
-                    console.log('focus');
-                    this._isLIsteningForKeyBoardBinding=true;
-                    Mousetrap.record(function(sequence) {
-                        // sequence is an array like ['ctrl+k', 'c']
-                        console.log('You pressed: ' + sequence.join(' '));
-                        self.set('_candidateBinding', sequence.join(''));
-                        self._isLIsteningForKeyBoardBinding=false;
 
+                updateKeyboardInput: function() {
+                    var self = this;
+
+                    var updatedInput = {
+                        name: self.selectedItem.name,
+                        controller: "keyboard",
+                        input: self.candidateBinding 
+                    };
+
+                    console.log("Updated:", updatedInput);
+                    self.eventEmitter.emit('plugin.inputController.updateInput', updatedInput);
+
+                    //Open the update toast
+                    self.openUpdatePresetToast();
+
+                    //And close the modal
+                    self.$.keyboardModal.close();
+                },
+
+                updateGamepadInput: function() {
+                    var self = this;
+
+                    var updatedInput = {
+                        name: self.selectedItem.name,
+                        controller: "gamepad",
+                        input: self.candidateBinding 
+                    };
+
+                    console.log("Updated:", updatedInput);
+                    self.eventEmitter.emit('plugin.inputController.updateInput', updatedInput);
+
+                    //Open the update toast
+                    self.openUpdatePresetToast();
+
+                    //And close the modal
+                    self.$.gamepadModal.close();
+                },
+
+                openDuplicateInputToast: function() {
+                    this.$.duplicateInputToast.open();
+                },
+
+                openClearGamepadDuplicateWarning: function() {
+                    var self = this;
+                    self.$.clearGamepadDuplicateWarningModal.open();
+                },
+
+                openClearKeyboardDuplicateWarning: function() {
+                    var self = this;
+                    self.$.clearKeyboardDuplicateWarningModal.open();
+                },
+
+                openUpdatePresetToast: function() {
+                    var self = this;
+
+                    self.candidateBinding = undefined;
+                    self.$.updatedPresetToast.open();
+                },
+
+                //Reset the candidateBinding on keyboard modal closed
+                onKeyboardModalClosed : function() {
+                    var self = this;
+                    
+                },
+                
+                //Reset the candidateBinding on gamepad modal closed
+                onGamepadModalClosed : function() {
+                    var self = this;
+                    
+                },
+                
+                //Function to achieve the sticky table headers with pure CSS.
+                tableContainerScroll: function() {
+                    var self = this;
+
+                    /*CSS way to do sticky headers*/
+                    var translate = "translate(0," + self.$.tableContainer.scrollTop + "px)";
+                    self.$.stickyHeader.style.transform = translate;
+                },
+
+                //Handles clearing an existing keyboard command
+                handleClearKeyboardBinding: function() {
+                    var self = this;
+
+                    //Clear the input from our presets
+                    console.log("Clearing:", self.selectedItem);
+
+                    //Format in a way that the input controller expects
+                    var clearedInput = {
+                        name: self.selectedItem.name,
+                        controller: "keyboard",
+                        input: self.selectedItem.bindings.keyboard
+                    };
+
+                    //Let the input controller know the new configurations
+                    self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
+
+                    this.$.clearedInputToast.open();
+                },
+
+                //Handles clearing an existing gamepad command
+                handleClearGamepadBinding: function() {
+                    var self = this;
+
+                    //Clear the input from our presets
+                    console.log("Clearing:", self.selectedItem);
+
+                    //Format in a way that the input controller expects
+                    var clearedInput = {
+                        name: self.selectedItem.name,
+                        controller: "gamepad",
+                        input: self.selectedItem.bindings.gamepad
+                    };
+
+                    //Let the input controller know
+                    self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
+                    this.$.clearedInputToast.open();
+                },
+
+                handleClearConflictingKeyboardBinding: function() {
+                    var self = this;
+
+                    console.log("Clearing:", self.conflictingBinding);
+                    
+                    //Format in a way that the input controller expects
+                    var clearedInput = {
+                        name: self.conflictingBinding.name,
+                        controller: "keyboard",
+                        input: self.conflictingBinding.bindings.keyboard
+                    };
+
+                    //Let the input controller know
+                    self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
+                    
+                    self.updateKeyboardInput();
+
+                    self.openUpdatePresetToast();
+                },
+
+                handleClearConflictingGamepadBinding: function() {
+                    var self = this;
+                    console.log("Clearing:",self.conflictingBinding);
+
+                    //Format in a way that the input controller expects
+                    var clearedInput = {
+                        name: self.conflictingBinding.name,
+                        controller: "gamepad",
+                        input: self.conflictingBinding.bindings.gamepad
+                    };
+
+                    //Let the input controller know
+                    self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
+
+                    self.updateGamepadInput();
+
+                    self.openUpdatePresetToast();
+                },             
+
+                //User has clicked a keyboard symbol
+                handleKeyboardChange: function(e) {
+                    var self = this;
+                    var inputPressed = e.model.item;
+                    self.selectedItem = inputPressed;
+                    
+                    this.$.keyboardModal.open();
+                },
+
+                //Keyboard modal has opened
+                handleKeyboardFocus: function(e) {
+                    var self = this;
+
+                    //Reset our state
+                    self.isListeningToKeyboard = false;
+                    self.isValidKeyboardReplacement = true;
+                },
+
+                //User has clicked a gamepad symbol
+                handleGamepadChange: function(e) {
+                    var self = this;
+                    var inputPressed = e.model.item;
+                    self.selectedItem = inputPressed;
+                    
+                    this.$.gamepadModal.open();
+                },
+
+                //Gamepad modal has opened
+                handleGamepadFocus: function(e) {
+                    var self = this;
+
+                    //Reset our state
+                    self.isValidGamepadReplacement = true;
+                },
+
+                //Handle the selection for the gamepad
+                handleGamepadRemapping: function(e) {
+                    var self = this;
+ 
+                    if(self.candidateBinding == null)
+                    {
+                        self.handleClearGamepadBinding();
+                    }
+                    self.checkForGamepadDuplicates();
+                },
+
+                handleKeyboardRemapping: function() {
+                    var self = this;
+
+                    //Start listening for keyboard inputs
+                    self.isListeningToKeyboard = true;
+
+                    Mousetrap.record( function(sequence) {
+                        self.isListeningToKeyboard = false;
+                        self.candidateBinding = sequence.join(' ');
+
+                        //Check to see if this is a valid replacement binding for the keyboard
+                        self.checkForKeyboardDuplicates();
                     });
 
                 },
-                handleGamePadFocuse: function(e) {
-                    this.$.gamepad.disabled = false;
-                },
-                handleKeyboardClear: function(e) {
-                    this.$.keyboard.value = "";
-                },
-                handleGamePadClear: function(e) {
-                    this.$.gamepad.value = "";
-                },
-                _ongamepadModalClosed: function(e){
-                    //The child drop-down-menu appears to be triggering a cascading iron-behavior event that the 
-                    //close of the dialog is tied to.  Must filter that out.
-                    if (e.srcElement!==this.$.gamepadmodal){
-                        return;
-                    }
-                    var self=this;
-                    if (e.detail.confirmed) {
-                        //Check for duplicates in case they choose to unbind the conflicted command
-                        self.unfilteredCommands.filter(function(command) {
-                            return command.bindings.gamepad === self.$.candidategamepad.value;
-                        }).map(function(command){
-                            var index = self.commands.indexOf(command);
-                            self.set(`commands.${index}.bindings.gamepad`,'');
-                            self.updateActiveMapping(self.commands[index]);
-                        })
 
-                        var index = self.commands.indexOf(self.selectedItem);
-                        self.set(`commands.${index}.bindings.gamepad`,self.$.candidategamepad.value);
-                        self.updateActiveMapping(self.commands[index]);
-                        //self.selectedItem.bindings.keyboard = self._candidateBinding
-                        self._candidateBinding = '';
-                        self.SaveToCurrentSession();
-                    }
-                    else {
-                      self._candidateBinding ='';   
-                      self.selectedItem = null;
-                    }
-                },                
-                _onkeyboardModalClosed: function(e){
-                    var self=this;
-                    if (e.detail.confirmed) {
-                        //Check for duplicates in case they choose to unbind the conflicted command
-                        self.unfilteredCommands.filter(function(command) {
-                            return command.bindings.keyboard === self._candidateBinding;
-                        }).map(function(command){
-                            var index = self.commands.indexOf(command);
-                            self.set(`commands.${index}.bindings.keyboard`,'');
-                            self.updateActiveMapping(self.commands[index]);
-                        })
+                //Converts a preset object(hash map) to a consumable array for the input configurator
+                presetToArray: function(preset) {
+                    var self = this;
+                    //Converts a js Map object to an array
+                    var arrayPreset = [];
 
-                        var index = self.commands.indexOf(self.selectedItem);
-                        self.set(`commands.${index}.bindings.keyboard`,self._candidateBinding);
-                        self.updateActiveMapping(self.commands[index]);
-                        //self.selectedItem.bindings.keyboard = self._candidateBinding
-                        self._candidateBinding = '';
-                        self.SaveToCurrentSession();
-                    }
-                    else {
-                      self._candidateBinding ='';  
-                    }
-                },
-                _handleKeyboardChange: function(e){
-                    var self=this;
-                    this.selectedItem = e.model.item;
-                    this._candidateBinding=this.selectedItem.bindings.keyboard; 
-                    this.$.keyboardmodal.open();
-                },
-                _handleGamepadChange: function(e){
-                    this.selectedItem = e.model.item;
-                    this._candidateBinding=this.selectedItem.bindings.gamepad;                 
-                    this.$.gamepadmodal.open();
-                },
-                _isValidReplacementBinding: function(bindingType,candidateBinding,currentBinding){
-                    if (bindingType=="keyboard"){
-                        return ((candidateBinding!==currentBinding) &&  this._noConflictWithCandidate(candidateBinding,currentBinding));
-                    } else {
-                        return ((candidateBinding!==currentBinding) &&  this._noConflictWithCandidateGP(candidateBinding,currentBinding));
-                    }
-                },
-                _noConflictWithCandidateGP: function(canidate,original){
-                    var self=this;
-                    if (canidate == ''){
-                        return true;
-                    }
-                    if (canidate == original){
-                        return true
-                    }
-                    return !self.unfilteredCommands.some(function(command) {
-                        return command.bindings.gamepad === canidate;
-                    });                    
-                },                
-                _noConflictWithCandidate: function(canidate,original){
-                    var self=this;
-                    if (canidate == '' || canidate == undefined){
-                        return true;
-                    }
-                    if (canidate == original){
-                        return true
-                    }
-                    return !self.unfilteredCommands.some(function(command) {
-                        return command.bindings.keyboard === canidate;
-                    });                    
-                },
-                _handleClearBinding: function(){
-                    this._candidateBinding = ''; 
-                },
-                _handleCanidateGamePadSelected: function(e){
-                    //this._candidateBinding =e.srcElement.selected; 
+                    //Iterate through the preset MAP to create an array for the dom element
+                    preset.inputs.forEach( function(value, input) {
+                        
+                        var binding = {
+                            keyboard: undefined,
+                            gamepad: undefined
+                        };
+                        
+                        //Register Keyboard control bindings
+                        if(value.controllers.has('keyboard'))
+                        {
+                            binding.keyboard = value.controllers.get('keyboard');
+                        }
+
+                        //Register Gamepad control bindings
+                        if(value.controllers.has('gamepad'))
+                        {
+                            binding.gamepad = value.controllers.get('gamepad');
+                        }
+
+                        var arrayInput = {
+                            shortName: value.shortName,
+                            name: value.name,
+                            description: value.description,
+                            bindings: binding
+                        };
+                        arrayPreset.push(arrayInput);
+                    });
+
+                    self.presetArray = arrayPreset;
+                    return arrayPreset;
                 }
             })
         })();

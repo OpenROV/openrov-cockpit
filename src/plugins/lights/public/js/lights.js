@@ -32,47 +32,48 @@
             }
 
             // Setup input handlers
-            this.inputDefaults = 
-            [
-              {
+            this.inputDefaults = [
+            {
                 name: 'plugin.lights.stepPositive',
                 description: 'Makes the ROV lights brighter.',
-                defaults: 
+                shortName: "Increase ROV Light Brightness",
+                controllers: new Map([["keyboard", 'p'],
+                                     ["gamepad", 'DPAD_UP']]),
+                actions:
                 {
-                  keyboard: 'p',
-                  gamepad: 'DPAD_UP'
-                },
-                down: function () 
-                {
-                  cockpit.emit( 'plugin.lights.stepPositive' );
+                    down: function() {
+                        cockpit.emit( 'plugin.lights.stepPositive' );
+                    }
                 }
-              },
-              {
+            },
+            {
                 name: 'plugin.lights.stepNegative',
+                shortName: "Decrease ROV Light Brightness",
                 description: 'Makes the ROV lights dimmer.',
-                defaults: 
+                controllers: new Map([["keyboard", 'o'],
+                                     ["gamepad", 'DPAD_DOWN']]),
+                actions:
                 {
-                  keyboard: 'o',
-                  gamepad: 'DPAD_DOWN'
-                },
-                down: function () 
-                {
-                  cockpit.emit( 'plugin.lights.stepNegative' );
+                    down: function() {
+                        cockpit.emit( 'plugin.lights.stepNegative' );
+                    }
                 }
-              },
-              {
+            },
+            {
                 name: 'plugin.lights.toggle',
+                shortName: "Toggle ROV Lights",
                 description: 'Toggles the ROV lights on/off.',
-                defaults: 
-                { 
-                  keyboard: 'i' 
-                },
-                down: function () 
+                controllers: new Map([["keyboard", 'i']]),
+                actions:
                 {
-                  cockpit.emit( 'plugin.lights.toggle' );
+                    down: function() {
+                        cockpit.emit( 'plugin.lights.toggle' );
+                    }
                 }
-              }
-            ];
+            }];
+
+            //If this was loaded after the input manager, let it know we are ready to be loaded
+            cockpit.emit('plugin.inputController.defaults', self.inputDefaults);                
         };
 
         updateFromStep()

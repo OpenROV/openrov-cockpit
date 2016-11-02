@@ -2,6 +2,7 @@
 {
   'use strict';
   loadScript('components/mousetrap-js/mousetrap.js');
+  var recordPluginNeeded = true;
 
   var inputController = namespace('systemPlugin.inputController');
   inputController.InputController = class InputController
@@ -12,7 +13,6 @@
       this.cockpit = cockpit;
       this.currentPreset = "OpenROVDefault";
       
-
       this.deferSetupForMousetrap();
     };
 
@@ -20,10 +20,15 @@
     {
         var self = this;
 
-        if( self.setup() == false )
-        {
+        if ( (typeof Mousetrap !== "undefined") && recordPluginNeeded) {
+          loadScript('components/mousetrap-js/plugins/record/mousetrap-record.js');
+          recordPluginNeeded=false;
+        }
+        
+        if((typeof Mousetrap == "undefined") || (typeof Mousetrap.record == "undefined") || self.setup() == false )
+        {          
           // Call timeout again
-          setTimeout( self.deferSetupForMousetrap.bind( self ), 1000 );
+          setTimeout( self.deferSetupForMousetrap.bind( self ), 100 );
         }
     }
 
@@ -33,6 +38,8 @@
 
       if (typeof Mousetrap !== "undefined")
       {
+
+        self.mousetrap = Mousetrap;
         self.controllers = new Map();
         //Data structure to hold our presets on the browser side
         //key: "preset-name" value: ["preset1", "preset2", ..., "presetN"]
@@ -42,7 +49,7 @@
         self.openrovPreset = new inputController.Preset("OpenROV Preset");
 
         //Add our default controllers
-        self.keyboard = new Keyboard(cockpit);
+        self.keyboard = new Keyboard(cockpit, self.mousetrap);
         self.controllers.set("keyboard", self.keyboard);
 
         self.gamepad = new Gamepad(cockpit);
@@ -405,9 +412,10 @@
   /*Keyboard Interface*/
   class Keyboard
   {
-    constructor(cockpit)
+    constructor(cockpit, mousetrap)
     {
       var self = this;
+      self.mousetrap = mousetrap;
 
       console.log("Started keyboard abstraction");
     };
@@ -417,18 +425,18 @@
 
     register(key, actions)
     {
-      if(Mousetrap.modified == undefined) 
+      var self = this;
+      if(self.mousetrap.modified == undefined) 
       {
-
-        var orgStopCalback = Mousetrap.prototype.stopCallback;
-        Mousetrap.prototype.stopCallback = function (e, element, combo, sequence) 
+        var orgStopCalback = self.mousetrap.prototype.stopCallback;
+        self.mousetrap.prototype.stopCallback = function (e, element, combo, sequence) 
         {
           if ((' ' + element.className + ' ').indexOf(' no-mousetrap ') > -1) {
             return true;
           }
           return orgStopCalback.call(this, e, element, combo, sequence);
         };
-        Mousetrap.modified = true;
+        self.mousetrap.modified = true;
       }
 
       if(key == null)
@@ -438,6 +446,9 @@
       }
 
       console.log("Registering:", key, "with Mousetrap");
+      
+      var callbacks = self.mousetrap.getCallbacks();
+      console.log(callbacks);
 
       //Register actions, used for unbinding as well
       if(actions.up !== undefined)
@@ -447,8 +458,11 @@
 
       if(actions.down !== undefined)
       {
-        Mousetrap.bind(key, actions.down, 'keydown');
+        self.mousetrap.bind(key, actions.down, 'keydown');
       }
+      
+      callbacks = self.mousetrap.getCallbacks();
+      console.log(callbacks);
     };
 
     registerPreset(preset)
@@ -467,18 +481,25 @@
     reset()
     {
       console.log("Resetting keyboard interface");
-      Mousetrap.reset();
+      self.mousetrap.reset();
     };
 
     unregister(key, actions)
     {
+      var self = this;
       if(key == null)
       {
         console.error("Tried to unregister an undefined key from Mousetrap");
         return;
       }
-      Mousetrap.unbind(key, 'keydown');
-      Mousetrap.unbind(key, 'keyup');
+      var callbacks = self.mousetrap.getCallbacks();
+      console.error(callbacks);
+
+      self.mousetrap.unbind(key, 'keydown');
+      self.mousetrap.unbind(key, 'keyup');
+
+      callbacks = self.mousetrap.getCallbacks();
+      console.error(callbacks);
     };
 
     update(previousInput, currentInput)

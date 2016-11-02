@@ -8,14 +8,43 @@
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center center;
+      position: relative;
+      top: 5px;
+      z-index: 1;
 
+      /*Hardware acceleration*/
+      translate3d(0,0,0);
+      transition-duration: 0.2s;
+      transition-timing-function: ease-out;
     }
+
+    #targetPos {
+      width: 6px;
+      height: 6px;
+      -moz-border-radius: 3px;
+      -webkit-border-radius: 3px;
+      border-radius: 2px;
+
+      position: relative;
+      z-index: 3;
+
+      background: red;
+      opacity: 1.0;
+    }
+
   </style>
   <template>
-    <img id="servoTiltImage">
-
+    <div style="position: relative; z-index: 1;">
+      <img id="servoTiltImage"/>
+      <div id="targetPos"></div>
+    </div>
   </template>
   <script>
+    
+    var mapTo = function (value, in_min, in_max, out_min, out_max) {
+        return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+    };
+    
     (function() {
       Polymer({
         is: "orov-servo-tilt",
@@ -25,6 +54,11 @@
             type: Number,
             value: 0,
             observer: '_servoAngleChanged'
+          },
+          targetAngle: {
+            type: Number,
+            value: 0,
+            observer: '_targetAngleChanged'
           },
           imgSrc: {
             type: String,
@@ -42,6 +76,18 @@
           this.$.servoTiltImage.style['-moz-transform'] = newvalue;
           this.$.servoTiltImage.style['transform'] = newvalue;
         },
+        _targetAngleChanged: function(){
+          
+          var targetAngleRads = this.targetAngle * Math.PI / 180;
+
+          //Empirical because it looks nice and smooth
+          var xPos = -7.788*(targetAngleRads*targetAngleRads) - 0.973*targetAngleRads + 31.469;
+          var yPos = -19.47*targetAngleRads - 18.667;
+
+          var translateTo = 'translate3d(' + xPos + 'px,' + yPos + 'px,0px)';
+          this.$.targetPos.style['transform'] = translateTo;
+        },
+
         ready: function () {
           this.$.servoTiltImage.style['background-image'] = this.imgSrc;
         },
@@ -49,6 +95,9 @@
           var self = this;
           emitter.withHistory.on('plugin.cameraServo.currentPos',function(angle){
             self.servoAngle = angle;
+          });
+          emitter.withHistory.on('plugin.cameraServo.targetPos',function(angle){
+            self.targetAngle = angle;
           });
         }
       })

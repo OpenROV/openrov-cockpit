@@ -74,7 +74,8 @@ UIManager.prototype.start = function start() {
       }),
       config: self.deps.config,
       scriplets: scriplets,
-      theme: theme
+      theme: theme,
+      cacheMode: process.env.IGNORE_CACHE=='true'?'offline':'fastest'
     });
   });
 

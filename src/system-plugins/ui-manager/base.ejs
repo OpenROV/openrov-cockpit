@@ -294,7 +294,7 @@ ga('send', 'pageview');
   <platinum-sw-fetch handler="dontCacheHandler"
                  path="/client/BWcCxwJdMnHP7Y3pKCNtbp5IA6o5lKlb(.*)"
                  origin="https://cdn.auth0.com"></platinum-sw-fetch>                                                              
-  <platinum-sw-cache default-cache-strategy="fastest" precache='["/js/replay.js"]'></platinum-sw-cache>
+  <platinum-sw-cache default-cache-strategy="<%=cacheMode%>" precache='["/js/replay.js"]'></platinum-sw-cache>
 </platinum-sw-register>
 
 <!-- Temporarily disabled pending solution for relative pathing -->

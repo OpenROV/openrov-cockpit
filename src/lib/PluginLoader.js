@@ -46,8 +46,7 @@ class PluginLoader
                         pluginInstance.name=plugin;
                         pluginInstance._raw=rawdata[plugin];
                         result.plugins.push(pluginInstance); 
-                    }
-                    catch (ex) {
+                    } catch (ex) {
                         console.log(JSON.stringify({
                             message: ex.message,
                             stack: ex.stack

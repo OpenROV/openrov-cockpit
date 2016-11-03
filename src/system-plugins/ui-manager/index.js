@@ -75,7 +75,7 @@ UIManager.prototype.start = function start() {
       config: self.deps.config,
       scriplets: scriplets,
       theme: theme,
-      cacheMode: process.env.IGNORE_CACHE=='true'?'offline':'fastest'
+      cacheMode: process.env.IGNORE_CACHE=='true'?'networkFirst':'fastest'
     });
   });
 

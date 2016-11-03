@@ -103,168 +103,184 @@ ga('send', 'pageview');
   <script>window.openrovtheme='<%=theme%>'</script>  
   <link id="lazyScripts" rel="import" href="/all_scripts.html" async>
   <link rel="import" href="components/polymer/polymer.html">
-  <style>
+<style>
     body.loading #splash {
-      opacity: 1;
-      z-index: 0;
+        opacity: 1;
+        z-index: 0;
+        background: linear-gradient(#CCCCCC, #34A1FF);
+        margin: 0;
+        padding: 0;
     }
+    
     #splash {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      transition: opacity 300ms cubic-bezier(0,0,0.2,1);
-      opacity: 0;
-      will-change: opacity;
-      z-index: 9000;
-      background: url("") no-repeat;
-      background-color: #E53935;
-    }
-#loader-wrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1000;
-}
-#loader {
-    display: block;
-    position: relative;
-    left: 50%;
-    top: 50%;
-    width: 150px;
-    height: 150px;
-    margin: -75px 0 0 -75px;
-    border-radius: 50%;
-    border: 3px solid transparent;
-    border-top-color: #3498db;
-
-    -webkit-animation: spin 2s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
-    animation: spin 2s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
-    z-index: 1001;
-}
-
-    #loader:before {
-        content: "";
         position: absolute;
-        top: 5px;
-        left: 5px;
-        right: 5px;
-        bottom: 5px;
-        border-radius: 50%;
-        border: 3px solid transparent;
-        border-top-color: #e74c3c;
-
-        -webkit-animation: spin 3s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
-        animation: spin 3s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
-    }
-
-    #loader:after {
-        content: "";
-        position: absolute;
-        top: 15px;
-        left: 15px;
-        right: 15px;
-        bottom: 15px;
-        border-radius: 50%;
-        border: 3px solid transparent;
-        border-top-color: #f9c922;
-
-        -webkit-animation: spin 1.5s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
-          animation: spin 1.5s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
-    }
-
-    @-webkit-keyframes spin {
-        0%   { 
-            -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: rotate(0deg);  /* IE 9 */
-            transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera */
-        }
-        100% {
-            -webkit-transform: rotate(360deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: rotate(360deg);  /* IE 9 */
-            transform: rotate(360deg);  /* Firefox 16+, IE 10+, Opera */
-        }
-    }
-    @keyframes spin {
-        0%   { 
-            -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: rotate(0deg);  /* IE 9 */
-            transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera */
-        }
-        100% {
-            -webkit-transform: rotate(360deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: rotate(360deg);  /* IE 9 */
-            transform: rotate(360deg);  /* Firefox 16+, IE 10+, Opera */
-        }
-    }
-
-    #loader-wrapper .loader-section {
-        position: fixed;
         top: 0;
-        width: 51%;
-        height: 100%;
-        background: #222;
-        z-index: 1000;
-    }
-
-    #loader-wrapper .loader-section.section-left {
         left: 0;
-    }
-    #loader-wrapper .loader-section.section-right {
         right: 0;
-    }
-
-    /* Loaded styles */
-    .loaded #loader-wrapper .loader-section.section-left {
-        -webkit-transform: translateX(-100%);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: translateX(-100%);  /* IE 9 */
-                transform: translateX(-100%);  /* Firefox 16+, IE 10+, Opera */
-
-        -webkit-transition: all 0.7s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);  /* Android 2.1+, Chrome 1-25, iOS 3.2-6.1, Safari 3.2-6  */
-                transition: all 0.7s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);  /* Chrome 26, Firefox 16+, iOS 7+, IE 10+, Opera, Safari 6.1+  */
-    }
-    .loaded #loader-wrapper .loader-section.section-right {
-        -webkit-transform: translateX(100%);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: translateX(100%);  /* IE 9 */
-                transform: translateX(100%);  /* Firefox 16+, IE 10+, Opera */
-
-        -webkit-transition: all 0.7s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);  /* Android 2.1+, Chrome 1-25, iOS 3.2-6.1, Safari 3.2-6  */
-                transition: all 0.7s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);  /* Chrome 26, Firefox 16+, iOS 7+, IE 10+, Opera, Safari 6.1+  */
-    }
-    .loaded #loader {
+        bottom: 0;
+        transition: opacity 2s cubic-bezier(0, 0, 0.2, 1);
         opacity: 0;
-
-        -webkit-transition: all 0.3s ease-out;  /* Android 2.1+, Chrome 1-25, iOS 3.2-6.1, Safari 3.2-6  */
-                transition: all 0.3s ease-out;  /* Chrome 26, Firefox 16+, iOS 7+, IE 10+, Opera, Safari 6.1+  */
-
+        will-change: opacity;
+        z-index: 9000;
+        background: linear-gradient(#CCCCCC, #34A1FF);
+        background-color: #34A1FF;
     }
-    .loaded #loader-wrapper {
-        visibility: hidden;
-
-        -webkit-transform: translateY(-100%);  /* Chrome, Opera 15+, Safari 3.1+ */
-            -ms-transform: translateY(-100%);  /* IE 9 */
-                transform: translateY(-100%);  /* Firefox 16+, IE 10+, Opera */
+    /* -------------------------------------------------------------------
+                Credit for the original wave animation and assets: Andy Fitzsimon
+                Link to Codepen: http://codepen.io/andyfitz/pen/akAKdV
+            ------------------------------------------------------------------- */
     
-        -webkit-transition: all 0.3s 1s ease-out;  /* Android 2.1+, Chrome 1-25, iOS 3.2-6.1, Safari 3.2-6  */
-                transition: all 0.3s 1s ease-out;  /* Chrome 26, Firefox 16+, iOS 7+, IE 10+, Opera, Safari 6.1+  */
+    .parallax>use {
+        animation: move-forever 12s linear infinite;
     }
     
-  </style>
+    .parallax>use:nth-child(1) {
+        animation-delay: -2s;
+    }
+    
+    .parallax>use:nth-child(2) {
+        animation-delay: -2s;
+        animation-duration: 5s;
+    }
+    
+    .parallax>use:nth-child(3) {
+        animation-delay: -4s;
+        animation-duration: 3s;
+    }
+    
+    @keyframes move-forever {
+        0% {
+            transform: translate(-90px, 0%);
+        }
+        100% {
+            transform: translate(85px, 0%);
+        }
+    }
+    
+    .editorial {
+        display: block;
+        width: 100%;
+        height: 10em;
+        margin: 0;
+    }
+    
+    .content {
+        background-color: #1D598D;
+        text-align: center;
+        height: 100%;
+        margin: -.1em 0 0 0;
+        padding: 2em;
+        color: #eee;
+    }
+    
+    .content h1 {
+        font-family: 'Lato', sans-serif;
+        margin-top: -1.3em;
+        font-weight: 100;
+        font-size: 4em;
+        font-size: 4em;
+    }
+    
+    #quote {
+        padding-top: 5em;
+        margin-bottom: 0.3em;
+        font-family: 'Lato', sans-serif;
+        font-style: italic;
+        font-size: 4em;
+    }
+    
+    #author {
+        font-family: 'Open Sans', sans-serif;
+        font-size: 1.5em;
+    }
+    
+    #loading {
+        font-family: 'Open Sans', sans-serif;
+        font-size: 1.0em;
+        padding-top: 15em;
+    }
+    /*prevent many large-by-comparison ripples by shrinking the height*/
+    
+    @media (max-width: 50em) {
+        .content h1 {
+            font-size: 12vmax;
+        }
+        .editorial {
+            height: 17vw;
+        }
+    }
+    
+    .sk-spinner-pulse {
+        width: 40px;
+        height: 40px;
+        margin: 40px auto;
+        background-color: white;
+        border-radius: 100%;
+        -webkit-animation: sk-pulseScaleOut 1s infinite ease-in-out;
+        animation: sk-pulseScaleOut 1s infinite ease-in-out;
+    }
+    
+    @-webkit-keyframes sk-pulseScaleOut {
+        0% {
+            -webkit-transform: scale(0);
+            transform: scale(0);
+        }
+        100% {
+            -webkit-transform: scale(1);
+            transform: scale(1);
+            opacity: 0;
+        }
+    }
+    
+    @keyframes sk-pulseScaleOut {
+        0% {
+            -webkit-transform: scale(0);
+            transform: scale(0);
+        }
+        100% {
+            -webkit-transform: scale(1);
+            transform: scale(1);
+            opacity: 0;
+        }
+    }
+</style>
   </head>
   <body class="loading">
-  <div id="splash">
-    <!-- from https://ihatetomatoes.net/create-custom-preloading-screen/ -->
-		<div id="loader-wrapper">
-			<div id="loader"></div>
+<div id="splash">
+    <svg class="editorial" xmlns="http://www.w3.org/2000/svg" viewBox="0 24 150 28" preserveAspectRatio="none">
+            <defs>
+            <path 
+                id="gentle-wave"
+                d="m -160,44.4 c 30,0 58,
+                    -18 87.7,-18 30.3,0 58.3,
+                    18 87.3,18 30,0 58,-18 88,
+                    -18 30,0 58,18 88,18 l 0,
+                    34.5 -351,0 z" />
+            </defs>
+            <g class="parallax">
+                <use xlink:href="#gentle-wave" x="50" y="0" fill="#34A1FF"/>
+                <use xlink:href="#gentle-wave" x="50" y="3" fill="#2A81CC"/>
+                <use xlink:href="#gentle-wave" x="50" y="6" fill="#1D598D"/>  
+            </g>
+        </svg>
 
-			<div class="loader-section section-left"></div>
-			<div class="loader-section section-right"></div>
+    <div class="content">
+        <h1> </h1>
 
-		</div>    
-  </div>
+        <!--Here we can load quotes and authors from a json file -->
+        <p id="quote">The Sea, once it casts its spell, holds one in its net of wonder forever.</p>
+        <p id="author">- Jacques Cousteau -</p>
+
+        <div id="loading">
+            <p> Connecting to the ROV </p>
+        </div>
+
+        <div class="sk-spinner sk-spinner-pulse"></div>
+
+
+    </div>
+
+</div>
 <link rel="import" href="components/platinum-sw/platinum-sw-register.html">
 <link rel="import" href="components/platinum-sw/platinum-sw-cache.html">
 <link rel="import" href="components/platinum-sw/platinum-sw-fetch.html">

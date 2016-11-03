@@ -29,9 +29,10 @@
 				"plugins__ui-manager__selectedUI": "new-ui",
 				"pluginsDownloadDirectory": "/tmp/plugins",
 				"cacheDirectory": "/tmp/cache",
-				"DATADIR": "/tmp"
+				"DATADIR": "/tmp",
+				"IGNORE_CACHE": "false"
 			},
-            "console": "internalConsole",			
+            "console": "internalConsole",			          
 			"sourceMaps": false,
 			"outDir": null
 		},

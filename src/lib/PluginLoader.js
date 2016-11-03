@@ -259,6 +259,10 @@ class PluginLoader
     return Promise.try(function(){
         var cache = {};
         try{
+            //TODO: When in production, make sure that updates to the environme
+            if (process.env.IGNORE_CACHE == "true") { 
+                throw new Error("Only load cache in production")
+            }           
             cache = require(cacheFile);
             result = cache.result;
             rawdata = cache.rawdata;

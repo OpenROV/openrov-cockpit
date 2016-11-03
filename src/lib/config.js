@@ -32,6 +32,7 @@ nconf.defaults({
   'smoothingIncriment': 40,
   'photoDirectory': '/var/www/openrov/photos',
   'pluginsDownloadDirectory': '/usr/share/cockpit/bower_components',
+  'cacheDirectory':'/usr/share/cockpit/cache',
   'thrust_modifier_port': 1,
   'thrust_modifier_vertical': -1,
   'thrust_modifier_starbord': 1,

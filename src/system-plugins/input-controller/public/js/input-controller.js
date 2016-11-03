@@ -446,9 +446,6 @@
       }
 
       console.log("Registering:", key, "with Mousetrap");
-      
-      var callbacks = self.mousetrap.getCallbacks();
-      console.log(callbacks);
 
       //Register actions, used for unbinding as well
       if(actions.up !== undefined)
@@ -460,9 +457,7 @@
       {
         self.mousetrap.bind(key, actions.down, 'keydown');
       }
-      
-      callbacks = self.mousetrap.getCallbacks();
-      console.log(callbacks);
+
     };
 
     registerPreset(preset)
@@ -492,14 +487,10 @@
         console.error("Tried to unregister an undefined key from Mousetrap");
         return;
       }
-      var callbacks = self.mousetrap.getCallbacks();
-      console.error(callbacks);
 
       self.mousetrap.unbind(key, 'keydown');
       self.mousetrap.unbind(key, 'keyup');
 
-      callbacks = self.mousetrap.getCallbacks();
-      console.error(callbacks);
     };
 
     update(previousInput, currentInput)

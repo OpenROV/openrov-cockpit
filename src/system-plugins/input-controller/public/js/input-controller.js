@@ -2,6 +2,18 @@
 {
   'use strict';
   loadScript('components/mousetrap-js/mousetrap.js');
+  
+  //Necessary for debug utils
+  var log;
+  var trace;
+  var log_debug;
+
+  $.getScript('components/visionmedia-debug/dist/debug.js', function() {
+    log = debug('input-controller:log');
+    trace = debug('input-controller:trace');
+    log_debug = debug('input-controller:debug');
+  });
+
   var recordPluginNeeded = true;
 
   var inputController = namespace('systemPlugin.inputController');
@@ -9,7 +21,7 @@
   {
     constructor(cockpit)
     {
-      console.log("Starting Input Controller");
+      log("Starting Input Controller");
       this.cockpit = cockpit;
       this.currentPreset = "OpenROVDefault";
       
@@ -93,7 +105,7 @@
         //Make sure we got a valid input
         if(defaults == null)
         {
-          console.error("A plugin tried to register undefined defaults!");
+          trace("A plugin tried to register undefined defaults!");
           return;
         }
 
@@ -106,7 +118,7 @@
 
         if(self.presets !== undefined)
         {
-          console.log(self.presets.get(self.currentPreset));
+          log_debug(self.presets.get(self.currentPreset));
           self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset));
         }
         
@@ -136,7 +148,7 @@
 
       if(input == null)
       {
-        console.error("Tried to update a null input");
+        trace("Tried to update a null input");
         return;
       }
 
@@ -159,7 +171,7 @@
 
       if(input == null)
       {
-        console.error("Tried to update a null input");
+        trace("Tried to update a null input");
         return;
       }
 
@@ -192,11 +204,11 @@
 
       if(input == null)
       {
-        console.error("Tried to register an undefined input!");
+        trace("Tried to register an undefined input!");
         return;
       }
 
-      console.log("Registering an input:", input, "to preset:", preset);
+      log_debug("Registering an input:", input, "to preset:", preset);
 
       self.registerInputWithPreset(input, preset);
       self.registerInputWithHardware(input);
@@ -225,7 +237,7 @@
       //If this preset already exists, just update the preset
       if(currentPreset.inputs.has(input.name))
       {
-        console.log("Input:", input.name, "already is registered with preset:", currentPreset.name);
+        log_debug("Input:", input.name, "already is registered with preset:", currentPreset.name);
       }
       else
       {
@@ -251,10 +263,10 @@
 
       if(input == null)
       {
-        console.error("Tried to unregister an undefined input!");
+        trace("Tried to unregister an undefined input!");
         return;
       }
-      console.log("Unregistering an input:", input, "to preset:", preset);
+      log_debug("Unregistering an input:", input, "to preset:", preset);
       
       //Before we create a new object, make sure that it doesn't already exists
       var currentPreset = self.presets.get(preset);
@@ -269,7 +281,7 @@
     constructor(cockpit)
     {
       var self = this;
-      console.log("Starting gamepad abstraction");
+      log("Starting gamepad abstraction");
       
       self.assignments = new Map();
       self.cockpit = cockpit;
@@ -327,21 +339,21 @@
 
       self.gamepadHardware.bind(HTML5Gamepad.Event.CONNECTED, function(device) {
         self.ignoreInputUntil = self.currentTime + 1000;
-        console.log("Gamepad connected", device);
+        log("Gamepad connected", device);
       });
 
       self.gamepadHardware.bind(HTML5Gamepad.Event.DISCONNECTED, function(device) {
-        console.log("Gamepad disconnected", device);
+        log("Gamepad disconnected", device);
       });
 
       self.gamepadHardware.bind(HTML5Gamepad.Event.UNSUPPORTED, function(device) {
-        console.error("Gamepad unsupported", device);
+        trace("Gamepad unsupported", device);
       });
 
 
       if(!self.gamepadHardware.init())
       {
-        console.error("Your browser doesn't support this gamepad");
+        trace("Your browser doesn't support this gamepad");
         return;
       }
 
@@ -354,7 +366,7 @@
   {
     constructor(cockpit)
     {
-      console.log("Starting gamepad interface");
+      log("Starting gamepad interface");
       
       var self = this;
       self.gamepadAbstraction = new GamepadAbstraction(cockpit);
@@ -365,11 +377,11 @@
       var self = this;
       if(key == null)
       {
-        console.error("Tried to register an undefined key with gamepad");
+        trace("Tried to register an undefined key with gamepad");
         return;
       }
 
-      console.log("Registering input:", key, "to gamepad");
+      log_debug("Registering input:", key, "to gamepad");
       self.gamepadAbstraction.assignments.set(key, actions);
     };
 
@@ -377,7 +389,7 @@
     {
       var self = this;
 
-      console.log("Resetting gamepad");
+      log_debug("Resetting gamepad");
       self.gamepadAbstraction.assignments.clear();
     };
     
@@ -386,11 +398,11 @@
       var self = this;
       if(key == null)
       {
-        console.error("Tried to unregister an undefined key with gamepad");
+        trace("Tried to unregister an undefined key with gamepad");
         return;
       }
 
-      console.log("Unregistering:", key, "from gamepad");
+      log_debug("Unregistering:", key, "from gamepad");
       self.gamepadAbstraction.assignments.delete(key);
     };
     
@@ -417,7 +429,7 @@
       var self = this;
       self.mousetrap = mousetrap;
 
-      console.log("Started keyboard abstraction");
+      log("Started keyboard abstraction");
     };
 
     //Prevents registration of uninteded key presses
@@ -441,11 +453,11 @@
 
       if(key == null)
       {
-        console.error("Tried to register an undefined key from Mousetrap");
+        trace("Tried to register an undefined key from Mousetrap");
         return;
       }
 
-      console.log("Registering:", key, "with Mousetrap");
+      log_debug("Registering:", key, "with Mousetrap");
 
       //Register actions, used for unbinding as well
       if(actions.up !== undefined)
@@ -484,7 +496,7 @@
       var self = this;
       if(key == null)
       {
-        console.error("Tried to unregister an undefined key from Mousetrap");
+        trace("Tried to unregister an undefined key from Mousetrap");
         return;
       }
 

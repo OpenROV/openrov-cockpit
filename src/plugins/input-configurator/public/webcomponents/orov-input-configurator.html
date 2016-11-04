@@ -395,7 +395,6 @@
                         input: self.candidateBinding 
                     };
 
-                    console.log("Updated:", updatedInput);
                     self.eventEmitter.emit('plugin.inputController.updateInput', updatedInput);
 
                     //Open the update toast
@@ -414,7 +413,6 @@
                         input: self.candidateBinding 
                     };
 
-                    console.log("Updated:", updatedInput);
                     self.eventEmitter.emit('plugin.inputController.updateInput', updatedInput);
 
                     //Open the update toast
@@ -471,8 +469,6 @@
                     var self = this;
 
                     //Clear the input from our presets
-                    console.log("Clearing:", self.selectedItem);
-
                     //Format in a way that the input controller expects
                     var clearedInput = {
                         name: self.selectedItem.name,
@@ -491,8 +487,6 @@
                     var self = this;
 
                     //Clear the input from our presets
-                    console.log("Clearing:", self.selectedItem);
-
                     //Format in a way that the input controller expects
                     var clearedInput = {
                         name: self.selectedItem.name,
@@ -507,8 +501,6 @@
 
                 handleClearConflictingKeyboardBinding: function() {
                     var self = this;
-
-                    console.log("Clearing:", self.conflictingBinding);
                     
                     //Format in a way that the input controller expects
                     var clearedInput = {
@@ -527,7 +519,6 @@
 
                 handleClearConflictingGamepadBinding: function() {
                     var self = this;
-                    console.log("Clearing:",self.conflictingBinding);
 
                     //Format in a way that the input controller expects
                     var clearedInput = {

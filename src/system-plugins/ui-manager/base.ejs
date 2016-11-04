@@ -404,9 +404,9 @@ ga('send', 'pageview');
   <script>
 
 function removeSplashScreen() {
-//    var loadEl = document.getElementById('splash');
-//    loadEl.addEventListener('transitionend', loadEl.remove);
-//    document.body.classList.remove('loading');  
+    var loadEl = document.getElementById('splash');
+    loadEl.addEventListener('transitionend', loadEl.remove);
+    document.body.classList.remove('loading');  
 }
 
 function setupLazyImportsBundleMetics() {

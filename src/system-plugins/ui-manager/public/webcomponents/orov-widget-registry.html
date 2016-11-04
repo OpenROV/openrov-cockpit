@@ -1,129 +1,168 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../orov-behaviors/orov-behavior.html">
 <dom-module name="orov-widget-registry">
-<template>
+    <template>
   <div hidden="true">
   <content id="ctnt"></content>
   </div>    
 </template>
-<script>
+    <script src="../visionmedia-debug/dist/debug.js"></script>
+    <script>
+        (function(window) {
+            var log, trace, log_debug;
+            log = debug('orov-widget-registry:log');
+            trace = debug('orov-widget-registry:trace')
+            log_debug = debug('orov-widget-registry:debug')
+            Polymer({
+                is: 'orov-widget-registry',
+                properties: {
+                    deferProcessing:{type: Boolean, value:function(){return false;}}
+                },
+                behaviors: [namespace('behaviors').oROVStandard],
+                ready: function() {
+                    if (this.$.ctnt.getDistributedNodes()[0] !== undefined) {
+                        this.widgetsList = JSON.parse(this.$.ctnt.getDistributedNodes()[0].data);
+                    }
+                    this.subscribers = [];
+                },
+                attached: function(){
+                  var self=this;
+                  //window.addEventListener('load',this.webComponentsReady.bind(this));
+                  if(!this.deferProcessing){
+                    self.async(this.newReady.bind(this));
+                  }
+                },
+                process: function(){
+                    this.webComponentsReady();                  
+                },
+                newReady: function(){
+                    var self=this;
+                    var process=function(){
+                       self.webComponentsReady();
+                    }
+                    var handleError=function(){
+                        console.error("failed to load bundle");
+                    }
+                    
+                    var link=this.importHref('/all_imports.html',
+                    process,
+                    handleError,
+                    true);
+                },
+                webComponentsReady: function() {
+                    var self = this;
+                    //Links are not supported in shadowdom, so using importHref helper to load in to the main
+                    //document.
 
-(function(window) {
-  Polymer({
-    is:'orov-widget-registry',
-    properties: {
-    },
-    behaviors: [namespace('behaviors').oROVStandard],
-    ready: function(){
-      if (this.$.ctnt.getDistributedNodes()[0]!==undefined){
-        this.widgetsList = JSON.parse(this.$.ctnt.getDistributedNodes()[0].data);
-      }
-      this.subscribers = [];
-    },
-    attached: function(){
-      var self=this;
-      //Links are not supported in shadowdom, so using importHref helper to load in to the main
-      //document.
+                    if (window.__Fix3814_LinksLoaded == true) {
+                        self.subscribers.forEach(function(fn) {
+                            fn();
+                        });
+                        self.loadloadedControls = true;
+                        return;
+                    }
 
-      if (window.__Fix3814_LinksLoaded==true){
-              self.subscribers.forEach(function(fn){
-                fn();
-              });
-              self.loadloadedControls=true;
-              return;        
-      }
+                    //This part is polymer specific. It should be possible to extend this for other web component types by figuring out where their module type name
+                    //is stored in the file.  In polymer it is under html.body.dom-module id attribute.
+                    var pendingLinkVerifications = 0;
+                    this.widgetsList.forEach(function(wc) {
+                        pendingLinkVerifications++;
 
-      //This part is polymer specific. It should be possible to extend this for other web component types by figuring out where their module type name
-      //is stored in the file.  In polymer it is under html.body.dom-module id attribute.
-      var pendingLinkVerifications = 0;
-      this.widgetsList.forEach(function(wc){
-        pendingLinkVerifications++;
-        var link = self.importHref(wc.path,
-          function(e){
-            console.log("loading link:",e.currentTarget.href);
-            var elements = e.currentTarget.import.getElementsByTagName("DOM-MODULE");
-            wc.loaded=true;
-            if (elements.length==1){
-              var id = elements[0].getAttribute('id');
-              wc.tag=id;
-              console.log(id);
-              if (e.currentTarget.href.indexOf(id+".html")<0){
-                console.warn(e.currentTarget.href + " filename is a mismatch for the html element type: " + id);
-              }
-              var widget = self.create(id);
-              wc.element=widget;
-            }
-            else{
-              //If there was no dom-module it is probably a behavior, just ignore.
-            }
-            pendingLinkVerifications--;
+                        return Promise.resolve()
+                            .then(function() {
 
-            if (pendingLinkVerifications==1){
-              var missing = self.widgetsList.filter(function(item){
-                return item.loaded==undefined;
-              });
-              console.log("Last item:" + JSON.stringify(missing));
-            //  debugger;
-            }
+                                var link = self.importHref(wc.path,
+                                    function(e) {
+                                        trace("loading link:", e.currentTarget.href);
+                                        var elements = e.currentTarget.import.getElementsByTagName("DOM-MODULE");
+                                        wc.loaded = true;
+                                        if (elements.length == 1) {
+                                            var id = elements[0].getAttribute('id');
+                                            wc.tag = id;
+                                            trace(id);
+                                            if (e.currentTarget.href.indexOf(id + ".html") < 0) {
+                                                console.warn(e.currentTarget.href + " filename is a mismatch for the html element type: " + id);
+                                            }
+                                            var widget = self.create(id);
+                                            wc.element = widget;
+                                        }
+                                        else {
+                                            //If there was no dom-module it is probably a behavior, just ignore.
+                                        }
+                                        pendingLinkVerifications--;
 
-            console.log("pendingLinkVerifications:",pendingLinkVerifications);
-            if (pendingLinkVerifications==0){
-              //TODO: Check on the issue below to see if we can remove this work around
-              //of setting a window global variable to indivate the links have already
-              //been loaded.
-              //https://github.com/Polymer/polymer/issues/3814
-              window.__Fix3814_LinksLoaded = true;
-              self.subscribers.forEach(function(fn){
-                fn();
-              });
-              self.loadloadedControls=true;
-            }
-        },function(err){
-          console.log("failed link load")
-          throw err
-        },
-        false); //importHref will return before sub depenency links are loaded using Async=true.  That causes behavior to fail to load.
+                                        if (pendingLinkVerifications == 1) {
+                                            var missing = self.widgetsList.filter(function(item) {
+                                                return item.loaded == undefined;
+                                            });
+                                            trace("Last item:" + JSON.stringify(missing));
+                                            //  debugger;
+                                        }
 
-        
-        link.onload=function(e){
-          console.log('loaded');
-        }
+                                        trace("pendingLinkVerifications:", pendingLinkVerifications);
+                                        if (pendingLinkVerifications == 0) {
+                                            //TODO: Check on the issue below to see if we can remove this work around
+                                            //of setting a window global variable to indivate the links have already
+                                            //been loaded.
+                                            //https://github.com/Polymer/polymer/issues/3814
+                                            window.__Fix3814_LinksLoaded = true;
+                                            self.subscribers.forEach(function(fn) {
+                                                fn();
+                                            });
+                                            self.loadloadedControls = true;
+                                        }
+                                    },
+                                    function(err) {
+                                        trace("failed link load")
+                                        throw err
+                                    },
+                                    false); //importHref will return before sub depenency links are loaded using Async=true.  That causes behavior to fail to load.
 
-        link.onerror=function(err){
-          pendingLinkVerifications--;
-          console.log("Failed link load");
-        }
-        
-      })
 
-    },
-    /**
-     * Listens for 'widget-registry-enumerate-widgets',function(filterFn,callback)
-     */
-    registerEmitterHandlers: function(emitter){
-      var self = this;
-      emitter.on('widget-registry-enumerate-widgets',function(filterFn,callback){
-        var responseFn = function(){
-          callback(self.widgetsList
-            .map(function(listItem){return listItem.element})
-            .filter(function(item){
-              if(item==undefined){
-                return false;
-              }
-              return filterFn(item);
+                                link.onload = function(e) {
+                                    trace('loaded');
+                                }
+
+                                link.onerror = function(err) {
+                                    pendingLinkVerifications--;
+                                    trace("Failed link load");
+                                }
+
+                            })
+                    })
+
+                },
+                /**
+                 * Listens for 'widget-registry-enumerate-widgets',function(filterFn,callback)
+                 */
+                registerEmitterHandlers: function(emitter) {
+                    var self = this;
+                    emitter.on('widget-registry-enumerate-widgets', function(filterFn, callback) {
+                        var responseFn = function() {
+                            callback(self.widgetsList
+                                .map(function(listItem) {
+                                    return listItem.element
+                                })
+                                .filter(function(item) {
+                                    if (item == undefined) {
+                                        return false;
+                                    }
+                                    return filterFn(item);
+                                })
+                                .map(function(element) {
+                                    return element.is
+                                }));
+                        }
+
+                        //If the controls have been enumerated go ahead and filter and return, else defer the call back
+                        if (self.loadedControls || window.__Fix3814_LinksLoaded) {
+                            responseFn();
+                        } else {
+                            self.subscribers.push(responseFn);
+                        }
+                    });
+                },
             })
-            .map(function(element){return element.is}));
-        }
-
-        //If the controls have been enumerated go ahead and filter and return, else defer the call back
-        if (self.loadedControls || window.__Fix3814_LinksLoaded){
-          responseFn();
-        } else {
-          self.subscribers.push(responseFn);
-        }
-      });
-    },    
-  })
-})(window);
-</script>
+        })(window);
+    </script>
 </dom-module>

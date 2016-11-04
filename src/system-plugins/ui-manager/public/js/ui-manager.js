@@ -23,8 +23,10 @@
     //    template.routedata = {page: 'cockpit'}
     if (window.location.hash == '') {
       window.location.replace('#/cockpit');
+      //window.location.replace('#/about');
     }
-    this.registerEventListeners(this.cockpit, this.rov);
+    this.registerEventListeners(this.cockpit, this.rov);    
+
   };
   var register = [];
   plugins.UIManager.prototype.registerEventListeners = function registerEventListeners(cockpit, rov) {

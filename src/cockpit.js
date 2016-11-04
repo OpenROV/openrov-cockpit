@@ -62,12 +62,14 @@ var bodyParser = require('body-parser');
 var multer = require('multer');
 var errorHandler = require('errorhandler');
 var pluginFolder = CONFIG.preferences.get('pluginsDownloadDirectory');
+var cacheFolder = CONFIG.preferences.get('cacheDirectory');
 var Promise = require('bluebird');
 var rimrafAsync = Promise.promisify(require('rimraf'));
 var mkdirpAsync = Promise.promisify(require('mkdirp'));
 
 // Setup required directories
 mkdirp(CONFIG.preferences.get('photoDirectory'));
+mkdirp(cacheFolder);
 if (!process.env.NODE_ENV){
   process.env.NODE_ENV = "production";
 }
@@ -205,18 +207,39 @@ deps.globalEventLoop.on('mcu.rovsys', function (data) {
 // -----------------------------------------------------------------------
 // Load Plugins
 // -----------------------------------------------------------------------
-var loader = new PluginLoader();
 mkdirp.sync(pluginFolder);
-var promises = [
-    loader.loadPlugins(path.join(__dirname, 'system-plugins'), 'system-plugin', true, deps),
-    loader.loadPlugins(path.join(__dirname, 'plugins'), 'plugin', true, deps),
-    loader.loadPlugins(pluginFolder, 'community-plugin', false, deps, function (file) {
+
+var options={
+  cacheFile:path.join(cacheFolder,'cachedLoadPluginsResults_systemPlugins.json'),
+  required:true
+}
+var loaderA = new PluginLoader(path.join(__dirname, 'system-plugins'), 'system-plugin', deps, options);
+
+options.cacheFile=path.join(cacheFolder,'cachedLoadPluginsResults_plugins.json');
+var loaderB = new PluginLoader(path.join(__dirname, 'plugins'), 'plugin', deps,options);
+
+options.required=false;
+options.filter = function (file) {
       return file.substring(0, 15) === 'openrov-plugin-';
-    })
+    }
+options.cacheFile=path.join(cacheFolder,'cachedLoadPluginsResults_community.json');    
+var loaderC = new PluginLoader(pluginFolder, 'community-plugin', deps,options );
+
+
+// Performance optimization, attempt to read from a cache of the plugins instead, fallback
+// if not available.
+var promises = [];
+
+  promises = [
+    loaderA.loadPluginsAsync(),
+    loaderB.loadPluginsAsync(),
+    loaderC.loadPluginsAsync()
   ];
+
 // If a required plugin fails to load, cockpit will terminate. Otherwise, the plugin will be skipped.
-Promise.all(promises).each(function (results) {
-  addPluginAssets(results);
+Promise.all(promises)
+.each(function(results){
+    addPluginAssets(results);
 }).then(function () {
   debug('Starting following plugins:');
   debug(deps.loadedPlugins);

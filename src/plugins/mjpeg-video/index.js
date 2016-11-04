@@ -61,7 +61,7 @@ mjpegvideo.prototype.start = function start() {
       if (cameras && cameras.length > 0) {
         self.startVideoServer();
         self.connectVideoServer();  // log('Found cameras ' + JSON.stringify(cameras));
-        self.deps.cockpit.emit("plugin.mjpeg-video.cameraInfo", cameras);
+        //self.deps.cockpit.emit("plugin.mjpeg-video.cameraInfo", cameras);
       }
     });
 

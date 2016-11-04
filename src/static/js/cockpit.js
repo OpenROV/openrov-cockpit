@@ -17,8 +17,8 @@
     this.sendUpdateEnabled = true;
     this.loadedPlugins = [];
     this.loadUiTheme(function () {
-      self.loadPlugins();
-      console.log('loaded plugins');
+     // self.loadPlugins();
+     // console.log('loaded plugins');
       self.listen();
     });
   };

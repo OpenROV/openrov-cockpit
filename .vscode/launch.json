@@ -28,9 +28,11 @@
 				"configfile": "/tmp/rovconfig.json",
 				"plugins__ui-manager__selectedUI": "new-ui",
 				"pluginsDownloadDirectory": "/tmp/plugins",
-				"DATADIR": "/tmp"
+				"cacheDirectory": "/tmp/cache",
+				"DATADIR": "/tmp",
+				"IGNORE_CACHE": "true"
 			},
-            "console": "internalConsole",			
+            "console": "internalConsole",			          
 			"sourceMaps": false,
 			"outDir": null
 		},

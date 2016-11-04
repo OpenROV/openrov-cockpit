@@ -21,7 +21,6 @@
   {
     constructor(cockpit)
     {
-      log("Starting Input Controller");
       this.cockpit = cockpit;
       this.currentPreset = "OpenROVDefault";
       

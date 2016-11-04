@@ -69,19 +69,8 @@
         //Add the default preset to the map
         self.presets.set("OpenROVDefault", self.openrovPreset);
 
-        //If plugins have loaded before us, let's get their defaults
-        self.cockpit.loadedPlugins.forEach(function(plugin) {
-          if(plugin.inputDefaults !== undefined)
-          {
-            //Do not support functions. Probably should
-            if(typeof plugin.inputDefaults !== 'function')
-            {
-              plugin.inputDefaults.forEach(function(input) {
-                self.register(input, self.currentPreset);
-              });
-            }
-          }
-        });
+        //Crawl plugin directory for inputs
+        self.listen();
 
         //Tell everyone else we got presets to use
         self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset));
@@ -97,6 +86,25 @@
     listen()
     {
       var self = this;
+
+      //Make sure that mousetrap is loaded before loading the plugin defaults
+      if(typeof Mousetrap == "undefined")
+      {
+        return;
+      }
+
+      self.cockpit.loadedPlugins.forEach(function(plugin) {
+        if(plugin.inputDefaults !== undefined)
+        {
+          //Do not support functions. Probably should
+          if(typeof plugin.inputDefaults !== 'function')
+          {
+            plugin.inputDefaults.forEach(function(input) {
+              self.register(input, self.currentPreset);
+            });
+          }
+        }
+      });
 
       this.cockpit.on('plugin.inputController.defaults', function(defaults) {
         

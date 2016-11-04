@@ -109,8 +109,15 @@ ga('send', 'pageview');
         background: linear-gradient(#CCCCCC, #34A1FF);
         margin: 0;
         padding: 0;
+    }    
+
+    /* This needs to be fixed to override additional style sheets from the theme that loads */
+    #splash * {
+      margin: 0px;
+      font-size:14px;
+      line-height: 1em;
     }
-    
+
     #splash {
         position: absolute;
         top: 0;
@@ -173,6 +180,7 @@ ga('send', 'pageview');
     }
     
     .content h1 {
+        margin-bottom: 0.3em;
         font-family: 'Lato', sans-serif;
         margin-top: -1.3em;
         font-weight: 100;
@@ -181,8 +189,8 @@ ga('send', 'pageview');
     
     #quote {
         padding-top: 5em;
-        margin-bottom: 0.3em;
-        font-family: 'Lato', sans-serif;
+        margin: 0.3em;
+        font-family: 'Lato', sans-serif; 
         font-style: italic;
         font-size: 4em;
         animation: fadein 3s;
@@ -279,7 +287,7 @@ ga('send', 'pageview');
             <p> Connecting to the ROV </p>
         </div>
 
-        <div class="sk-spinner sk-spinner-pulse"></div>
+        <div class="sk-spinner sk-spinner-pulse" style="margin: 40px auto;"></div>
 
 
     </div>
@@ -396,9 +404,9 @@ ga('send', 'pageview');
   <script>
 
 function removeSplashScreen() {
-    var loadEl = document.getElementById('splash');
-    loadEl.addEventListener('transitionend', loadEl.remove);
-    document.body.classList.remove('loading');  
+//    var loadEl = document.getElementById('splash');
+//    loadEl.addEventListener('transitionend', loadEl.remove);
+//    document.body.classList.remove('loading');  
 }
 
 function setupLazyImportsBundleMetics() {

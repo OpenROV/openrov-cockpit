@@ -15,8 +15,7 @@
             // Setup input handlers
             this.inputDefaults = [{
                 name: 'plugin.example.sayHello',
-                shortName: "Say Hello!",
-                description: 'Invoke the node plugins sayHello() API',
+                description: 'Say Hello!',
                 controllers: new Map([["keyboard", "alt+0"]]),
                 actions:
                 {

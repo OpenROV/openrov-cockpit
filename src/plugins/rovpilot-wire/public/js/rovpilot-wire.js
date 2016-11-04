@@ -23,8 +23,7 @@
     this.inputDefaults = [
       {
         name: 'rovPilot.toggleHeadingHold',
-        shortName: "Toggle Heading Hold",
-        description: 'Toggles the heading hold on/off',
+        description: "Toggle Heading Hold",
         controllers: new Map([["keyboard", "m"]]),
         actions:
         {
@@ -35,8 +34,7 @@
       },
       {
         name: 'rovPilot.toggleDepthHold',
-        shortName: "Toggle Depth Hold",
-        description: 'Toggles the depth hold on/off',
+        description: "Toggle Depth Hold",
         controllers: new Map([["keyboard", "n"]]),
         actions:
         {

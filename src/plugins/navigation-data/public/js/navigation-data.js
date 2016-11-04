@@ -8,8 +8,7 @@
     this.inputDefaults = [
     {
       name: 'plugin.navigationData.toggleHeadsUpDisplay',
-      shortName: "Toggle HUD",
-      description: 'Toggle the heads-up-display on/off',
+      description: "Toggle HUD",
       controllers: new Map([["keyboard", '\\']]),
       actions:
       {

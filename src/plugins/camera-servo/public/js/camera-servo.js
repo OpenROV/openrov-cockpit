@@ -21,8 +21,7 @@
             this.inputDefaults = [
                 {
                     name: 'plugin.cameraServo.stepPositive',
-                    shortName: "Step camera up",
-                    description: 'Points the camera further up',
+                    description: 'Step camera up',
                     controllers: new Map([
                         ["keyboard", "q"],
                         ["gamepad", "Y"]]),
@@ -35,8 +34,7 @@
                 },
                 {
                     name: 'plugin.cameraServo.stepCenter',
-                    shortName: "Center camera",
-                    description: 'Return camera to center position',
+                    description: 'Center camera',
                     controllers: new Map([
                         ["keyboard", "a"],
                         ["gamepad", "B"]]),
@@ -49,8 +47,7 @@
                 },
                 {
                     name: 'plugin.cameraServo.stepNegative',
-                    shortName: "Step camera down",
-                    description: 'Point the camera further down.',
+                    description: 'Step camera down',
                     controllers: new Map([
                         ["keyboard", "z"],
                         ["gamepad", "A"]]),

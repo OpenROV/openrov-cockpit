@@ -35,8 +35,7 @@
             this.inputDefaults = [
             {
                 name: 'plugin.lights.stepPositive',
-                description: 'Makes the ROV lights brighter.',
-                shortName: "Increase ROV Light Brightness",
+                description: 'Make the ROV lights brighter.',
                 controllers: new Map([["keyboard", 'p'],
                                      ["gamepad", 'DPAD_UP']]),
                 actions:
@@ -48,8 +47,7 @@
             },
             {
                 name: 'plugin.lights.stepNegative',
-                shortName: "Decrease ROV Light Brightness",
-                description: 'Makes the ROV lights dimmer.',
+                description: 'Make the ROV lights dimmer.',
                 controllers: new Map([["keyboard", 'o'],
                                      ["gamepad", 'DPAD_DOWN']]),
                 actions:
@@ -61,8 +59,7 @@
             },
             {
                 name: 'plugin.lights.toggle',
-                shortName: "Toggle ROV Lights",
-                description: 'Toggles the ROV lights on/off.',
+                description: 'Toggle the ROV lights on/off.',
                 controllers: new Map([["keyboard", 'i']]),
                 actions:
                 {

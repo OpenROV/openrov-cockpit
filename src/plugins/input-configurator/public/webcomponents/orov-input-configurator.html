@@ -28,6 +28,7 @@
 
         section {
             position: relative;
+            width: 67%;
             border: 1px solid #000;
         }
 
@@ -49,6 +50,10 @@
         #tableContainer {
             overflow: auto;
             height: 100%;
+        }
+
+        #descriptionRow {
+            width: 500px;
         }
 
         #duplicateInputToast {
@@ -133,26 +138,26 @@
                     <thead id="stickyHeader">
                         <tr>
                             <th>
-                                <div>{{__('Command')}}</div>
+                                <div>{{__('Description')}}</div>
                             </th>
                             <th>
                                 <div>{{__('Keyboard')}}</div>
                             </th>
                             <th>
                                 <div>{{__('Gamepad')}}</div>
-                            </th>
+                            </th>     
                             <th>
-                                <div>{{__('Description')}}</div>
-                            </th>           
+                                <div>{{__('Emitter Name')}}</div>
+                            </th>          
                         </tr>
                     </thead>
                     <tbody>
                         <template is="dom-repeat" items="[[presetArray]]">
                             <tr>
-                                <td>{{item.shortName}}</td>
+                                <td id="descriptionRow">{{__(item.description)}}</td>
                                 <td><kbd class="light" on-tap="handleKeyboardChange">{{item.bindings.keyboard}}&nbsp;</kbd></td>
                                 <td><kbd on-tap="handleGamepadChange">{{item.bindings.gamepad}}&nbsp;</kbd></td>
-                                <td>{{__(item.description)}}</td>
+                                <td>{{__(item.name)}}</td>
                             </tr>
                         </template>
                     </tbody>

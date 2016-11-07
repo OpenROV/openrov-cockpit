@@ -57,7 +57,7 @@
         self.presets = new Map();
 
         //The OpenROV default mapping preset. Defined by crawling the plugins
-        self.openrovPreset = new inputController.Preset("OpenROV Preset");
+        self.openrovPreset = new inputController.Preset("Defaults");
 
         //Add our default controllers
         self.keyboard = new Keyboard(cockpit, self.mousetrap);
@@ -66,14 +66,17 @@
         self.gamepad = new Gamepad(cockpit);
         self.controllers.set("gamepad", self.gamepad);
 
-        //Add the default preset to the map
-        self.presets.set("OpenROVDefault", self.openrovPreset);
+        //Add the controllers to this preset
+        self.presets.set("Defaults", self.openrovPreset);
+        self.presets.get("Defaults").addController("gamepad");
+        self.presets.get("Defaults").addController("keyboard");
+        
 
         //Crawl plugin directory for inputs
         self.listen();
 
         //Tell everyone else we got presets to use
-        self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset));
+        //self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset));
         return true;
       }
       else
@@ -93,20 +96,21 @@
         return;
       }
 
-      self.cockpit.loadedPlugins.forEach(function(plugin) {
-        if(plugin.inputDefaults !== undefined)
-        {
-          //Do not support functions. Probably should
-          if(typeof plugin.inputDefaults !== 'function')
-          {
-            plugin.inputDefaults.forEach(function(input) {
-              self.register(input, self.currentPreset);
-            });
-          }
-        }
-      });
+      // self.cockpit.loadedPlugins.forEach(function(plugin) {
+      //   if(plugin.inputDefaults !== undefined)
+      //   {
+      //     //Do not support functions. Probably should
+      //     if(typeof plugin.inputDefaults !== 'function')
+      //     {
+      //       plugin.inputDefaults.forEach(function(input) {
+      //         self.register(input, self.currentPreset);
+      //       });
+      //     }
 
-      this.cockpit.on('plugin.inputController.defaults', function(defaults) {
+      //   }
+      // });
+
+      this.cockpit.on('plugin.inputController.debug', function(actions, defaults) {
         
         //Listen for plugins asking to register their default input configurations
         //Make sure we got a valid input
@@ -116,9 +120,31 @@
           return;
         }
 
-        self.register(defaults, self.currentPreset);
+        console.log("GOT STUFF:", actions, defaults);
 
-        self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset));
+        for(var controllerName in defaults ) 
+        {
+          var controller = defaults[controllerName];
+          
+          console.log("CONTROLLERS:", controller);
+          for(var value in controller)
+          {
+            var controllerValue = controller[value];
+
+            console.log(controllerValue);
+
+            var valueToAdd = {
+              controller: controllerName,
+              name: value,
+              action: actions[controllerValue.action]
+            };
+
+            self.presets.get("Defaults").addAction(valueToAdd);
+          }
+        }
+        //self.register(defaults, self.currentPreset);
+
+        //self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset));
       });
 
       this.cockpit.on('plugin.inputController.sendPreset', function() {
@@ -126,7 +152,7 @@
         if(self.presets !== undefined)
         {
           log_debug(self.presets.get(self.currentPreset));
-          self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset));
+          //self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset));
         }
         
       });

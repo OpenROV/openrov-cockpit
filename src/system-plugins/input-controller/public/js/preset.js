@@ -16,11 +16,39 @@
             
             self.name = presetName;
 
-            //The inputs this preset will hold
-            //Represented as ["inputName"]:{name, description, bindings}
-            self.inputs = new Map();
+            //The controllers this preset will hold
+            self.controllers = new Map();
         };
 
+        addController(controllerIn)
+        {
+            if(controllerIn == null)
+            {
+                console.error("Tried to add a null controller");
+                return;
+            }
+
+            var self = this;
+
+            //Check to see if this controller exists
+            if(self.controllers.has(controllerIn))
+            {
+                return;
+            }
+
+            //Init with the default input classes we support. More can be added
+            var value = {
+                buttons: new Map(),
+                axes: new Map()
+            };
+
+            self.controllers.set(controllerIn, value);
+        };
+
+        addAction(action)
+        {
+            console.log("GOT ACTION:", action);
+        };
 
         addInput(input)
         {

@@ -38,41 +38,84 @@
 
             //Init with the default input classes we support. More can be added
             var value = {
-                buttons: new Map(),
-                axes: new Map()
+                button: new Map(),
+                axis: new Map()
             };
 
             self.controllers.set(controllerIn, value);
-        };
-
-        addAction(action)
-        {
-            console.log("GOT ACTION:", action);
         };
 
         addInput(input)
         {
             var self = this;
 
-            //Make sure we got a valid input
-            if(input == null)
-            {
-                console.error("Tried to add an undefined input to preset:", self.name);
-                return;
-            }
+            console.log("GOT input:", input);
             
-            //Check to see if this input exists
-            if(self.inputs.has(input.name))
+
+            //Make sure the associated controller exists
+            if(!self.controllers.has(input.controller))
             {
-                console.log("Already have a registration for:", input.name, "with preset:", self.name);
+                console.error("Tried to add an input with an unregistered controller: ", input);
                 return;
             }
-            else
-            {
-                //If it doesn't exist on our map, add it!
-                self.inputs.set(input.name, input);
-            }           
+
+            
+            var controller = self.controllers.get(input.controller);
+            console.log("CONTROLMAN: ", controller[input.type]);
+            
+            var inputMap = controller[input.type];
+
+            var inputToAdd = {
+                description: input.action.description,
+                action: input.action.controls[input.type]
+            };
+
+            inputMap.set(input.name, inputToAdd);
+            console.log("ADDED YO:",self.controllers);
+
+            // if(!controller.has(input.type))
+            // {
+            //     console.error("Tried to add an input with an unregistered input type: ", input);
+            //     return;
+            // }
+
+            // var inputType = controller.get(input.type);
+            
+            // if(inputType.has(input.name))
+            // {
+            //     console.error("Tried to add an input that already exists: ", input);
+            //     return;
+            // }
+
+            // inputType.set(input.name, input.actions);
+
+            // console.log("ADDED YO:",self.controllers);
+
         };
+
+        // addInput(input)
+        // {
+        //     var self = this;
+
+        //     //Make sure we got a valid input
+        //     if(input == null)
+        //     {
+        //         console.error("Tried to add an undefined input to preset:", self.name);
+        //         return;
+        //     }
+            
+        //     //Check to see if this input exists
+        //     if(self.inputs.has(input.name))
+        //     {
+        //         console.log("Already have a registration for:", input.name, "with preset:", self.name);
+        //         return;
+        //     }
+        //     else
+        //     {
+        //         //If it doesn't exist on our map, add it!
+        //         self.inputs.set(input.name, input);
+        //     }           
+        // };
 
         removeInput(input)
         {

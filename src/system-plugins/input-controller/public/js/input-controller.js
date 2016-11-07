@@ -75,8 +75,6 @@
         //Crawl plugin directory for inputs
         self.listen();
 
-        //Tell everyone else we got presets to use
-        //self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset));
         return true;
       }
       else
@@ -96,20 +94,6 @@
         return;
       }
 
-      // self.cockpit.loadedPlugins.forEach(function(plugin) {
-      //   if(plugin.inputDefaults !== undefined)
-      //   {
-      //     //Do not support functions. Probably should
-      //     if(typeof plugin.inputDefaults !== 'function')
-      //     {
-      //       plugin.inputDefaults.forEach(function(input) {
-      //         self.register(input, self.currentPreset);
-      //       });
-      //     }
-
-      //   }
-      // });
-
       this.cockpit.on('plugin.inputController.debug', function(actions, defaults) {
         
         //Listen for plugins asking to register their default input configurations
@@ -126,20 +110,23 @@
         {
           var controller = defaults[controllerName];
           
-          console.log("CONTROLLERS:", controller);
-          for(var value in controller)
+          console.log("CONTROLLER:", controller);
+
+          for(var inputName in controller)
           {
-            var controllerValue = controller[value];
+            var input = controller[inputName];
 
-            console.log(controllerValue);
+            console.log("INPUT:",input);
 
-            var valueToAdd = {
+            var inputToAdd = {
               controller: controllerName,
-              name: value,
-              action: actions[controllerValue.action]
+              name: inputName,
+              type: input.type,
+              action: actions[input.action]
             };
 
-            self.presets.get("Defaults").addAction(valueToAdd);
+
+            self.presets.get("Defaults").addInput(inputToAdd);
           }
         }
         //self.register(defaults, self.currentPreset);

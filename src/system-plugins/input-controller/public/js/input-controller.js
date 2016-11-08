@@ -155,33 +155,12 @@
       this.cockpit.on('plugin.inputController.unregisterInput', function(input) {
 
         //Try to update that input
-        self.unregisterInput(input, self.currentPreset);
+        self.unregisterInput(input);
       });
 
     };
 
-    unregisterInput(input, preset)
-    {
-      var self = this;
 
-      if(input == null)
-      {
-        trace("Tried to update a null input");
-        return;
-      }
-
-      var currentPreset = self.presets.get(preset);
-
-      //Unregister the input with hardware
-      var controller = self.controllers.get(input.controller);
-      controller.unregister(input.input);
-
-      //Update the input with the preset
-      currentPreset.unregisterInput(input);
-      
-      //Let everyone know we just updated
-      self.cockpit.emit('plugin.inputController.updatedPreset', currentPreset);
-    };
 
     updateInput(input, preset)
     {
@@ -230,24 +209,6 @@
       self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset));
     };
 
-    //Registration of a single input
-    //This function will register an input with the passed preset
-    register(input, preset)
-    {
-      var self = this;
-
-      if(input == null)
-      {
-        trace("Tried to register an undefined input!");
-        return;
-      }
-
-      log_debug("Registering an input:", input, "to preset:", preset);
-
-      self.registerInputWithPreset(input, preset);
-      self.registerInputWithHardware(input);
-    };
-
     registerInputWithHardware(input)
     {
       var self = this;
@@ -271,8 +232,6 @@
       var currentPreset = self.presets.get(self.currentPreset);
 
       //If this preset already exists, just update the preset
-      console.log("CURRENT PRESET:", currentPreset);
-
       if(!self.actions.has(input.action))
       {
         console.error("Action does not exist", input.action);
@@ -289,6 +248,44 @@
       currentPreset.registerInput(inputForPreset);
     };
 
+    unregisterInput(input)
+    {
+      var self = this;
+
+      if(input == null)
+      {
+        trace("Tried to update a null input");
+        return;
+      }
+
+      var currentPreset = self.presets.get(self.currentPreset);
+
+      //Unregister with current preset
+      self.unregisterInputWithPreset(input);
+
+      //And with hardware
+      self.unregisterInputWithHardware(input);
+      
+      //Let everyone know we just updated
+      self.cockpit.emit('plugin.inputController.updatedPreset', currentPreset, self.actions);
+    };
+    
+    unregisterInputWithHardware(input)
+    {
+      var self = this;
+
+      var hardware = self.controllers.get(input.controller);
+      hardware.unregisterInput(input);
+    };
+    
+    unregisterInputWithPreset(input)
+    {
+      var self = this;
+      
+      var currentPreset = self.presets.get(self.currentPreset);
+      currentPreset.unregisterInput(input);
+    };
+
     resetControllers()
     {
       var self = this;
@@ -298,23 +295,6 @@
       });
     }
 
-    //Unregistration of a single input
-    //This function will unregister an input with the current preset
-    unregister(input, preset)
-    {
-      var self = this;
-
-      if(input == null)
-      {
-        trace("Tried to unregister an undefined input!");
-        return;
-      }
-      log_debug("Unregistering an input:", input, "to preset:", preset);
-      
-      //Before we create a new object, make sure that it doesn't already exists
-      var currentPreset = self.presets.get(preset);
-      currentPreset.removeInput(input);
-    };
   }
 
   //Helper classes
@@ -450,7 +430,7 @@
       self.gamepadAbstraction.assignments.clear();
     };
     
-    unregister(key, actions)
+    unregisterInput(input)
     {
       var self = this;
       if(key == null)
@@ -459,8 +439,8 @@
         return;
       }
 
-      log_debug("Unregistering:", key, "from gamepad");
-      self.gamepadAbstraction.assignments.delete(key);
+      log_debug("Unregistering:", input.name, "from gamepad");
+      self.gamepadAbstraction.assignments.delete(input.name);
     };
     
     update(previousInput, currentInput)
@@ -581,17 +561,17 @@
       self.mousetrap.reset();
     };
 
-    unregister(key, actions)
+    unregisterInput(input)
     {
       var self = this;
-      if(key == null)
+      if(input == null)
       {
         trace("Tried to unregister an undefined key from Mousetrap");
         return;
       }
 
-      self.mousetrap.unbind(key, 'keydown');
-      self.mousetrap.unbind(key, 'keyup');
+      self.mousetrap.unbind(input.name, 'keydown');
+      self.mousetrap.unbind(input.name, 'keyup');
 
     };
 

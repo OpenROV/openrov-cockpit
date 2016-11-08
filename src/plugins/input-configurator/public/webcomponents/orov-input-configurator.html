@@ -155,8 +155,8 @@
                         <template is="dom-repeat" items="[[presetArray]]">
                             <tr>
                                 <td id="descriptionRow">{{__(item.description)}}</td>
-                                <td><kbd class="light" on-tap="handleKeyboardChange">{{item.bindings.keyboard}}&nbsp;</kbd></td>
-                                <td><kbd on-tap="handleGamepadChange">{{item.bindings.gamepad}}&nbsp;</kbd></td>
+                                <td><kbd class="light" on-tap="handleKeyboardChange">{{item.bindings.keyboard.name}}&nbsp;</kbd></td>
+                                <td><kbd on-tap="handleGamepadChange">{{item.bindings.gamepad.name}}&nbsp;</kbd></td>
                                 <td>{{__(item.name)}}</td>
                             </tr>
                         </template>
@@ -171,7 +171,7 @@
             <p> {{__('Click REMAP and then enter the desired key to set this control')}} </p>
             <p> {{__('Click CLEAR to remove inputs associated with this command')}} </p>
             <h3>
-                {{__('Current Mapping')}}: <kbd class="light">{{selectedItem.bindings.keyboard}}</kbd>
+                {{__('Current Mapping')}}: <kbd class="light">{{selectedItem.bindings.keyboard.name}}</kbd>
                 <paper-spinner active={{isListeningToKeyboard}} text="Waiting for keyboard input"></paper-spinner>
             </h3>
             
@@ -203,7 +203,7 @@
             <p> {{__('Click CLEAR to remove inputs associated with this command')}} </p>
 
             <h3>
-                {{__('Current Mapping')}}: <kbd>{{selectedItem.bindings.gamepad}}</kbd>
+                {{__('Current Mapping')}}: <kbd>{{selectedItem.bindings.gamepad.name}}</kbd>
             </h3>
 
             <div>
@@ -335,11 +335,9 @@
 
                 attached: function() {
                     var self = this;
-
-                    //Tell the input controller we want presets with a recurrent function 
+                    //Tell the input controller we want presets 
                     if(self.presets == undefined)
                     {
-                        console.log("STUF TUFS")
                         self.eventEmitter.emit('plugin.inputController.sendPreset');
                     }
                     
@@ -483,14 +481,14 @@
 
                     //Clear the input from our presets
                     //Format in a way that the input controller expects
-                    var clearedInput = {
-                        name: self.selectedItem.name,
-                        controller: "keyboard",
-                        input: self.selectedItem.bindings.keyboard
-                    };
+                    // var clearedInput = {
+                    //     name: self.selectedItem.name,
+                    //     controller: "keyboard",
+                    //     input: self.selectedItem.bindings.keyboard
+                    // };
 
                     //Let the input controller know the new configurations
-                    self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
+                    self.eventEmitter.emit('plugin.inputController.unregisterInput', self.selectedItem.bindings.keyboard);
 
                     this.$.clearedInputToast.open();
                 },
@@ -613,6 +611,7 @@
                 //Converts a preset object(hash map) to a consumable array for the input configurator
                 presetToArray: function(preset) {
                     var self = this;
+                    console.log("OHBOI", preset);
 
                     //Convert preset to a consumable map for converting to an array
                     var inputMap = new Map();
@@ -625,10 +624,22 @@
 
                             typeMap.forEach(function(actionName, input) {
 
-                                var binding = new Map();
+                                var inputToAdd = 
+                                {
+                                    controller: controllerName,
+                                    type: type,
+                                    name: input
+                                };
 
-                                binding.set(controllerName, input);
-                                inputMap.set(actionName, binding);
+                                if(inputMap.has(actionName))
+                                {
+                                    //Add it to the array of inputs assocaited with this action
+                                    inputMap.get(actionName).push(inputToAdd);
+                                }
+                                else
+                                {
+                                    inputMap.set(actionName, [inputToAdd]);
+                                }
                             });
                         }
                     });
@@ -636,26 +647,27 @@
                     //Now, convert the js Map object to an array for polymer
                     var arrayPreset = [];
 
-                    inputMap.forEach(function(input, actionName) {
+                    inputMap.forEach(function(inputs, actionName) {
 
-                        //Add more controllers here
                         var binding = {
                             keyboard: undefined,
                             gamepad: undefined
                         };
 
-                        //Register keyboard control bindings
-                        if(input.has('keyboard'))
+                        //Iterate through the inputs
+                        for(var index in inputs)
                         {
-                            binding.keyboard = input.get('keyboard');
+                            var currentInput = inputs[index];
+                            if(currentInput.controller == "keyboard")
+                            {
+                                binding.keyboard = currentInput;
+                            }
+                            if(currentInput.controller == "gamepad")
+                            {
+                                binding.gamepad = currentInput;
+                            }
                         }
-
-                        //Register gamepad control bindings
-                        if(input.has('gamepad'))
-                        {
-                            binding.gamepad = input.get('gamepad');
-                        }
-
+                        
                         var arrayInput = {
                             name: actionName,
                             description: self.actions.get(actionName).description,
@@ -664,6 +676,7 @@
 
                         arrayPreset.push(arrayInput);
                     });
+                    console.log(arrayPreset);
 
                     self.presetArray = arrayPreset;
                     return arrayPreset;

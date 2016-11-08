@@ -104,7 +104,7 @@
         //Map action strings to functions
         for(var action in plugin.actions)
         {
-          self.actions.set(action, plugin.actions[action].controls);
+          self.actions.set(action, plugin.actions[action]);
         }
 
         //Add the inputs to our preset
@@ -130,12 +130,14 @@
         }
       });
 
+      console.log("BOIO", self.actions);
+
       this.cockpit.on('plugin.inputController.sendPreset', function() {
 
         if(self.presets !== undefined)
         {
           log_debug(self.presets.get(self.currentPreset));
-          //self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset));
+          self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset), self.actions);
         }
         
       });
@@ -223,6 +225,9 @@
 
       self.registerInputWithPreset(input);
       self.registerInputWithHardware(input);
+
+      //Let everyone know we just updated
+      self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset));
     };
 
     //Registration of a single input
@@ -251,7 +256,7 @@
         name: input.name,
         controller: input.controller,
         type: input.type,
-        action: self.actions.get(input.action)[input.type]
+        action: self.actions.get(input.action).controls[input.type] //Actually grab the function associated with this input
       };
 
       //iterate through controllers associated with the input
@@ -278,7 +283,7 @@
         name: input.name,
         controller: input.controller,
         type: input.type,
-        action: self.actions.get(input.action)[input.type]
+        action: input.action
       };
 
       currentPreset.registerInput(inputForPreset);

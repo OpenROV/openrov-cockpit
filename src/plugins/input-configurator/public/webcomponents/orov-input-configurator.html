@@ -262,6 +262,11 @@
             Polymer({
                 is: "orov-input-configurator",
                 properties: {
+                    actions: {
+                        type: Map,
+                        value: undefined
+                    },
+
                     candidateBinding: {
                         type: Object,
                         value: undefined
@@ -310,10 +315,12 @@
 
                 registerEmitterHandlers: function(emitter) {
                     var self = this;
-                    this.presetFunction = function(preset) {
+                    
+                    this.presetFunction = function(preset, actions) {
 
                         //Set this to our current preset on the input Configurator
                         self.preset = preset;
+                        self.actions = actions;
 
                         //Update the UI to reflect this
                         self.presetToArray(self.preset);
@@ -332,6 +339,7 @@
                     //Tell the input controller we want presets with a recurrent function 
                     if(self.presets == undefined)
                     {
+                        console.log("STUF TUFS")
                         self.eventEmitter.emit('plugin.inputController.sendPreset');
                     }
                     
@@ -605,34 +613,55 @@
                 //Converts a preset object(hash map) to a consumable array for the input configurator
                 presetToArray: function(preset) {
                     var self = this;
-                    //Converts a js Map object to an array
+
+                    //Convert preset to a consumable map for converting to an array
+                    var inputMap = new Map();
+
+                    preset.controllers.forEach(function(controller, controllerName) {
+                        
+                        for(var type in controller)
+                        {
+                            var typeMap = controller[type];
+
+                            typeMap.forEach(function(actionName, input) {
+
+                                var binding = new Map();
+
+                                binding.set(controllerName, input);
+                                inputMap.set(actionName, binding);
+                            });
+                        }
+                    });
+
+                    //Now, convert the js Map object to an array for polymer
                     var arrayPreset = [];
 
-                    //Iterate through the preset MAP to create an array for the dom element
-                    preset.inputs.forEach( function(value, input) {
-                        
+                    inputMap.forEach(function(input, actionName) {
+
+                        //Add more controllers here
                         var binding = {
                             keyboard: undefined,
                             gamepad: undefined
                         };
-                        
-                        //Register Keyboard control bindings
-                        if(value.controllers.has('keyboard'))
+
+                        //Register keyboard control bindings
+                        if(input.has('keyboard'))
                         {
-                            binding.keyboard = value.controllers.get('keyboard');
+                            binding.keyboard = input.get('keyboard');
                         }
 
-                        //Register Gamepad control bindings
-                        if(value.controllers.has('gamepad'))
+                        //Register gamepad control bindings
+                        if(input.has('gamepad'))
                         {
-                            binding.gamepad = value.controllers.get('gamepad');
+                            binding.gamepad = input.get('gamepad');
                         }
 
                         var arrayInput = {
-                            name: value.name,
-                            description: value.description,
+                            name: actionName,
+                            description: self.actions.get(actionName).description,
                             bindings: binding
                         };
+
                         arrayPreset.push(arrayInput);
                     });
 

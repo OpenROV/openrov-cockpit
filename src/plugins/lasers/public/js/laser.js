@@ -11,20 +11,33 @@
       enabled: false
     };
     
-    this.inputDefaults = [{
-      name: 'plugin.laser.Toggle',
-      description: 'Toggle lasers',
-      controllers: new Map([["keyboard", "l"]]),    
-      actions:
+
+    this.actions = 
+    {
+      "plugin.laser.Toggle":
       {
-        down: function() {
-          cockpit.rov.emit('plugin.laser.set', self.laserState.enabled == true ? 0 : 1);
+        description: 'Toggle lasers',
+        controls:
+        {
+          button:
+          {
+            down: function() {
+              cockpit.rov.emit('plugin.laser.set', self.laserState.enabled == true ? 0 : 1);
+            }            
+          }
         }
       }
-    }];
+    };
 
-    //If this was loaded after the input manager, let it know we are ready to be loaded
-    cockpit.emit('plugin.inputController.defaults', self.inputDefaults);
+    this.inputDefaults = 
+    {
+      keyboard:
+      {
+        "l": { type: "button",
+               action: "plugin.laser.Toggle" }
+      }
+    };
+    
   };
   
   plugins.Laser = Laser;

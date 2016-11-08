@@ -149,7 +149,7 @@
       this.cockpit.on('plugin.inputController.updateInput', function(input) {
 
         //Try to update that input
-        self.updateInput(input, self.currentPreset);
+        self.updateInput(input);
       });
 
       this.cockpit.on('plugin.inputController.unregisterInput', function(input) {
@@ -162,7 +162,7 @@
 
 
 
-    updateInput(input, preset)
+    updateInput(input)
     {
       var self = this;
 
@@ -171,25 +171,30 @@
         trace("Tried to update a null input");
         return;
       }
+      var currentPreset = self.presets.get(self.currentPreset);
 
-      //The preset we are using
-      var currentPreset = self.presets.get(preset);
-
-      //The hardware we are interacting with
-      var controller = self.controllers.get(input.controller);
-
-
-      //Update the input with the hardware
-      //We need a handle on what the previous input key was, so let's get it
-      var previousInput = currentPreset.inputs.get(input.name);
-      controller.update(previousInput, input);
-
-      //Update the input with the preset
-      var currentPreset = self.presets.get(preset);
-      currentPreset.updateInput(input);
+      self.updateInputWithPreset(input);
+      self.updateInputWithHardware(input);
 
       //Let everyone know we just updated
       self.cockpit.emit('plugin.inputController.updatedPreset', currentPreset);
+    };
+
+    updateInputWithPreset(input)
+    {
+      var self = this;
+
+      console.log("UPDAING WITH PRESET", input);
+
+      var currentPreset = self.presets.get(self.currentPreset);
+      currentPreset.updateInput(input);
+    };
+
+    updateInputWithHardware(input)
+    {
+      var self = this;
+
+      
     };
 
     registerInput(input)
@@ -248,6 +253,15 @@
       currentPreset.registerInput(inputForPreset);
     };
 
+    resetControllers()
+    {
+      var self = this;
+      
+      self.controllers.forEach(function(controller) {
+        controller.reset();
+      });
+    };
+
     unregisterInput(input)
     {
       var self = this;
@@ -285,16 +299,6 @@
       var currentPreset = self.presets.get(self.currentPreset);
       currentPreset.unregisterInput(input);
     };
-
-    resetControllers()
-    {
-      var self = this;
-      
-      self.controllers.forEach(function(controller) {
-        controller.reset();
-      });
-    }
-
   }
 
   //Helper classes

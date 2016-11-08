@@ -68,8 +68,6 @@
             //Create a handle to the input type for this controller we will be adding an input to
             var inputMap = controller[input.type];
             inputMap.set(input.name, input.action);
-
-            console.log("Bros:",self.controllers);
         };
 
         updateInput(input)

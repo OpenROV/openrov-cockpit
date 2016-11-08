@@ -20,32 +20,47 @@
       controlResetsSetPoint: false 
     };
 
-    this.inputDefaults = [
+    this.actions = 
+    {
+      'rovPilot.toggleHeadingHold':
       {
-        name: 'rovPilot.toggleHeadingHold',
         description: "Toggle Heading Hold",
-        controllers: new Map([["keyboard", "m"]]),
-        actions:
+        controls:
         {
-          down: function() {
-            self.cockpit.emit('plugin.rovpilot.headingHold.set-enabled', !self.headingHold_state.enabled);
+          button:
+          {
+            down: function() {
+              self.cockpit.emit('plugin.rovpilot.headingHold.set-enabled', !self.headingHold_state.enabled);
+            }            
           }
         }
       },
+      'rovPilot.toggleDepthHold':
       {
-        name: 'rovPilot.toggleDepthHold',
         description: "Toggle Depth Hold",
-        controllers: new Map([["keyboard", "n"]]),
-        actions:
+        controls:
         {
-          down: function() {
-            self.cockpit.emit('plugin.rovpilot.depthHold.set-enabled', !self.depthHold_state.enabled);
+          button:
+          {
+            down: function() {
+              self.cockpit.emit('plugin.rovpilot.depthHold.set-enabled', !self.depthHold_state.enabled);
+            }            
           }
         }
-      }];   
-    
-    //If this was loaded after the input manager, let it know we are ready to be loaded
-    cockpit.emit('plugin.inputController.defaults', self.inputDefaults);
+      }      
+    };
+
+    this.inputDefaults = 
+    {
+      keyboard:
+      {
+        "m": { type: "button", 
+               action: 'rovPilot.toggleHeadingHold' },
+        "n": { type: "button", 
+               action: 'rovPilot.toggleDepthHold' }
+      }
+    };
+
   };
 
   ROVpilotWire.prototype.altMenuDefaults = function altMenuDefaults() {

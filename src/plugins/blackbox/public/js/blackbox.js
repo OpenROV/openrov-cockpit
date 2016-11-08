@@ -32,18 +32,34 @@
     this.otherBuffer = [];
     this.sessions_cache = [];
 
-    this.inputDefaults = [
+    this.actions =
     {
-      name: 'blackbox.record',
-      description: 'Toggle recording of telemetry data.',
-      controllers: new Map([["keyboard", "r"]]),
-      actions:
+      "plugin.blackbox.record":
       {
-        down: function() {
-          self.toggleRecording();
+        description: 'Toggle recording of telemetry data.',
+        controls:
+        {
+          button:
+          {
+            down: function() {
+              self.toggleRecording();
+            }
+          }
         }
       }
-    }];
+    };
+
+
+
+    this.inputDefaults =
+    {
+      keyboard:
+      {
+        r: { type: "button",
+             action: "plugin.blackbox.record" }
+      }
+    };
+
 
     //If this was loaded after the input manager, let it know we are ready to be loaded
     cockpit.emit('plugin.inputController.defaults', self.inputDefaults);

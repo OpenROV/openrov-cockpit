@@ -22,8 +22,18 @@
     constructor(cockpit)
     {
       this.cockpit = cockpit;
+
+      //Mapping from strings to JS functions
+      this.actions = new Map();
+
+      //Mapping from strings to hardware
+      this.controllers = new Map();
+
+      //Data structure to hold our presets on the browser side
+      this.presets = new Map();
       this.currentPreset = "Defaults";
-      
+      this.defaultPreset = new inputController.Preset(this.currentPreset);
+
       this.deferSetupForMousetrap();
     };
 
@@ -51,17 +61,11 @@
       {
 
         self.mousetrap = Mousetrap;
-        self.controllers = new Map();
-
-        self.actions = new Map();
-        //Data structure to hold our presets on the browser side
-        //key: "preset-name" value: ["preset1", "preset2", ..., "presetN"]
-        self.presets = new Map();
-
+        
         //The OpenROV default mapping preset. Defined by crawling the plugins
         self.openrovPreset = new inputController.Preset("Defaults");
 
-        //Add our default controllers
+        //Add our default keyboard controllers
         self.keyboard = new Keyboard(cockpit, self.mousetrap);
         self.controllers.set("keyboard", self.keyboard);
 
@@ -73,7 +77,6 @@
         self.presets.get("Defaults").addController("gamepad");
         self.presets.get("Defaults").addController("keyboard");
         
-
         //Crawl plugin directory for inputs
         self.listen();
 
@@ -96,69 +99,35 @@
         return;
       }
 
-      this.cockpit.on('plugin.inputController.debug', function(actions, defaults) {
+      self.cockpit.loadedPlugins.forEach(function(plugin) {
         
-        //Listen for plugins asking to register their default input configurations
-        //Make sure we got a valid input
-        if(defaults == null)
+        //Map action strings to functions
+        for(var action in plugin.actions)
         {
-          trace("A plugin tried to register undefined defaults!");
-          return;
+          self.actions.set(action, plugin.actions[action].controls);
         }
 
-        console.log("GOT STUFF:", actions, defaults);
-
-        //Add the function mappings to our internal representation:
-        for(var action in actions)
+        //Add the inputs to our preset
+        if(typeof plugin.inputDefaults !== 'function')
         {
-          console.log("STUFF:", action, actions[action]);
-          self.actions.set(action, actions[action].controls);
-        }
-        
-        for(var controllerName in defaults)
-        {
-          var controller = defaults[controllerName];
-
-          for(var inputName in controller)
+          for(var controllerName in plugin.inputDefaults)
           {
-            var input = controller[inputName];
+            var controller = plugin.inputDefaults[controllerName];
+            for(var inputName in controller)
+            {
+              var input = controller[inputName];
 
-            var inputToRegister = {
-              name: inputName,
-              controller: controllerName,
-              type: input.type,
-              action: input.action
-            };
+              var inputToRegister = {
+                name: inputName,
+                controller: controllerName,
+                type: input.type,
+                action: input.action
+              };
 
-            self.registerInput(inputToRegister);
+              self.registerInput(inputToRegister);
+            }
           }
         }
-        
-        // //Register with preset
-        // for(var controllerName in defaults ) 
-        // {
-        //   var controller = defaults[controllerName];
-          
-        //   for(var inputName in controller)
-        //   {
-        //     var input = controller[inputName];
-
-        //     var inputToAdd = {
-        //       controller: controllerName,
-        //       name: inputName,
-        //       type: input.type,
-        //       action: actions[input.action]
-        //     };
-
-        //     self.presets.get("Defaults").addInput(inputToAdd);
-        //   }
-        // }
-
-        // //Register with hardware
-        // self.controllers.forEach(function(controller) {
-        //   console.log("WOHOO", controller);
-        //   controller.addInput(inputToAdd);
-        // });
       });
 
       this.cockpit.on('plugin.inputController.sendPreset', function() {

@@ -12,22 +12,33 @@
 
             self.settings = null;     // These get sent by the local model
 
-            // Setup input handlers
-            this.inputDefaults = [{
-                name: 'plugin.example.sayHello',
-                description: 'Say Hello!',
-                controllers: new Map([["keyboard", "alt+0"]]),
-                actions:
+            //Set up actions associated with this plugin
+            this.actions = 
+            {
+                "plugin.example.sayHello":
                 {
-                    down: function() {
-                        //Emit the sayHello locally
-                        cockpit.emit('plugin.example.sayHello');
+                    description: "Say Hello!",
+                    controls:
+                    {
+                        button:
+                        {
+                            down: function() {
+                                cockpit.emit('plugin.example.sayHello');
+                            }
+                        }
                     }
                 }
-              }];
+            };
 
-              //If this was loaded after the input manager, let it know we are ready to be loaded
-              cockpit.emit('plugin.inputController.defaults', self.inputDefaults);
+            // Setup input handlers
+            this.inputDefaults =
+            {
+                keyboard:
+                {
+                    "alt+0": { type: "button",
+                               action: "plugin.example.sayHello"}
+                }
+            };
         };
 
         sayHello()

@@ -84,11 +84,6 @@
                          action: "plugin.cameraServo.stepNegative" }
                 }
             };
-
-            //If this was loaded after the input manager, let it know we are ready to be loaded
-            setTimeout( function() {
-                cockpit.emit('plugin.inputController.debug', self.actions, self.inputDefaults);
-            }, 1000);
         };
 
         

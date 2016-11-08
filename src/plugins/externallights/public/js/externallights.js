@@ -31,43 +31,62 @@
                 "max": 5
             }
 
+            self.actions = 
+            {
+                "plugin.externalLights.stepPositive":
+                {
+                    description: 'Increase External Light Brightness',
+                    controls:
+                    {
+                        button:
+                        {
+                            down: function() {
+                                cockpit.emit( 'plugin.externalLights.stepPositive' );
+                            }                            
+                        }
+                    }
+                },
+                "plugin.externalLights.stepNegative":
+                {
+                    description: "Decrease External Light Brightness",
+                    controls:
+                    {
+                        button:
+                        {
+                            down: function() {
+                                cockpit.emit( 'plugin.externalLights.stepNegative' );
+                            }                            
+                        }
+                    }
+                },
+                "plugin.externalLights.toggle":
+                {
+                    description: "Toggle External Light",
+                    controls:
+                    {
+                        button:
+                        {
+                            down: function() {
+                                cockpit.emit( 'plugin.externalLights.toggle' );
+                            }                            
+                        }
+                    }
+                }
+            };
+
             // Setup input handlers
-            self.inputDefaults = [
+            self.inputDefaults = 
             {
-                name: 'plugin.externalLights.stepPositive',
-                description: 'Increase External Light Brightness',
-                controllers: new Map([["keyboard", "="]]),                
-                actions:
+                keyboard:
                 {
-                    down: function() {
-                        cockpit.emit( 'plugin.externalLights.stepPositive' );
-                    }
+                    "=": { type: "button",
+                           action: "plugin.externalLights.stepPositive" },
+                    "-": { type: "button",
+                           action: "plugin.externalLights.stepNegative" },
+                    "0": { type: "button",
+                           action: "plugin.externalLights.toggle" },
                 }
-            },
-            {
-                name: 'plugin.externalLights.stepNegative',
-                description: "Decrease External Light Brightness",
-                controllers: new Map([["keyboard", "-"]]),                
-                actions:
-                {
-                    down: function() {
-                        cockpit.emit( 'plugin.externalLights.stepNegative' );
-                    }
-                }
-            },
-            {
-                name: 'plugin.externalLights.toggle',
-                description: "Toggle External Light",
-                controllers: new Map([["keyboard", "0"]]),                
-                actions:
-                {
-                    down: function() {
-                        cockpit.emit( 'plugin.externalLights.toggle');
-                    }
-                }
-            }];
-            //If this was loaded after the input manager, let it know we are ready to be loaded
-            cockpit.emit('plugin.inputController.defaults', self.inputDefaults);
+            };
         };
 
         updateFromStep()

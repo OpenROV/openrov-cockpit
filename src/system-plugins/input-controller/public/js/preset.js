@@ -47,10 +47,7 @@
 
         addInput(input)
         {
-            var self = this;
-
-            console.log("GOT input:", input);
-            
+            var self = this;        
 
             //Make sure the associated controller exists
             if(!self.controllers.has(input.controller))
@@ -59,38 +56,45 @@
                 return;
             }
 
-            
             var controller = self.controllers.get(input.controller);
-            console.log("CONTROLMAN: ", controller[input.type]);
-            
+
+            //Create a handle to the input type for this controller we will be adding an input to
             var inputMap = controller[input.type];
 
+            //Create a data structure for this input, for the map
             var inputToAdd = {
                 description: input.action.description,
                 action: input.action.controls[input.type]
             };
 
+            //Add it to the map
             inputMap.set(input.name, inputToAdd);
-            console.log("ADDED YO:",self.controllers);
+        };
 
-            // if(!controller.has(input.type))
-            // {
-            //     console.error("Tried to add an input with an unregistered input type: ", input);
-            //     return;
-            // }
+        registerInput(input)
+        {
+            var self = this;
 
-            // var inputType = controller.get(input.type);
-            
-            // if(inputType.has(input.name))
-            // {
-            //     console.error("Tried to add an input that already exists: ", input);
-            //     return;
-            // }
+            if(input == null)
+            {
+                console.error("Undefined input trying to register with preset");
+                return;
+            }
 
-            // inputType.set(input.name, input.actions);
+            //Make sure the associated controller exists
+            if(!self.controllers.has(input.controller))
+            {
+                console.error("Tried to add an input with an unregistered controller: ", input);
+                return;
+            }
 
-            // console.log("ADDED YO:",self.controllers);
+            var controller = self.controllers.get(input.controller);
 
+            //Create a handle to the input type for this controller we will be adding an input to
+            var inputMap = controller[input.type];
+            inputMap.set(input.name, input.action);
+
+            console.log("Bros:",self.controllers);
         };
 
         // addInput(input)

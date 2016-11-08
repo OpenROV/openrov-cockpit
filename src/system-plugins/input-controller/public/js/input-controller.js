@@ -22,7 +22,7 @@
     constructor(cockpit)
     {
       this.cockpit = cockpit;
-      this.currentPreset = "OpenROVDefault";
+      this.currentPreset = "Defaults";
       
       this.deferSetupForMousetrap();
     };
@@ -52,6 +52,8 @@
 
         self.mousetrap = Mousetrap;
         self.controllers = new Map();
+
+        self.actions = new Map();
         //Data structure to hold our presets on the browser side
         //key: "preset-name" value: ["preset1", "preset2", ..., "presetN"]
         self.presets = new Map();
@@ -106,32 +108,57 @@
 
         console.log("GOT STUFF:", actions, defaults);
 
-        for(var controllerName in defaults ) 
+        //Add the function mappings to our internal representation:
+        for(var action in actions)
+        {
+          console.log("STUFF:", action, actions[action]);
+          self.actions.set(action, actions[action].controls);
+        }
+        
+        for(var controllerName in defaults)
         {
           var controller = defaults[controllerName];
-          
-          console.log("CONTROLLER:", controller);
 
           for(var inputName in controller)
           {
             var input = controller[inputName];
 
-            console.log("INPUT:",input);
-
-            var inputToAdd = {
-              controller: controllerName,
+            var inputToRegister = {
               name: inputName,
+              controller: controllerName,
               type: input.type,
-              action: actions[input.action]
+              action: input.action
             };
 
-
-            self.presets.get("Defaults").addInput(inputToAdd);
+            self.registerInput(inputToRegister);
           }
         }
-        //self.register(defaults, self.currentPreset);
+        
+        // //Register with preset
+        // for(var controllerName in defaults ) 
+        // {
+        //   var controller = defaults[controllerName];
+          
+        //   for(var inputName in controller)
+        //   {
+        //     var input = controller[inputName];
 
-        //self.cockpit.emit('plugin.inputController.updatedPreset', self.presets.get(self.currentPreset));
+        //     var inputToAdd = {
+        //       controller: controllerName,
+        //       name: inputName,
+        //       type: input.type,
+        //       action: actions[input.action]
+        //     };
+
+        //     self.presets.get("Defaults").addInput(inputToAdd);
+        //   }
+        // }
+
+        // //Register with hardware
+        // self.controllers.forEach(function(controller) {
+        //   console.log("WOHOO", controller);
+        //   controller.addInput(inputToAdd);
+        // });
       });
 
       this.cockpit.on('plugin.inputController.sendPreset', function() {
@@ -215,6 +242,19 @@
       self.cockpit.emit('plugin.inputController.updatedPreset', currentPreset);
     };
 
+    registerInput(input)
+    {
+      var self = this;
+
+      if(input == null)
+      {
+        trace("Tried to register a null input");
+        return;
+      }
+
+      self.registerInputWithPreset(input);
+      self.registerInputWithHardware(input);
+    };
 
     //Registration of a single input
     //This function will register an input with the passed preset
@@ -238,32 +278,41 @@
     {
       var self = this;
 
-      //iterate through controllers associated with the input
-      input.controllers.forEach(function(value, controller) {
-        
-        //Grab the hardware interface and add the binding
-        var hardware = self.controllers.get(controller);
-        hardware.register(value, input.actions);
+      var inputForHardware = {
+        name: input.name,
+        controller: input.controller,
+        type: input.type,
+        action: self.actions.get(input.action)[input.type]
+      };
 
-      });
+      //iterate through controllers associated with the input
+      var hardware = self.controllers.get(inputForHardware.controller);
+      hardware.registerInput(inputForHardware);
     };
 
-    registerInputWithPreset(input, preset)
+    registerInputWithPreset(input)
     {
       var self = this;
 
-      var currentPreset = self.presets.get(preset);
+      var currentPreset = self.presets.get(self.currentPreset);
 
       //If this preset already exists, just update the preset
-      if(currentPreset.inputs.has(input.name))
+      console.log("CURRENT PRESET:", currentPreset);
+
+      if(!self.actions.has(input.action))
       {
-        log_debug("Input:", input.name, "already is registered with preset:", currentPreset.name);
+        console.error("Action does not exist", input.action);
+        return;
       }
-      else
-      {
-        currentPreset.addInput(input);
-      }
-      
+
+      var inputForPreset = {
+        name: input.name,
+        controller: input.controller,
+        type: input.type,
+        action: self.actions.get(input.action)[input.type]
+      };
+
+      currentPreset.registerInput(inputForPreset);
     };
 
     resetControllers()
@@ -312,7 +361,7 @@
       //Ignore until time
       self.ignoreInputUntil = 0;
 
-      //Bindings
+      //Bindingsadding
       self.gamepadHardware.bind(HTML5Gamepad.Event.AXIS_CHANGED, function(e) {
         if(self.currentTime.getTime() < self.ignoreInputUntil)
         {
@@ -392,6 +441,20 @@
       self.gamepadAbstraction = new GamepadAbstraction(cockpit);
     };
 
+    addInput(input)
+    {
+      var self = this;
+      console.log("ADDING INPUT TO GP:", input);
+    };
+
+
+    registerInput(input)
+    {
+      var self = this;
+
+      self.gamepadAbstraction.assignments.set(input.name, input.action);
+    };
+
     register(key, actions)
     {
       var self = this;
@@ -452,8 +515,41 @@
       log("Started keyboard abstraction");
     };
 
-    //Prevents registration of uninteded key presses
+    
+    addInput(input)
+    {
+      var self = this;
+      console.log("ADDING INPUT TO Mousetrap:", input);
+    };
 
+    registerInput(input)
+    {
+      var self = this;
+
+      if(self.mousetrap.modified == undefined) 
+      {
+        var orgStopCalback = self.mousetrap.prototype.stopCallback;
+        self.mousetrap.prototype.stopCallback = function (e, element, combo, sequence) 
+        {
+          if ((' ' + element.className + ' ').indexOf(' no-mousetrap ') > -1) {
+            return true;
+          }
+          return orgStopCalback.call(this, e, element, combo, sequence);
+        };
+        self.mousetrap.modified = true;
+      }
+
+      if(input.action.up !== undefined)
+      {
+        Mousetrap.bind(input.name, input.action.up, 'keyup');
+      }
+
+      if(input.action.down !== undefined)
+      {
+        self.mousetrap.bind(input.name, input.action.down, 'keydown');
+      }
+      
+    };
 
     register(key, actions)
     {

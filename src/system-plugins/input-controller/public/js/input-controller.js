@@ -94,7 +94,7 @@
       var self = this;
 
       //Make sure that mousetrap is loaded before loading the plugin defaults
-      if(typeof Mousetrap == "undefined")
+      if((typeof Mousetrap == "undefined") || (typeof self.mousetrap == "undefined"))
       {
         return;
       }

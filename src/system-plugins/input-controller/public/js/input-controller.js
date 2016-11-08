@@ -433,7 +433,7 @@
     unregisterInput(input)
     {
       var self = this;
-      if(key == null)
+      if(input == null)
       {
         trace("Tried to unregister an undefined key with gamepad");
         return;

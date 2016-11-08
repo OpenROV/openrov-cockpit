@@ -48,193 +48,247 @@
       return input;
     }
 
-    self.inputDefaults = [
+    self.actions = 
     {
-        name: 'rovPilot.moveForward',
-        shortName: "Move forward",
+      'rovPilot.moveForward':
+      {
         description: 'Set throttle forward',
-        controllers: new Map([["keyboard", "up"]]),
-        actions:
+        controls:
         {
-          down: function() {
-            rov.cockpit.emit('plugin.rovpilot.setThrottle', 1);
-          },
-          up: function() {
-            rov.cockpit.emit('plugin.rovpilot.setThrottle', 0);
+          button:
+          {
+            down: function() {
+              rov.cockpit.emit('plugin.rovpilot.setThrottle', 1);
+            },
+            up: function() {
+              rov.cockpit.emit('plugin.rovpilot.setThrottle', 0);
+            }           
           }
         }
-    },
-    {
-        name: 'rovPilot.moveBackwards',
-        shortName: "Move backwards",
+      },
+      'rovPilot.moveBackwards':
+      {
         description: 'Set throttle backwards (aft)',
-        controllers: new Map([["keyboard", "down"]]),
-        actions:
+        controls:
         {
-          down: function() {
-            rov.cockpit.emit('plugin.rovpilot.setThrottle', -1);
-          },
-          up: function() {
-            rov.cockpit.emit('plugin.rovpilot.setThrottle', 0);
+          button:
+          {
+            down: function() {
+              rov.cockpit.emit('plugin.rovpilot.setThrottle', -1);
+            },
+            up: function() {
+              rov.cockpit.emit('plugin.rovpilot.setThrottle', 0);
+            }           
           }
         }
-    },
-    {
-        name: 'rovPilot.moveThrottle',
-        shortName: "Command throttle with gamepad thumbsticks",
-        description: 'Set throttle via axis input',
-        controllers: new Map([["gamepad", "LEFT_STICK_Y"]]),
-        actions:
+      },
+      'rovPilot.moveThrottle':
+      {
+        description: "Command throttle with gamepad thumbsticks",
+        controls:
         {
-          axis: function(v) {
-            rov.cockpit.emit('plugin.rovpilot.setThrottle', -1 * postProcessStickValues(v));
+          axis: 
+          {
+            update: function(value) {
+              rov.cockpit.emit('plugin.rovpilot.setThrottle', -1 * postProcessStickValues(value));
+            }
           }
         }
-    },
-    {
-        name: 'rovPilot.moveYaw',
-        shortName: "Command yaw with gamepad thumbsticks",
-        description: 'Turn the ROV via the axis input',
-        controllers: new Map([["gamepad", "LEFT_STICK_X"]]),
-        actions:
+      },
+      'rovPilot.moveYaw':
+      {
+        description: "Command yaw with gamepad thumbsticks",
+        controls:
         {
-          axis: function(v) {
-            rov.cockpit.emit('plugin.rovpilot.setYaw', postProcessStickValues(v));
+          axis: 
+          {
+            update: function(value) {
+              rov.cockpit.emit('plugin.rovpilot.setYaw', postProcessStickValues(value));
+            }
           }
         }
-    },
-    {
-        name: 'rovPilot.moveLeft',
-        shortName: "Move left",
-        description: 'Turn the ROV via the axis input',
-        controllers: new Map([["keyboard", "left"]]),
-        actions:
+      },
+      'rovPilot.moveLeft':
+      {
+        description: "Move left",
+        controls:
         {
+          button:
+          {
             down: function() {
               rov.cockpit.emit('plugin.rovpilot.setYaw', -1);
             },
             up: function() {
               rov.cockpit.emit('plugin.rovpilot.setYaw', 0);
-            }
-        }
-    },
-    {
-        name: 'rovPilot.moveRight',
-        shortName: "Move right",
-        description: 'Turn the ROV to the starboard (right) side',
-        controllers: new Map([["keyboard", "right"]]),
-        actions:
-        {
-          down: function() {
-            rov.cockpit.emit('plugin.rovpilot.setYaw', 1);
-          },
-          up: function() {
-            rov.cockpit.emit('plugin.rovpilot.setYaw', 0);
+            }           
           }
         }
-    },
-    {
-        name: 'rovPilot.moveLift',
-        shortName: "Command depth with gamepad thumbsticks",
-        description: 'Bring the ROV shallower or deeper via axis input.',
-        controllers: new Map([["gamepad", "RIGHT_STICK_Y"]]),
-        actions:
-        {
-          axis: function(v) {
-            rov.cockpit.emit('plugin.rovpilot.setLift', -1 * postProcessStickValues(v));
-          }
-        }
-    },
-    {
-        name: 'rovPilot.moveUp',
-        shortName: "Ascend",
-        description: 'Bring the ROV shallower (up)',
-        controllers: new Map([["keyboard", "shift"]]),
-        actions:
-        {
-          down: function() {
-            rov.cockpit.emit('plugin.rovpilot.setLift', -1);
-          },
-          up: function() {
-            rov.cockpit.emit('plugin.rovpilot.setLift', 0);
-          }
-        }
-    },
-    {
-        name: 'rovPilot.moveDown',
-        shortName: "Descend",
-        description: 'Bring the ROV deeper (down)',
-        controllers: new Map([["keyboard", "ctrl"]]),
-        actions:
-        {
-          down: function() {
-            rov.cockpit.emit('plugin.rovpilot.setLift', 1);
-          },
-          up: function() {
-            rov.cockpit.emit('plugin.rovpilot.setLift', 0);
-          }
-        }
-    },
-    {
-        name: 'rovPilot.powerLevel1',
-        shortName: "Power Level 1",
-        description: 'Set the power level of the ROV to level 1',
-        controllers: new Map([["keyboard", "1"]]),
-        actions:
-        {
-          down: function() {
-            rov.cockpit.emit('plugin.rovpilot.setPowerLevel', 1);
-          }
-        }
-    },
-    {
-        name: 'rovPilot.powerLevel2',
-        shortName: "Power Level 2",
-        description: 'Set the power level of the ROV to level 2',
-        controllers: new Map([["keyboard", "2"]]),
-        actions:
-        {
-          down: function() {
-            rov.cockpit.emit('plugin.rovpilot.setPowerLevel', 2);
-          }
-        }
-    },
+      },
+      'rovPilot.moveRight':
       {
-        name: 'rovPilot.powerLevel3',
-        shortName: "Power Level 3",
-        description: 'Set the power level of the ROV to level 3',
-        controllers: new Map([["keyboard", "3"]]),
-        actions:
+        description: "Move right",
+        controls:
         {
-          down: function() {
-            rov.cockpit.emit('plugin.rovpilot.setPowerLevel', 3);
+          button:
+          {
+            down: function() {
+              rov.cockpit.emit('plugin.rovpilot.setYaw', 1);
+            },
+            up: function() {
+              rov.cockpit.emit('plugin.rovpilot.setYaw', 0);
+            }           
           }
         }
-    },
+      },
+      'rovPilot.moveLift':
+      {
+        description: "Command depth with gamepad thumbsticks",
+        controls:
+        {
+          axis: 
+          {
+            update: function(value) {
+              rov.cockpit.emit('plugin.rovpilot.setLift', -1 * postProcessStickValues(value));
+            }
+          }
+        }
+      },
+      'rovPilot.moveUp':
+      {
+        description: "Ascend",
+        controls:
+        {
+          button:
+          {
+            down: function() {
+              rov.cockpit.emit('plugin.rovpilot.setLift', -1);
+            },
+            up: function() {
+              rov.cockpit.emit('plugin.rovpilot.setLift', 0);
+            }           
+          }
+        }
+      },
+      'rovPilot.moveDown':
+      {
+        description: "Descend",
+        controls:
+        {
+          button:
+          {
+            down: function() {
+              rov.cockpit.emit('plugin.rovpilot.setLift', 1);
+            },
+            up: function() {
+              rov.cockpit.emit('plugin.rovpilot.setLift', 0);
+            }           
+          }
+        }
+      },
+      'rovPilot.powerLevel1':
+      {
+        description: "Set power level to 1",
+        controls:
+        {
+          button:
+          {
+            down: function() {
+              rov.cockpit.emit('plugin.rovpilot.setPowerLevel', 1);
+            }          
+          }
+        }
+      },
+      'rovPilot.powerLevel2':
+      {
+        description: "Set power level to 2",
+        controls:
+        {
+          button:
+          {
+            down: function() {
+              rov.cockpit.emit('plugin.rovpilot.setPowerLevel', 2);
+            }          
+          }
+        }
+      },
+      'rovPilot.powerLevel3':
+      {
+        description: "Set power level to 3",
+        controls:
+        {
+          button:
+          {
+            down: function() {
+              rov.cockpit.emit('plugin.rovpilot.setPowerLevel', 3);
+            }          
+          }
+        }
+      },
+      'rovPilot.powerLevel4':
+      {
+        description: "Set power level to 4",
+        controls:
+        {
+          button:
+          {
+            down: function() {
+              rov.cockpit.emit('plugin.rovpilot.setPowerLevel', 4);
+            }          
+          }
+        }
+      },
+      'rovPilot.powerLevel5':
+      {
+        description: "Set power level to 5",
+        controls:
+        {
+          button:
+          {
+            down: function() {
+              rov.cockpit.emit('plugin.rovpilot.setPowerLevel', 5);
+            }          
+          }
+        }
+      }
+    };
+
+    self.inputDefaults =
     {
-        name: 'rovPilot.powerLevel4',
-        shortName: "Power Level 4",
-        description: 'Set the power level of the ROV to level 4',
-        controllers: new Map([["keyboard", "4"]]),
-        actions:
-        {
-          down: function() {
-            rov.cockpit.emit('plugin.rovpilot.setPowerLevel', 4);
-          }
-        }
-    },
-    {
-        name: 'rovPilot.powerLevel5',
-        shortName: "Power Level 5",
-        description: 'Set the power level of the ROV to level 5',
-        controllers: new Map([["keyboard", "5"]]),
-        actions:
-        {
-          down: function() {
-            rov.cockpit.emit('plugin.rovpilot.setPowerLevel', 5);
-          }
-        }
-    }];
+      keyboard:
+      {
+        "up": { type: "button",
+               action: 'rovPilot.moveForward' },
+        "down": { type: "button",
+               action: 'rovPilot.moveBackwards' },
+        "left": { type: "button",
+               action: 'rovPilot.moveLeft' },
+        "right": { type: "button",
+               action: 'rovPilot.moveRight' },
+        "shift": { type: "button",
+               action: 'rovPilot.moveUp' },       
+        "ctrl": { type: "button",
+               action: 'rovPilot.moveDown' }, 
+        "1": { type: "button",
+               action: 'rovPilot.powerLevel1' }, 
+        "2": { type: "button",
+               action: 'rovPilot.powerLevel2' }, 
+        "3": { type: "button",
+               action: 'rovPilot.powerLevel3' }, 
+        "4": { type: "button",
+               action: 'rovPilot.powerLevel4' }, 
+        "5": { type: "button",
+               action: 'rovPilot.powerLevel5' }, 
+      },
+      gamepad:
+      {
+        "LEFT_STICK_Y": { type: "axis",
+                          action: 'rovPilot.moveThrottle' },
+        "LEFT_STICK_X": { type: "axis",
+                          action: 'rovPilot.moveYaw' },
+        "RIGHT_STICK_Y": { type: "axis",
+                          action: 'rovPilot.moveLift' },
+      }
+    };
   };
 
   ROVpilot.prototype.altMenuDefaults = function altMenuDefaults() {

@@ -5,18 +5,31 @@
     var self = this;
     self.cockpit = cockpit;
     
-    this.inputDefaults = [
+    this.actions = 
     {
-      name: 'plugin.navigationData.toggleHeadsUpDisplay',
-      description: "Toggle HUD",
-      controllers: new Map([["keyboard", '\\']]),
-      actions:
+      'plugin.navigationData.toggleHeadsUpDisplay':
       {
-        down: function() {
-          cockpit.emit('plugin.navigationData.toggleHeadsUpDisplay');
+        description: "Toggle HUD",
+        controls:
+        {
+          button:
+          {
+            down: function() {
+              cockpit.emit('plugin.navigationData.toggleHeadsUpDisplay');
+            }           
+          }
         }
       }
-    }];
+    };
+
+    this.inputDefaults = 
+    {
+      keyboard:
+      {
+        "\\": { type: "button",
+                action: 'plugin.navigationData.toggleHeadsUpDisplay' }
+      }
+    };
 
   };
   plugins.navigationData.prototype.getTelemetryDefinitions = function getTelemetryDefinitions() {

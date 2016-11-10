@@ -99,8 +99,6 @@
 
   InputConfigurator.prototype.sendToInputController = function (mapping) {
     var self = this;
-<<<<<<< HEAD
-
     var control = { 
       name: mapping.name, 
       bindings: {}
@@ -113,12 +111,6 @@
     console.log("Sending update binding call");
     self.cockpit.emit('InputController.updateBinding', control, function() {  
       console.log('done');  
-=======
-    var control = { name: mapping.name, bindings: {}};
-    mapping.bindings.forEach(function(aBinding) { control.bindings[aBinding.name] = aBinding.binding })
-    self.cockpit.emit('InputController.updateBinding', control, function() { 
-      // console.log('done');  
->>>>>>> a6c7c5542c0bd4b85a87e9d509cb900f178c1b08
     });
   };
 

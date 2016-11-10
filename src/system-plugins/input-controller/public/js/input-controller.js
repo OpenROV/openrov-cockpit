@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 (function(window, document) 
 {
   'use strict';
@@ -17,15 +16,6 @@
 
   var recordPluginNeeded = true;
 
-=======
-(function (window, document) {
-  var log,trace,log_debug;
-  $.getScript('components/visionmedia-debug/dist/debug.js', function () {  
-    log = debug('input-controlller:log');
-    trace = debug('input-controlller:trace') 
-    log_debug = debug('input-controlller:debug')   
-  });
->>>>>>> a6c7c5542c0bd4b85a87e9d509cb900f178c1b08
   var inputController = namespace('systemPlugin.inputController');
   inputController.InputController = class InputController
   {
@@ -138,23 +128,6 @@
           }
         }
       });
-<<<<<<< HEAD
-=======
-      if (duplicateInformation.length > 0) {
-        self.cockpit.emit('plugin-input-controller-duplicates', duplicateInformation);
-        trace('Found duplicate commands: \n' + duplicateInformation.join('\n'));
-      }
-    };
-    return self;
-  };
-  inputController.InputController.prototype.register = function (control) {
-    this._register(control, true);
-  };
-  
-  inputController.InputController.prototype.commands = function() {
-    return this.model.commands();
-  };
->>>>>>> a6c7c5542c0bd4b85a87e9d509cb900f178c1b08
 
 
       this.cockpit.on('plugin.inputController.sendPreset', function() {
@@ -315,7 +288,6 @@
       {
         trace("Tried to update a null input");
         return;
-<<<<<<< HEAD
       }
 
       //Unregister with current preset
@@ -388,18 +360,6 @@
           if(typeof assignment.axis == 'function')
           {
             assignment.axis(e.value);
-=======
-      var command = new inputController.Command(aControl);
-      self.registerdCommands[command.name] = command;
-      self.model.commands.push(command);
-      self.cockpit.emit('InputController.registeredCommand', command);
-      trace('InputController: Registering control ' + command.name);
-      self.controllers.forEach(function (controller) {
-        if (command.active) {
-          controller.register(command);
-          for (var property in command.bindings) {
-            self.registerdControls[property + ':' + command.bindings[property]] = command;
->>>>>>> a6c7c5542c0bd4b85a87e9d509cb900f178c1b08
           }
         }
       });
@@ -415,7 +375,6 @@
             button.down();
           }
         }
-<<<<<<< HEAD
       });
 
       self.gamepadHardware.bind(HTML5Gamepad.Event.BUTTON_UP, function(e) {
@@ -428,30 +387,6 @@
           {
             button.up();
           }
-=======
-      }
-    });
-    self.controllers.forEach(function (controller) {
-      controller.reset();
-    });
-    var commandsToRegister = [];
-    for (var command in self.registerdCommands) {
-      commandsToRegister.push(self.registerdCommands[command]);
-    }
-    self.model.commands.length = 0;
-    self._register(commandsToRegister, false);
-  };
-  inputController.InputController.prototype.activate = function (controlName) {
-    var self = this;
-    var controlsToActivate = [].concat(controlName);
-    controlsToActivate.forEach(function (commandName) {
-      var command = self.registerdCommands[commandName];
-      command.replaced = [];
-      for (var property in command.bindings) {
-        if (self.registerdControls[property + ':' + command.bindings[property]] !== undefined) {
-          trace('There is a conflict with ' + self.registerdControls[property + ':' + command.bindings[property]].name);
-          command.replaced.push(self.registerdControls[property + ':' + command.bindings[property]]);
->>>>>>> a6c7c5542c0bd4b85a87e9d509cb900f178c1b08
         }
       });
 
@@ -474,33 +409,7 @@
         trace("Your browser doesn't support this gamepad");
         return;
       }
-<<<<<<< HEAD
-
     };
-
-=======
-      command.active = true;
-      self._register(command, false);
-      trace('activated command ' + command.name);
-    });
-  };
-  inputController.InputController.prototype.deactivate = function (controlName) {
-    var self = this;
-    var controlsToDeactivate = [].concat(controlName);
-    controlsToDeactivate.forEach(function (commandName) {
-      var command = self.registerdCommands[commandName];
-      if (command) {
-        command.active = false;
-        self.unregister(command);
-        command.replaced.forEach(function(oldcommand){
-          self._register(oldcommand, false);
-          trace('re-activated ' + oldcommand.name);
-        });
-        command.replaced = [];
-        trace('Deactivated command ' + command.name);
-      }
-    });
->>>>>>> a6c7c5542c0bd4b85a87e9d509cb900f178c1b08
   };
 
   /*Gamepad interface*/

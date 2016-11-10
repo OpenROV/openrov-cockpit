@@ -183,23 +183,6 @@
             newData = data;
 
           });
-          setInterval(function(){
-            if (newData==lastData) return;
-            lastData=newData;
-            var data=newData;
-              if ('voltage' in data.board){
-                self.setVoltage(parseFloat(data.board.voltage));
-              };
-
-              if ('port' in data.battery.current){
-                self.setLeftBattery(parseFloat(data.battery.current.port));
-              };
-
-              if ('starboard' in data.battery.current){
-                self.setRightBattery(parseFloat(data.battery.current.starboard));
-              };            
-            
-          },500)
 
           emitter.withHistory.on('settings-change.batteryDefintions', function(settings){
             var selectedBattery = settings.batteryDefintions.selectedBattery;
@@ -266,7 +249,26 @@
           this.setVoltage(this.voltage);
           this.setLeftBattery(this.leftCurrent);
           this.setRightBattery(this.rightCurrent);
+          this._dataThrottleInterval=setInterval(function(){
+            if (newData==lastData) return;
+            lastData=newData;
+            var data=newData;
+              if ('voltage' in data.board){
+                self.setVoltage(parseFloat(data.board.voltage));
+              };
 
+              if ('port' in data.battery.current){
+                self.setLeftBattery(parseFloat(data.battery.current.port));
+              };
+
+              if ('starboard' in data.battery.current){
+                self.setRightBattery(parseFloat(data.battery.current.starboard));
+              };            
+            
+          },500)
+        },
+        detached:function(){
+          clearInterval(this._dataThrottleInterval);          
         }
       });
     }());

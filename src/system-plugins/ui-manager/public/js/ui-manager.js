@@ -9,11 +9,9 @@
   plugins.UIManager.prototype.listen = function listen() {
     var template = $('#t')[0];
     template.addEventListener('dom-change', function () {
-      console.log('boom');
       window.dispatchEvent(new Event('resize'));
     });
     template.addEventListener('routedata-changed', function () {
-      console.log('scriplet change');
       window.dispatchEvent(new Event('resize'));
     });
     template.cockpitEventEmitter = this.cockpit;

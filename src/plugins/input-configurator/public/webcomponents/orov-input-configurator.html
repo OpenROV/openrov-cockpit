@@ -311,7 +311,6 @@
                 ["RIGHT_STICK_X", "axis"],
                 ["RIGHT_STICK_Y", "axis"]
             ];
-
             var gamepadMap = new Map(gamepadTypes);
 
             Polymer({
@@ -398,6 +397,37 @@
                     
                 },
 
+                //Check for duplicated gamepad inputs
+                checkForGamepadDuplicates: function() {
+                    var self = this;
+
+                    if(self.presetArray == undefined || self.candidateBinding == undefined)
+                    {
+                        return;
+                    }
+
+                    //Check if this is a valid binding
+                    var isDuplicate = self.presetArray.some(function(element, index, array) {
+                        self.conflictingBinding = element;
+                        if(element.bindings.gamepad !== undefined)
+                        {
+                            return element.bindings.gamepad.name == self.candidateBinding;
+                        }
+                    });
+
+                    if(isDuplicate)
+                    {
+                        self.openDuplicateInputToast();
+                        self.isValidGamepadReplacement = false;                       
+                    }
+                    else
+                    {
+                        self.isValidGamepadReplacement = true;
+                        self.updateGamepadInput();
+                    }
+                },
+                
+                //Check for duplicated keyboard inputs
                 checkForKeyboardDuplicates: function() {
                     var self = this;
 
@@ -428,36 +458,28 @@
                     }
                 },
 
-                checkForGamepadDuplicates: function() {
+                //Update an existing gamepad binding
+                updateGamepadInput: function() {
                     var self = this;
 
-                    if(self.presetArray == undefined || self.candidateBinding == undefined)
-                    {
-                        return;
-                    }
-
-                    //Check if this is a valid binding
-                    var isDuplicate = self.presetArray.some(function(element, index, array) {
-                        self.conflictingBinding = element;
-                        if(element.bindings.gamepad !== undefined)
-                        {
-                            return element.bindings.gamepad.name == self.candidateBinding;
+                    var updatedInput = {
+                        action: self.selectedItem.name,
+                        input: {
+                            name: self.candidateBinding,
+                            controller: "gamepad",
+                            type: gamepadMap.get(self.candidateBinding)
                         }
-                    });
+                    };
+                    self.eventEmitter.emit('plugin.inputController.updateInput', updatedInput);
 
-                    if(isDuplicate)
-                    {
-                        self.openDuplicateInputToast();
-                        self.isValidGamepadReplacement = false;                       
-                    }
-                    else
-                    {
-                        self.isValidGamepadReplacement = true;
-                        self.updateGamepadInput();
-                    }
+                    //Open the update toast
+                    self.openUpdatePresetToast();
+
+                    //And close the modal
+                    self.$.gamepadModal.close();
                 },
-                
 
+                //Update an existing keyboard binding
                 updateKeyboardInput: function() {
                     var self = this;
 
@@ -480,116 +502,38 @@
                     self.$.keyboardModal.close();
                 },
 
-                hasActionType: function(actionName, typeIn) {
+                //Clear a conflicting gamepad binding
+                handleClearConflictingGamepadBinding: function() {
                     var self = this;
 
-                    //Get the action
-                    var action = self.actions.get(actionName);
+                    //Format in a way that the input controller expects
+                    var clearedInput = {
+                        action: self.conflictingBinding.name,
+                        input: self.conflictingBinding.bindings.gamepad
+                    };
 
-                    for(var type in action.controls)
-                    {
-                        //If this type is equivalent, we are ok
-                        if(type == typeIn)
-                        {
-                            return true;
-                        }
-                    }
+                    //Let the input controller know
+                    self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
 
-                    return false;
-                },
+                    self.updateGamepadInput();
+                    self.openUpdatePresetToast();
+                }, 
 
-                updateGamepadInput: function() {
+                //Clear a conflicting keyboard binding
+                handleClearConflictingKeyboardBinding: function() {
                     var self = this;
 
-                    //Check to see if this is valid replacement
-                    if(self.hasActionType(self.selectedItem.name, gamepadMap.get(self.candidateBinding)))
-                    {
+                    //Format in a way that the input controller expects
+                    var clearedInput = {
+                        action: self.conflictingBinding.name,
+                        input: self.conflictingBinding.bindings.keyboard
+                    };
 
-                        var updatedInput = {
-                            action: self.selectedItem.name,
-                            input: {
-                                name: self.candidateBinding,
-                                controller: "gamepad",
-                                type: gamepadMap.get(self.candidateBinding)
-                            }
-                        };
-                        self.eventEmitter.emit('plugin.inputController.updateInput', updatedInput);
-
-                        //Open the update toast
-                        self.openUpdatePresetToast();
-
-                        //And close the modal
-                        self.$.gamepadModal.close();
-                    }
-                    else
-                    {
-                        console.error("Crap");
-                    }
-                },
-
-                openDuplicateInputToast: function() {
-                    this.$.duplicateInputToast.open();
-                },
-
-                openClearGamepadDuplicateWarning: function() {
-                    var self = this;
-                    self.$.clearGamepadDuplicateWarningModal.open();
-                },
-
-                openClearKeyboardDuplicateWarning: function() {
-                    var self = this;
-                    self.$.clearKeyboardDuplicateWarningModal.open();
-                },
-
-                openUpdatePresetToast: function() {
-                    var self = this;
-
-                    self.candidateBinding = undefined;
-                    self.$.updatedPresetToast.open();
-                },
-
-                openInvalidGamepadTypeModal: function() {
-                    var self = this;
-                    self.$.invalidGamepadTypeModal.open();
-                },
-
-                //Reset the candidateBinding on keyboard modal closed
-                onKeyboardModalClosed : function() {
-                    var self = this;
+                    //Let the input controller know
+                    self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
                     
-                },
-                
-                //Reset the candidateBinding on gamepad modal closed
-                onGamepadModalClosed : function() {
-                    var self = this;
-                    
-                },
-                
-                //Function to achieve the sticky table headers with pure CSS.
-                tableContainerScroll: function() {
-                    var self = this;
-
-                    /*CSS way to do sticky headers*/
-                    var translate = "translate(0," + self.$.tableContainer.scrollTop + "px)";
-                    self.$.stickyHeader.style.transform = translate;
-                },
-
-                //Handles clearing an existing keyboard command
-                handleClearKeyboardBinding: function() {
-                    var self = this;
-
-                    if(self.selectedItem.bindings.keyboard !== undefined)
-                    {
-                        //Clear the input from our presets
-                        //Let the input controller know the new configurations
-                        var clearedInput = {
-                            action: self.selectedItem.name,
-                            input: self.selectedItem.bindings.keyboard
-                        };
-                        self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
-                    }
-
-                    this.$.clearedInputToast.open();
+                    self.updateKeyboardInput();
+                    self.openUpdatePresetToast();
                 },
 
                 //Handles clearing an existing gamepad command
@@ -611,56 +555,24 @@
                     this.$.clearedInputToast.open();
                 },
 
-                handleClearConflictingKeyboardBinding: function() {
+                //Handles clearing an existing keyboard command
+                handleClearKeyboardBinding: function() {
                     var self = this;
 
-                    //Format in a way that the input controller expects
-                    var clearedInput = {
-                        action: self.conflictingBinding.name,
-                        input: self.conflictingBinding.bindings.keyboard
-                    };
+                    if(self.selectedItem.bindings.keyboard !== undefined)
+                    {
+                        //Clear the input from our presets
+                        //Let the input controller know the new configurations
+                        var clearedInput = {
+                            action: self.selectedItem.name,
+                            input: self.selectedItem.bindings.keyboard
+                        };
+                        self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
+                    }
 
-                    //Let the input controller know
-                    self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
-                    
-                    self.updateKeyboardInput();
-                    self.openUpdatePresetToast();
+                    this.$.clearedInputToast.open();
                 },
-
-                handleClearConflictingGamepadBinding: function() {
-                    var self = this;
-
-                    //Format in a way that the input controller expects
-                    var clearedInput = {
-                        action: self.conflictingBinding.name,
-                        input: self.conflictingBinding.bindings.gamepad
-                    };
-
-                    //Let the input controller know
-                    self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
-
-                    self.updateGamepadInput();
-                    self.openUpdatePresetToast();
-                },             
-
-                //User has clicked a keyboard symbol
-                handleKeyboardChange: function(e) {
-                    var self = this;
-                    var inputPressed = e.model.item;
-                    self.selectedItem = inputPressed;
-                    
-                    this.$.keyboardModal.open();
-                },
-
-                //Keyboard modal has opened
-                handleKeyboardFocus: function(e) {
-                    var self = this;
-
-                    //Reset our state
-                    self.isListeningToKeyboard = false;
-                    self.isValidKeyboardReplacement = true;
-                },
-
+                
                 //User has clicked a gamepad symbol
                 handleGamepadChange: function(e) {
                     var self = this;
@@ -699,6 +611,24 @@
                     
                 },
 
+                //User has clicked a keyboard symbol
+                handleKeyboardChange: function(e) {
+                    var self = this;
+                    var inputPressed = e.model.item;
+                    self.selectedItem = inputPressed;
+                    
+                    this.$.keyboardModal.open();
+                },
+
+                //Keyboard modal has opened
+                handleKeyboardFocus: function(e) {
+                    var self = this;
+
+                    //Reset our state
+                    self.isListeningToKeyboard = false;
+                    self.isValidKeyboardReplacement = true;
+                },
+
                 handleKeyboardRemapping: function() {
                     var self = this;
 
@@ -714,6 +644,57 @@
                     });
 
                 },
+
+                //Checks to see if this action accepts this type
+                hasActionType: function(actionName, typeIn) {
+                    var self = this;
+
+                    //Get the action
+                    var action = self.actions.get(actionName);
+
+                    for(var type in action.controls)
+                    {
+                        //If this type is equivalent, we are ok
+                        if(type == typeIn)
+                        {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                },
+
+                onKeyboardModalClosed : function() {
+                    var self = this;
+                },
+
+                onGamepadModalClosed : function() {
+                    var self = this;  
+                },
+
+                //Toasts and modals
+                openClearGamepadDuplicateWarning: function() {
+                    var self = this;
+                    self.$.clearGamepadDuplicateWarningModal.open();
+                },
+                openClearKeyboardDuplicateWarning: function() {
+                    var self = this;
+                    self.$.clearKeyboardDuplicateWarningModal.open();
+                },
+                openDuplicateInputToast: function() {
+                    this.$.duplicateInputToast.open();
+                },
+                openInvalidGamepadTypeModal: function() {
+                    var self = this;
+                    self.$.invalidGamepadTypeModal.open();
+                },
+                openUpdatePresetToast: function() {
+                    var self = this;
+
+                    self.candidateBinding = undefined;
+                    self.$.updatedPresetToast.open();
+                },
+
 
                 //Converts a preset object(hash map) to a consumable array for the input configurator
                 presetToArray: function(preset) {
@@ -746,6 +727,15 @@
 
                     self.presetArray = arrayPreset;
                     return arrayPreset;
+                },
+
+                //Function to achieve the sticky table headers with pure CSS.
+                tableContainerScroll: function() {
+                    var self = this;
+
+                    /*CSS way to do sticky headers*/
+                    var translate = "translate(0," + self.$.tableContainer.scrollTop + "px)";
+                    self.$.stickyHeader.style.transform = translate;
                 }
             })
         })();

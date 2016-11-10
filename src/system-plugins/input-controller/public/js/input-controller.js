@@ -357,9 +357,9 @@
         if(self.assignments.has(axis))
         {
           var assignment = self.assignments.get(axis);
-          if(typeof assignment.axis == 'function')
+          if(typeof assignment.update == 'function')
           {
-            assignment.axis(e.value);
+            assignment.update(e.value);
           }
         }
       });
@@ -473,8 +473,8 @@
 
       //Register the new input
       var inputToRegister = {
-        name: newInput.name,
-        action: action
+        action: action,
+        input: newInput.input
       };
 
       self.registerInput(inputToRegister);     
@@ -543,7 +543,6 @@
 
       self.mousetrap.unbind(inputIn.name, 'keydown');
       self.mousetrap.unbind(inputIn.name, 'keyup');
-
     };
 
 

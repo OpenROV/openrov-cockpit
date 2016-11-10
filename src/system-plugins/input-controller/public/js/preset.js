@@ -16,89 +16,69 @@
             
             self.name = presetName;
 
-            //The controllers this preset will hold
-            self.controllers = new Map();
+            //The actions this preset will hold
+            self.actions = new Map();
         };
 
-        addController(controllerIn)
+        addAction(actionIn)
         {
-            if(controllerIn == null)
+            if(actionIn == null)
             {
-                console.error("Tried to add a null controller");
+                console.error("Tried to add a null action");
                 return;
             }
 
             var self = this;
 
             //Check to see if this controller exists
-            if(self.controllers.has(controllerIn))
+            if(self.actions.has(actionIn))
             {
                 return;
             }
 
-            //Init with the default input classes we support. More can be added
-            var value = {
-                button: new Map(),
-                axis: new Map()
-            };
-
-            self.controllers.set(controllerIn, value);
+            //Set this action (string) to an empty array (for inputs)
+            self.actions.set(actionIn, new Map());
         };
 
 
-        registerInput(input)
+        registerInput(actionIn, inputIn)
         {
             var self = this;
 
-            if(input == null)
+            if(inputIn == null)
             {
                 console.error("Undefined input trying to register with preset");
                 return;
             }
 
             //Make sure the associated controller exists
-            if(!self.controllers.has(input.controller))
+            if(!self.actions.has(actionIn))
             {
-                console.error("Tried to add an input with an unregistered controller: ", input);
+                console.error("Tried to add an input with an unregistered action: ", inputIn);
                 return;
             }
 
-            var controller = self.controllers.get(input.controller);
-
             //Create a handle to the input type for this controller we will be adding an input to
-            var inputMap = controller[input.type];
-            inputMap.set(input.name, input.action);
+            var action = self.actions.get(actionIn);
+
+            action.set(inputIn.controller, inputIn);
         };
 
-        updateInput(input)
+        updateInput(actionIn, inputIn)
         {
             var self = this;
 
             //If this input exists update it
-            if(self.inputs.has(input.name))
-            {
-                //Grab the input
-                var existingInput = self.inputs.get(input.name);
-
-                //Update the controller
-                existingInput.controllers.set(input.controller, input.input);
-            }
-            else
-            {
-                console.log("Tried to update an input that doesn't exist with this preset. Adding it");
-                self.addInput(input);
-            }
+            var action = self.actions.get(actionIn);
+            action.set(inputIn.controller, inputIn);
         };
         
-        unregisterInput(input)
+        unregisterInput(actionIn, inputIn)
         {
             var self = this;
 
-            var controller = self.controllers.get(input.controller);
-            var inputType = input.type;
-
-            //Delete it
-            controller[inputType].delete(input.name);    
+            var action = self.actions.get(actionIn);
+            action.delete(inputIn.controller); 
         };
     };
 

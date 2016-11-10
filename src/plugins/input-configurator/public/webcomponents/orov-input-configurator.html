@@ -273,6 +273,34 @@
 
             var keyboardMap = ["", "", "", "CANCEL", "", "", "HELP", "", "BACK_SPACE", "TAB", "", "", "CLEAR", "ENTER", "RETURN", "", "SHIFT", "CTRL", "ALT", "PAUSE", "CAPSLOCK", "KANA", "EISU", "JUNJA", "FINAL", "HANJA", "", "ESC", "CONVERT", "NONCONVERT", "ACCEPT", "MODECHANGE", "SPACE", "PAGE_UP", "PAGE_DOWN", "END", "HOME", "LEFT", "UP", "RIGHT", "DOWN", "SELECT", "PRINT", "EXECUTE", "PRINTSCREEN", "INSERT", "DELETE", "", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", ";", "LESS_THAN", "=", "GREATER_THAN", "QUESTION_MARK", "AT", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "WIN", "", "CONTEXT_MENU", "", "SLEEP", "NUMPAD0", "NUMPAD1", "NUMPAD2", "NUMPAD3", "NUMPAD4", "NUMPAD5", "NUMPAD6", "NUMPAD7", "NUMPAD8", "NUMPAD9", "MULTIPLY", "ADD", "SEPARATOR", "SUBTRACT", "DECIMAL", "DIVIDE", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "F13", "F14", "F15", "F16", "F17", "F18", "F19", "F20", "F21", "F22", "F23", "F24", "", "", "", "", "", "", "", "", "NUM_LOCK", "SCROLL_LOCK", "WIN_OEM_FJ_JISHO", "WIN_OEM_FJ_MASSHOU", "WIN_OEM_FJ_TOUROKU", "WIN_OEM_FJ_LOYA", "WIN_OEM_FJ_ROYA", "", "", "", "", "", "", "", "", "", "CIRCUMFLEX", "EXCLAMATION", "\"", "#", "$", "%", "&", "_", "(", ")", "*", "+", "|", "HYPHEN_MINUS", "{", "}", "~", "", "", "", "", "VOLUME_MUTE", "VOLUME_DOWN", "VOLUME_UP", "", "", ";", "=", ",", "-", ".", "/", "`", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "[", "\\", "]", "'", "", "META", "ALTGR", "", "WIN_ICO_HELP", "WIN_ICO_00", "", "WIN_ICO_CLEAR", "", "", "WIN_OEM_RESET", "WIN_OEM_JUMP", "WIN_OEM_PA1", "WIN_OEM_PA2", "WIN_OEM_PA3", "WIN_OEM_WSCTRL", "WIN_OEM_CUSEL", "WIN_OEM_ATTN", "WIN_OEM_FINISH", "WIN_OEM_COPY", "WIN_OEM_AUTO", "WIN_OEM_ENLW", "WIN_OEM_BACKTAB", "ATTN", "CRSEL", "EXSEL", "EREOF", "PLAY", "ZOOM", "", "PA1", "WIN_OEM_CLEAR", ""];
 
+
+            //Mapping of gamepad objects to type
+            var gamepadTypes = [
+                ["A", "button"],
+                ["B", "button"],
+                ["X", "button"],
+                ["Y", "button"],
+                ["LB", "button"],
+                ["RB", "button"],
+                ["LEFT_TRIGGER", "button"],
+                ["RIGHT_TRIGGER", "button"],
+                ["LEFT_STICK", "button"],
+                ["RIGHT_STICK", "button"],
+                ["START", "button"],
+                ["BACK", "button"],
+                ["HOME", "button"],
+                ["DPAD_DOWN", "button"],
+                ["DPAD_LEFT", "button"],
+                ["DPAD_RIGHT", "button"],
+                ["DPAD_UP", "button"],
+                ["LEFT_STICK_X", "axis"],
+                ["LEFT_STICK_Y", "axis"],
+                ["RIGHT_STICK_X", "axis"],
+                ["RIGHT_STICK_Y", "axis"]
+            ];
+
+            var gamepadMap = new Map(gamepadTypes);
+
             Polymer({
                 is: "orov-input-configurator",
                 properties: {
@@ -369,7 +397,10 @@
                     //Check if this is a valid binding
                     var isDuplicate = self.presetArray.some(function(element, index, array) {
                         self.conflictingBinding = element;
-                        return element.bindings.keyboard == self.candidateBinding;
+                        if(element.bindings.keyboard !== undefined)
+                        {
+                            return element.bindings.keyboard.name == self.candidateBinding;
+                        } 
                     });
 
                     if( isDuplicate )
@@ -395,7 +426,10 @@
                     //Check if this is a valid binding
                     var isDuplicate = self.presetArray.some(function(element, index, array) {
                         self.conflictingBinding = element;
-                        return element.bindings.gamepad == self.candidateBinding;
+                        if(element.bindings.gamepad !== undefined)
+                        {
+                            return element.bindings.gamepad.name == self.candidateBinding;
+                        }
                     });
 
                     if(isDuplicate)
@@ -414,10 +448,14 @@
                 updateKeyboardInput: function() {
                     var self = this;
 
+                    
                     var updatedInput = {
-                        name: self.selectedItem.name,
-                        controller: "keyboard",
-                        input: self.candidateBinding 
+                        action: self.selectedItem.name,
+                        input: {
+                            name: self.candidateBinding,
+                            controller: "keyboard",
+                            type: "button"
+                        }
                     };
 
                     self.eventEmitter.emit('plugin.inputController.updateInput', updatedInput);
@@ -429,24 +467,51 @@
                     self.$.keyboardModal.close();
                 },
 
+                hasActionType: function(actionName, typeIn) {
+                    var self = this;
+
+                    //Get the action
+                    var action = self.actions.get(actionName);
+
+                    for(var type in action.controls)
+                    {
+                        //If this type is equivalent, we are ok
+                        if(type == typeIn)
+                        {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                },
+
                 updateGamepadInput: function() {
                     var self = this;
 
-                    var updatedInput = {
-                        name: self.selectedItem.name,
-                        controller: "gamepad",
-                        input: self.candidateBinding 
-                    };
+                    //Check to see if this is valid replacement
+                    if(self.hasActionType(self.selectedItem.name, gamepadMap.get(self.candidateBinding)))
+                    {
 
-                    
+                        var updatedInput = {
+                            action: self.selectedItem.name,
+                            input: {
+                                name: self.candidateBinding,
+                                controller: "gamepad",
+                                type: gamepadMap.get(self.candidateBinding)
+                            }
+                        };
+                        self.eventEmitter.emit('plugin.inputController.updateInput', updatedInput);
 
-                    self.eventEmitter.emit('plugin.inputController.updateInput', updatedInput);
+                        //Open the update toast
+                        self.openUpdatePresetToast();
 
-                    //Open the update toast
-                    self.openUpdatePresetToast();
-
-                    //And close the modal
-                    self.$.gamepadModal.close();
+                        //And close the modal
+                        self.$.gamepadModal.close();
+                    }
+                    else
+                    {
+                        console.error("Crap");
+                    }
                 },
 
                 openDuplicateInputToast: function() {
@@ -495,9 +560,16 @@
                 handleClearKeyboardBinding: function() {
                     var self = this;
 
-                    //Clear the input from our presets
-                    //Let the input controller know the new configurations
-                    self.eventEmitter.emit('plugin.inputController.unregisterInput', self.selectedItem.bindings.keyboard);
+                    if(self.selectedItem.bindings.keyboard !== undefined)
+                    {
+                        //Clear the input from our presets
+                        //Let the input controller know the new configurations
+                        var clearedInput = {
+                            action: self.selectedItem.name,
+                            input: self.selectedItem.bindings.keyboard
+                        };
+                        self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
+                    }
 
                     this.$.clearedInputToast.open();
                 },
@@ -506,19 +578,27 @@
                 handleClearGamepadBinding: function() {
                     var self = this;
 
-                    //Clear the input from our presets
-                    //Let the input controller know
-                    self.eventEmitter.emit('plugin.inputController.unregisterInput', self.selectedItem.bindings.gamepad);
+                    if(self.selectedItem.bindings.gamepad !== undefined)
+                    {         
+                        //Clear the input from our presets
+                        //Let the input controller know
+                        var clearedInput = {
+                            action: self.selectedItem.name,
+                            input: self.selectedItem.bindings.gamepad
+                        };
+
+                        self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
+                    }
+                    
                     this.$.clearedInputToast.open();
                 },
 
                 handleClearConflictingKeyboardBinding: function() {
                     var self = this;
-                    
+
                     //Format in a way that the input controller expects
                     var clearedInput = {
-                        name: self.conflictingBinding.name,
-                        controller: "keyboard",
+                        action: self.conflictingBinding.name,
                         input: self.conflictingBinding.bindings.keyboard
                     };
 
@@ -537,8 +617,8 @@
                     var clearedInput = {
                         name: self.conflictingBinding.name,
                         controller: "gamepad",
-                        input: self.conflictingBinding.bindings.gamepad
-                    };
+                        input: self.conflictingBinding.bindings.keyboard
+                    }
 
                     //Let the input controller know
                     self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
@@ -614,61 +694,20 @@
                 presetToArray: function(preset) {
                     var self = this;
 
-                    //Convert preset to a consumable map for converting to an array
-                    var inputMap = new Map();
-
-                    preset.controllers.forEach(function(controller, controllerName) {
-                        
-                        for(var type in controller)
-                        {
-                            var typeMap = controller[type];
-
-                            typeMap.forEach(function(actionName, input) {
-
-                                var inputToAdd = 
-                                {
-                                    controller: controllerName,
-                                    type: type,
-                                    name: input
-                                };
-
-                                if(inputMap.has(actionName))
-                                {
-                                    //Add it to the array of inputs assocaited with this action
-                                    inputMap.get(actionName).push(inputToAdd);
-                                }
-                                else
-                                {
-                                    inputMap.set(actionName, [inputToAdd]);
-                                }
-                            });
-                        }
-                    });
-
-                    //Now, convert the js Map object to an array for polymer
                     var arrayPreset = [];
 
-                    inputMap.forEach(function(inputs, actionName) {
+                    preset.actions.forEach(function(action, actionName) {
 
                         var binding = {
                             keyboard: undefined,
                             gamepad: undefined
                         };
 
-                        //Iterate through the inputs
-                        for(var index in inputs)
-                        {
-                            var currentInput = inputs[index];
-                            if(currentInput.controller == "keyboard")
-                            {
-                                binding.keyboard = currentInput;
-                            }
-                            if(currentInput.controller == "gamepad")
-                            {
-                                binding.gamepad = currentInput;
-                            }
-                        }
-                        
+                        action.forEach(function(input, controllerName) {
+
+                            binding[controllerName] = input;
+                        }); 
+
                         var arrayInput = {
                             name: actionName,
                             description: self.actions.get(actionName).description,
@@ -677,6 +716,7 @@
 
                         arrayPreset.push(arrayInput);
                     });
+
                     arrayPreset.sort(compare);
 
                     self.presetArray = arrayPreset;

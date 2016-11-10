@@ -78,7 +78,7 @@ $(function () {
     //$.getScript('js/missioncontrol.js');
     return;
   }
-  var tokenOption = force == false ? sessionStorage.sessionID : 'reset';
+  var tokenOption = force == false ? localStorage.sessionID : 'reset';
   var socket = window.io.connect(window.location.protocol + '//' + window.location.hostname + ':' + window.location.port, {
       path: '/cockpitsocket',
       query: 'token=' + tokenOption
@@ -113,7 +113,7 @@ $(function () {
       if (bridge !== null) {
         alert('This should not be called');
       }
-      sessionStorage.sessionID = sessionID;
+      localStorage.setItem('sessionID', sessionID);
       bridge = new window.SocketIOtoEmitterBridge(socket, window.cockpit.rov);
       $('#t')[0].rovOnline = true;
       $('#t')[0].userRole = 'Pilot';

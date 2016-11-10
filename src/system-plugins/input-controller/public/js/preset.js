@@ -1,5 +1,16 @@
 (function () 
-{
+{  
+    //Necessary for debug utils
+    var log;
+    var trace;
+    var log_debug;
+
+    $.getScript('components/visionmedia-debug/dist/debug.js', function() {
+        log = debug('input-controller:log');
+        trace = debug('input-controller:trace');
+        log_debug = debug('input-controller:debug');
+    });
+
     'use strict';
     class Preset
     {
@@ -7,13 +18,11 @@
         {
             if(presetName == null)
             {
-                console.error("Tried to create a null preset!");
+                trace("Tried to create a null preset!");
                 return;
             }
             
-            var self = this;
-            console.log("Creating a new preset:", presetName);
-            
+            var self = this;            
             self.name = presetName;
 
             //The actions this preset will hold
@@ -24,7 +33,7 @@
         {
             if(actionIn == null)
             {
-                console.error("Tried to add a null action");
+                log_debug("Tried to add a null action");
                 return;
             }
 
@@ -47,14 +56,14 @@
 
             if(inputIn == null)
             {
-                console.error("Undefined input trying to register with preset");
+                trace("Undefined input trying to register with preset");
                 return;
             }
 
             //Make sure the associated controller exists
             if(!self.actions.has(actionIn))
             {
-                console.error("Tried to add an input with an unregistered action: ", inputIn);
+                trace("Tried to add an input with an unregistered action: ", inputIn);
                 return;
             }
 

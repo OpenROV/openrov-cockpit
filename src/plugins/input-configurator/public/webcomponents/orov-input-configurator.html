@@ -68,6 +68,10 @@
         .green-button {
             color: #34A853;
         }
+
+        .blue-button {
+            color: #135569;
+        }
         /**
         * KEYS.css
         *
@@ -243,6 +247,15 @@
                 <div class="buttons">
                     <paper-button dialog-confirm on-tap="handleClearConflictingGamepadBinding" class="green-button">{{__('Confirm')}}</paper-button>
                     <paper-button dialog-dismiss>{{__('Decline')}}</paper-button>
+                </div>
+            </paper-dialog>
+
+            <paper-dialog id="invalidGamepadTypeModal">
+                <h2>{{__('Type mismatch!')}}</h2>
+                <p><kbd>{{candidateBinding}}</kbd>  {{__(' is not a valid input command for ')}} <b>{{selectedItem.name}}</b> </p>
+                <p>{{__('Select a different command')}}</p>
+                <div class="buttons">
+                    <paper-button dialog-dismiss class="blue-button">{{__('OK')}}</paper-button>
                 </div>
             </paper-dialog>
 
@@ -535,6 +548,11 @@
                     self.$.updatedPresetToast.open();
                 },
 
+                openInvalidGamepadTypeModal: function() {
+                    var self = this;
+                    self.$.invalidGamepadTypeModal.open();
+                },
+
                 //Reset the candidateBinding on keyboard modal closed
                 onKeyboardModalClosed : function() {
                     var self = this;
@@ -589,7 +607,7 @@
 
                         self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
                     }
-                    
+
                     this.$.clearedInputToast.open();
                 },
 
@@ -606,7 +624,6 @@
                     self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
                     
                     self.updateKeyboardInput();
-
                     self.openUpdatePresetToast();
                 },
 
@@ -615,16 +632,14 @@
 
                     //Format in a way that the input controller expects
                     var clearedInput = {
-                        name: self.conflictingBinding.name,
-                        controller: "gamepad",
-                        input: self.conflictingBinding.bindings.keyboard
-                    }
+                        action: self.conflictingBinding.name,
+                        input: self.conflictingBinding.bindings.gamepad
+                    };
 
                     //Let the input controller know
                     self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
 
                     self.updateGamepadInput();
-
                     self.openUpdatePresetToast();
                 },             
 
@@ -671,7 +686,17 @@
                     {
                         self.handleClearGamepadBinding();
                     }
-                    self.checkForGamepadDuplicates();
+
+                    //Check to make sure this is a valid input for this action
+                    if(self.hasActionType(self.selectedItem.name, gamepadMap.get(self.candidateBinding)))
+                    {
+                        self.checkForGamepadDuplicates();
+                    }
+                    else
+                    {
+                        self.openInvalidGamepadTypeModal();
+                    }
+                    
                 },
 
                 handleKeyboardRemapping: function() {

@@ -253,8 +253,6 @@
         input: input
       };
 
-      console.log(inputForHardware);
-
       hardware.registerInput(inputForHardware);
     };
 
@@ -454,19 +452,18 @@
     unregisterInput(inputIn)
     {
       var self = this;
-      var input = inputIn.input;
 
-      if(input == null)
+      if(inputIn == null)
       {
         trace("Tried to unregister an undefined key with gamepad");
         return;
       }
 
-      log_debug("Unregistering:", input.name, "from gamepad");
-      self.gamepadAbstraction.assignments.delete(input.name);
+      log_debug("Unregistering:", inputIn.name, "from gamepad");
+      self.gamepadAbstraction.assignments.delete(inputIn.name);
     };
     
-    updateInput(previousInput, currentInput, action)
+    updateInput(previousInput, newInput, action)
     {
       var self = this;
 
@@ -496,13 +493,6 @@
       self.mousetrap = mousetrap;
 
       log("Started keyboard abstraction");
-    };
-
-    
-    addInput(input)
-    {
-      var self = this;
-      console.log("ADDING INPUT TO Mousetrap:", input);
     };
 
     registerInput(inputIn)

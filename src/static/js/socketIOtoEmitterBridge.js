@@ -44,6 +44,9 @@
       var orig_wh = emitter.withHistory.on;
       emitter.withHistory.on = function (type, fn) {
         self.socket.emit('fromcache', type, function () {
+          if (arguments.length == 0){
+            return;
+          }
           var args = new Array(arguments.length);
           for (var i = 0; i < args.length; ++i) {
             args[i] = arguments[i];

@@ -6,7 +6,7 @@
     <!-- The following viewport code is intended to fullscreen the cockpit and prevent scrolling -->
     <!--meta id="Viewport" name="viewport" width="initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"-->
     <!--<script type='text/javascript' src="bower_components/jquery/dist/jquery.min.js"></script>-->
-    <script type='text/javascript' src="components/jquery/dist/jquery.js"></script>
+    <script type='text/javascript' src="components/jquery/dist/jquery.js"></script>    
     <!--script type='text/javascript' src="components/jquery-ui/jquery-ui.min.js"></script-->
     <title><%= title %></title>
     <%
@@ -24,6 +24,11 @@
 
 
 <script>
+  //Prevent jquery from breaking caching
+  $.ajaxSetup({
+    cache: true
+  });
+
 window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
 
   ga('create', 'UA-18444815-8', 'auto');
@@ -67,11 +72,10 @@ ga('send', 'pageview');
       eventLabel:  err.filename + ':  ' + err.lineno  
     });
   });  
+
 </script>
-  </head>
 
   <script type='text/javascript' src="js/libs/eventemitter2.js"></script>
-  <!--<script type='text/javascript' src="js/libs/bootstrap.min.js"></script>-->
 
   <script type='text/javascript' src='js/libs/gamepad.js'></script>
   <script type='text/javascript' src='js/utilities.js'></script>
@@ -84,9 +88,6 @@ ga('send', 'pageview');
   <script type='text/javascript' src='js/socketIOtoEmitterBridge.js'></script>  
   <script type='text/javascript' src="js/cockpit.js"></script>
   <script type="text/javascript" src="js/app.js"></script>
-  <script type="text/javascript" src="plugin/new-ui/js/lib/0_jquery.svg.min.js"></script>
-  <script type="text/javascript" src="plugin/new-ui/js/lib/1_jquery.svgdom.min.js"></script>
-  <script type="text/javascript" src="plugin/new-ui/js/lib/2_jquery.svganim.min.js"></script>
 
   <script type="text/javascript" src="components/webcomponentsjs/webcomponents-lite.js"></script>
   <script>
@@ -98,23 +99,230 @@ ga('send', 'pageview');
       lazyRegister: true
     };
   </script>
-  <script>window.openrovtheme='<%=theme%>'</script>
+  <script>window.openrovtheme='<%=theme%>'</script>  
+  <link id="lazyScripts" rel="import" href="/all_scripts.html" async>
   <link rel="import" href="components/polymer/polymer.html">
-  <!-- Load the browser global services -->
-  <% for(var i=0; i<scripts.length; i++) {%>
-  <script type="text/javascript" src="<%= scripts[i] %>"></script><% } %>
+<style>
+    body.loading #splash {
+        opacity: 1;
+        z-index: 9000;
+        background: linear-gradient(#CCCCCC, #34A1FF);
+        margin: 0;
+        padding: 0;
+    }    
 
-  <body>
+    /* This needs to be fixed to override additional style sheets from the theme that loads */
+    #splash * {
+      margin: 0px;
+      font-size:14px;
+      line-height: 1em;
+    }
+
+    #splash {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        transition: opacity 1s cubic-bezier(0, 0, 0.2, 1);
+        opacity: 0;
+        will-change: opacity;
+        z-index: 0;
+        background: linear-gradient(#CCCCCC, #34A1FF);
+        background-color: #34A1FF;
+    }
+    /* -------------------------------------------------------------------
+                Credit for the original wave animation and assets: Andy Fitzsimon
+                Link to Codepen: http://codepen.io/andyfitz/pen/akAKdV
+            ------------------------------------------------------------------- */
+    
+    .parallax>use {
+        animation: move-forever 12s linear infinite;
+    }
+    
+    .parallax>use:nth-child(1) {
+        animation-delay: -2s;
+    }
+    
+    .parallax>use:nth-child(2) {
+        animation-delay: -2s;
+        animation-duration: 5s;
+    }
+    
+    .parallax>use:nth-child(3) {
+        animation-delay: -4s;
+        animation-duration: 3s;
+    }
+    
+    @keyframes move-forever {
+        0% {
+            transform: translate(-90px, 0%);
+        }
+        100% {
+            transform: translate(85px, 0%);
+        }
+    }
+    
+    .editorial {
+        display: block;
+        width: 100%;
+        height: 10em;
+        margin: 0;
+    }
+    
+    .content {
+        background-color: #1D598D;
+        text-align: center;
+        height: 100%;
+        margin: -.1em 0 0 0;
+        padding: 2em;
+        color: #eee;       
+    }
+    
+    .content h1 {
+        margin-bottom: 0.3em;
+        font-family: 'Lato', sans-serif;
+        margin-top: -1.3em;
+        font-weight: 100;
+        font-size: 4em;
+    }
+    
+    #quote {
+        padding-top: 5em;
+        margin: 0.3em;
+        font-family: 'Lato', sans-serif; 
+        font-style: italic;
+        font-size: 4em;
+        animation: fadein 3s;
+    }
+    @keyframes fadein {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }    
+    
+    #author {
+        font-family: 'Open Sans', sans-serif;
+        font-size: 1.5em;
+        animation: fadein 6s;
+    }
+    
+    #loading {
+        font-family: 'Open Sans', sans-serif;
+        font-size: 1.0em;
+        padding-top: 15em;
+    }
+    /*prevent many large-by-comparison ripples by shrinking the height*/
+    
+    @media (max-width: 50em) {
+        .content h1 {
+            font-size: 12vmax;
+        }
+        .editorial {
+            height: 17vw;
+        }
+    }
+    
+    .sk-spinner-pulse {
+        width: 40px;
+        height: 40px;
+        margin: 40px auto;
+        background-color: white;
+        border-radius: 100%;
+        -webkit-animation: sk-pulseScaleOut 1s infinite ease-in-out;
+        animation: sk-pulseScaleOut 1s infinite ease-in-out;
+    }
+    
+    @-webkit-keyframes sk-pulseScaleOut {
+        0% {
+            -webkit-transform: scale(0);
+            transform: scale(0);
+        }
+        100% {
+            -webkit-transform: scale(1);
+            transform: scale(1);
+            opacity: 0;
+        }
+    }
+    
+    @keyframes sk-pulseScaleOut {
+        0% {
+            -webkit-transform: scale(0);
+            transform: scale(0);
+        }
+        100% {
+            -webkit-transform: scale(1);
+            transform: scale(1);
+            opacity: 0;
+        }
+    }
+</style>
+  </head>
+  <body class="loading">
+<div id="splash">
+    <svg class="editorial" xmlns="http://www.w3.org/2000/svg" viewBox="0 24 150 28" preserveAspectRatio="none">
+            <defs>
+            <path 
+                id="gentle-wave"
+                d="m -160,44.4 c 30,0 58,
+                    -18 87.7,-18 30.3,0 58.3,
+                    18 87.3,18 30,0 58,-18 88,
+                    -18 30,0 58,18 88,18 l 0,
+                    34.5 -351,0 z" />
+            </defs>
+            <g class="parallax">
+                <use xlink:href="#gentle-wave" x="50" y="0" fill="#34A1FF"/>
+                <use xlink:href="#gentle-wave" x="50" y="3" fill="#2A81CC"/>
+                <use xlink:href="#gentle-wave" x="50" y="6" fill="#1D598D"/>  
+            </g>
+        </svg>
+
+    <div class="content">
+        <h1> </h1>
+
+        <!--Here we can load quotes and authors from a json file -->
+        <p id="quote">The Sea, once it casts its spell, holds one in its net of wonder forever.</p>
+        <p id="author">- Jacques Cousteau -</p>
+
+        <div id="loading">
+            <p> Connecting to the ROV </p>
+        </div>
+
+        <div class="sk-spinner sk-spinner-pulse" style="margin: 40px auto;"></div>
+
+
+    </div>
+
+</div>
 <link rel="import" href="components/platinum-sw/platinum-sw-register.html">
 <link rel="import" href="components/platinum-sw/platinum-sw-cache.html">
+<link rel="import" href="components/platinum-sw/platinum-sw-fetch.html">
+<link rel="import" href="components/platinum-sw/platinum-sw-import-script.html">
 <link rel="import" href="components/terms-of-use/terms-of-use.html">
-
 <!--TODO: Add logic to support either popout or popin(swapping) of applets-->
 <template id="t" is="dom-bind"  strip-whitespace>
- <terms-of-use style="z-index:9999;display:block;position:absolute;width:100%;heigh:100%;"></terms-of-use> 
-<platinum-sw-register auto-register reload-on-install state="{{pswstate}}">
-  <platinum-sw-offline-analytics></platinum-sw-offline-analytics>  
-  <platinum-sw-cache default-cache-strategy="networkFirst"></platinum-sw-cache>
+ <terms-of-use style="z-index:9999;display:block;position:absolute;width:100%;heigh:100%;"></terms-of-use>
+                                                
+
+  <!--
+    TODO: Occasionally see a `Uncaught (in promise) DOMException: Entry was not found.` error that has to do with
+    the system trying to open the cache.  Suspect the logic to expire the cache with a new sw-script is putting
+    the name or access of the cache in limbo while the install is taking place.
+    --> 
+  <!-- pattern for custom fetch handler from: https://codelabs.developers.google.com/codelabs/polymer-offline-weather/index.html?index=..%2F..%2Findex#6 -->
+<platinum-sw-register auto-register skipWaiting clients-claim reload-on-install state="{{pswstate}}">
+  <platinum-sw-import-script href="/system-plugin/ui-manager/js/nocache-fetch-handler.js"></platinum-sw-import-script>
+  <platinum-sw-import-script href="/system-plugin/ui-manager/js/cache-ignoreParameters-handler.js"></platinum-sw-import-script>
+  <platinum-sw-offline-analytics></platinum-sw-offline-analytics>
+  <platinum-sw-fetch handler="dontCacheHandler"
+                 path="/cockpitsocket(.*)"></platinum-sw-fetch> 
+  <platinum-sw-fetch handler="dontCacheHandler"
+                 path="/peerview(.*)"></platinum-sw-fetch>                     
+  <platinum-sw-fetch handler="cacheIgnoreParametersHandler"
+                 path="/"></platinum-sw-fetch>
+  <platinum-sw-fetch handler="dontCacheHandler"
+                 path="/client/BWcCxwJdMnHP7Y3pKCNtbp5IA6o5lKlb(.*)"
+                 origin="https://cdn.auth0.com"></platinum-sw-fetch>                                                              
+  <platinum-sw-cache default-cache-strategy="<%=cacheMode%>" precache='["/js/replay.js"]'></platinum-sw-cache>
 </platinum-sw-register>
 
 <!-- Temporarily disabled pending solution for relative pathing -->
@@ -127,9 +335,16 @@ ga('send', 'pageview');
 <app-route route="{{route}}" pattern="/:page" data={{routedata}} active="{{homeActive}}"></app-route>
 
 <link rel="import" href="components/ui-manager/orov-widget-registry.html">
-<orov-widget-registry event-emitter="{{cockpitEventEmitter}}">
+
+<orov-widget-registry id="widgetRegistry" event-emitter="{{cockpitEventEmitter}}">
   <%=JSON.stringify(webcomponents);%>
 </orov-widget-registry>
+<script>
+  Polymer.RenderStatus.afterNextRender(this.$.widgetRegistry, () => {
+    console.info("After render of windows registry");
+  });
+</script>
+<!--link id="lazyImports" rel="import" href="/all_imports.html" async-->
 
   <%
     var header = scriplets.find(function(item){return item.name=='header'});
@@ -148,9 +363,17 @@ ga('send', 'pageview');
     if ((scriplets[i].name == 'header') || (scriplets[i].name == 'footer')|| (scriplets[i].name == 'head')){continue;}%>
   <template is="dom-if" restamp=true if="{{displaySection(routedata.page,'<%= scriplets[i].name %>')}}">
 <script>
+  var fn = function(){
+    console.info("on applet <%= scriplets[i].name %>");
+    removeSplashScreen();
+    window.removeEventListener('WebComponentsReady',fn);
+  }
+  window.addEventListener('WebComponentsReady', fn);  
   ga('set', 'page', '<%= scriplets[i].name %>');
   ga('set', 'dimension1', '<%= theme %>');
   ga('send', 'pageview');
+
+
 </script>
   <%- include(scriplets[i].path,{
     title: title,
@@ -174,6 +397,69 @@ ga('send', 'pageview');
     config: config
   })%>
   <%}%>
+  <script>
+    //removeSplashScreen();
+  </script>
 </template>
+  <script>
+
+function removeSplashScreen() {
+    var loadEl = document.getElementById('splash');
+    loadEl.addEventListener('transitionend', loadEl.remove);
+    document.body.classList.remove('loading');  
+}
+
+function setupLazyImportsBundleMetics() {
+  // Critical imports bundle perf.
+  var lazyBundle = document.querySelector('#lazyImports');
+  if (lazyBundle) {
+    var process = function() {
+      var entry = performance.getEntriesByName(lazyBundle.href)[0];
+      var str = `started @ ${entry.startTime.toFixed(2)} ms, took: ${entry.duration.toFixed(2)} ms`;
+      console.info('lazyImportsBundle: ' + str);
+      var wr = document.querySelector('#widgetRegistry');
+      wr.process();
+    };
+    if (lazyBundle.import && lazyBundle.import.readyState === 'complete'){
+      process()
+    } else {
+      lazyBundle.onload = function(e) {
+        process();
+      };
+    }
+  }
+}    
+
+function setupLazyScriptBundleMetics() {
+  // Critical imports bundle perf.
+  var lazyBundle = document.querySelector('#lazyScripts');
+  if (lazyBundle) {
+    var process = function(){
+      if (!window.cockpit){
+        setTimeout(process.bind(this),50);
+        return;
+      }
+      var entry = performance.getEntriesByName(lazyBundle.href)[0];
+      var str = `started @ ${entry.startTime.toFixed(2)} ms, took: ${entry.duration.toFixed(2)} ms`;
+      console.info('lazyScriptsBundle: ' + str);
+      window.cockpit.loadPlugins();
+    }
+    if (lazyBundle.import && lazyBundle.import.readyState === 'complete'){
+      process()
+    } else {
+      lazyBundle.onload = function(e) {
+        process();
+      };
+    }
+  }
+}
+ setupLazyScriptBundleMetics();
+window.addEventListener('WebComponentsReady', function(e) {
+ // setupLazyImportsBundleMetics();
+   console.info("Web Componet Ready Event",$('#t')[0].rovOnline);
+
+ });
+
+  </script>
   </body>
 </html>

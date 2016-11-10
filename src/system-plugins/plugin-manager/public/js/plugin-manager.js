@@ -121,7 +121,7 @@
       return;
     }
     _plugins = this.cockpit.loadedPlugins.filter(function (plugin) {
-      console.log('evaluating plugin for pluginmanager');
+    //  console.log('evaluating plugin for pluginmanager');
       if (plugin.Plugin_Meta !== undefined) {
         return true;
       }

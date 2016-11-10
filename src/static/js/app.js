@@ -1,5 +1,6 @@
 //This is the support file for the /views/index.ejs
 $(function () {
+
   //http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
   function getParameterByName(name, url) {
     if (!url)
@@ -58,13 +59,15 @@ $(function () {
         context: this,
         args: parms
       };
-      console.log('seeding event:', key);
+ //     console.log('seeding event:', key);
     });
   }
   e = new window.EventEmiiterStoreAndForward(e, cacheSeed);
   var cockpit = new Cockpit(e);
+  var template = $('#t')[0];
+  //template.cockpitEventEmitter = cockpit;
   window.cockpit = cockpit;
-  $('#t')[0].rovOnline = false;
+  template.rovOnline = false;
   if (mc !== null) {
     loadScript('js/missioncontrol.js');
     //$.getScript('js/missioncontrol.js');

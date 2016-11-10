@@ -50,6 +50,7 @@ if [ ! -f /var/swapfile ]; then
   bash /opt/openrov/system/scripts/addswapfile.sh
 fi
 
-nice -n 19 /opt/openrov/system/scripts/knight-rider.js &
+#Disabled pending optimized solution that does not slam kernel 
+#nice -n 19 /opt/openrov/system/scripts/knight-rider.js &
 
 exit 0

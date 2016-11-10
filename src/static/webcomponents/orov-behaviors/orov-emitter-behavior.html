@@ -24,9 +24,12 @@
       }
     },
     created: function () {
-      console.log('oROV Emitter Behavior for ', this, 'enabled!');
+    //  console.log('oROV Emitter Behavior for ', this, 'enabled!');
     },
     _registerTreeOfListeners: function(root,emitter){
+      if (!root){
+        return;
+      }
       var self=this;
       if(emitter == undefined){
         return;
@@ -64,9 +67,9 @@
     },
     attached: function () {
       //Added a new lifecycle event for the control:
-      console.log("About to registerBusListners for:",this.localName)
+   //   console.log("About to registerBusListners for:",this.localName)
       this._registerBusListeners();
-      console.log('OROV-BEHAVIOR: Registerd eventEmitter');
+    //  console.log('OROV-BEHAVIOR: Registerd eventEmitter');
       this.processedAttached=true;
     },
     _eventEmitterChanged: function (newvalue, oldvalue) {

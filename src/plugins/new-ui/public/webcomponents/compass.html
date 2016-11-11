@@ -217,19 +217,22 @@
           });
           emitter.on('plugin.navigationData.data', function(data) {
             newData = data;
-          });
-          setInterval(function(){
-            if (newData == lastData) return;
-            lastData=newData;
-            self.setHeading(self.pad(parseFloat(newData.heading).toFixed(0), 3));          
-          },100);
+          }); 
         },
         attached: function() {
           var self = this;
           self.options.headingFill = self.options.bezel;
           this.setHeading(this.heading);
           this.setBearing(this.bearing);
-          this.format(this.options);          
+          this.format(this.options);  
+          this._dataThrottleInterval = setInterval(function(){
+            if (newData == lastData) return;
+            lastData=newData;
+            self.setHeading(self.pad(parseFloat(newData.heading).toFixed(0), 3));          
+          },100);                 
+        },
+        detached: function(){
+          clearInterval(this._dataThrottleInterval);
         },
         compassMode: function() {
           if(this.isCompass) {

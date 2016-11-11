@@ -138,10 +138,13 @@
               self.handleDescendantEvent(e);
             }, true);
           }
-          setInterval(function () {
+          this._updateInterval=setInterval(function () {
             self.displayTelemetry();
           }, 1000);
 
+        },
+        detached:function(){
+          clearInterval(this._updateInterval);
         },
         logStatusData: function (data) {
           for (var i in data) {

@@ -89,6 +89,11 @@
             var action = self.actions.get(actionIn);
             action.delete(inputIn.controller); 
         };
+
+        writeToJSON()
+        {
+            
+        };
     };
 
     var systemPlugins = namespace('systemPlugin');

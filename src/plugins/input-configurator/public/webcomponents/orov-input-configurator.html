@@ -136,6 +136,7 @@
         <p>
             {{__('Click on the button you want to change in the table below')}}
         </p>        
+        
         <section class="">      
             <div id="tableContainer">
                 <table>
@@ -261,6 +262,9 @@
 
         </paper-dialog>
 
+        <div class="buttons">
+            <paper-button id="savePresetButton" on-tap="handleSavePreset"> Save Preset </paper-button>
+            <paper-button id="loadPresetButton" on-tap="handleLoadPreset"> Load Preset </paper-button>
 
         <paper-toast id="updatedPresetToast" text="Updated Preset!"></paper-toast>
         <paper-toast id="clearedInputToast" text="Cleared input!"></paper-toast>
@@ -643,6 +647,20 @@
                         self.checkForKeyboardDuplicates();
                     });
 
+                },
+
+                handleLoadPreset: function()
+                {
+                    var self = this;
+                    console.log("Requesting preset to be loaded");
+                    self.eventEmitter.emit('plugin.inputConfigurator.loadPreset', "Defaults");
+                },
+
+                handleSavePreset: function()
+                {
+                    var self = this;
+                    console.log("Sent preset to be saved!");
+                    self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.preset);
                 },
 
                 //Checks to see if this action accepts this type

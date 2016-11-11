@@ -165,7 +165,7 @@
           },
           isCompass: {
             type: Boolean,
-            value: function(){return true;}
+            value: function(){return false;}
           },
           mode: {
             type: String,
@@ -262,9 +262,20 @@
           this.set('options.background', newOptions.background ? newOptions.background : this.options.background);
         },
         setHeading: function(value) {
+          
+          if(this.isCompass)
+          {
+            this.heading = value;
+          }
+          else  
+          {
+            this.heading = value;
 
-          var self = this;
-
+            if(value > 180)
+            {
+              this.heading = -(360 - value);
+            }
+          }      
           
           rotateElement(this.$.indicator, indicatorAngle, value);
 
@@ -282,6 +293,11 @@
           else  
           {
             this.bearing = value;
+            
+            if(value > 180)
+            {
+              this.bearing = -(360 - value);
+            }
           } 
 
           if (value) {

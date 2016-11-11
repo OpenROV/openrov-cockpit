@@ -285,6 +285,10 @@ function Bridge()
       return ( intIn * 0.001 );
   }
 
+  function mapTo(value, in_min, in_max, out_min, out_max) {
+    return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+  };
+
   bridge.emitNavData = function () {
     var result = '';
     // Generate depth
@@ -292,9 +296,11 @@ function Bridge()
     currentDepth += currentDepth * rnd;
     currentDepth = Math.min(Math.max(currentDepth, 1), 100);
     result += 'depth_d:' + encode( currentDepth ) + ';';
+    
     // Generate heading
-    currentHeading += 5;
-    result += 'imu_y:' + encode( currentHeading ) + ';';
+    currentHeading += 1;
+    var headingOut = mapTo(currentHeading, 0, 359, -180, 180);
+    result += 'imu_y:' + encode( headingOut ) + ';';
     if (currentHeading >= 360) {
       currentHeading = 0;
     }

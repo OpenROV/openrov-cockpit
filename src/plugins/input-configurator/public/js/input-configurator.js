@@ -36,6 +36,16 @@
         console.log("Got something to share", presetNameIn);
         self.cockpit.rov.emit('plugin.inputConfigurator.loadPreset', presetNameIn);
       });
+
+      this.cockpit.on('plugin.inputConfigurator.getSavedPresets', function() {
+        console.log("Getting saved presets");
+        self.cockpit.rov.emit('plugin.inputConfigurator.getSavedPresets');
+      });
+
+      this.cockpit.rov.on('plugin.inputConfigurator.savedPresets', function(presetsIn) {
+        console.log("Got saved presets", presetsIn);
+        self.cockpit.emit('plugin.inputConfigurator.savedPresets', presetsIn);
+      });
     }
   };
 

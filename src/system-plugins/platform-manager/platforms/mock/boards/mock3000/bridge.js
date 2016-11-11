@@ -24,7 +24,12 @@ function Bridge()
   // Initial values
   var time = 1000;
   var currentDepth = 1;
+
   var currentHeading = 0;
+  var headingClockwise = true;
+  var headingCounter = 0;
+  var headingOut = 0;
+
   var currentPitch = 0;
   var currentRoll = 0;
   var currentServo = 1500;
@@ -193,7 +198,7 @@ function Bridge()
       case 'holdHeading_on': 
       {
         var targetHeading = 0;
-        targetHeading = currentHeading;
+        targetHeading = headingOut;
         bridge.targetHoldEnabled = true;
         bridge.emitStatus('targetHeading:' + (bridge.targetHoldEnabled ? targetHeading.toString() : DISABLED));
         debug('Heading hold enabled');
@@ -289,6 +294,7 @@ function Bridge()
     return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
   };
 
+
   bridge.emitNavData = function () {
     var result = '';
     // Generate depth
@@ -298,12 +304,43 @@ function Bridge()
     result += 'depth_d:' + encode( currentDepth ) + ';';
     
     // Generate heading
-    currentHeading += 1;
-    var headingOut = mapTo(currentHeading, 0, 359, -180, 180);
-    result += 'imu_y:' + encode( headingOut ) + ';';
-    if (currentHeading >= 360) {
-      currentHeading = 0;
+    if(headingClockwise)
+    {
+      //Increment by one
+      currentHeading += 5;
+      headingOut = mapTo(currentHeading, 0, 359, -180, 180);
+      
+      if(currentHeading >= 359)
+      {
+        currentHeading = 0;
+        headingCounter += 1;
+      }
+
+      if(headingCounter > 2)
+      {
+        headingClockwise = false;
+        headingCounter = 0;
+      }
     }
+    else
+    {
+      //Increment by one
+      currentHeading -= 5;
+      headingOut = mapTo(currentHeading, 0, 359, -180, 180);
+
+      if(currentHeading <= 0)
+      {
+        currentHeading = 359;
+        headingCounter += 1;
+      }
+      if(headingCounter > 2)
+      {
+        headingClockwise = true;
+        headingCounter = 0;
+      }
+    }
+
+    result += 'imu_y:' + encode( headingOut ) + ';';
     // Generate pitch
     //p(t) = 90*sin(t)
     currentPitch = 90*Math.sin(time);

@@ -16,6 +16,14 @@
 
   var recordPluginNeeded = true;
 
+(function (window, document) {
+  var log,trace,log_debug;
+  $.getScript('components/visionmedia-debug/dist/debug.js', function () {  
+    log = debug('input-controlller:log');
+    trace = debug('input-controlller:trace') 
+    log_debug = debug('input-controlller:debug')   
+  });
+
   var inputController = namespace('systemPlugin.inputController');
   inputController.InputController = class InputController
   {
@@ -128,7 +136,6 @@
           }
         }
       });
-
 
       this.cockpit.on('plugin.inputController.sendPreset', function() {
 
@@ -325,7 +332,7 @@
 
       self.currentPreset.unregisterInput(inputIn.action, inputToUnregister);
     };
-  }
+  };
 
   //Helper classes
   /*Gamepad abstraction*/

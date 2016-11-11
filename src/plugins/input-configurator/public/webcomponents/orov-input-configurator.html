@@ -449,6 +449,10 @@
                     {
                         self.eventEmitter.emit('plugin.inputController.sendPreset');
                     }
+                    else
+                    {
+                        self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.preset);
+                    }
                     
                 },
 
@@ -706,7 +710,7 @@
                     
                     //Request the node module to send up the preset requested
                     self.eventEmitter.emit('plugin.inputConfigurator.loadPreset', self.candidatePreset);
-                    
+
                     self.candidatePreset = undefined;
                     self.openLoadedPresetToast();
                     self.$.loadPresetModal.close();

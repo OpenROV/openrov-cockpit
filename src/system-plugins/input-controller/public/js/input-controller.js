@@ -177,13 +177,56 @@
         console.log("New preset to add");
         self.addPreset(presetIn);
       }
+      self.handleChangePreset(presetIn.name);
     };
 
     handleChangePreset(presetName)
     {
+      var self = this;
+      console.log("Changing to this preset");
 
+      //Grab a handle to our preset
+      var preset = self.presets.get(presetName);
+      
+      //Unregister the old preset
+      self.unregisterPresetWithHardware(self.currentPreset);
+
+      //And update to the new one
+      self.registerPresetWithHardware(preset);
+      self.currentPreset = preset;
+      self.cockpit.emit('plugin.inputController.updatedPreset', self.currentPreset, self.actions);
     };
 
+    registerPresetWithHardware(preset)
+    {
+      var self = this;
+
+      preset.actions.forEach(function(action, actionName) {
+        action.forEach(function(inputIn){
+          var inputToRegister = {
+            action: actionName,
+            input: inputIn
+          };
+          self.registerInputWithHardware(inputToRegister);
+        })
+      });
+    };
+    
+    unregisterPresetWithHardware(preset)
+    {
+      var self = this;
+
+      preset.actions.forEach(function(action, actionName) {
+        action.forEach(function(inputIn){
+          var inputToRegister = {
+            action: actionName,
+            input: inputIn
+          };
+          self.unregisterInputWithHardware(inputToRegister);
+        })
+      });
+
+    };
     addPreset(presetIn)
     {
       var self = this;

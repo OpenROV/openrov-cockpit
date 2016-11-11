@@ -36,12 +36,6 @@
         console.log("Got something to share", presetNameIn);
         self.cockpit.rov.emit('plugin.inputConfigurator.loadPreset', presetNameIn);
       });
-
-      this.cockpit.rov.on('plugin.inputConfigurator.loadedPreset', function(presetIn) {
-        console.log("Got a preset from node", presetIn);
-        self.cockpit.emit('plugin.inputController.updatedPreset', presetIn);
-      });
-
     }
   };
 

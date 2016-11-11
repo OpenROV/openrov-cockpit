@@ -35,7 +35,11 @@
 			var self = this;
 
 			console.log("Input Configurator: Saving preset");
-			fs.writeFile('/tmp/presets/data.json', JSON.stringify(presetIn, null, 2) , 'utf-8');
+			console.log(presetIn.name);
+
+			var presetFilePath = '/tmp/presets/' + presetIn.name + "_preset.json";
+
+			fs.writeFile(presetFilePath, JSON.stringify(presetIn, null, 2) , 'utf-8');
 		}
 
 
@@ -44,7 +48,10 @@
 			var self = this;
 			
 			console.log("Input Configurator: Loading preset");
-			var presetOut = JSON.parse(fs.readFileSync('/tmp/presets/data.json', 'utf8'));
+
+			var presetFilePath = '/tmp/presets/' + presetName + "_preset.json";
+
+			var presetOut = JSON.parse(fs.readFileSync(presetFilePath, 'utf8'));
 			self.cockpitBus.emit('plugin.inputConfigurator.loadedPreset', presetOut);
 		}
 

@@ -262,13 +262,31 @@
 
         </paper-dialog>
 
+
+        <paper-dialog id="savePresetModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation">
+            
+            <h1>{{__('Enter a preset name')}}</h1>
+
+            <paper-input id="savePresetInput" label="preset name" required auto-validate error-message="preset name needs some text!"></paper-input>
+
+            <div class="buttons">
+                <paper-button dialog-confirm on-tap="handleSavePreset" class="blue-button">{{__('OK')}}</paper-button>
+                <paper-button dialog-dismiss class="blue-button">{{__('CANCEL')}}</paper-button>
+                
+            </div>
+        </paper-dialog>
+
         <div class="buttons">
-            <paper-button id="savePresetButton" on-tap="handleSavePreset"> Save Preset </paper-button>
+            <paper-button id="savePresetButton" on-tap="openSavePresetModal"> Save Preset </paper-button>
             <paper-button id="loadPresetButton" on-tap="handleLoadPreset"> Load Preset </paper-button>
+        </div>
+
 
         <paper-toast id="updatedPresetToast" text="Updated Preset!"></paper-toast>
         <paper-toast id="clearedInputToast" text="Cleared input!"></paper-toast>
+        <paper-toast id="savedPresetToast" text="Saved preset!"></paper-toast>
         <paper-toast id="duplicateInputToast" class="fit-bottom" text="Duplicate found."></paper-toast>
+
     </template>
     <script>
 
@@ -659,8 +677,22 @@
                 handleSavePreset: function()
                 {
                     var self = this;
-                    console.log("Sent preset to be saved!");
-                    self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.preset);
+
+                    var presetName = self.$.savePresetInput.value;
+                    if(presetName)
+                    {
+                        self.preset.name = presetName;
+                        self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.preset);
+
+                        self.openSavedPresetToast();
+                    }
+                },
+
+                openSavePresetModal: function()
+                {
+                    var self = this;
+                    
+                    self.$.savePresetModal.open();
                 },
 
                 //Checks to see if this action accepts this type
@@ -711,6 +743,11 @@
 
                     self.candidateBinding = undefined;
                     self.$.updatedPresetToast.open();
+                },
+                openSavedPresetToast: function() {
+                    var self = this;
+
+                    self.$.savedPresetToast.open();
                 },
 
 

@@ -31,7 +31,7 @@
 
       //Data structure to hold our presets on the browser side
       this.presets = new Map();
-      this.currentPresetName = "Defaults";
+      this.currentPresetName = "defaults";
       this.currentPreset = new inputController.Preset(this.currentPresetName);
 
       this.presets.set(this.currentPresetName, this.currentPreset);
@@ -167,12 +167,52 @@
     handleLoadedPreset(presetIn)
     {
       var self = this;
-
-      //Check to see if this preset is already registered
       if(self.presets.has(presetIn.name))
       {
-        
+        console.log("this preset exists");
+
       }
+      else
+      {
+        console.log("New preset to add");
+        self.addPreset(presetIn);
+      }
+    };
+
+    handleChangePreset(presetName)
+    {
+
+    };
+
+    addPreset(presetIn)
+    {
+      var self = this;
+
+      var newPreset = new inputController.Preset(presetIn.name);
+
+      //Use the default list to init
+      //TODO: Figure out how to do a clone in JS
+      self.presets.get("defaults").actions.forEach(function(action, actionName) {
+        newPreset.addAction(actionName);
+      })
+
+      for(var actionName in presetIn.actions)
+      {
+        var action = presetIn.actions[actionName];
+        
+        for(var controllerName in action[1])
+        {
+          var controller = action[1][controllerName];
+          var actionToRegister = action[0];
+          var inputToRegister = controller[1];
+
+          newPreset.registerInput(actionToRegister, inputToRegister);
+        }
+      }
+      console.log(newPreset);
+
+      //Add it to our internal Map
+      self.presets.set(newPreset.name, newPreset);
     }
 
     updateInput(input)

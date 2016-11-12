@@ -165,11 +165,11 @@
           },
           isCompass: {
             type: Boolean,
-            value: function(){return true;}
+            value: function(){return false;}
           },
           mode: {
             type: String,
-            value: function(){return "Compass";}
+            value: function(){return "Gyro";}
           },
           options: {
             type: Object,
@@ -205,11 +205,15 @@
         registerEmitterHandlers: function(emitter) {
           var self = this;
           emitter.withHistory.on('plugin.rovpilot.headingHold.state', function(state) {
-            if (state.enabled){
-              self.setBearing(state.targetHeading);
+
+            if (state.enabled)
+            {
+              self.setBearing(parseFloat(state.targetHeading).toFixed(0));
               self.options.headingFill = 'none';
               self.options.headingStrokeWidth = self.options.headingStrokeWidthTargetHold;
-            } else {
+            } 
+            else 
+            {
               self.setBearing(undefined);
               self.options.headingFill = self.options.bezel;
               self.options.headingStrokeWidth = 0;
@@ -221,14 +225,15 @@
         },
         attached: function() {
           var self = this;
+
           self.options.headingFill = self.options.bezel;
+
           this.setHeading(this.heading);
           this.setBearing(this.bearing);
-          this.format(this.options);  
           this._dataThrottleInterval = setInterval(function(){
             if (newData == lastData) return;
             lastData=newData;
-            self.setHeading(self.pad(parseFloat(newData.heading).toFixed(0), 3));          
+            self.setHeading(parseFloat(newData.heading).toFixed(0));          
           },100);                 
         },
         detached: function(){
@@ -265,53 +270,33 @@
           this.set('options.background', newOptions.background ? newOptions.background : this.options.background);
         },
         setHeading: function(value) {
-          
-          if(this.isCompass)
-          {
-            this.heading = value;
-          }
-          else  
-          {
-            this.heading = value;
+          var self = this;
+          self.heading = value;     
 
-            if(value > 180)
-            {
-              this.heading = -(360 - value);
-            }
-          }      
-          
           rotateElement(this.$.indicator, indicatorAngle, value);
 
-          if (!this.target) {
-            
+          if(!this.target) 
+          {
             var bearing = $(this.$.bearing);
             rotateElement(this.$.bearing, bearingAngle, value);
           }
         },
         setBearing: function(value) {
-          if(this.isCompass)
-          {
-            this.bearing = value;
-          }
-          else  
-          {
-            this.bearing = value;
-            
-            if(value > 180)
-            {
-              this.bearing = -(360 - value);
-            }
-          } 
+          var self = this;
+          self.bearing = value;
 
-          if (value) {
-            this.target = this.pad(this.bearing, 3);
+          if(value) 
+          {
+            this.target = this.bearing;
 
             rotateElement(this.$.bearing, bearingAngle, value);
 
             this.$.target.style.fillOpacity="100.0";
             this.$.lock.style.fillOpacity="100.0";
 
-          } else {
+          } 
+          else 
+          {
 
             this.$.target.style.fillOpacity="0.0";
             this.$.lock.style.fillOpacity="0.0";
@@ -320,12 +305,6 @@
 
             this.target = undefined;
           }
-        },
-        pad: function(num, size) {
-          var s = num + '';
-          while (s.length < size)
-            s = '0' + s;
-          return s;
         }
       });
   </script>

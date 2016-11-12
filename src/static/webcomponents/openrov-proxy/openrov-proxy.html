@@ -1,0 +1,23 @@
+//TODO:
+//  Either replace the MouseTrap or make it a bower dependency
+//  Create a way to make contained elements in to accordian items automatically
+//  Make the Acordian behavior optional?
+
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id="openrov-proxy">
+
+ 
+  <template>
+  <iframe src="/proxy" style="display:block; visibility:hidden; position:absolute"></iframe>
+  </template>
+  <script>
+    (function () {
+      Polymer({
+        is: 'openrov-proxy',
+        properties: {
+        },
+      });
+    }());
+  </script>
+</dom-module>

@@ -17,7 +17,7 @@
         }
       },
       behaviors: [namespace('behaviors').oROVStandard],
-      registerBaseEmitterHanlders: function(emitter) {
+      registerEmitterHandlers: function(emitter) {
         var self = this;
         emitter.withHistory.on('systemEnvironment.state', function (state) {
           if ('runTime' in state.mcu){
@@ -27,15 +27,10 @@
       },
       attached: function () {
         var self=this;
-        if(typeof(this.registerEmitterHandlers)=='function'){
-          var org = this.registerEmitterHandlers;
-          this.registerEmitterHandlers=function(emitter){
-            self.registerBaseEmitterHanlders(emitter);
-            org(emitter);
-          };
-        } 
-        this.registerBaseEmitterHanlders(this.eventEmitter);
-        setInterval(function(){self.time = new Date().toLocaleTimeString();},1000);
+        this._updateInterval=setInterval(function(){self.time = new Date().toLocaleTimeString();},1000);
+      },
+      detached:function(){
+        clearInterval(this._updateInterval);
       }
     };
   </script>

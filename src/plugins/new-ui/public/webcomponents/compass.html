@@ -221,24 +221,23 @@
           });
           emitter.on('plugin.navigationData.data', function(data) {
             newData = data;
-          });
-          setInterval(function(){
-            if(newData == lastData) 
-            {
-              return;
-            }
-            lastData = newData;
-            self.setHeading(parseFloat(newData.heading).toFixed(0));          
-          },100);
+          }); 
         },
         attached: function() {
           var self = this;
 
           self.options.headingFill = self.options.bezel;
 
-          self.setHeading(self.heading);
-          self.setBearing(self.bearing);
-          self.format(self.options);          
+          this.setHeading(this.heading);
+          this.setBearing(this.bearing);
+          this._dataThrottleInterval = setInterval(function(){
+            if (newData == lastData) return;
+            lastData=newData;
+            self.setHeading(parseFloat(newData.heading).toFixed(0));          
+          },100);                 
+        },
+        detached: function(){
+          clearInterval(this._dataThrottleInterval);
         },
         compassMode: function() {
           if(this.isCompass) {

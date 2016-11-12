@@ -12,17 +12,9 @@
            viewers:{type:Array,value:function(){return [];}}
       },
       behaviors: [namespace('behaviors').oROVStandard],
-      attached: function(){
-        if(typeof(this.registerEmitterHandlers)=='function'){
-          var org = this.registerEmitterHandlers;
-          this.registerEmitterHandlers=function(emitter){
-            self.registerBaseEmitterHanlders(emitter);
-            org(emitter);
-          };
-          this.registerBaseEmitterHanlders(this.eventEmitter);
-        }          
+      attached: function(){       
       },
-      registerBaseEmitterHanlders: function(emitter){
+      registerEmitterHandlers: function(emitter){
         var self = this;
           emitter.withHistory.on('plugin-peerview-status',function(status){
             self.set('streaming',status.viewers.length>0);

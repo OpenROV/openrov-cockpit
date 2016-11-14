@@ -116,9 +116,24 @@
                     log('Reconnecting to mjpg-streamer supervisor...');
                 }),
 
-                svStreamRegistration: new Listener( this.supervisor, 'stream.registration', false, function( camera, info )
+                svStreamRegistration: new Listener( this.supervisor, 'stream.registration', false, function( serial, info )
                 {
                     log('Stream Registration: ' + JSON.stringify(info) );
+
+                    // TODO: Lookup location based on serial ID
+
+                    self.globalBus.emit( 'CameraRegistration', 
+                    {
+                        location:           info.txtRecord.cameraLocation,
+                        videoMimeType:      info.txtRecord.videoMimeType,
+                        resolution:         info.txtRecord.resolution,
+                        framerate:          info.txtRecord.framerate,
+                        wspath:             info.txtRecord.wspath,
+                        relativeServiceUrl: info.txtRecord.relativeServiceUrl,
+                        sourcePort:         info.port,
+                        sourceAddress:      '',
+                        connectionType:     'wss'
+                    });
                 })
             }
         }

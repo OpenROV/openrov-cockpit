@@ -10,8 +10,8 @@ const EventEmitter  = require( "eventemitter3" );
 const fs 		    = Promise.promisifyAll( require( "fs" ) );
 
 // Logging utilities
-const log           = require( "debug" )( "app:log" );
-const error		    = require( "debug" )( "app:error" );
+const log           = require( "debug" )( "app:supervisor:log" );
+const error		    = require( "debug" )( "app:supervisor:error" );
 
 const Camera        = require( "Camera" );
 const maxCameras    = 4;
@@ -46,17 +46,32 @@ class Supervisor
             return wsPort++;
         });
 
-        this.CameraCleanup = new Periodic( 5000, "timeout", () =>
+        this.periodics = 
         {
-            for( var serial in this.cameras )
+            cameraCleanup: new Periodic( 5000, "timeout", () =>
             {
-                if( this.cameras[ serial ] !== undefined && this.cameras[ serial ].alive === false )
+                for( var serial in this.cameras )
                 {
-                    log( `Removing camera ${serial}` );
-                    this.removeCamera( serial );
+                    if( this.cameras[ serial ] !== undefined && this.cameras[ serial ].alive === false )
+                    {
+                        return Promise.try( () =>
+                        {
+                            log( `Removing camera ${serial}` );
+                            this.removeCamera( serial );
+                        })
+                        .catch( (err) =>
+                        {
+                            error( `Error removing camera: ${err.message}`);
+                        })
+                    }
                 }
-            }
-        });
+            }),
+
+            broadcastRegistrations: new Periodic( 5000, "timeout", () =>
+            {
+                this.broadcastCameraRegistrations();
+            })
+        }
     }
 
     run()
@@ -76,8 +91,9 @@ class Supervisor
         // Perform initial camera scan
         this.scanForCameras();
 
-        // Start camera cleanup periodic function
-        this.CameraCleanup.start();
+        // Start periodic functions
+        this.periodics.cameraCleanup.start();
+        this.periodics.broadcastRegistrations.start();
 
         // Start handling connections
         this.sioServer.on( "connection", client => 
@@ -89,8 +105,11 @@ class Supervisor
 
             client.on( "updateSettings", ( settings ) =>
             {
+                // For now, update defaults and send to all cameras
+                this.defaultCamSettings = settings;
+
                 // Send settings update event
-                this.eventBus.emit( "updateSettings", settings );
+                this.eventBus.emit( "updateSettings", this.defaultCamSettings );
             });
 
             client.on( "scan", () =>
@@ -109,63 +128,80 @@ class Supervisor
     scanForCameras()
     {
         return execFileAsync( "v4l2-ctl", [ "--list-devices" ] )
-                .then( ( results ) =>
+            .then( ( results ) =>
+            {
+                // Return list of V4L capable video device files
+                return results.stdout.replace( /\t/g, '', "" )      // Trim away tabs
+                    .split( "\n" )                                  // Split by lines
+                    .filter( ( line ) => 
+                    { 
+                        // Return only the /dev/* lines
+                        return ( line.indexOf( "/dev/" ) !== -1 ) 
+                    } );
+            })
+            .then( (deviceFiles) =>
+            {
+                // Filter on MJPG capable cameras
+                return Promise.filter( deviceFiles, (deviceFile) =>
                 {
-                    // Return list of V4L capable video device files
-                    return results.stdout.replace( /\t/g, '', "" ).split( "\n" ).filter( ( line ) => { return ( line.indexOf( "/dev/" ) !== -1 ) } );
-                })
-                .then( (deviceFiles) =>
-                {
-                    // Filter on MJPG capable cameras
-                    return Promise.filter( deviceFiles, (deviceFile) =>
-                    {
-                        return execFileAsync( "v4l2-ctl", [ "--list-formats", "-d", deviceFile ] )
-                                .then( (result) =>
-                                {
-                                    return ( result.stdout.indexOf( "MJPG" ) !== -1 );
-                                });
-                    });
-                })
-                .then( ( mjpgDevices ) =>
-                {
-                    // Create new cameras for devices with valid serial numbers
-                    return Promise.map( mjpgDevices, ( device ) =>
-                    {
-                        // Look up serial numbers for devices
-                        return execFileAsync( "udevadm", [ "info", "-a", "-n", device ] )
-                                .then( ( results ) => 
-                                {
-                                    // Parse serial number from results
-                                    return results.stdout.match( /{serial}=="(.*)"/)[1];
-                                })
-                                .then( (serial) =>
-                                {
-                                    log( `Creating camera ${serial}` );
-                                    this.createCamera( serial, device );
-                                })
-                                .catch( (err) =>
-                                {
-                                    // Skip
-                                    error( `Could not create camera[${device}]: ${err.message}` );
-                                });
-                    });                  
-                })
-                .then( (cameras ) =>
-                {
-                    // Do stuff
-                })
-                .catch( (err) =>
-                {
-                    log( "No V4L cameras found." );
+                    // List camera's supported formats
+                    return execFileAsync( "v4l2-ctl", [ "--list-formats", "-d", deviceFile ] )
+                        .then( (result) =>
+                        {
+                            // Return true if MJPG is a present format
+                            return ( result.stdout.indexOf( "MJPG" ) !== -1 );
+                        })
+                        .catch( (err) =>
+                        {
+                            // Somehow this camera failed to provide a format using v4l2-ctl. Skip it.
+                            error( `Error fetching formats for ${deviceFile}: ${err.message}`)
+                            return false;
+                        });
                 });
+            })
+            .then( ( mjpgDevices ) =>
+            {
+                // Create new cameras for devices with valid serial numbers
+                return Promise.map( mjpgDevices, ( device ) =>
+                {
+                    // Get device info
+                    return execFileAsync( "udevadm", [ "info", "-a", "-n", device ] )
+                        .then( ( results ) => 
+                        {
+                            // Parse serial number from results
+                            return {    serial: results.stdout.match( /{serial}=="(.*)"/)[1],
+                                        device: device }
+                        })
+                        .catch( (err) =>
+                        {
+                            // Skip
+                            error( `Could not find serial number for camera[${device}]: ${err.message}` );
+                        });
+                })
+                .map( (cameraInfo) =>
+                {
+                    return Promise.try( () =>
+                    {
+                        log( `Creating camera ${cameraInfo.serial}` );
+                        this.createCamera( cameraInfo.serial, cameraInfo.device );
+                    })
+                    .catch( (err) =>
+                    {
+                        error( `Error creating camera: ${err.message}` );
+                    });
+                });     
+            })
+            .catch( (err) =>
+            {
+                log( "No V4L cameras found." );
+            });
     }
 
     createCamera( serial, devicePath )
     {
         if( this.cameras[ serial ] !== undefined )
         {
-            log( "Camera already exists" );
-            return;
+            throw new Error( "Camera already exists" );
         }
 
         // Request a port
@@ -174,23 +210,26 @@ class Supervisor
         if( port )
         {
             // Create the camera
-            this.cameras[ serial ] = new Camera( devicePath, port, this.sslInfo, this.defaultCamSettings, this.sioServer, this.eventBus );
+            this.cameras[ serial ] = new Camera( serial, devicePath, port, this.sslInfo, this.defaultCamSettings, this.sioServer, this.eventBus );
 
             // Start the camera
             this.cameras[ serial ].start();
         }
         else
         {
-            error( "Could not create camera. Limit reached." );
+            throw new Error( "Could not create camera. Limit reached." );
         }
     }
 
     removeCamera( serial )
     {
         // Stop the camera
-        this.cameras[ serial ].stop()
+        return this.cameras[ serial ].stop()
             .then( ()=>
             {
+                // Recycle port number
+                this.portPool.recycle( this.cameras[ serial ].wsPort );
+
                 // Remove from camera list (leaves the serial key, but deletes the structure)
                 this.cameras[ serial ] = undefined;
             });

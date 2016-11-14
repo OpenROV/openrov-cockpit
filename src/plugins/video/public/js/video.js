@@ -1,75 +1,112 @@
-(function (window, document, jQuery) {
+(function (window, document, jQuery) 
+{
   //The function wrapper prevents leaking variables to global space
   'use strict';
+
   var Video;
+
   //These lines register the Video object in a plugin namespace that makes
   //referencing the plugin easier when debugging.
-  var plugins = namespace('plugins');
+  var plugins   = namespace('plugins');
   plugins.Video = Video;
-  Video = function Video(cockpit) {
+
+  Video = function Video(cockpit) 
+  {
     console.log('Loading video plugin in the browser.');
+
     //instance variables
     this.cockpit = cockpit;
     this.rov = cockpit.rov;
+
     // for plugin management:
-    this.Plugin_Meta = {
+    this.Plugin_Meta = 
+    {
       name: 'video',
       viewName: 'Video plugin',
       defaultEnabled: true
     };
   };
-  var StartWorker = function (code) {
+
+  var StartWorker = function (code) 
+  {
     var lines = code.split('\n');
     lines.splice(0, 1);
     lines.splice(lines.length - 2, 2);
-    var worker = lines.join('\n');
-    var blob = new Blob([worker]);
+
+    var worker  = lines.join('\n');
+    var blob    = new Blob([worker]);
     var blobURL = window.URL.createObjectURL(blob);
-    var worker = new Worker(blobURL);
+    var worker  = new Worker(blobURL);
+
     window.URL.revokeObjectURL(blobURL);
+
     return worker;
   };
-  var ResolveURL = function (canidateURL) {
-    var http = location.protocol;
+
+  var ResolveURL = function( candidateURL ) 
+  {
+    var http    = location.protocol;
     var slashes = http.concat('//');
-    var host = slashes.concat(window.location.hostname);
-    //just return fully qualifed addresses
-    if (canidateURL.startsWith('http')) {
-      //use the URL as is
-      return canidateURL;
+    var host    = slashes.concat(window.location.hostname);
+
+    // Just return fully qualifed addresses
+    if( candidateURL.startsWith( 'http' ) ) 
+    {
+      // Use the URL as is
+      return candidateURL;
     }
+
     //if a port is defined, use it
-    if (canidateURL.startsWith(':')) {
-      //append host to rest of url that includes a new port
-      return host.concat(canidateURL);
-    } else {
+    if( candidateURL.startsWith(':') ) 
+    {
+      // Append host to rest of url that includes a new port
+      return host.concat( candidateURL );
+    } 
+    else 
+    {
       //we have a relative or absolute URL to the existing host+port
-      if (window.location.port != '' && window.location.port != '443' && window.location.port != '80') {
+      if (window.location.port != '' && window.location.port != '443' && window.location.port != '80') 
+      {
         host.concat(':' + window.location.port);
       }
     }
-    return host.concat(canidateURL);
+
+    return host.concat(candidateURL);
   };
-  //listen gets called by the plugin framework after all of the plugins
-  //have loaded.
-  Video.prototype.listen = function listen() {
+
+  // listen gets called by the plugin framework after all of the plugins have loaded.
+  Video.prototype.listen = function listen() 
+  {
     var self = this;
-    var CameraRegsitrations = {};
-    this.rov.withHistory.on('CameraRegistration', function (data) {
+    var CameraRegistrations = {};
+
+    this.rov.withHistory.on('CameraRegistration', function (data) 
+    {
       //TODO: More robust handling of duplicat CameraRegistration messages.  If the Camera
       //already is setup, we want to ignore.  But we also want to handle multiple Cameras
       //and camera's that change settings.
-      data.sourceAddress = ResolveURL(data.relativeServiceUrl);
-      if (CameraRegsitrations[data.sourceAddress]) {
+      data.sourceAddress = ResolveURL( data.relativeServiceUrl );
+
+      if( CameraRegistrations[ data.sourceAddress ] ) 
+      {
         return;
       }
-      CameraRegsitrations[data.sourceAddress] = true;
-      switch (data.connectionType) {
+
+      CameraRegistrations[ data.sourceAddress ] = true;
+
+      switch( data.connectionType ) 
+      {
+      case 'wss':
+        data.sourceAddress = ResolveURL( data.relativeServiceUrl );
+        self.cockpit.emit('CameraRegistration', data);
+        break;
+
       case 'http':
         //pass on to MJPEG player that will connect over http
         data.sourceAddress = ResolveURL(data.relativeServiceUrl);
         self.cockpit.emit('CameraRegistration', data);
         break;
+
       case 'socket.io':
         //create the connection and pass data to the cocpkit bus for processing
         var connection;
@@ -95,6 +132,7 @@
         });
         self.cockpit.emit('CameraRegistration', data);
         break;
+
       case 'rov':
         //data is comming over the rov bus, just pass it on to the cockpit bus
         var dataflowing = false;
@@ -115,9 +153,11 @@
         });
         self.cockpit.emit('CameraRegistration', data);
         break;
+
       default:
         console.error('Unrecognized camera registration connectionType:', data.connectionType);
       }
+
     });
   };
   window.Cockpit.plugins.push(Video);

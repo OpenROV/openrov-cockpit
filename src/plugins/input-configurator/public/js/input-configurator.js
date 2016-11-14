@@ -71,7 +71,6 @@
         
         //Update the server settings to reflect this new preset
         self.cockpit.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
-        console.log(self.settings);
       });
       
       this.cockpit.on('plugin.inputConfigurator.loadPreset', function(presetNameIn) {
@@ -80,6 +79,8 @@
 
         //Search the settings for the preset requested
         var result = $.grep(self.settings.presets, function(preset){ 
+          //Convert to Object
+          preset = JSON.parse(preset, 'utf8');
           return preset.name == presetNameIn; 
         });
 
@@ -90,7 +91,11 @@
         }
         else if(result.length == 1)
         {
-          console.log(result[0]);
+          console.log("Got preset from settings.", presetNameIn);
+
+          var presetOut = JSON.parse(result[0], 'utf8');
+          console.log(presetOut);
+          self.cockpit.emit('plugin.inputController.updatedPreset', presetOut);
         }
         else
         {

@@ -1,3 +1,6 @@
+// Test With:
+// DEBUG="app:*" node App.js -p 8300 -c "data.pem" -k "key.pem"
+
 // To eliminate hard coding paths for require, we are modifying the NODE_PATH to include our lib folder
 var nodepath =  __dirname + "/:" + 
                 __dirname + "/lib/:" + 

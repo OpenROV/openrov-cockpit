@@ -7,14 +7,14 @@
     const assert    = require('assert');
     const Listener  = require( 'Listener' );
 
-    var log         = require('debug')('app:log:mjpeg');
-    var debug       = require('debug')('app:debug:mjpeg');
-    var error       = require('debug')('app:error:mjpeg');
+    var log         = require('debug')('app:mjpeg:log');
+    var debug       = require('debug')('app:mjpeg:debug');
+    var error       = require('debug')('app:mjpeg:error');
 
     var defaults = 
     {
         port: 8300,
-        wspath: '/mjpeg-video'
+        wspath: '/mjpeg'
     };
 
     class MjpgStreamer
@@ -42,7 +42,7 @@
             this.supervisorLaunchOptions = 
             [
                 "node",
-                require.resolve( 'mjpeg-video-server' ),
+                require.resolve( './supervisor/App.js' ),
                 "-p",
                 defaults.port,
                 "-c",
@@ -62,11 +62,21 @@
                 name: 'mjpeg-video-server',
                 env: 
                 {
-                    //'DEBUG': 'app*,camera*,channel*'
+                    'DEBUG': 'app*'
                 },
                 maxRestarts: -1,
                 sleep: 1000
-            });            
+            });      
+
+            this.svMonitor.on( "stdout", (data) =>
+            {
+                log( data.toString() );
+            });
+
+            this.svMonitor.on( "stderr", (data) =>
+            {
+                error( data.toString() );
+            });      
 
             // Set up listeners
             this.listeners = 
@@ -129,7 +139,7 @@
                         resolution:         info.txtRecord.resolution,
                         framerate:          info.txtRecord.framerate,
                         wspath:             info.txtRecord.wspath,
-                        relativeServiceUrl: info.txtRecord.relativeServiceUrl,
+                        relativeServiceUrl: `:${info.port}`,
                         sourcePort:         info.port,
                         sourceAddress:      '',
                         connectionType:     'wss'
@@ -140,15 +150,15 @@
 
         start()
         {
-            // Start the supervisor process
-            this.svMonitor.start();
-
             // Enable listeners
             this.listeners.svConnect.enable();
             this.listeners.svDisconnect.enable();
             this.listeners.svError.enable();
             this.listeners.svReconnect.enable();
             this.listeners.svStreamRegistration.enable();
+
+            // Start the supervisor process
+            this.svMonitor.start();
         }
 
         stop()

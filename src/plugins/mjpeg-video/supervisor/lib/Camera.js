@@ -94,12 +94,13 @@ class Camera
 
     getDaemonCommand()
     {
-        // TEMP: Removed -s
+        // TEMP: Removed -s -c ${this.sslInfo.certPath} -k ${this.sslInfo.keyPath}
+        log( this.sslInfo.certPath, this.sslInfo.keyPath );
         return [
             "nice", "-1",
             "mjpg_streamer",
             "-i", `input_uvc.so -r ${this.settings.resolution} -f ${this.settings.framerate} -d ${this.devicePath}`,
-            "-o", `output_ws.so -p ${this.wsPort} -c ${this.sslInfo.certPath} -k ${this.sslInfo.keyPath}`
+            "-o", `output_ws.so -p ${this.wsPort}`
         ];
     }
 

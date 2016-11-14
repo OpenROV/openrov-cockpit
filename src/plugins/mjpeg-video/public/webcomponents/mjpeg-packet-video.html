@@ -3,92 +3,114 @@
 
 <dom-module id="mjpeg-packet-video">
     <style>
-    
-    #camera1 {
-      width: 100%;
-      max-height: 100%;
-    }
+        #camera1 {
+        width: 100%;
+        max-height: 100%;
+        }
     </style>
-    <template>
-    <div id="videocontainer" style="display:block; height:100%; width:100%; position:relative;" on-hover="">
-      <canvas id="camera1"></canvas>
-      <content></content>
-    </div>
 
-  </template>
+    <template>
+        <div id="videocontainer" style="display:block; height:100%; width:100%; position:relative;" on-hover="">
+            <canvas id="camera1"></canvas>
+            <content></content>
+        </div>
+    </template>
+
     <script>
-        (function() {
-            Polymer({
+        (function() 
+        {
+            Polymer(
+            {
                 is: 'mjpeg-packet-video',
-                properties: {
-                    fps: {
+                properties: 
+                {
+                    fps: 
+                    {
                         type: Number
                     }
                 },
-                behaviors: [
-                Polymer.IronResizableBehavior
+                behaviors: 
+                [
+                    Polymer.IronResizableBehavior
                 ],                
-                listeners: {
-                'iron-resize': '_onIronResize'
+                listeners: 
+                {
+                    'iron-resize': '_onIronResize'
                 },     
-                _onIronResize: function(){
-                    var canvas = this.$.camera1;
-                    var style = window.getComputedStyle(this.$.videocontainer, null);
-                    canvas.width=parseInt(style.getPropertyValue('width'));
-                    canvas.height=parseInt(style.getPropertyValue('height'));
+                _onIronResize: function()
+                {
+                    var canvas  = this.$.camera1;
+                    var style   = window.getComputedStyle(this.$.videocontainer, null);
+
+                    canvas.width    = parseInt( style.getPropertyValue( 'width' ) );
+                    canvas.height   = parseInt( style.getPropertyValue( 'height' ) );
                 }, 
-                detached: function() {
-                    clearInterval(this._OncePerSecondInterval);
+                detached: function() 
+                {
+                    clearInterval( this._OncePerSecondInterval );
                 },          
-                attached: function() {
-                    this._drawCounter = 0;
-                    var self = this;
-                    var canvas = this.$.camera1;
-                    var image = new Image();
-                    this._OncePerSecondInterval=setInterval(function() {
-                        self.set('fps', self._drawCounter)
+                attached: function() 
+                {
+                    this._drawCounter   = 0;
+                    var self            = this;
+                    var canvas          = this.$.camera1;
+                    var image           = new Image();
+
+                    this._OncePerSecondInterval = setInterval( function() 
+                    {
+                        self.set( 'fps', self._drawCounter )
                         self._drawCounter = 0;
-                        if(canvas.width==0){
+
+                        if( canvas.width == 0 )
+                        {
                             self._onIronResize();
                         }                        
-                    }, 1000);
+                    }, 1000 );
+
                     var style = window.getComputedStyle(self.$.videocontainer, null);
+
                    // canvas.width=parseInt(style.getPropertyValue('width'));
                    // canvas.height=parseInt(style.getPropertyValue('height'));
-                    this._drawFrame = function(frame) {
 
-                            var blob = new Blob([frame], {
-                                type: 'application/octet-binary'
-                            });
-                            var url = URL.createObjectURL(blob);
-                            var style = window.getComputedStyle(self.$.videocontainer, null);
-                            image.onload = function() {
-                                var vertialMargin=0;
-                                width = parseInt(style.getPropertyValue('width'));
-                                height = parseInt(style.getPropertyValue('height'));
-                                proportionalHeight = canvas.width * image.height / image.width;
-                                ctx = canvas.getContext('2d');
-                               // ctx.fillrect()
-                                if (proportionalHeight<canvas.height){
-                                    vertialMargin=(canvas.height-proportionalHeight)/2;
-                                }
-                                ctx.drawImage(image, 0, vertialMargin, canvas.width, proportionalHeight);
-                                
-                                self._drawCounter++;
-                                URL.revokeObjectURL(url);
+                    this._drawFrame = function(frame) 
+                    {
+                        var url = URL.createObjectURL( frame );
+                        var style = window.getComputedStyle(self.$.videocontainer, null);
+
+                        image.onload = function() 
+                        {
+                            var verticalMargin   = 0;
+                            width               = parseInt( style.getPropertyValue( 'width' ) );
+                            height              = parseInt( style.getPropertyValue( 'height' ) );
+                            proportionalHeight  = canvas.width * image.height / image.width;
+                            ctx                 = canvas.getContext('2d');
+
+
+                            if( proportionalHeight < canvas.height )
+                            {
+                                verticalMargin = ( canvas.height - proportionalHeight ) / 2;
                             }
-                            image.src = url;
-                        
+
+                            ctx.drawImage( image, 0, verticalMargin, canvas.width, proportionalHeight );
+                            
+                            self._drawCounter++;
+                            URL.revokeObjectURL( url );
+                        }
+
+                        image.src = url;
                     }
                 },
+
                 stop: function() {},
                 ready: function() {},
                 /**
                  * Takes a byte array for the jpeg image and displays it on screen
                  */
-                append: function(frame) {
-                    var self=this;
-                    window.requestAnimationFrame(function(){
+                append: function(frame) 
+                {
+                    var self = this;
+                    window.requestAnimationFrame( function()
+                    {
                         self._drawFrame(frame);
                     });
                 }

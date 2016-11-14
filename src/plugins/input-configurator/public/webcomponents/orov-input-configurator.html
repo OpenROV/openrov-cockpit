@@ -264,15 +264,22 @@
 
 
         <paper-dialog id="savePresetModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation">
-            
-            <h1>{{__('Enter a preset name')}}</h1>
+
+            <h1>{{__('Overwrite a saved preset or enter a new preset name')}}</h1>
+
+            <paper-dropdown-menu id="savedPresetsDropdown" label="presets">
+                <paper-listbox class="dropdown-content" attr-for-selected="value" selected="{{item.name}}" >
+                    <template is="dom-repeat" items="[[savedPresets]]">
+                        <paper-item value="{{item}}" on-tap="overwritePreset">{{item}}</paper-item>
+                    </template>
+                </paper-listbox>
+            </paper-dropdown-menu>
 
             <paper-input id="savePresetInput" label="preset name" required auto-validate char-counter maxlength="25" error-message="preset name needs some text!"></paper-input>
 
             <div class="buttons">
-                <paper-button dialog-confirm on-tap="handleSavePreset" class="blue-button">{{__('OK')}}</paper-button>
+                <paper-button dialog-confirm on-tap="saveNewPreset" class="blue-button">{{__('OK')}}</paper-button>
                 <paper-button dialog-dismiss class="blue-button">{{__('CANCEL')}}</paper-button>
-                
             </div>
         </paper-dialog>
 
@@ -429,8 +436,9 @@
                     }.bind(this);
 
                     this.getSavedPresetListFunction = function(presets) {
-                        console.log(presets);
+                        console.log("Got saved presets: ", presets);
                         self.savedPresets = presets;
+                        console.log("But this is what we have?", self.savedPresets);
                     }.bind(this);
 
                     emitter.on('plugin.inputController.updatedPreset', this.presetFunction );
@@ -716,20 +724,26 @@
                     self.$.loadPresetModal.close();
                 },
 
-                handleSavePreset: function()
+                saveNewPreset: function()
+                {
+                    var self = this;
+                    var presetName = self.$.savePresetInput.value;
+
+                    if(presetName)
+                    {
+                        self.handleSavePreset(presetName);
+                    }
+                },
+
+                handleSavePreset: function(presetName)
                 {
                     var self = this;
 
-                    var presetName = self.$.savePresetInput.value;
-                    if(presetName)
-                    {
-                        //Sanitize
-                        presetName = presetName.replace(/\s+/g, '');
-                        self.preset.name = presetName;
-                        self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.preset);
-
-                        self.openSavedPresetToast();
-                    }
+                    self.preset.name = presetName;
+                    self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.preset);
+                    
+                    self.$.savePresetModal.close();
+                    self.openSavedPresetToast();
                 },
 
                 openSavePresetModal: function()
@@ -747,6 +761,14 @@
                     self.eventEmitter.emit('plugin.inputConfigurator.getSavedPresets', self.preset);
                     
                     self.$.loadPresetModal.open();
+                },
+
+                overwritePreset: function(oEvent)
+                {
+                    var self = this;
+                    var presetName = oEvent.model.get('item');
+                    self.handleSavePreset(presetName);
+                    
                 },
 
                 //Checks to see if this action accepts this type

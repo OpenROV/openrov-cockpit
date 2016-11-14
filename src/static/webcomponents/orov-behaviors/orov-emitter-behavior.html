@@ -21,7 +21,8 @@
           };
         },
         observer: '_eventEmitterChanged'
-      }
+      },
+      _emListeners: {type: Array, value: function(){return [];}}
     },
     created: function () {
     //  console.log('oROV Emitter Behavior for ', this, 'enabled!');
@@ -54,7 +55,7 @@
        });
       }
       if(root.registerEmitterHandlers !== undefined){
-      root.registerEmitterHandlers.call(self,emitter);
+        root.registerEmitterHandlers.call(self,emitter);
       }
 
     },
@@ -62,8 +63,17 @@
       if(this.eventEmitter==undefined){
         return;
       }
-      this.visited=[]
+      var self=this;
+      this.visited=[];
+      var originalOn = this.eventEmitter.on;
+      this.eventEmitter.on = function(){
+        var event = arguments[0];
+        var fn = arguments[1];
+        self._emListeners.push({event:event,fn:fn});
+        originalOn.apply(this,arguments);
+      }
       this._registerTreeOfListeners(this,this.eventEmitter);
+      this.eventEmitter.on=originalOn;
     },
     attached: function () {
       //Added a new lifecycle event for the control:
@@ -71,6 +81,13 @@
       this._registerBusListeners();
     //  console.log('OROV-BEHAVIOR: Registerd eventEmitter');
       this.processedAttached=true;
+    },
+    detached: function (){
+      //Unregister all BusListeners
+      while(this._emListeners.length>0){
+        var registration =this._emListeners.shift();
+        this.eventEmitter.off(registration.event,registration.fn);
+      }
     },
     _eventEmitterChanged: function (newvalue, oldvalue) {
       var self = this;

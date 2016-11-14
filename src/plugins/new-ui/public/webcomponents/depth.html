@@ -204,14 +204,7 @@
           emitter.on('plugin.navigationData.data', function (data) {
             newState = data;
           });
-          setInterval(function(){
-              if (newState == lastState){return;};
-              lastState = newState
-              var data = lastState;
-              if ('depth' in data) {
-                self.set('depth',Number(data.depth));//.toFixed(1);
-              }
-          },100);
+
           emitter.withHistory.on('plugin.rovpilot.depthHold.state', function (state) {
             if(state.enabled){
             self.target = Number(state.targetDepth).toFixed(1);
@@ -230,6 +223,14 @@
           });
         },
         attached: function(){
+          this._dataThrottleInterval=setInterval(function(){
+              if (newState == lastState){return;};
+              lastState = newState
+              var data = lastState;
+              if ('depth' in data) {
+                self.set('depth',Number(data.depth));//.toFixed(1);
+              }
+          },100);
           var self = this;
           var depthChangeUp = $(this.$.depthChangeUp).find('svg polygon');
           var depthChangeDown = $(this.$.depthChangeDown).find('svg polygon');
@@ -270,7 +271,7 @@
             self.change = changeText;
             oldDepth = currentDepth;
           };
-          setInterval(update, 1000);
+          this._updateInterval=setInterval(update, 1000);
           depthChangeUp.css({
             fill: this.options.indicatorInactive,
             stroke: this.options.strokeInactive
@@ -279,6 +280,10 @@
             fill: this.options.indicatorInactive,
             stroke: this.options.strokeInactive
           });
+        },
+        detached:function(){
+          clearInterval(this._dataThrottleInterval);
+          clearInterval(this._updateInterval);
         },
         formatDepth : function(depth){
           return depth.toFixed(1);

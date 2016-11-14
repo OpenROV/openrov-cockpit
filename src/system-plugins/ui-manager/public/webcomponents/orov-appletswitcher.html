@@ -48,9 +48,6 @@
     behaviors: [namespace('behaviors').oROVStandard, namespace('behaviors').oROVAppletSwitcher],
     handleMenuSelection: function(e)
     {
-      console.log( "Clicked App Menu Button: " + e.detail.label );
-      console.log( "Action: " + e.detail.action );
-      console.log( "Target: " + e.detail.target );
       var options = {target:e.detail.target};
 
       if (lastMouseEvent.shiftKey){

@@ -35,13 +35,16 @@
               history: 20
             });
       //      this.meter.hide();
+        },
+        attached: function(){
+           var self = this;
 
-            var self = this;
-
-            setInterval(function () {
+           this._updateInterval=setInterval(function () {
               self.meter.tick();
             }, 33.3);
-
+        },
+        detached: function(){
+          clearInterval( this._updateInterval);
         }
       })
     })();

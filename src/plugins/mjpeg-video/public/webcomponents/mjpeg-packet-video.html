@@ -36,13 +36,16 @@
                     var style = window.getComputedStyle(this.$.videocontainer, null);
                     canvas.width=parseInt(style.getPropertyValue('width'));
                     canvas.height=parseInt(style.getPropertyValue('height'));
-                },           
+                }, 
+                detached: function() {
+                    clearInterval(this._OncePerSecondInterval);
+                },          
                 attached: function() {
                     this._drawCounter = 0;
                     var self = this;
                     var canvas = this.$.camera1;
                     var image = new Image();
-                    setInterval(function() {
+                    this._OncePerSecondInterval=setInterval(function() {
                         self.set('fps', self._drawCounter)
                         self._drawCounter = 0;
                         if(canvas.width==0){

@@ -26,6 +26,8 @@
         presets: []
       };
 
+      self.savedPresets = [];
+
       self.rov = self.cockpit.rov.withHistory;
       self.isSavingSettings = false;
            
@@ -41,68 +43,20 @@
         if(!self.isSavingSettings)
         {
           self.settings = settings.inputConfigurator;
+
+          //Update the saved preset name lists
+          self.updateSavedPresetList();
         }
       });
 
       this.cockpit.on('plugin.inputConfigurator.savePreset', function(presetIn) {
         console.log("Saving preset to settings");
-
-        //The preset we want to save to the settings manager
-        var presetToSave = JSON.stringify(presetIn, null, 2);
-
-        //Add this preset to our settings object
-        var presetName = presetIn.name;
-        
-        //Remove this preset, if found
-        for(var i = 0; i < self.settings.presets.length; ++i)
-        {
-          //Get the object
-          var preset = JSON.parse(self.settings.presets[i], 'utf8');
-
-          if(preset.name == presetName)
-          {
-            self.settings.presets.splice(i, 1);
-            break;
-          }
-        }
-
-        //Add the preset
-        self.settings.presets.push(presetToSave);
-        
-        //Update the server settings to reflect this new preset
-        self.cockpit.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
+        self.savePreset(presetIn);
       });
       
       this.cockpit.on('plugin.inputConfigurator.loadPreset', function(presetNameIn) {
-        
         console.log("Loading preset", presetNameIn);
-
-        //Search the settings for the preset requested
-        var result = $.grep(self.settings.presets, function(preset){ 
-          //Convert to Object
-          preset = JSON.parse(preset, 'utf8');
-          return preset.name == presetNameIn; 
-        });
-
-        if(result.length == 0)
-        {
-          console.error("There is no preset in the settings:", presetNameIn);
-          return;
-        }
-        else if(result.length == 1)
-        {
-          console.log("Got preset from settings.", presetNameIn);
-
-          var presetOut = JSON.parse(result[0], 'utf8');
-          console.log(presetOut);
-          self.cockpit.emit('plugin.inputController.updatedPreset', presetOut);
-        }
-        else
-        {
-          console.error("Multiple presets with this name found:", presetNameIn);
-          return;
-        }
-
+        self.loadPreset(presetNameIn);
       });
 
       this.cockpit.rov.on('plugin.inputConfigurator.loadedPreset', function(presetIn) {
@@ -110,6 +64,85 @@
         self.cockpit.emit('plugin.inputController.updatedPreset', presetIn);
       });
 
+    }
+
+    //Class methods
+    loadPreset(presetNameIn)
+    {
+      var self = this;
+      //Search the settings for the preset requested
+      var result = $.grep(self.settings.presets, function(preset){ 
+        //Convert to Object
+        preset = JSON.parse(preset, 'utf8');
+        return preset.name == presetNameIn; 
+      });
+
+      if(result.length == 0)
+      {
+        console.error("There is no preset in the settings:", presetNameIn);
+        return;
+      }
+      else if(result.length == 1)
+      {
+        console.log("Got preset from settings.", presetNameIn);
+
+        var presetOut = JSON.parse(result[0], 'utf8');
+        console.log(presetOut);
+        self.cockpit.emit('plugin.inputController.updatedPreset', presetOut);
+      }
+      else
+      {
+        console.error("Multiple presets with this name found:", presetNameIn);
+        return;
+      }
+    };
+
+    savePreset(presetIn)
+    {
+      var self = this;
+      //The preset we want to save to the settings manager
+      var presetToSave = JSON.stringify(presetIn, null, 2);
+
+      //Add this preset to our settings object
+      var presetName = presetIn.name;
+      
+      //Remove this preset, if found
+      console.log(self.settings.presets);
+      for(var i = 0; i < self.settings.presets.length; ++i)
+      {
+        //Get the object
+        var preset = JSON.parse(self.settings.presets[i], 'utf8');
+
+        if(preset.name == presetName)
+        {
+          self.settings.presets.splice(i, 1);
+          break;
+        }
+      }
+
+      //Add the preset
+      self.settings.presets.push(presetToSave);
+      
+      //Update the server settings to reflect this new preset
+      self.cockpit.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
+    }
+
+    updateSavedPresetList()
+    {
+      var self = this;
+      
+      //Clear the array
+      self.savedPresets.length = 0;
+
+      //Update the saved preset name lists
+      for(var i = 0; i < self.settings.presets.length; ++i)
+      {
+        var preset = JSON.parse(self.settings.presets[i], 'utf8');
+        self.savedPresets.push(preset.name);
+      }
+
+      console.log("Preset names:", self.savedPresets);
+      self.cockpit.emit('plugin.inputConfigurator.savedPresets', self.savedPresets);
     }
   };
 

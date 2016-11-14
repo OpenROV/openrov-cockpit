@@ -49,7 +49,7 @@
         
         #tableContainer {
             overflow: auto;
-            height: 100%;
+            height: 300px;
         }
 
         #descriptionRow {
@@ -262,13 +262,56 @@
 
         </paper-dialog>
 
+
+        <paper-dialog id="savePresetModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation">
+            
+            <h1>{{__('Overwrite a saved preset or enter a new preset name')}}</h1>
+
+            <paper-dropdown-menu id="savedPresetsDropdown" label="presets">
+                <paper-listbox class="dropdown-content" attr-for-selected="value" selected="{{item.name}}" >
+                    <template is="dom-repeat" items="[[savedPresets]]">
+                        <paper-item value="{{item}}" on-tap="overwritePreset">{{item}}</paper-item>
+                    </template>
+                </paper-listbox>
+            </paper-dropdown-menu>
+
+            <paper-input id="savePresetInput" label="preset name" required auto-validate char-counter maxlength="25" error-message="preset name needs some text!"></paper-input>
+
+            <div class="buttons">
+                <paper-button dialog-confirm on-tap="saveNewPreset" class="blue-button">{{__('OK')}}</paper-button>
+                <paper-button dialog-dismiss class="blue-button">{{__('CANCEL')}}</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="loadPresetModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation">
+            <h1>{{__('Choose a preset')}}</h1>
+            <paper-dropdown-menu id="savedPresetsDropdown" label="presets">
+                <paper-listbox class="dropdown-content" attr-for-selected="value" selected="{{candidatePreset}}" on-iron-select="handleLoadPreset">
+                    <template is="dom-repeat" items="[[savedPresets]]">
+                        <paper-item value="{{item}}">{{item}}</paper-item>
+                    </template>
+                </paper-listbox>
+            </paper-dropdown-menu>
+    
+            <div class="buttons">
+                <paper-button dialog-dismiss class="blue-button">{{__('CANCEL')}}</paper-button>
+            </div>
+        </paper-dialog>
+
         <div class="buttons">
-            <paper-button id="savePresetButton" on-tap="handleSavePreset"> Save Preset </paper-button>
-            <paper-button id="loadPresetButton" on-tap="handleLoadPreset"> Load Preset </paper-button>
+            <paper-button id="savePresetButton" on-tap="openSavePresetModal"> Save Preset </paper-button>
+            <paper-button id="loadPresetButton" on-tap="openLoadPresetModal"> Load Preset </paper-button>
+        </div>
+
 
         <paper-toast id="updatedPresetToast" text="Updated Preset!"></paper-toast>
+
         <paper-toast id="clearedInputToast" text="Cleared input!"></paper-toast>
+        <paper-toast id="savedPresetToast" text="Saved preset!"></paper-toast>
+        <paper-toast id="loadedPresetToast" text="Loaded preset!"></paper-toast>
+
         <paper-toast id="duplicateInputToast" class="fit-bottom" text="Duplicate found."></paper-toast>
+
     </template>
     <script>
 
@@ -329,6 +372,10 @@
                         type: Object,
                         value: undefined
                     },
+                    candidatePreset: {
+                        type: String,
+                        value: undefined
+                    },
 
                     conflictingBinding: {
                         type: Object,
@@ -340,6 +387,10 @@
                     },
 
                     presetArray: {
+                        type: Array,
+                        value: undefined
+                    },
+                    savedPresets: {
                         type: Array,
                         value: undefined
                     },
@@ -384,11 +435,19 @@
                         self.presetToArray(self.preset);
                     }.bind(this);
 
+                    this.getSavedPresetListFunction = function(presets) {
+                        console.log("Got saved presets: ", presets);
+                        self.savedPresets = presets;
+                        console.log("But this is what we have?", self.savedPresets);
+                    }.bind(this);
+
                     emitter.on('plugin.inputController.updatedPreset', this.presetFunction );
+                    emitter.on('plugin.inputConfigurator.savedPresets', this.getSavedPresetListFunction );
                 },
                 
                 detached: function(){
-                    this.eventEmitter.off('plugin.inputController.updatedPreset',this.presetFunction)
+                    this.eventEmitter.off('plugin.inputController.updatedPreset',this.presetFunction);
+                    this.eventEmitter.off('plugin.inputConfigurator.savedPresets',this.getSavedPresetListFunction);
                 },
 
                 attached: function() {
@@ -397,6 +456,10 @@
                     if(self.presets == undefined)
                     {
                         self.eventEmitter.emit('plugin.inputController.sendPreset');
+                    }
+                    else
+                    {
+                        self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.preset);
                     }
                     
                 },
@@ -652,15 +715,60 @@
                 handleLoadPreset: function()
                 {
                     var self = this;
-                    console.log("Requesting preset to be loaded");
-                    self.eventEmitter.emit('plugin.inputConfigurator.loadPreset', "Defaults");
+                    
+                    //Request the node module to send up the preset requested
+                    self.eventEmitter.emit('plugin.inputConfigurator.loadPreset', self.candidatePreset);
+
+                    self.candidatePreset = undefined;
+                    self.openLoadedPresetToast();
+                    self.$.loadPresetModal.close();
                 },
 
-                handleSavePreset: function()
+                saveNewPreset: function()
                 {
                     var self = this;
-                    console.log("Sent preset to be saved!");
+                    var presetName = self.$.savePresetInput.value;
+
+                    if(presetName)
+                    {
+                        self.handleSavePreset(presetName);
+                    }
+                },
+
+                handleSavePreset: function(presetName)
+                {
+                    var self = this;
+
+                    self.preset.name = presetName;
                     self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.preset);
+                    
+                    self.$.savePresetModal.close();
+                    self.openSavedPresetToast();
+                },
+
+                openSavePresetModal: function()
+                {
+                    var self = this;
+                    
+                    self.$.savePresetModal.open();
+                },
+
+                openLoadPresetModal: function()
+                {
+                    var self = this;
+
+                    //Get the saved presets from disk
+                    self.eventEmitter.emit('plugin.inputConfigurator.getSavedPresets', self.preset);
+                    
+                    self.$.loadPresetModal.open();
+                },
+
+                overwritePreset: function(oEvent)
+                {
+                    var self = this;
+                    var presetName = oEvent.model.get('item');
+                    self.handleSavePreset(presetName);
+                    
                 },
 
                 //Checks to see if this action accepts this type
@@ -711,6 +819,16 @@
 
                     self.candidateBinding = undefined;
                     self.$.updatedPresetToast.open();
+                },
+                openSavedPresetToast: function() {
+                    var self = this;
+
+                    self.$.savedPresetToast.open();
+                },
+                openLoadedPresetToast: function() {
+                    var self = this;
+
+                    self.$.loadedPresetToast.open();
                 },
 
 

@@ -7,7 +7,6 @@
   var log;
   var trace;
   var log_debug;
-
   $.getScript('components/visionmedia-debug/dist/debug.js', function() {
     log = debug('input-controller:log');
     trace = debug('input-controller:trace');
@@ -20,7 +19,16 @@
     constructor(cockpit)
     {
       this.cockpit = cockpit;
+
+      var self = this;
       
+      self.settings = {
+        presets: []
+      };
+
+      self.rov = self.cockpit.rov.withHistory;
+      self.isSavingSettings = false;
+           
     };
 
 
@@ -28,13 +36,68 @@
     {
       var self = this;
 
+      //Listen for server setting changes
+      this.rov.on('settings-change.inputConfigurator', function(settings) {
+        if(!self.isSavingSettings)
+        {
+          self.settings = settings.inputConfigurator;
+        }
+      });
+
       this.cockpit.on('plugin.inputConfigurator.savePreset', function(presetIn) {
-        self.cockpit.rov.emit('plugin.inputConfigurator.savePreset', presetIn);
+        console.log("Saving preset to settings");
+
+        //The preset we want to save to the settings manager
+        var presetToSave = JSON.stringify(presetIn, null, 2);
+
+        //Add this preset to our settings object
+        var presetName = presetIn.name;
+        
+        //Remove this preset, if found
+        for(var i = 0; i < self.settings.presets.length; ++i)
+        {
+          //Get the object
+          var preset = JSON.parse(self.settings.presets[i], 'utf8');
+
+          if(preset.name == presetName)
+          {
+            self.settings.presets.splice(i, 1);
+            break;
+          }
+        }
+
+        //Add the preset
+        self.settings.presets.push(presetToSave);
+        
+        //Update the server settings to reflect this new preset
+        self.cockpit.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
+        console.log(self.settings);
       });
       
       this.cockpit.on('plugin.inputConfigurator.loadPreset', function(presetNameIn) {
-        console.log("Got something to share", presetNameIn);
-        self.cockpit.rov.emit('plugin.inputConfigurator.loadPreset', presetNameIn);
+        
+        console.log("Loading preset", presetNameIn);
+
+        //Search the settings for the preset requested
+        var result = $.grep(self.settings.presets, function(preset){ 
+          return preset.name == presetNameIn; 
+        });
+
+        if(result.length == 0)
+        {
+          console.error("There is no preset in the settings:", presetNameIn);
+          return;
+        }
+        else if(result.length == 1)
+        {
+          console.log(result[0]);
+        }
+        else
+        {
+          console.error("Multiple presets with this name found:", presetNameIn);
+          return;
+        }
+
       });
 
       this.cockpit.rov.on('plugin.inputConfigurator.loadedPreset', function(presetIn) {

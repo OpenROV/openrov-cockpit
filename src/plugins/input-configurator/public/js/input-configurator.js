@@ -92,7 +92,7 @@
 
         var presetOut = JSON.parse(result[0], 'utf8');
         console.log(presetOut);
-        self.cockpit.emit('plugin.inputController.updatedPreset', presetOut);
+        self.cockpit.emit('plugin.inputConfigurator.loadedPreset', presetOut);
       }
       else
       {

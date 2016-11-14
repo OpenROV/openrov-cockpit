@@ -154,7 +154,7 @@
         self.unregisterInput(input);
       });
 
-      this.cockpit.rov.on('plugin.inputConfigurator.loadedPreset', function(loadedPreset) {
+      this.cockpit.on('plugin.inputConfigurator.loadedPreset', function(loadedPreset) {
 
         //Try to update that input
         console.log("Input controller got a loaded preset", loadedPreset);
@@ -194,6 +194,7 @@
       //And update to the new one
       self.registerPresetWithHardware(preset);
       self.currentPreset = preset;
+      console.log("Changed preset,", self.currentPreset);
       self.cockpit.emit('plugin.inputController.updatedPreset', self.currentPreset, self.actions);
     };
 

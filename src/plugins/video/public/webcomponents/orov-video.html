@@ -7,88 +7,115 @@
 <dom-module name="orov-video">
   <style>
   </style>
+
   <template>
     <template is="dom-if" if="{{displayPlayer(videoMimeType,'video/x-motion-jpeg','http',_registerdConnection)}}" >
-    <mjpeg-video id="camera1" border='1' style='width: 100%; height:100%'
+      <mjpeg-video id="camera1" border='1' style='width: 100%; height:100%'
       menuState='on'
       src='{{videoSource}}'
       framespersecond='{{framesPerSecond}}'
       canvas='{{canvas}}'
       cors='false'
       showMenu='true'>
-      <content></content>
-     </mjpeg-video>
+        <content></content>
+      </mjpeg-video>
     </template>
 
     <template is="dom-if" if="{{displayPlayer(videoMimeType,'video/x-motion-jpeg','socket.io',_registerdConnection)}}" >
-    <mjpeg-packet-video id="camera1" border='1' style='width: 100%; height:100%'>
-      <content></content>
-     </mjpeg-packet-video>
+      <mjpeg-packet-video id="camera1" border='1' style='width: 100%; height:100%'>
+        <content></content>
+      </mjpeg-packet-video>
     </template>    
 
     <template id="mp4template" is="dom-if" if="{{displayPlayer(videoMimeType,'video/mp4','socket.io',_registerdConnection)}}">
       <packet-video id="camera1" border='1' style='width: 100%; height:100%'
-        menuState='on'
-        src='{{videoSource}}'
-        framespersecond='{{framesPerSecond}}'
-        canvas='{{canvas}}'
-        cors='false'
-        showMenu='true'
-        show-stats='{{showStats}}'>
-      <content></content>
-    </packet-video>
+      menuState='on'
+      src='{{videoSource}}'
+      framespersecond='{{framesPerSecond}}'
+      canvas='{{canvas}}'
+      cors='false'
+      showMenu='true'
+      show-stats='{{showStats}}'>
+        <content></content>
+      </packet-video>
     </template>
-
 
   </template>
   <script>
 
-      Polymer({
+      Polymer(
+        {
         is: "orov-video",
-        properties: {
-          videoSource: {type:Object},
-          framesPerSecond: {type:Number},
-          canvas: {type:Object, observer: '_canvasChanged'},
-          videoMimeType: {type:String},
-          location: {type:String},
-          showStats: {type:Boolean, value:function(){return false;}},
-          shortCircuit: {type:Boolean, value:function(){return false;}},
-          _registerdConnection: {type:Object, value:function(){return null;}}
+        properties: 
+        {
+          videoSource:          { type: Object },
+          framesPerSecond:      { type: Number },
+          canvas:               { type: Object, observer: '_canvasChanged' },
+          videoMimeType:        { type: String },
+          location:             { type: String },
+          showStats:            { type: Boolean, value: function(){ return false; } },
+          shortCircuit:         { type: Boolean, value: function(){ return false; } },
+          _registerdConnection: { type: Object, value: function(){ return null; } }
         },
-        behaviors: [namespace('behaviors').oROVStandard],
-        detached: function(){
+        behaviors: [ namespace('behaviors').oROVStandard ],
+        detached: function()
+        {
           this.shortCircuit=true;
         },
-				attached : function() {
-					if (this.emitter) {
+				attached : function() 
+        {
+					if (this.emitter) 
+          {
 						this.emitter.emit('video.ready');
 					}
+
           this.shortCircuit=false;
 				},
         packetVideo_initializationInProgress: false,
-        registerEmitterHandlers: function(emitter){
-          var self = this;
-					self.emitter = emitter;
-          emitter.withHistory.on('settings-change.videosettings',function(settings){
-            if (self.shortCircuit) {return;}
+        registerEmitterHandlers: function(emitter)
+        {
+          var self      = this;
+					self.emitter  = emitter;
+
+          emitter.withHistory.on('settings-change.videosettings',function(settings)
+          {
+            if (self.shortCircuit) 
+            {
+              return;
+            }
+
             self.showStats = settings.videosettings['show-stats'];
-            
           });
 
-          emitter.on('video.forward.get-canvas',function(callback){
-            if (self.shortCircuit) {return;}            
-            if (typeof(callback)==='function'){
+          emitter.on('video.forward.get-canvas',function(callback)
+          {
+            if (self.shortCircuit) 
+            {
+              return;
+            }      
+
+            if (typeof(callback)==='function')
+            {
               callback({forwardCanvas:this.canvas});
             }
           });
-          emitter.withHistory.on('CameraRegistration',function(data){
-            
-            if (self.shortCircuit) {return;}            
-            if (data.location!==self.location) return;
-            //      self.rov.emit('CameraRegistration',{cameraLocation:'front', videoMimeType:'video/mp4', resolution:'1920x1080', framerate:30, sourcePort:service.port, sourceAddress:service.address});
-            self.videoMimeType=data.videoMimeType;
-            self.framesPerSecond=data.framerate;
-            self.videoSource = data.sourceAddress;
+
+          emitter.withHistory.on('CameraRegistration',function(data)
+          {
+            if (self.shortCircuit) 
+            {
+              return;
+            }       
+
+            if (data.location!==self.location)
+            { 
+              return;
+            }
+
+            self.videoMimeType    = data.videoMimeType;
+            self.framesPerSecond  = data.framerate;
+            self.videoSource      = data.sourceAddress;
+
             self.set('_registerdConnection',data);
           });
 
@@ -96,24 +123,40 @@
           //we go ahead and request the initalization packet and
           //init the camera before appending the raw data.
 
-          emitter.on('x-h264-video.data',function(data){
-            if (self.shortCircuit) {return;}            
-            if (self.$$('#camera1')===null){
+          emitter.on('x-h264-video.data',function(data)
+          {
+            if (self.shortCircuit) 
+            {
+              return;
+            }         
+
+            if (self.$$('#camera1')===null)
+            {
               return;
             }
-            if(self.$$('#camera1').initialized){
+
+            if(self.$$('#camera1').initialized)
+            {
               self.$$('#camera1').append(new Uint8Array(data));
-            } else {
-              if(!self.packetVideo_initializationInProgress){
+            } 
+            else 
+            {
+              if(!self.packetVideo_initializationInProgress)
+              {
                 self.packetVideo_initializationInProgress = true;
-                emitter.emit('request_Init_Segment',function(data){
-                  self.$$('#camera1').init(new Uint8Array(data),function(){
+
+                emitter.emit('request_Init_Segment',function(data)
+                {
+                  self.$$('#camera1').init(new Uint8Array(data),function()
+                  {
                     packetVideo_initializationInProgress = false;
                     emitter.emit('video.videoElementAvailable',self.$$('#camera1').getVideoElement());
                   });
                 });
+
                 //timeout and try agian after 1 second
-                setTimeout(function(){
+                setTimeout(function()
+                {
                   self.packetVideo_initializationInProgress = false;
                 },5000);
               }
@@ -121,24 +164,39 @@
           });
 
 
-          emitter.on('x-motion-jpeg.data',function(frame){
-            if (self.shortCircuit) {return;}            
-            if (self.$$('#camera1')===null){
+          emitter.on('x-motion-jpeg.data',function(frame)
+          {
+            if (self.shortCircuit) 
+            {
+              return;
+            }     
+
+            if (self.$$('#camera1')===null)
+            {
               return;
             }
+
             self.$$('#camera1').append(frame);
           })
         },
-        _canvasChanged: function(){
-          if (this.eventEmitter!==undefined){
+
+        _canvasChanged: function()
+        {
+          if (this.eventEmitter!==undefined)
+          {
             this.eventEmitter.emit('video.forward.canvas-changed',this.canvas);
           }
         },
-        displayPlayer(mimeType,playerType,connection,registeredConnection){
-          if (registeredConnection == null){
+
+        displayPlayer( mimeType, playerType, connection, registeredConnection )
+        {
+          if (registeredConnection == null)
+          {
             return false;
           }
-          var connectionMatch=connection==null?true:registeredConnection.connectionType==connection;
+
+          var connectionMatch = connection == null ? true : registeredConnection.connectionType == connection;
+
           return ((mimeType==playerType) && connectionMatch);
         }
     });

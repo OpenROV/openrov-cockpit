@@ -22,6 +22,7 @@ var argv = require( "yargs" )
     .string( "c" )
     .string( "k" )
     .boolean( "m" )
+    .boolean( "h" )
     .demand( [ "p", "c", "k" ] )
     .fail( function (msg, err) 
     {
@@ -35,16 +36,12 @@ try
 {	
     var settings =
     {
-        port:   argv.p,     // Supervisor socket.io port number
-        cert:   argv.c,     // Absolute SSL Cert Path
-        key:    argv.k,     // Absolute SSL Key Path
+        port:           argv.p,                                         // Supervisor socket.io port number
+        cert:           argv.c,                                         // Absolute SSL Cert Path
+        key:            argv.k,                                         // Absolute SSL Key Path
+        useMock:        ( ( argv.m !== undefined ) ? argv.m : false ),  // Use mock mode
+        useHardware:    ( ( argv.h !== undefined ) ? argv.h : false )   // Use real hardware (true) or mock hardware (false)
     }
-	
-    // Optional mock setting
-	if( argv.m !== undefined )
-	{
-		settings.mock = argv.m;
-	}
 
     // Create supervisor
     const Supervisor    = require( "Supervisor" );

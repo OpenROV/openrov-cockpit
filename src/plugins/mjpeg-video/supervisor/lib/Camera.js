@@ -10,19 +10,22 @@ const dError		= require( "debug" )( "app:daemon:error" );
 
 class Camera
 {
-    constructor( serial, devicePath, wsPort, sslInfo, defaultSettings, sioServer, eventBus )
+    constructor( serial, devicePath, wsPort, configuration )
     {
         // Camera properties
         this.serial     = serial;
         this.devicePath = devicePath;
         this.wsPort     = wsPort;
-        this.sslInfo    = sslInfo;
-        this.settings   = defaultSettings;
         this.alive      = true;
 
-        // Comm buses
-        this.sioServer  = sioServer;
-        this.eventBus   = eventBus;
+        // Config
+        this.sslInfo    = configuration.sslInfo;
+        this.settings   = configuration.cameraSettings;
+        this.sioServer  = configuration.sioServer;
+        this.eventBus   = configuration.eventBus;
+
+        // Mock mode info
+        this.useMock            = configuration.useMock;
 
         // Create process daemon
         this.daemon = Respawn( this.getDaemonCommand(),
@@ -61,16 +64,10 @@ class Camera
                     // Send registration message
                     this.sioServer.emit( "stream.registration", this.serial, 
                     {
-                        service:	'mjpeg-video',
-                        port:		this.wsPort,
-                        addresses:	['127.0.0.1'],
+                        port:		        this.wsPort,
                         resolution: 		this.settings.resolution, 
                         framerate: 			this.settings.framerate,
-                        videoMimeType: 		'video/x-motion-jpeg',
-                        cameraLocation: 	"forward",
-                        relativeServiceUrl: "",  
-                        wspath: 			"",
-                        connectionType:     "wss"
+                        connectionType:     ( this.useMock ? "ws" : "wss" )
                     });
                 }
             }),
@@ -92,13 +89,25 @@ class Camera
 
     getDaemonCommand()
     {
-        log( this.sslInfo.certPath, this.sslInfo.keyPath );
-        return [
-            "nice", "-1",
-            "mjpg_streamer",
-            "-i", `input_uvc.so -r ${this.settings.resolution} -f ${this.settings.framerate} -d ${this.devicePath}`,
-            "-o", `output_ws.so -p ${this.wsPort} -s -c ${this.sslInfo.certPath} -k ${this.sslInfo.keyPath}`
-        ];
+        if( this.useMock )
+        {
+            return [
+                "nice", "--1",
+                "mjpg_streamer",
+                "-i", `input_uvc.so -r ${this.settings.resolution} -f ${this.settings.framerate} -d ${this.devicePath}`,
+                "-o", `output_ws.so -p ${this.wsPort}`
+            ];
+        }
+        else
+        {
+            // Uses SSL
+            return [
+                "nice", "--1",
+                "mjpg_streamer",
+                "-i", `input_uvc.so -r ${this.settings.resolution} -f ${this.settings.framerate} -d ${this.devicePath}`,
+                "-o", `output_ws.so -p ${this.wsPort} -s -c ${this.sslInfo.certPath} -k ${this.sslInfo.keyPath}`
+            ];
+        }
     }
 
     start()

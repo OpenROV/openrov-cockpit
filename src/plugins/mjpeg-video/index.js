@@ -49,10 +49,25 @@
                 "/etc/openrov/star_openrov_net.key",
             ];
 
-            if( process.env.MJPG_MOCK === 'true' ) 
+            // Handle mock options
+            if( process.env.USE_MOCK === 'true' && process.env.MOCK_VIDEO_TYPE === 'MJPEG' ) 
             {
+                log( "Using MJPEG video format in Mock Mode.");
+
                 this.supervisorLaunchOptions.push( '-m' );
                 this.supervisorLaunchOptions.push( 'true' );
+
+                if( process.env.MOCK_VIDEO_HARDWARE === 'false' )
+                {
+                    log( "Using actual MJPEG video source.");
+
+                    this.supervisorLaunchOptions.push( '-h' );
+                    this.supervisorLaunchOptions.push( 'true' );
+                }
+                else
+                {
+                    log( "Using mocked MJPEG video source.");
+                }
             }
 
             this.svMonitor = respawn( this.supervisorLaunchOptions, 
@@ -73,7 +88,7 @@
 
             this.svMonitor.on( "stderr", (data) =>
             {
-                //error( data.toString() );
+                error( data.toString() );
             });      
 
             // Set up listeners
@@ -131,14 +146,12 @@
                 {
                     log('Stream Registration: ' + JSON.stringify(info) );
 
-                    // TODO: Lookup location based on serial ID
-
                     this.globalBus.emit( 'CameraRegistration', 
                     {
-                        location:           info.cameraLocation,
-                        videoMimeType:      info.videoMimeType,
+                        location:           "forward",               // TODO: Lookup location based on serial ID
+                        videoMimeType: 		"video/x-motion-jpeg",
                         resolution:         info.resolution,
-                        framerate:          info.framerate,
+                        framerate:          info.framerate, 
                         wspath:             "",
                         relativeServiceUrl: `:${info.port}`,
                         sourcePort:         info.port,

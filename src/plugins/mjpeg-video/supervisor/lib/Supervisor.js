@@ -129,7 +129,22 @@ class Supervisor
     // Search for new V4L devices with MJPEG support
     scanForCameras()
     {
-        return execFileAsync( "v4l2-ctl", [ "--list-devices" ] )
+        if( this.settings.useMock === true && this.settings.useHardware === false )
+        {
+            // Create and start the mock camera
+            return Promise.try( () =>
+                {
+                    log( `Creating Mock Camera` );
+                    this.createMockCamera();
+                })
+                .catch( (err) =>
+                {
+                    error( `Error creating Mock Camera: ${err.message}` );
+                });
+        }
+        else
+        {
+            return execFileAsync( "v4l2-ctl", [ "--list-devices" ] )
             .then( ( results ) =>
             {
                 // Return list of V4L capable video device files
@@ -197,6 +212,7 @@ class Supervisor
             {
                 log( "No V4L cameras found." );
             });
+        }
     }
 
     createCamera( serial, devicePath )
@@ -212,7 +228,14 @@ class Supervisor
         if( port )
         {
             // Create the camera
-            this.cameras[ serial ] = new Camera( serial, devicePath, port, this.sslInfo, this.defaultCamSettings, this.sioServer, this.eventBus );
+            this.cameras[ serial ] = new Camera( serial, devicePath, port, 
+            {
+                sslInfo:            this.sslInfo,
+                cameraSettings:     this.defaultCamSettings,
+                sioServer:          this.sioServer,
+                eventBus:           this.eventBus,
+                useMock:            ( this.settings.useMock === true && this.settings.useHardware === true ),
+            } );
 
             // Start the camera
             this.cameras[ serial ].start();
@@ -220,6 +243,34 @@ class Supervisor
         else
         {
             throw new Error( "Could not create camera. Limit reached." );
+        }
+    }
+
+    createMockCamera()
+    {
+        if( this.cameras[ "MOCK_SERIAL" ] !== undefined )
+        {
+            throw new Error( "Mock camera already exists" );
+        }
+
+        // Request a port
+        let port = this.portPool.request();
+
+        if( port )
+        {
+            // Create the camera
+            this.cameras[ serial ] = new MockCamera( serial, imagePath, port, 
+            {
+                sioServer:          this.sioServer,
+                eventBus:           this.eventBus
+            } );
+
+            // Start the camera
+            this.cameras[ serial ].start();
+        }
+        else
+        {
+            throw new Error( "Could not create Mock Camera. Limit reached." );
         }
     }
 

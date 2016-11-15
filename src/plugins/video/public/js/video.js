@@ -50,7 +50,7 @@
     var host    = slashes.concat(window.location.hostname);
 
     // Just return fully qualifed addresses
-    if( candidateURL.startsWith( 'http' ) ) 
+    if( candidateURL.startsWith( 'http' ) )
     {
       // Use the URL as is
       return candidateURL;
@@ -101,7 +101,7 @@
 
         if( address.startsWith( "http" ) )
         {
-          address.replace( "http", "ws" );
+          address = address.replace( /http/, "ws" );
         }
         else if( address.startsWith( "https" ) )
         {
@@ -138,11 +138,11 @@
 
         if( address.startsWith( "http" ) )
         {
-          address.replace( "http", "wss" );
+          address = address.replace( /http/, "wss" );
         }
         else if( address.startsWith( "https" ) )
         {
-          address.replace( "https", "wss" );
+          address = address.replace( /https/, "wss" );
         }
         else
         {

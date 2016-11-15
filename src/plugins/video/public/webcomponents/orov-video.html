@@ -25,7 +25,13 @@
       <mjpeg-packet-video id="camera1" border='1' style='width: 100%; height:100%'>
         <content></content>
       </mjpeg-packet-video>
-    </template>    
+    </template>
+
+    <template is="dom-if" if="{{displayPlayer(videoMimeType,'video/x-motion-jpeg','wss',_registerdConnection)}}" >
+      <mjpeg-packet-video id="camera1" border='1' style='width: 100%; height:100%'>
+        <content></content>
+      </mjpeg-packet-video>
+    </template>        
 
     <template id="mp4template" is="dom-if" if="{{displayPlayer(videoMimeType,'video/mp4','socket.io',_registerdConnection)}}">
       <packet-video id="camera1" border='1' style='width: 100%; height:100%'

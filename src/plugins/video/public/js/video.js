@@ -97,52 +97,73 @@
       switch( data.connectionType ) 
       {
       case 'ws':
-        data.sourceAddress = ResolveURL( data.relativeServiceUrl );
+        var address = data.sourceAddress;
+
+        if( address.startsWith( "http" ) )
+        {
+          address.replace( "http", "ws" );
+        }
+        else if( address.startsWith( "https" ) )
+        {
+          console.error( "Can't connect to ws on an https connection. Ignoring camera registration." );
+          break;
+        }
+        else
+        {
+          console.error( "Unknown protocol" );
+          break;
+        }
 
         // Connect to websocket
-        var ws = new WebSocket( data.sourceAddress.replace( "http", "ws" ) );
-
-        var forwardPacket = function( packet ) 
-        {
-          self.cockpit.emit( 'x-motion-jpeg.data', packet );
-        };
+        var ws = new WebSocket( address );
 
         // Set up ws listener to draw frames
         ws.onmessage = function( evt ) 
         {
+            // Emit packet on the cockpit bus
             self.cockpit.emit( 'x-motion-jpeg.data', evt.data );
         };
 
         ws.onclose = function() 
         {
             console.log( "Lost connection to video websocket. Removing registration." );
-            CameraRegistrations[ data.sourceAddress.replace( "ws", "http" ) ] = false;
+            CameraRegistrations[ data.sourceAddress ] = false;
         };
 
         self.cockpit.emit( 'CameraRegistration', data );
         break;
 
       case 'wss':
-        data.sourceAddress = ResolveURL( data.relativeServiceUrl );
+        var address = data.sourceAddress;
+
+        if( address.startsWith( "http" ) )
+        {
+          address.replace( "http", "wss" );
+        }
+        else if( address.startsWith( "https" ) )
+        {
+          address.replace( "https", "wss" );
+        }
+        else
+        {
+          console.error( "Unknown protocol" );
+          break;
+        }
 
         // Connect to websocket
-        var ws = new WebSocket( data.sourceAddress.replace( "http", "wss" ) );
-
-        var forwardPacket = function( packet ) 
-        {
-          self.cockpit.emit( 'x-motion-jpeg.data', packet );
-        };
+        var ws = new WebSocket( address );
 
         // Set up ws listener to draw frames
         ws.onmessage = function( evt ) 
         {
-            self.cockpit.emit( 'x-motion-jpeg.data', evt.data ); 
+            // Emit packet on the cockpit bus
+            self.cockpit.emit( 'x-motion-jpeg.data', evt.data );
         };
 
         ws.onclose = function() 
         {
             console.log( "Lost connection to video websocket. Removing registration." );
-            CameraRegistrations[ data.sourceAddress.replace( "wss", "http" ) ] = false;
+            CameraRegistrations[ data.sourceAddress ] = false;
         };
 
         self.cockpit.emit( 'CameraRegistration', data );

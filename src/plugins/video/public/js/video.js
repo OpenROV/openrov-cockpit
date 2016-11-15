@@ -142,7 +142,7 @@
         ws.onclose = function() 
         {
             console.log( "Lost connection to video websocket. Removing registration." );
-            CameraRegistrations[ data.sourceAddress.replace( "ws", "http" ) ] = false;
+            CameraRegistrations[ data.sourceAddress.replace( "wss", "http" ) ] = false;
         };
 
         self.cockpit.emit( 'CameraRegistration', data );

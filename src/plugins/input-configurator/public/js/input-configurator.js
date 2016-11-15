@@ -125,6 +125,12 @@
 
         var presetOut = JSON.parse(result[0], 'utf8');
         self.cockpit.emit('plugin.inputConfigurator.loadedPreset', presetOut);
+
+        //They loaded a preset, set the lastPreset to this name
+        self.settings.lastPreset = JSON.stringify(lastPreset,null,2);
+
+        //Update the server settings to reflect this new preset
+        self.cockpit.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
       }
       else
       {

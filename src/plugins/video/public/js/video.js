@@ -96,9 +96,56 @@
 
       switch( data.connectionType ) 
       {
+      case 'ws':
+        data.sourceAddress = ResolveURL( data.relativeServiceUrl );
+
+        // Connect to websocket
+        var ws = new WebSocket( data.sourceAddress.replace( "http", "ws" ) );
+
+        var forwardPacket = function( packet ) 
+        {
+          self.cockpit.emit( 'x-motion-jpeg.data', packet );
+        };
+
+        // Set up ws listener to draw frames
+        ws.onmessage = function( evt ) 
+        {
+            self.cockpit.emit( 'x-motion-jpeg.data', evt.data );
+        };
+
+        ws.onclose = function() 
+        {
+            console.log( "Lost connection to video websocket. Removing registration." );
+            CameraRegistrations[ data.sourceAddress.replace( "ws", "http" ) ] = false;
+        };
+
+        self.cockpit.emit( 'CameraRegistration', data );
+        break;
+
       case 'wss':
         data.sourceAddress = ResolveURL( data.relativeServiceUrl );
-        self.cockpit.emit('CameraRegistration', data);
+
+        // Connect to websocket
+        var ws = new WebSocket( data.sourceAddress.replace( "http", "wss" ) );
+
+        var forwardPacket = function( packet ) 
+        {
+          self.cockpit.emit( 'x-motion-jpeg.data', packet );
+        };
+
+        // Set up ws listener to draw frames
+        ws.onmessage = function( evt ) 
+        {
+            self.cockpit.emit( 'x-motion-jpeg.data', evt.data ); 
+        };
+
+        ws.onclose = function() 
+        {
+            console.log( "Lost connection to video websocket. Removing registration." );
+            CameraRegistrations[ data.sourceAddress.replace( "ws", "http" ) ] = false;
+        };
+
+        self.cockpit.emit( 'CameraRegistration', data );
         break;
 
       case 'http':

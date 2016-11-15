@@ -49,7 +49,7 @@
         
         #tableContainer {
             overflow: auto;
-            height: 300px;
+            height: 400px;
         }
 
         #descriptionRow {
@@ -70,7 +70,7 @@
         }
 
         .blue-button {
-            color: #135569;
+            color: #1c4472;
         }
         /**
         * KEYS.css
@@ -238,9 +238,11 @@
                     </paper-listbox>
                 </paper-dropdown-menu>      
             </div>
-            <paper-button disabled$={{isValidGamepadReplacement}} on-tap="openClearGamepadDuplicateWarning">{{__('Clear conflicting binding')}}</paper-button>
-            <paper-button on-tap="handleClearGamepadBinding" dialog-confirm>{{__('Clear')}}</paper-button>
-            <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
+            <div class="buttons">
+                <paper-button disabled$={{isValidGamepadReplacement}} on-tap="openClearGamepadDuplicateWarning">{{__('Clear conflicting binding')}}</paper-button>
+                <paper-button on-tap="handleClearGamepadBinding" dialog-confirm>{{__('Clear')}}</paper-button>
+                <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
+            </div>
             
             <paper-dialog id="clearGamepadDuplicateWarningModal">
                 <h2>{{__('Are you sure?')}}</h2>
@@ -263,8 +265,7 @@
         </paper-dialog>
 
 
-        <paper-dialog id="savePresetModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation">
-
+        <paper-dialog id="savePresetModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation" on-iron-overlay-closed="onSavePresetModalClosed">
             <h1>{{__('Overwrite a saved preset or enter a new preset name')}}</h1>
 
             <paper-dropdown-menu id="savedPresetsDropdown" label="presets">
@@ -275,7 +276,7 @@
                 </paper-listbox>
             </paper-dropdown-menu>
 
-            <paper-input id="savePresetInput" label="preset name" required auto-validate char-counter maxlength="25" error-message="preset name needs some text!"></paper-input>
+            <paper-input id="savePresetInput" label="preset name" on-keydown="checkForEnter" inputValue="{{candidatePreset}}" canrequired auto-validate char-counter maxlength="25" error-message="preset name needs some text!"></paper-input>
 
             <div class="buttons">
                 <paper-button dialog-confirm on-tap="saveNewPreset" class="blue-button">{{__('OK')}}</paper-button>
@@ -284,7 +285,7 @@
         </paper-dialog>
 
         <paper-dialog id="loadPresetModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation">
-            <h1>{{__('Choose a preset')}}</h1>
+            <h1>{{__('Choose a preset to load')}}</h1>
             <paper-dropdown-menu id="savedPresetsDropdown" label="presets">
                 <paper-listbox class="dropdown-content" attr-for-selected="value" selected="{{candidatePreset}}" on-iron-select="handleLoadPreset">
                     <template is="dom-repeat" items="[[savedPresets]]">
@@ -324,10 +325,12 @@
         </paper-dialog>
 
         <div class="buttons">
-            <paper-button id="savePresetButton" on-tap="openSavePresetModal"> Save Preset </paper-button>
-            <paper-button id="loadPresetButton" on-tap="openLoadPresetModal"> Load Preset </paper-button>
-            <paper-button id="deletePresetButton" on-tap="openDeletePresetModal"> Delete Preset </paper-button>
+            <paper-button raised id="savePresetButton" on-tap="openSavePresetModal"><iron-icon icon="save"></iron-icon>Save Preset </paper-button>
+            <paper-button raised id="loadPresetButton" on-tap="openLoadPresetModal"><iron-icon icon="file-upload"></iron-icon> Load Preset </paper-button>
+            <paper-button raised id="deletePresetButton" on-tap="openDeletePresetModal"><iron-icon icon="delete"></iron-icon> Delete Preset </paper-button>
         </div>
+
+        <p> {{__('Current Preset:')}} <b>{{preset.name}}</b> </p>
 
 
         <paper-toast id="updatedPresetToast" text="Updated Preset! Remember to save your new preset!"></paper-toast>
@@ -457,8 +460,8 @@
                     this.presetFunction = function(preset, actions) {
 
                         //Set this to our current preset on the input Configurator
-                        console.log("Got an updated preset", preset);
 
+                        //Shallow copy to aviod references
                         self.preset = jQuery.extend({}, preset);
                         self.actions = actions;
 
@@ -472,7 +475,6 @@
                     }.bind(this);
 
                     this.getSavedPresetListFunction = function(presets) {
-                        console.log("Got saved presets: ", presets);
                         
                         //Reset the internal state
                         if(self.savedPresets !== undefined)
@@ -482,7 +484,6 @@
                             //Avoid reference passing
                             for(var i = 0; i < presets.length; ++i)
                             {
-                                console.log("Debug", presets[i]);
                                 self.push('savedPresets', presets[i]);
                             }
                         }
@@ -508,6 +509,15 @@
                     
                     //Get the list of saved presets from disk
                     self.eventEmitter.emit('plugin.inputConfigurator.getSavedPresets', self.preset);  
+                },
+
+                //Check if enter was pressed
+                checkForEnter: function(e) {
+                    var self = this;
+                    if(e.keyCode == 13)
+                    {
+                        self.saveNewPreset();
+                    }
                 },
 
                 //Check for duplicated gamepad inputs
@@ -795,9 +805,8 @@
                 {
                     var self = this;
 
-                    self.preset.name = presetName;
+                    self.set('preset.name', presetName);
                     self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.preset);
-                    
                     self.$.savePresetModal.close();
                     self.openSavedPresetToast();
                 },
@@ -811,7 +820,7 @@
 
                 openLoadPresetModal: function()
                 {
-                    var self = this;                  
+                    var self = this;                
                     self.$.loadPresetModal.open();
                 },
 
@@ -826,7 +835,6 @@
                 openDeletePresetModal: function()
                 {
                     var self = this;
-                    console.log(self.savedPresets);
                     self.$.deletePresetModal.open();
                 },
                 
@@ -863,6 +871,12 @@
 
                 onGamepadModalClosed : function() {
                     var self = this;  
+                },
+                onSavePresetModalClosed: function() {
+                    var self = this;
+
+                    //Reset the candidatePreset
+                    self.candidatePreset = undefined;
                 },
 
                 //Toasts and modals

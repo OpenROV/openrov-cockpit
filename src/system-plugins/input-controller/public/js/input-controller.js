@@ -163,9 +163,7 @@
       this.cockpit.on('plugin.inputConfigurator.loadedPreset', function(loadedPreset) {
 
         //Try to update that input
-        console.log("Input controller got a loaded preset", loadedPreset);
         self.handleLoadedPreset(loadedPreset);
-
       });
 
     };
@@ -173,20 +171,12 @@
     deletePreset(preset)
     {
       var self = this;
-
-      console.log(preset);
     };
     handleLoadedPreset(presetIn)
     {
       var self = this;
-      if(self.presets.has(presetIn.name))
+      if(!self.presets.has(presetIn.name))
       {
-        console.log("this preset exists");
-
-      }
-      else
-      {
-        console.log("New preset to add");
         self.addPreset(presetIn);
       }
       self.handleChangePreset(presetIn.name);
@@ -195,7 +185,6 @@
     handleChangePreset(presetName)
     {
       var self = this;
-      console.log("Changing to this preset");
 
       //Grab a handle to our preset
       var preset = self.presets.get(presetName);
@@ -205,8 +194,8 @@
 
       //And update to the new one
       self.registerPresetWithHardware(preset);
+
       self.currentPreset = preset;
-      console.log("Changed preset,", self.currentPreset);
       self.cockpit.emit('plugin.inputController.updatedPreset', self.currentPreset, self.actions);
     };
 
@@ -247,7 +236,6 @@
       var newPreset = new inputController.Preset(presetIn.name);
 
       //Use the default list to init
-      //TODO: Figure out how to do a clone in JS
       self.presets.get("defaults").actions.forEach(function(action, actionName) {
         newPreset.addAction(actionName);
       })
@@ -265,7 +253,6 @@
           newPreset.registerInput(actionToRegister, inputToRegister);
         }
       }
-      console.log(newPreset);
 
       //Add it to our internal Map
       self.presets.set(newPreset.name, newPreset);
@@ -535,13 +522,6 @@
       self.gamepadAbstraction = new GamepadAbstraction(cockpit);
     };
 
-    addInput(input)
-    {
-      var self = this;
-      console.log("ADDING INPUT TO GP:", input);
-    };
-
-
     registerInput(inputIn)
     {
       var self = this;
@@ -639,7 +619,6 @@
 
     reset()
     {
-      console.log("Resetting keyboard interface");
       self.mousetrap.reset();
     };
 

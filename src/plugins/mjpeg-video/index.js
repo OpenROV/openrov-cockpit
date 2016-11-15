@@ -23,8 +23,6 @@
         {
             log( "Loaded Cockpit Plugin: MjpgStreamer" );
 
-            var self        = this;
-
             this.globalBus  = deps.globalEventLoop;
             this.cockpitBus = deps.cockpit;
 
@@ -75,27 +73,30 @@
 
             this.svMonitor.on( "stderr", (data) =>
             {
-                error( data.toString() );
+                //error( data.toString() );
             });      
 
             // Set up listeners
             this.listeners = 
             {
-                settings: new Listener( this.globalBus, 'settings-change.mjpegVideo', true, function( settings )
+                settings: new Listener( this.globalBus, 'settings-change.mjpegVideo', true, (settings) =>
                 {
                     try
                     {
                         // Check for settings changes
-                        assert.notDeepEqual( settings.mjpegVideo, self.settings );
+                        assert.notDeepEqual( settings.mjpegVideo, this.settings );
 
                         // Update settings
-                        self.settings = settings.mjpegVideo;
+                        this.settings = settings.mjpegVideo;
 
+                        log( this.settings );
+
+                        // TODO: Work through this
                         // Send update to supervisor so it restarts the stream
-                        self.supervisor.emit( "settingsChange", self.settings );
+                        //this.supervisor.emit( "updateSettings", this.settings );
                     
                         // Emit settings update to cockpit
-                        self.cockpitBus.emit( 'plugin.mjpegVideo.settingsChange', self.settings );
+                        this.cockpitBus.emit( 'plugin.mjpegVideo.settingsChange', this.settings );
                     }
                     catch( err )
                     {
@@ -103,12 +104,12 @@
                     }
                 }),
 
-                svConnect: new Listener( this.supervisor, 'connect', false, function()
+                svConnect: new Listener( this.supervisor, 'connect', false, () =>
                 {
                     log( 'Successfully connected to mjpg-streamer supervisor' );
 
                     // Start listening for settings changes (gets the latest settings)
-                    self.listeners.settings.enable();
+                    this.listeners.settings.enable();
                 }),
 
                 svDisconnect: new Listener( this.supervisor, 'disconnect', false, function()
@@ -126,13 +127,13 @@
                     log('Reconnecting to mjpg-streamer supervisor...');
                 }),
 
-                svStreamRegistration: new Listener( this.supervisor, 'stream.registration', false, function( serial, info )
+                svStreamRegistration: new Listener( this.supervisor, 'stream.registration', false, ( serial, info ) =>
                 {
                     log('Stream Registration: ' + JSON.stringify(info) );
 
                     // TODO: Lookup location based on serial ID
 
-                    self.globalBus.emit( 'CameraRegistration', 
+                    this.globalBus.emit( 'CameraRegistration', 
                     {
                         location:           info.txtRecord.cameraLocation,
                         videoMimeType:      info.txtRecord.videoMimeType,
@@ -142,7 +143,7 @@
                         relativeServiceUrl: `:${info.port}`,
                         sourcePort:         info.port,
                         sourceAddress:      '',
-                        connectionType:     'wss'
+                        connectionType:     'ws'
                     });
                 })
             }

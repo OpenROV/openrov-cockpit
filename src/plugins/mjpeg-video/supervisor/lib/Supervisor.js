@@ -14,7 +14,7 @@ const log           = require( "debug" )( "app:supervisor:log" );
 const error		    = require( "debug" )( "app:supervisor:error" );
 
 const Camera        = require( "Camera" );
-const maxCameras    = 4;
+const maxCameras    = 1;
 
 class Supervisor
 {
@@ -108,8 +108,10 @@ class Supervisor
                 // For now, update defaults and send to all cameras
                 this.defaultCamSettings = settings;
 
+                log( settings );
+
                 // Send settings update event
-                this.eventBus.emit( "updateSettings", this.defaultCamSettings );
+                //this.eventBus.emit( "updateSettings", this.defaultCamSettings );
             });
 
             client.on( "scan", () =>

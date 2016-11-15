@@ -135,15 +135,15 @@
 
                     this.globalBus.emit( 'CameraRegistration', 
                     {
-                        location:           info.txtRecord.cameraLocation,
-                        videoMimeType:      info.txtRecord.videoMimeType,
-                        resolution:         info.txtRecord.resolution,
-                        framerate:          info.txtRecord.framerate,
-                        wspath:             info.txtRecord.wspath,
+                        location:           info.cameraLocation,
+                        videoMimeType:      info.videoMimeType,
+                        resolution:         info.resolution,
+                        framerate:          info.framerate,
+                        wspath:             "",
                         relativeServiceUrl: `:${info.port}`,
                         sourcePort:         info.port,
-                        sourceAddress:      '',
-                        connectionType:     'ws'
+                        sourceAddress:      "",
+                        connectionType:     info.connectionType
                     });
                 })
             }

@@ -64,15 +64,13 @@ class Camera
                         service:	'mjpeg-video',
                         port:		this.wsPort,
                         addresses:	['127.0.0.1'],
-                        txtRecord:
-                        {
-                            resolution: 		this.settings.resolution, 
-                            framerate: 			this.settings.framerate,
-                            videoMimeType: 		'video/x-motion-jpeg',
-                            cameraLocation: 	"forward",
-                            relativeServiceUrl: "",  
-                            wspath: 			""
-                        }
+                        resolution: 		this.settings.resolution, 
+                        framerate: 			this.settings.framerate,
+                        videoMimeType: 		'video/x-motion-jpeg',
+                        cameraLocation: 	"forward",
+                        relativeServiceUrl: "",  
+                        wspath: 			"",
+                        connectionType:     "wss"
                     });
                 }
             }),
@@ -94,13 +92,12 @@ class Camera
 
     getDaemonCommand()
     {
-        // TEMP: Removed -s -c ${this.sslInfo.certPath} -k ${this.sslInfo.keyPath}
         log( this.sslInfo.certPath, this.sslInfo.keyPath );
         return [
             "nice", "-1",
             "mjpg_streamer",
             "-i", `input_uvc.so -r ${this.settings.resolution} -f ${this.settings.framerate} -d ${this.devicePath}`,
-            "-o", `output_ws.so -p ${this.wsPort}`
+            "-o", `output_ws.so -p ${this.wsPort} -s -c ${this.sslInfo.certPath} -k ${this.sslInfo.keyPath}`
         ];
     }
 

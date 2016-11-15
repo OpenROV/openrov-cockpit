@@ -49,6 +49,11 @@
         }
       });
 
+      this.cockpit.on('plugin.inputConfigurator.deletePreset', function(presetToDelete) {
+        //console.log("Delete:", presetToDelete);
+        self.deletePreset(presetToDelete);
+      });
+
       this.cockpit.on('plugin.inputConfigurator.savePreset', function(presetIn) {
         console.log("Saving preset to settings");
         self.savePreset(presetIn);
@@ -61,16 +66,31 @@
 
       this.cockpit.on('plugin.inputConfigurator.getSavedPresets', function() {
         console.log("Getting saved presets");
-        self.cockpit.rov.emit('plugin.inputConfigurator.getSavedPresets');
-      });
-
-      this.cockpit.rov.on('plugin.inputConfigurator.savedPresets', function(presetsIn) {
-        console.log("Got saved presets", presetsIn);
-        self.cockpit.emit('plugin.inputConfigurator.savedPresets', presetsIn);
+        self.updateSavedPresetList();
       });
     }
 
     //Class methods
+    deletePreset(presetToDelete)
+    {
+      var self = this;
+
+      //Remove this preset, if found
+      for(var i = 0; i < self.settings.presets.length; ++i)
+      {
+        //Get the object
+        var preset = JSON.parse(self.settings.presets[i], 'utf8');
+
+        if(preset.name == presetToDelete)
+        {
+          self.settings.presets.splice(i, 1);
+          break;
+        }
+      }
+      
+      //Update the server settings to reflect this new preset
+      self.cockpit.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
+    }
     loadPreset(presetNameIn)
     {
       var self = this;

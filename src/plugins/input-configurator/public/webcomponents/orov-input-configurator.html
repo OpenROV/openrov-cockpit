@@ -298,9 +298,35 @@
             </div>
         </paper-dialog>
 
+        <paper-dialog id="deletePresetModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation">
+            <h1>{{__('Choose a preset to delete')}}</h1>
+            <paper-dropdown-menu id="savedPresetsDropdown" label="presets">
+                <paper-listbox class="dropdown-content" attr-for-selected="value">
+                    <template is="dom-repeat" items="[[savedPresets]]">
+                        <paper-item value="{{item}}" on-tap="openDeletePresetWarningModal">{{item}}</paper-item>
+                    </template>
+                </paper-listbox>
+            </paper-dropdown-menu>
+    
+            <div class="buttons">
+                <paper-button dialog-dismiss class="blue-button">{{__('CANCEL')}}</paper-button>
+            </div>
+
+            <paper-dialog id="deletePresetWarningModal">
+                <h2>{{__('Are you sure?')}}</h2>
+                <p>{{__('Confirming this will permanently delete preset:')}} <b>{{presetToDelete}}</b></p>
+                <div class="buttons">
+                    <paper-button dialog-confirm on-tap="handleDeletePreset" class="red-button">{{__('Confirm')}}</paper-button>
+                    <paper-button dialog-dismiss>{{__('Decline')}}</paper-button>
+                </div>
+            </paper-dialog>
+
+        </paper-dialog>
+
         <div class="buttons">
             <paper-button id="savePresetButton" on-tap="openSavePresetModal"> Save Preset </paper-button>
             <paper-button id="loadPresetButton" on-tap="openLoadPresetModal"> Load Preset </paper-button>
+            <paper-button id="deletePresetButton" on-tap="openDeletePresetModal"> Delete Preset </paper-button>
         </div>
 
 
@@ -376,7 +402,10 @@
                         type: String,
                         value: undefined
                     },
-
+                    presetToDelete: {
+                        type: String,
+                        value: undefined
+                    },
                     conflictingBinding: {
                         type: Object,
                         value: undefined
@@ -388,11 +417,11 @@
 
                     presetArray: {
                         type: Array,
-                        value: undefined
+                        value: []
                     },
                     savedPresets: {
                         type: Array,
-                        value: undefined
+                        value: []
                     },
 
                     selectedItem: {
@@ -438,8 +467,20 @@
 
                     this.getSavedPresetListFunction = function(presets) {
                         console.log("Got saved presets: ", presets);
-                        self.savedPresets = presets;
-                        console.log("But this is what we have?", self.savedPresets);
+                        
+                        //Reset the internal state
+                        if(self.savedPresets !== undefined)
+                        {
+                            self.splice('savedPresets', 0, self.savedPresets.length);
+                            
+                            //Avoid reference passing
+                            for(var i = 0; i < presets.length; ++i)
+                            {
+                                console.log("Debug", presets[i]);
+                                self.push('savedPresets', presets[i]);
+                            }
+                        }
+                        
                     }.bind(this);
 
                     emitter.on('plugin.inputController.updatedPreset', this.presetFunction );
@@ -462,6 +503,9 @@
                     {
                         self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.preset);
                     }
+
+                    //Get the saved presets from disk
+                    self.eventEmitter.emit('plugin.inputConfigurator.getSavedPresets', self.preset);
                     
                 },
 
@@ -568,6 +612,16 @@
 
                     //And close the modal
                     self.$.keyboardModal.close();
+                },
+
+                //Delete a preset
+                handleDeletePreset: function()
+                {
+                    var self = this;
+
+                    //Delete from input controller
+                    self.eventEmitter.emit('plugin.inputConfigurator.deletePreset', self.presetToDelete);
+                    self.$.deletePresetModal.close();
                 },
 
                 //Clear a conflicting gamepad binding
@@ -756,11 +810,7 @@
 
                 openLoadPresetModal: function()
                 {
-                    var self = this;
-
-                    //Get the saved presets from disk
-                    self.eventEmitter.emit('plugin.inputConfigurator.getSavedPresets', self.preset);
-                    
+                    var self = this;                  
                     self.$.loadPresetModal.open();
                 },
 
@@ -768,8 +818,23 @@
                 {
                     var self = this;
                     var presetName = oEvent.model.get('item');
-                    self.handleSavePreset(presetName);
-                    
+
+                    self.handleSavePreset(presetName);  
+                },
+
+                openDeletePresetModal: function()
+                {
+                    var self = this;
+                    console.log(self.savedPresets);
+                    self.$.deletePresetModal.open();
+                },
+                
+                openDeletePresetWarningModal: function(oEvent)
+                {
+                    var self = this;
+
+                    self.presetToDelete = oEvent.model.get('item');
+                    self.$.deletePresetWarningModal.open();
                 },
 
                 //Checks to see if this action accepts this type

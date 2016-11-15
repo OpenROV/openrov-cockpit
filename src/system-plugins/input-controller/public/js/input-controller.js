@@ -154,6 +154,12 @@
         self.unregisterInput(input);
       });
 
+      this.cockpit.on('plugin.inputConfigurator.deletePreset', function(preset) {
+
+        //Try to remove that preset from the list
+        self.deletePreset(preset);
+      });
+
       this.cockpit.on('plugin.inputConfigurator.loadedPreset', function(loadedPreset) {
 
         //Try to update that input
@@ -164,6 +170,12 @@
 
     };
 
+    deletePreset(preset)
+    {
+      var self = this;
+
+      console.log(preset);
+    };
     handleLoadedPreset(presetIn)
     {
       var self = this;

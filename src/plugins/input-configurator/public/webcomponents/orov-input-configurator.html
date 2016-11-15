@@ -132,7 +132,7 @@
     <template>
 
         
-        <h2>{{__('Input Configurator')}}</h2>
+        <h2>{{__('Input Configurator - Beta')}}</h2>
         <p>
             {{__('Click on the button you want to change in the table below')}}
         </p>        
@@ -458,11 +458,17 @@
 
                         //Set this to our current preset on the input Configurator
                         console.log("Got an updated preset", preset);
-                        self.preset = preset;
+
+                        self.preset = jQuery.extend({}, preset);
                         self.actions = actions;
 
                         //Update the UI to reflect this
                         self.presetToArray(self.preset);
+
+                        if(self.preset.name == "defaults")
+                        {
+                            self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.preset);
+                        }
                     }.bind(this);
 
                     this.getSavedPresetListFunction = function(presets) {
@@ -495,18 +501,13 @@
                 attached: function() {
                     var self = this;
                     //Tell the input controller we want presets 
-                    if(self.presets == undefined)
+                    if(self.preset == undefined)
                     {
                         self.eventEmitter.emit('plugin.inputController.sendPreset');
                     }
-                    else
-                    {
-                        self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.preset);
-                    }
-
-                    //Get the saved presets from disk
-                    self.eventEmitter.emit('plugin.inputConfigurator.getSavedPresets', self.preset);
                     
+                    //Get the list of saved presets from disk
+                    self.eventEmitter.emit('plugin.inputConfigurator.getSavedPresets', self.preset);  
                 },
 
                 //Check for duplicated gamepad inputs

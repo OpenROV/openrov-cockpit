@@ -32,6 +32,10 @@
 				'type': 'object',
 				'id': 'inputConfigurator',
 				'properties': {
+					'lastPreset': {
+						type: 'string',
+						default: 'undefined'
+					},
 					'presets': {
 						'type': 'array'
 					}

@@ -128,7 +128,7 @@
           }
         }
       });
-
+      
       this.cockpit.on('plugin.inputController.sendPreset', function() {
 
         if(self.currentPreset !== undefined)

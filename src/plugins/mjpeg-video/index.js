@@ -79,7 +79,7 @@
                 },
                 maxRestarts: -1,
                 sleep: 1000
-            });      
+            });
 
             this.svMonitor.on( "stdout", (data) =>
             {

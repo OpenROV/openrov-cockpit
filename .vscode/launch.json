@@ -31,8 +31,7 @@
 				"pluginsDownloadDirectory": "/tmp/plugins",
 				"cacheDirectory": "/tmp/cache",
 				"DATADIR": "/tmp",
-				"IGNORE_CACHE": "true",
-				"COCKPIT_PATH": "${workspaceRoot}"
+				"IGNORE_CACHE": "true"
 			},
             "console": "internalConsole",			          
 			"sourceMaps": false,

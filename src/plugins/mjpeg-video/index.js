@@ -40,7 +40,7 @@
             this.supervisorLaunchOptions = 
             [
                 "node",
-                require.resolve( './supervisor/App.js' ),
+                require.resolve( 'mjpeg-video-server' ),
                 "-p",
                 defaults.port,
                 "-c",
@@ -75,6 +75,7 @@
                 name: 'mjpeg-video-server',
                 env: 
                 {
+                    'COCKPIT_PATH': process.env[ "COCKPIT_PATH" ],
                     'DEBUG': 'app*'
                 },
                 maxRestarts: -1,

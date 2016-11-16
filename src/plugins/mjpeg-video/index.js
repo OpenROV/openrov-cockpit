@@ -29,7 +29,7 @@
             this.settings   = {};
             this.camera     = null;
 
-            this.supervisor = io.connect( 'http://localhost:' + defaults.port, 
+            this.supervisor = io.connect( 'http://localhost:' + defaults.port,
             {
                 path: defaults.wspath,
                 reconnection: true,
@@ -105,14 +105,10 @@
                         // Update settings
                         this.settings = settings.mjpegVideo;
 
-                        log( this.settings );
+                        log( `Updating MJPEG streamer settings to: \n${this.settings}` );
 
-                        // TODO: Work through this
                         // Send update to supervisor so it restarts the stream
-                        //this.supervisor.emit( "updateSettings", this.settings );
-                    
-                        // Emit settings update to cockpit
-                        this.cockpitBus.emit( 'plugin.mjpegVideo.settingsChange', this.settings );
+                        this.supervisor.emit( "updateSettings", this.settings );
                     }
                     catch( err )
                     {
@@ -200,12 +196,7 @@
                 'id':       'mjpegVideo',
 
                 'properties': {
-                    'port': 
-                    {
-                        'type': 'number',
-                        'default': 8200
-                    },
-                    'fps': 
+                    'framerate': 
                     {
                         'type': 'string',
                         'enum': 
@@ -214,7 +205,7 @@
                             '15',
                             '10'
                         ],
-                        'title': 'Framerate',
+                        'title': 'Framerate (FPS)',
                         'default': '30'
                     },
                     'resolution': 
@@ -224,18 +215,22 @@
                         [
                             '1920x1080',
                             '1280x720',
-                            '640x480'
+                            '800x600',
+                            '640x480',
+                            '352x288',
+                            '320x240',
+                            '176x144',
+                            '160x120'
                         ],
                         'title': 'Resolution',
-                        'default': '1280x720'
+                        'default': '800x600'
                     }                    
                 },
 
                 'required': 
                 [
-                    'port',             // Port to host websocket server on
-                    'fps',              // Framerate setting for camera
-                    'resolution'        // Resolution setting for camera
+                    'framerate',    // Framerate setting for camera
+                    'resolution'    // Resolution setting for camera
                 ]
             }];
         }

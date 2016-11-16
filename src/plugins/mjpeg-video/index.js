@@ -29,14 +29,6 @@
             this.settings   = {};
             this.camera     = null;
 
-            this.supervisor = io.connect( 'http://localhost:' + defaults.port,
-            {
-                path: defaults.wspath,
-                reconnection: true,
-                reconnectionAttempts: Infinity,
-                reconnectionDelay: 1000
-            });
-
             this.supervisorLaunchOptions = 
             [
                 "node",
@@ -50,25 +42,41 @@
             ];
 
             // Handle mock options
-            if( process.env.USE_MOCK === 'true' && process.env.MOCK_VIDEO_TYPE === 'MJPEG' ) 
+            if( process.env.USE_MOCK === 'true' ) 
             {
-                log( "Using MJPEG video format in Mock Mode.");
-
-                this.supervisorLaunchOptions.push( '-m' );
-                this.supervisorLaunchOptions.push( 'true' );
-
-                if( process.env.MOCK_VIDEO_HARDWARE === 'false' )
+                if( process.env.MOCK_VIDEO_TYPE === "MJPEG" )
                 {
-                    log( "Using actual MJPEG video source.");
+                    log( "Using MJPEG video format in Mock Mode.");
 
-                    this.supervisorLaunchOptions.push( '-h' );
+                    this.supervisorLaunchOptions.push( '-m' );
                     this.supervisorLaunchOptions.push( 'true' );
+
+                    if( process.env.MOCK_VIDEO_HARDWARE === 'false' )
+                    {
+                        log( "Using actual MJPEG video source.");
+
+                        this.supervisorLaunchOptions.push( '-h' );
+                        this.supervisorLaunchOptions.push( 'true' );
+                    }
+                    else
+                    {
+                        log( "Using mocked MJPEG video source.");
+                    }
                 }
                 else
                 {
-                    log( "Using mocked MJPEG video source.");
+                    this.disabled = true;
+                    return;
                 }
             }
+
+            this.supervisor = io.connect( 'http://localhost:' + defaults.port,
+            {
+                path: defaults.wspath,
+                reconnection: true,
+                reconnectionAttempts: Infinity,
+                reconnectionDelay: 1000
+            });
 
             this.svMonitor = respawn( this.supervisorLaunchOptions, 
             {
@@ -167,6 +175,11 @@
 
         start()
         {
+            if( this.disabled )
+            {
+                return;
+            }
+
             // Enable listeners
             this.listeners.svConnect.enable();
             this.listeners.svDisconnect.enable();
@@ -182,6 +195,11 @@
 
         stop()
         {
+            if( this.disabled )
+            {
+                return;
+            }
+            
             // Stop the supervisor process
             this.svMonitor.stop();
 

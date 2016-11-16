@@ -121,10 +121,14 @@ geomux.prototype.start = function start()
     // Figure out which video server to use
     if( process.env.USE_MOCK == 'true' )
     {
-      if (process.env.GEO_MOCK == 'true') 
+      if (process.env.MOCK_VIDEO_TYPE === "GEOMUX")
       {
           geoprogram = require.resolve('geo-video-simulator');
-      } 
+      }
+      else
+      {
+          return;
+      }
     }
     else
     {

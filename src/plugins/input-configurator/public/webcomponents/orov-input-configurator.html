@@ -162,7 +162,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <template is="dom-repeat" items="[[presetArray]]">
+                        <template is="dom-repeat" items="[[buttonArray]]">
                             <tr>
                                 <td id="descriptionRow">{{__(item.description)}}</td>
                                 <td><kbd class="light" on-tap="handleKeyboardChange">{{item.bindings.keyboard.name}}&nbsp;</kbd></td>
@@ -178,7 +178,7 @@
         <h3> {{__('Axis Controls')}} </h3>
 
         <section>      
-            <div id="tableContainer">
+            <div id="tableContainer" style="height:150px">
                 <table>
                     <thead id="stickyHeader">
                         <tr>
@@ -194,10 +194,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <template is="dom-repeat" items="[[presetArray]]">
+                        <template is="dom-repeat" items="[[axisArray]]">
                             <tr>
                                 <td id="descriptionRow">{{__(item.description)}}</td>
-                                <td><kbd on-tap="handleGamepadChange">{{item.bindings.gamepad.name}}&nbsp;</kbd></td>
+                                <td><kbd on-tap="handleAxisChange">{{item.bindings.gamepad.name}}&nbsp;</kbd></td>
                                 <td>{{__(item.name)}}</td>
                             </tr>
                         </template>
@@ -279,25 +279,50 @@
                 <paper-button on-tap="handleClearGamepadBinding" dialog-confirm>{{__('Clear')}}</paper-button>
                 <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
             </div>
-            
-            <paper-dialog id="clearGamepadDuplicateWarningModal">
-                <h2>{{__('Are you sure?')}}</h2>
-                <p>{{__('Confirming this will clear the binding to ')}} <b>{{conflictingBinding.name}}</b>  {{__(' and set ')}} <kbd>{{candidateBinding}}</kbd> {{__(' as the binding to ')}} <b>{{selectedItem.name}}</b> </p>
-                <div class="buttons">
-                    <paper-button dialog-confirm on-tap="handleClearConflictingGamepadBinding" class="green-button">{{__('Confirm')}}</paper-button>
-                    <paper-button dialog-dismiss>{{__('Decline')}}</paper-button>
-                </div>
-            </paper-dialog>
+        </paper-dialog>
+        
+        <paper-dialog id="axisOptionsModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation"on-iron-overlay-opened="handleGamepadFocus">
+            <h1>{{__('Gamepad mapping:')}} {{selectedItem.name}}</h1>
+            <p> {{__('Choose a control from the dropdown to remap this command to')}} </p>
+            <p> {{__('Click CLEAR to remove inputs associated with this command')}} </p>
 
-            <paper-dialog id="invalidGamepadTypeModal">
-                <h2>{{__('Type mismatch!')}}</h2>
-                <p><kbd>{{candidateBinding}}</kbd>  {{__(' is not a valid input command for ')}} <b>{{selectedItem.name}}</b> </p>
-                <p>{{__('Select a different command')}}</p>
-                <div class="buttons">
-                    <paper-button dialog-dismiss class="blue-button">{{__('OK')}}</paper-button>
-                </div>
-            </paper-dialog>
+            <h3>
+                {{__('Current Mapping')}}: <kbd>{{selectedItem.bindings.gamepad.name}}</kbd>
+            </h3>
 
+            <div>
+                <paper-dropdown-menu id="candidategamepad" label="gamepad control">
+                    <paper-listbox class="dropdown-content" attr-for-selected="value" selected="{{candidateBinding}}" on-iron-select="handleGamepadRemapping">
+                        <paper-item value="LEFT_STICK_X">{{__('LEFT_STICK_X')}}</paper-item>
+                        <paper-item value="LEFT_STICK_Y">{{__('LEFT_STICK_Y')}}</paper-item>
+                        <paper-item value="RIGHT_STICK_X">{{__('RIGHT_STICK_X')}}</paper-item>
+                        <paper-item value="RIGHT_STICK_Y">{{__('RIGHT_STICK_Y')}}</paper-item>
+                    </paper-listbox>
+                </paper-dropdown-menu>      
+            </div>
+            <div class="buttons">
+                <paper-button disabled$={{isValidGamepadReplacement}} on-tap="openClearGamepadDuplicateWarning">{{__('Clear conflicting binding')}}</paper-button>
+                <paper-button on-tap="handleClearGamepadBinding" dialog-confirm>{{__('Clear')}}</paper-button>
+                <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="clearGamepadDuplicateWarningModal">
+            <h2>{{__('Are you sure?')}}</h2>
+            <p>{{__('Confirming this will clear the binding to ')}} <b>{{conflictingBinding.name}}</b>  {{__(' and set ')}} <kbd>{{candidateBinding}}</kbd> {{__(' as the binding to ')}} <b>{{selectedItem.name}}</b> </p>
+            <div class="buttons">
+                <paper-button dialog-confirm on-tap="handleClearConflictingGamepadBinding" class="green-button">{{__('Confirm')}}</paper-button>
+                <paper-button dialog-dismiss>{{__('Decline')}}</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="invalidGamepadTypeModal">
+            <h2>{{__('Type mismatch!')}}</h2>
+            <p><kbd>{{candidateBinding}}</kbd>  {{__(' is not a valid input command for ')}} <b>{{selectedItem.name}}</b> </p>
+            <p>{{__('Select a different command')}}</p>
+            <div class="buttons">
+                <paper-button dialog-dismiss class="blue-button">{{__('OK')}}</paper-button>
+            </div>
         </paper-dialog>
 
 
@@ -487,6 +512,14 @@
                         type: Map,
                         value: undefined
                     },
+                    axisArray: {
+                        type: Array,
+                        value: []
+                    },
+                    buttonArray: {
+                        type: Array,
+                        value: []
+                    },
 
                     candidateBinding: {
                         type: Object,
@@ -665,7 +698,7 @@
                     else
                     {
                         self.isValidGamepadReplacement = true;
-                            self.updateGamepadInput();
+                        self.updateGamepadInput();
                     }
                 },
 
@@ -719,6 +752,7 @@
 
                     //And close the modal
                     self.$.gamepadModal.close();
+                    self.$.axisOptionsModal.close();
                 },
 
                 //Update an existing keyboard binding
@@ -776,6 +810,7 @@
                     //Let the input controller know
                     self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
 
+                    self.isCustomConfig = true;
                     self.updateGamepadInput();
                     self.openUpdatePresetToast();
                 }, 
@@ -793,6 +828,7 @@
                     //Let the input controller know
                     self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
                     
+                    self.isCustomConfig = true;
                     self.updateKeyboardInput();
                     self.openUpdatePresetToast();
                 },
@@ -813,6 +849,7 @@
                         self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
                     }
 
+                    self.isCustomConfig = true;
                     this.$.clearedInputToast.open();
                 },
 
@@ -831,6 +868,7 @@
                         self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
                     }
 
+                    self.isCustomConfig = true;
                     this.$.clearedInputToast.open();
                 },
                 
@@ -841,6 +879,12 @@
                     self.selectedItem = inputPressed;
                     
                     this.$.gamepadModal.open();
+                },
+
+                handleAxisChange: function(e) {
+                    var self = this;
+                    self.selectedItem = e.model.item;
+                    self.openAxisOptionsModal()
                 },
 
                 //Gamepad modal has opened
@@ -1106,10 +1150,24 @@
                 presetToArray: function(preset) {
                     var self = this;
 
-                    console.log(preset);
+                    //array for buttons
+                    var buttons = [];
+                    var axes = [];
+                    
                     var arrayPreset = [];
 
                     preset.actions.forEach(function(action, actionName) {
+                        var isAxis = false;
+                        var controls = self.actions.get(actionName).controls;
+
+                        for(var control in controls)
+                        {
+                            if(control == "axis")
+                            {
+                                //This command takes axis commands, dump into the axis array instead of the button array
+                                isAxis = true;
+                            }
+                        }
 
                         var binding = {
                             keyboard: undefined,
@@ -1128,11 +1186,24 @@
                         };
 
                         arrayPreset.push(arrayInput);
+                        if(isAxis)
+                        {
+                            axes.push(arrayInput);
+                        }
+                        else
+                        {
+                            buttons.push(arrayInput);
+                        }
                     });
 
                     arrayPreset.sort(compare);
+                    axes.sort(compare);
+                    buttons.sort(compare);
 
                     self.presetArray = arrayPreset;
+                    self.axisArray = axes;
+                    self.buttonArray = buttons;
+
                     return arrayPreset;
                 },
 

@@ -47,18 +47,6 @@
 
           //Update the saved preset name lists
           self.updateSavedPresetList();
-
-          if(self.checkForLastPreset)
-          {
-            var lastPresetName = JSON.parse(self.settings.lastPreset, 'utf8');
-
-            if(lastPresetName !== undefined && lastPresetName !== self.defaultPresetName)
-            {
-              //Load the last preset 
-              self.loadPreset(lastPresetName);
-            }
-            self.checkForLastPreset = false;
-          }
         }
       });
 

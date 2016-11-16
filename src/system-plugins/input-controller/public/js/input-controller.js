@@ -37,6 +37,10 @@
       this.presets.set(this.currentPresetName, this.currentPreset);
 
       this.needToSaveDefaults = true;
+      this.checkForLastPreset = true;
+      this.defaultPresetName = "defaults";
+      this.settings = {};
+
       this.deferSetupForMousetrap();
     };
 
@@ -130,8 +134,22 @@
         }
       });
 
-      self.saveDefaults();
-      
+      //Listen for server setting changes
+      this.cockpit.rov.on('settings-change.inputConfigurator', function(settings) {
+          
+          self.settings = settings.inputConfigurator;
+          if(self.checkForLastPreset)
+          {
+            var lastPresetName = JSON.parse(self.settings.lastPreset, 'utf8');
+            if(lastPresetName !== undefined && lastPresetName !== self.defaultPresetName)
+            {
+              //Load the last preset 
+              self.cockpit.emit('plugin.inputConfigurator.loadPreset', lastPresetName);
+            }
+            self.checkForLastPreset = false;
+          }
+      });
+
       this.cockpit.on('plugin.inputController.sendPreset', function() {
 
         if(self.currentPreset !== undefined)
@@ -174,6 +192,8 @@
         //Try to update that input
         self.handleSavePreset(presetToSave);
       });
+
+      self.saveDefaults();
 
     };
 

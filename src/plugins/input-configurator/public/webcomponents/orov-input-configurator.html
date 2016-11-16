@@ -300,7 +300,7 @@
             </div>
         </paper-dialog>
 
-        <paper-dialog id="loadPresetModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation">
+        <paper-dialog id="loadPresetModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation"  on-iron-overlay-closed="onLoadPresetModalClose">
             <h1>{{__('Choose a preset to load')}}</h1>
             <paper-dropdown-menu id="savedPresetsDropdown" label="presets">
                 <paper-listbox class="dropdown-content" attr-for-selected="value" selected="{{candidatePreset}}" on-iron-select="handleLoadPreset">
@@ -337,13 +337,25 @@
                     <paper-button dialog-dismiss>{{__('Decline')}}</paper-button>
                 </div>
             </paper-dialog>
+        </paper-dialog>
 
+        <paper-dialog id="extraOptionsModal">
+            <h2>{{__('Extra Options')}}</h2>
+           
+            <paper-checkbox id="invertAxisCheckbox">Invert</paper-checkbox>
+            <paper-checkbox id="exponentialSticksCheckbox">Exponential Sticks</paper-checkbox>
+
+            <div class="buttons">
+                <paper-button dialog-confirm on-tap="handleExtraOptions">{{__('Confirm')}}</paper-button>
+                <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
+            </div>
         </paper-dialog>
 
         <div class="buttons">
             <paper-button raised id="savePresetButton" on-tap="openSavePresetModal"><iron-icon icon="save"></iron-icon>Save Preset </paper-button>
             <paper-button raised id="loadPresetButton" on-tap="openLoadPresetModal"><iron-icon icon="file-upload"></iron-icon> Load Preset </paper-button>
             <paper-button raised id="deletePresetButton" on-tap="openDeletePresetModal"><iron-icon icon="delete"></iron-icon> Delete Preset </paper-button>
+            <paper-button raised id="extraOptionsButton" on-tap="openExtraOptionsModal"><iron-icon icon="icons:settings"></iron-icon> Extra Options </paper-button>
         </div>
 
         <paper-dialog id="cannotOverwriteDefaultModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation"> 
@@ -355,18 +367,17 @@
 
         <p> {{__('Current Preset:')}} <b>{{preset.name}}</b>
             <template is="dom-if" if="{{isCustomConfig}}">
-               <i>{{__('custom')}}</i>
+               <i>{{__('unsaved')}}</i>
             </template>
         </p>
 
 
+        <!--Toasts-->
         <paper-toast id="updatedPresetToast" text="Updated Preset! Remember to save your new preset!"></paper-toast>
-
         <paper-toast id="clearedInputToast" text="Cleared input!"></paper-toast>
         <paper-toast id="savedPresetToast" text="Saved preset!"></paper-toast>
         <paper-toast id="loadedPresetToast" text="Loaded preset!"></paper-toast>
         <paper-toast id="deletedPresetToast" text="Deleted preset!"></paper-toast>
-
         <paper-toast id="duplicateInputToast" class="fit-bottom" text="Duplicate found."></paper-toast>
 
     </template>
@@ -600,10 +611,10 @@
                     else
                     {
                         self.isValidGamepadReplacement = true;
-                        self.updateGamepadInput();
+                            self.updateGamepadInput();
                     }
                 },
-                
+
                 //Check for duplicated keyboard inputs
                 checkForKeyboardDuplicates: function() {
                     var self = this;
@@ -789,7 +800,7 @@
                 //Handle the selection for the gamepad
                 handleGamepadRemapping: function(e) {
                     var self = this;
- 
+
                     if(self.candidateBinding == null)
                     {
                         self.handleClearGamepadBinding();
@@ -805,6 +816,24 @@
                         self.openInvalidGamepadTypeModal();
                     }
                     
+                },
+
+                openExtraOptionsModal: function()
+                {
+                    var self = this;
+                    self.$.extraOptionsModal.open();
+                },
+
+                handleExtraOptions: function()
+                {
+                    var self = this;
+
+                },
+                openAxisOptionsModal: function()
+                {
+                    var self = this;
+
+                    self.$.axisOptionsModal.open();
                 },
 
                 //User has clicked a keyboard symbol
@@ -881,6 +910,12 @@
                         self.openSavedPresetToast();
                     }
 
+                },
+
+                onLoadPresetModalClose: function()
+                {
+                    var self = this;
+                    self.candidatePreset = undefined;
                 },
 
                 openOverridePresetModal: function(oEvent)

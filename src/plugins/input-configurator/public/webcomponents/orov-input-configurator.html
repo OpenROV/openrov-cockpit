@@ -10,6 +10,7 @@
 <link rel="import" href="../paper-spinner/paper-spinner.html">
 <link rel="import" href="../paper-spinner/paper-spinner-lite.html">
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../neon-animation/neon-animation.html">
 
 <dom-module name="orov-input-configurator">
@@ -342,13 +343,23 @@
         <paper-dialog id="extraOptionsModal">
             <h2>{{__('Extra Options')}}</h2>
            
-            <paper-checkbox id="invertAxisCheckbox">Invert</paper-checkbox>
-            <paper-checkbox id="exponentialSticksCheckbox">Exponential Sticks</paper-checkbox>
+            <paper-listbox class="dropdown-content">
+                <paper-item>
+                    <paper-checkbox id="invertLeftYAxisCheckbox">Invert Left Y Axis</paper-checkbox>
+                </paper-item>
+                <paper-item>
+                    <paper-checkbox id="invertRightYAxisCheckbox">Invert Right Y Axis</paper-checkbox>
+                </paper-item>
+                <paper-item>
+                    <paper-checkbox id="exponentialSticksCheckbox">Enable Exponential Sticks</paper-checkbox>
+                </paper-item>
+            </paper-listbox>
 
             <div class="buttons">
                 <paper-button dialog-confirm on-tap="handleExtraOptions">{{__('Confirm')}}</paper-button>
                 <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
             </div>
+
         </paper-dialog>
 
         <div class="buttons">
@@ -507,8 +518,6 @@
                     var self = this;
                     
                     this.presetFunction = function(preset, actions) {
-
-                        console.log(preset);
                         //Shallow copy to aviod references
                         self.preset = self.copyPreset(preset);
                         self.actions = actions;
@@ -828,6 +837,16 @@
                 {
                     var self = this;
 
+                    var invertLeft = self.$.invertLeftYAxisCheckbox.checked;
+                    var invertRight = self.$.invertRightYAxisCheckbox.checked;
+                    var exponentialSticks = self.$.exponentialSticksCheckbox.checked;
+
+                    var extraOptionsPayload = {
+                        invertLeft: invertLeft,
+                        invertRight: invertRight,
+                        exponentialSticks: exponentialSticks
+                    };
+                    self.eventEmitter.emit('plugin.inputConfigurator.extraOptionsChanged', extraOptionsPayload);
                 },
                 openAxisOptionsModal: function()
                 {

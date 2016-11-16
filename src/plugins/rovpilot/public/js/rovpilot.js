@@ -28,8 +28,8 @@
     var self = this;
 
     //Get the stick values
-    self.cockpit.withHistory.on('settings-change.inputConfiguratorGeneral', function (settings) {
-      self.settings = settings.inputConfiguratorGeneral;
+    self.cockpit.withHistory.on('settings-change.inputConfigurator', function (settings) {
+      self.settings = settings.inputConfigurator.extraOptions.rovPilot;
     });
 
     //Helper function to set the exponentialRate value

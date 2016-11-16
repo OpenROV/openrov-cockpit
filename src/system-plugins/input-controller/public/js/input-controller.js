@@ -144,10 +144,6 @@
         self.resetControllers();
       });
 
-      this.cockpit.on('plugin.inputController.debug', function() {
-        self.saveDefaults();
-      });
-
       this.cockpit.on('plugin.inputController.updateInput', function(input) {
 
         //Try to update that input
@@ -185,11 +181,12 @@
     {
       var self = this;
 
+      //Work around for JSON.stringify not working on startup
       setTimeout( function() {
         var defaultPreset = self.presets.get("defaults");
         defaultPreset = self.convertToObject(defaultPreset);
         self.cockpit.emit('plugin.inputConfigurator.savePreset', defaultPreset);  
-      }, 3000);
+      }, 1500);
     };
 
     convertToObject(presetIn)
@@ -235,9 +232,6 @@
     {
       var self = this;
       self.presets.delete(preset.name);
-      
-      console.log(preset);
-      console.log(self.currentPresetName);
 
       if(preset == self.currentPresetName)
       {
@@ -257,8 +251,6 @@
     handleChangePreset(presetName)
     {
       var self = this;
-      console.log("Changing to", presetName);
-      console.log(self.presets)
 
       //Grab a handle to our preset
       var preset = self.presets.get(presetName);
@@ -280,7 +272,6 @@
 
       if(presetToSave.name !== "defaults")
       {
-        console.log("Saving preset");
         var presetToSave = self.convertToPreset(presetToSave);
 
         self.presets.set(presetToSave.name, presetToSave);
@@ -329,8 +320,6 @@
         newPreset.addAction(actionName);
       });
 
-      console.log("here",newPreset);
-
       for(var actionName in presetIn.actions)
       {
         var action = presetIn.actions[actionName];
@@ -348,7 +337,7 @@
       //Add it to our internal Map
       self.presets.set(newPreset.name, newPreset);
       self.handleChangePreset(newPreset.name);
-    }
+    };
 
     updateInput(input)
     {

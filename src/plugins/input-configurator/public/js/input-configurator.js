@@ -32,8 +32,6 @@
       self.rov = self.cockpit.rov.withHistory;
       self.isSavingSettings = false;
       self.checkForLastPreset = true;
-      self.garbage = undefined;
-      self.checkForGarbage = true;
     };
 
 
@@ -69,15 +67,7 @@
       });
 
       this.cockpit.on('plugin.inputConfigurator.savePreset', function(presetIn) {
-        if(self.checkForGarbage)
-        {
-          self.checkForGarbage = false;
-          self.garbage = self.copyPreset(presetIn);
-        }
         self.savePreset(presetIn);
-      });
-      this.cockpit.on('plugin.inputConfigurator.saveDefaults', function(presetIn) {
-        self.saveDefaults(presetIn);
       });
       
       this.cockpit.on('plugin.inputConfigurator.loadPreset', function(presetNameIn) {
@@ -87,6 +77,19 @@
       this.cockpit.on('plugin.inputConfigurator.getSavedPresets', function() {
         self.updateSavedPresetList();
       });
+
+      this.cockpit.on('plugin.inputConfigurator.extraOptionsChanged', function(extraOptions) {
+        self.updateExtraOptions(extraOptions);
+      });
+    };
+
+    updateExtraOptions(extraOptions)
+    {
+      var self = this;
+      self.settings.extraOptions.rovPilot = JSON.stringify(extraOptions, null, 2);
+
+      //Update the server settings to reflect this new preset
+      self.cockpit.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
     };
 
     copyPreset(presetIn)
@@ -110,11 +113,6 @@
         return returnPreset;
     };
     //Class methods
-    saveDefaults(defaults)
-    {
-      var self = this;
-      console.log("Defaults", defaults);
-    }
     deletePreset(presetToDelete)
     {
       var self = this;
@@ -189,8 +187,6 @@
       }
 
       //Add the preset
-      console.log("About to string:", presetIn);
-
       var stringPreset = JSON.stringify(presetIn);
       self.settings.presets.push(stringPreset);
 

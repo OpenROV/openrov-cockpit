@@ -99,14 +99,14 @@
       case 'ws':
         var address = data.sourceAddress;
 
-        if( address.startsWith( "http" ) )
-        {
-          address = address.replace( /http/, "ws" );
-        }
-        else if( address.startsWith( "https" ) )
+        if( address.startsWith( "https" ) )
         {
           console.error( "Can't connect to ws on an https connection. Ignoring camera registration." );
           break;
+        }
+        else if( address.startsWith( "http" ) )
+        {
+          address = address.replace( /http/, "ws" );
         }
         else
         {
@@ -136,13 +136,13 @@
       case 'wss':
         var address = data.sourceAddress;
 
-        if( address.startsWith( "http" ) )
-        {
-          address = address.replace( /http/, "wss" );
-        }
-        else if( address.startsWith( "https" ) )
+        if( address.startsWith( "https" ) )
         {
           address = address.replace( /https/, "wss" );
+        }
+        else if( address.startsWith( "http" ) )
+        {
+          address = address.replace( /http/, "wss" );
         }
         else
         {

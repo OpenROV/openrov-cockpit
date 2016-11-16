@@ -266,20 +266,36 @@
 
 
         <paper-dialog id="savePresetModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation" on-iron-overlay-closed="onSavePresetModalClosed">
-            <h1>{{__('Overwrite a saved preset or enter a new preset name')}}</h1>
+            <h1>{{__('Save your current configuration')}}</h1>
 
             <paper-dropdown-menu id="savedPresetsDropdown" label="presets">
                 <paper-listbox class="dropdown-content" attr-for-selected="value" selected="{{item.name}}" >
                     <template is="dom-repeat" items="[[savedPresets]]">
-                        <paper-item value="{{item}}" on-tap="overwritePreset">{{item}}</paper-item>
+                        <paper-item value="{{item}}" on-tap="openOverridePresetModal">{{item}}</paper-item>
                     </template>
+                    <paper-item on-tap="openSaveNewPresetModal"><iron-icon icon="save" item-icon></iron-icon>{{__('Save a new preset')}}</paper-item>                    
                 </paper-listbox>
             </paper-dropdown-menu>
 
-            <paper-input id="savePresetInput" label="preset name" on-keydown="checkForEnter" inputValue="{{candidatePreset}}" canrequired auto-validate char-counter maxlength="25" error-message="preset name needs some text!"></paper-input>
+            <paper-dialog id="saveNewPresetModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation"> 
+                <h1>{{__('Enter a new preset name to save')}}</h1>
+                <paper-input id="savePresetInput" label="preset name" on-keydown="checkForEnter" inputValue="{{candidatePreset}}" canrequired auto-validate char-counter maxlength="25" error-message="preset name needs some text!"></paper-input>
+                <div class="buttons">
+                    <paper-button dialog-dismiss on-tap="saveNewPreset" class="blue-button">{{__('Save')}}</paper-button>
+                    <paper-button dialog-dismiss class="blue-button">{{__('Cancel')}}</paper-button>
+                </div>
+            </paper-dialog>
 
+            <paper-dialog id="overridePresetModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation"> 
+                <h1>{{__('Are you sure? This will override your current saved settings for this preset')}}</h1>
+                <div class="buttons">
+                    <paper-button dialog-dismiss on-tap="overwritePreset" class="blue-button">{{__('SAVE')}}</paper-button>
+                    <paper-button dialog-dismiss class="blue-button">{{__('Cancel')}}</paper-button>
+                </div>
+            </paper-dialog>
+            
             <div class="buttons">
-                <paper-button dialog-confirm on-tap="saveNewPreset" class="blue-button">{{__('OK')}}</paper-button>
+                <paper-button dialog-dismiss on-tap="overwritePreset" class="blue-button">{{__('SAVE')}}</paper-button>
                 <paper-button dialog-dismiss class="blue-button">{{__('CANCEL')}}</paper-button>
             </div>
         </paper-dialog>
@@ -330,7 +346,18 @@
             <paper-button raised id="deletePresetButton" on-tap="openDeletePresetModal"><iron-icon icon="delete"></iron-icon> Delete Preset </paper-button>
         </div>
 
-        <p> {{__('Current Preset:')}} <b>{{preset.name}}</b> </p>
+        <paper-dialog id="cannotOverwriteDefaultModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation"> 
+            <h2>{{__('Cannot override the default preset. Select a different preset')}}</h2>
+            <div class="buttons">
+                <paper-button dialog-dismiss class="blue-button">{{__('OK')}}</paper-button>
+            </div>
+        </paper-dialog>
+
+        <p> {{__('Current Preset:')}} <b>{{preset.name}}</b>
+            <template is="dom-if" if="{{isCustomConfig}}">
+               <i>{{__('custom')}}</i>
+            </template>
+        </p>
 
 
         <paper-toast id="updatedPresetToast" text="Updated Preset! Remember to save your new preset!"></paper-toast>
@@ -338,6 +365,7 @@
         <paper-toast id="clearedInputToast" text="Cleared input!"></paper-toast>
         <paper-toast id="savedPresetToast" text="Saved preset!"></paper-toast>
         <paper-toast id="loadedPresetToast" text="Loaded preset!"></paper-toast>
+        <paper-toast id="deletedPresetToast" text="Deleted preset!"></paper-toast>
 
         <paper-toast id="duplicateInputToast" class="fit-bottom" text="Duplicate found."></paper-toast>
 
@@ -405,6 +433,10 @@
                         type: String,
                         value: undefined
                     },
+                    defaultPresetName: {
+                        type: String,
+                        value: "defaults"
+                    },
                     presetToDelete: {
                         type: String,
                         value: undefined
@@ -412,6 +444,11 @@
                     conflictingBinding: {
                         type: Object,
                         value: undefined
+                    },
+
+                    isCustomConfig: {
+                        type: Boolean,
+                        value: false
                     },
 
                     preset: {
@@ -454,24 +491,19 @@
                     'tableContainer.scroll': 'tableContainerScroll'
                 },
 
+
                 registerEmitterHandlers: function(emitter) {
                     var self = this;
                     
                     this.presetFunction = function(preset, actions) {
 
-                        //Set this to our current preset on the input Configurator
-
+                        console.log(preset);
                         //Shallow copy to aviod references
-                        self.preset = jQuery.extend({}, preset);
+                        self.preset = self.copyPreset(preset);
                         self.actions = actions;
 
                         //Update the UI to reflect this
                         self.presetToArray(self.preset);
-
-                        if(self.preset.name == "defaults")
-                        {
-                            self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.preset);
-                        }
                     }.bind(this);
 
                     this.getSavedPresetListFunction = function(presets) {
@@ -510,12 +542,34 @@
                     //Get the list of saved presets from disk
                     self.eventEmitter.emit('plugin.inputConfigurator.getSavedPresets', self.preset);  
                 },
+                copyPreset: function(presetIn)
+                {
+                    var self = this;
+
+                    var returnPreset = {
+                        name: presetIn.name,
+                        actions: new Map(),
+                    };
+                    
+                    //Iterate through actions
+                    presetIn.actions.forEach(function(action, actionName) {
+                        var actionToAdd = new Map();
+
+                        action.forEach(function(input, controllerName) {
+                        actionToAdd.set(controllerName, jQuery.extend({}, input));  
+                        });
+
+                        returnPreset.actions.set(actionName, actionToAdd);
+                    });
+                    return returnPreset;
+                },
 
                 //Check if enter was pressed
                 checkForEnter: function(e) {
                     var self = this;
                     if(e.keyCode == 13)
                     {
+                        //Uncomment this to enable 'enter' key saving
                         self.saveNewPreset();
                     }
                 },
@@ -630,9 +684,18 @@
                 {
                     var self = this;
 
-                    //Delete from input controller
-                    self.eventEmitter.emit('plugin.inputConfigurator.deletePreset', self.presetToDelete);
-                    self.$.deletePresetModal.close();
+                    if(self.presetToDelete == self.defaultPresetName)
+                    {
+                        self.$.cannotOverwriteDefaultModal.open();
+                        self.$.deletePresetModal.close();
+                    }
+                    else
+                    {
+                        //Delete from input controller
+                        self.eventEmitter.emit('plugin.inputConfigurator.deletePreset', self.presetToDelete);
+                        self.$.deletePresetModal.close();
+                        self.$.deletedPresetToast.open();
+                    }
                 },
 
                 //Clear a conflicting gamepad binding
@@ -794,7 +857,7 @@
                 {
                     var self = this;
                     var presetName = self.$.savePresetInput.value;
-
+                    
                     if(presetName)
                     {
                         self.handleSavePreset(presetName);
@@ -805,10 +868,26 @@
                 {
                     var self = this;
 
-                    self.set('preset.name', presetName);
-                    self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.preset);
-                    self.$.savePresetModal.close();
-                    self.openSavedPresetToast();
+                    if(presetName == self.defaultPresetName)
+                    {
+                        self.$.cannotOverwriteDefaultModal.open();
+                    }
+                    else
+                    {
+                        self.set('preset.name', presetName);
+                        
+                        self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.preset);
+                        self.$.savePresetModal.close();
+                        self.openSavedPresetToast();
+                    }
+
+                },
+
+                openOverridePresetModal: function(oEvent)
+                {
+                    var self = this;
+                    candidatePreset = oEvent.model.get('item');
+                    self.$.overridePresetModal.open();
                 },
 
                 openSavePresetModal: function()
@@ -827,9 +906,7 @@
                 overwritePreset: function(oEvent)
                 {
                     var self = this;
-                    var presetName = oEvent.model.get('item');
-
-                    self.handleSavePreset(presetName);  
+                    self.handleSavePreset(candidatePreset);  
                 },
 
                 openDeletePresetModal: function()
@@ -844,6 +921,12 @@
 
                     self.presetToDelete = oEvent.model.get('item');
                     self.$.deletePresetWarningModal.open();
+                },
+
+                openSaveNewPresetModal: function()
+                {
+                    var self = this;
+                    self.$.saveNewPresetModal.open();
                 },
 
                 //Checks to see if this action accepts this type
@@ -899,11 +982,14 @@
                     var self = this;
 
                     self.candidateBinding = undefined;
+                    self.isCustomConfig = true;
+
                     self.$.updatedPresetToast.open();
                 },
                 openSavedPresetToast: function() {
                     var self = this;
 
+                    self.isCustomConfig = false;
                     self.$.savedPresetToast.open();
                 },
                 openLoadedPresetToast: function() {

@@ -32,6 +32,8 @@
       self.rov = self.cockpit.rov.withHistory;
       self.isSavingSettings = false;
       self.checkForLastPreset = true;
+      self.garbage = undefined;
+      self.checkForGarbage = true;
     };
 
 
@@ -67,7 +69,15 @@
       });
 
       this.cockpit.on('plugin.inputConfigurator.savePreset', function(presetIn) {
+        if(self.checkForGarbage)
+        {
+          self.checkForGarbage = false;
+          self.garbage = self.copyPreset(presetIn);
+        }
         self.savePreset(presetIn);
+      });
+      this.cockpit.on('plugin.inputConfigurator.saveDefaults', function(presetIn) {
+        self.saveDefaults(presetIn);
       });
       
       this.cockpit.on('plugin.inputConfigurator.loadPreset', function(presetNameIn) {
@@ -77,9 +87,34 @@
       this.cockpit.on('plugin.inputConfigurator.getSavedPresets', function() {
         self.updateSavedPresetList();
       });
-    }
+    };
 
+    copyPreset(presetIn)
+    {
+        var self = this;
+
+        var returnPreset = {
+            name: presetIn.name,
+            actions: new Map(),
+        };
+        
+        //Iterate through actions
+        presetIn.actions.forEach(function(action, actionName) {
+            var actionToAdd = new Map();
+
+            action.forEach(function(input, controllerName) {
+              actionToAdd.set(controllerName, jQuery.extend({}, input));  
+            });
+            returnPreset.actions.set(actionName, actionToAdd);
+        });
+        return returnPreset;
+    };
     //Class methods
+    saveDefaults(defaults)
+    {
+      var self = this;
+      console.log("Defaults", defaults);
+    }
     deletePreset(presetToDelete)
     {
       var self = this;
@@ -133,13 +168,10 @@
         return;
       }
     };
-
     savePreset(presetIn)
     {
       var self = this;
-      //The preset we want to save to the settings manager
-      var presetToSave = JSON.stringify(presetIn, null, 2);
-
+    
       //Add this preset to our settings object
       var presetName = presetIn.name;
       
@@ -147,9 +179,9 @@
       for(var i = 0; i < self.settings.presets.length; ++i)
       {
         //Get the object
-        var preset = JSON.parse(self.settings.presets[i], 'utf8');
+        var tmpPreset = JSON.parse(self.settings.presets[i], 'utf8');
 
-        if(preset.name == presetName)
+        if(tmpPreset.name == presetName)
         {
           self.settings.presets.splice(i, 1);
           break;
@@ -157,10 +189,12 @@
       }
 
       //Add the preset
-      self.settings.presets.push(presetToSave);
+      console.log("About to string:", presetIn);
+
+      var stringPreset = JSON.stringify(presetIn);
+      self.settings.presets.push(stringPreset);
 
       var lastPreset = presetIn.name;
-        
       self.settings.lastPreset = JSON.stringify(lastPreset,null,2);
 
       //Update the server settings to reflect this new preset

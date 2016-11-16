@@ -33,9 +33,10 @@
       this.presets = new Map();
       this.currentPresetName = "defaults";
       this.currentPreset = new inputController.Preset(this.currentPresetName);
-
+      
       this.presets.set(this.currentPresetName, this.currentPreset);
 
+      this.needToSaveDefaults = true;
       this.deferSetupForMousetrap();
     };
 
@@ -128,6 +129,8 @@
           }
         }
       });
+
+      self.saveDefaults();
       
       this.cockpit.on('plugin.inputController.sendPreset', function() {
 
@@ -135,11 +138,14 @@
         {
           self.cockpit.emit('plugin.inputController.updatedPreset', self.currentPreset, self.actions);
         }
-        
       });
 
       this.cockpit.on('plugin.inputController.resetControllers', function() {
         self.resetControllers();
+      });
+
+      this.cockpit.on('plugin.inputController.debug', function() {
+        self.saveDefaults();
       });
 
       this.cockpit.on('plugin.inputController.updateInput', function(input) {
@@ -166,25 +172,93 @@
         self.handleLoadedPreset(loadedPreset);
       });
 
+
+      this.cockpit.on('plugin.inputConfigurator.savePreset', function(presetToSave) {
+
+        //Try to update that input
+        self.handleSavePreset(presetToSave);
+      });
+
+    };
+
+    saveDefaults()
+    {
+      var self = this;
+
+      setTimeout( function() {
+        var defaultPreset = self.presets.get("defaults");
+        defaultPreset = self.convertToObject(defaultPreset);
+        self.cockpit.emit('plugin.inputConfigurator.savePreset', defaultPreset);  
+      }, 3000);
+    };
+
+    convertToObject(presetIn)
+    {
+      var self = this;
+      var returnPreset = {
+          name: presetIn.name,
+          actions: new Map()
+      };
+      
+      //Iterate through actions
+      presetIn.actions.forEach(function(action, actionName) {
+          var actionToAdd = new Map();
+
+          action.forEach(function(input, controllerName) {
+            actionToAdd.set(controllerName, input);  
+          });
+          returnPreset.actions.set(actionName, actionToAdd);
+      });
+      return returnPreset;
+    };
+
+    convertToPreset(presetIn)
+    {
+      var self = this;
+
+      var returnPreset = new inputController.Preset(presetIn.name);
+
+      //Iterate through actions
+      presetIn.actions.forEach(function(action, actionName) {
+        var actionToAdd = new Map();
+
+        action.forEach(function(input, controllerName) {
+          actionToAdd.set(controllerName, jQuery.extend({}, input));  
+        });
+
+        returnPreset.actions.set(actionName, actionToAdd);
+      });
+      return returnPreset;
     };
 
     deletePreset(preset)
     {
       var self = this;
+      self.presets.delete(preset.name);
+      
+      console.log(preset);
+      console.log(self.currentPresetName);
+
+      if(preset == self.currentPresetName)
+      {
+        self.cockpit.emit('plugin.inputConfigurator.loadPreset', "defaults");
+      }
     };
+
     handleLoadedPreset(presetIn)
     {
       var self = this;
-      if(!self.presets.has(presetIn.name))
-      {
-        self.addPreset(presetIn);
-      }
-      self.handleChangePreset(presetIn.name);
+
+      self.deletePreset(presetIn.name);
+
+      self.addPreset(presetIn);
     };
 
     handleChangePreset(presetName)
     {
       var self = this;
+      console.log("Changing to", presetName);
+      console.log(self.presets)
 
       //Grab a handle to our preset
       var preset = self.presets.get(presetName);
@@ -196,7 +270,22 @@
       self.registerPresetWithHardware(preset);
 
       self.currentPreset = preset;
+      self.currentPresetName = preset.name;
       self.cockpit.emit('plugin.inputController.updatedPreset', self.currentPreset, self.actions);
+    };
+
+    handleSavePreset(presetToSave)
+    {
+      var self = this;
+
+      if(presetToSave.name !== "defaults")
+      {
+        console.log("Saving preset");
+        var presetToSave = self.convertToPreset(presetToSave);
+
+        self.presets.set(presetToSave.name, presetToSave);
+        self.handleChangePreset(presetToSave.name);
+      }
     };
 
     registerPresetWithHardware(preset)
@@ -238,7 +327,9 @@
       //Use the default list to init
       self.presets.get("defaults").actions.forEach(function(action, actionName) {
         newPreset.addAction(actionName);
-      })
+      });
+
+      console.log("here",newPreset);
 
       for(var actionName in presetIn.actions)
       {
@@ -256,6 +347,7 @@
 
       //Add it to our internal Map
       self.presets.set(newPreset.name, newPreset);
+      self.handleChangePreset(newPreset.name);
     }
 
     updateInput(input)

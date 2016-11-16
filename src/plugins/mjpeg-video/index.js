@@ -194,6 +194,7 @@
                 'title':    'MJPEG Video',
                 'type':     'object',
                 'id':       'mjpegVideo',
+                'category' : 'video',
 
                 'properties': {
                     'framerate': 

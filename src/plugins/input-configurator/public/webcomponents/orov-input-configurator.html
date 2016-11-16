@@ -141,7 +141,43 @@
             {{__('Click on the button you want to change in the table below')}}
         </p>        
         
-        <section class="">      
+        <h3> {{__('Buttons')}} </h3>
+        <section>      
+            <div id="tableContainer">
+                <table>
+                    <thead id="stickyHeader">
+                        <tr>
+                            <th>
+                                <div>{{__('Description')}}</div>
+                            </th>
+                            <th>
+                                <div>{{__('Keyboard')}}</div>
+                            </th>
+                            <th>
+                                <div>{{__('Gamepad')}}</div>
+                            </th>     
+                            <th>
+                                <div>{{__('Emitter Name')}}</div>
+                            </th>          
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template is="dom-repeat" items="[[presetArray]]">
+                            <tr>
+                                <td id="descriptionRow">{{__(item.description)}}</td>
+                                <td><kbd class="light" on-tap="handleKeyboardChange">{{item.bindings.keyboard.name}}&nbsp;</kbd></td>
+                                <td><kbd on-tap="handleGamepadChange">{{item.bindings.gamepad.name}}&nbsp;</kbd></td>
+                                <td>{{__(item.name)}}</td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <h3> {{__('Axes)}} </h3>
+
+        <section>      
             <div id="tableContainer">
                 <table>
                     <thead id="stickyHeader">
@@ -1074,6 +1110,7 @@
                 presetToArray: function(preset) {
                     var self = this;
 
+                    console.log(preset);
                     var arrayPreset = [];
 
                     preset.actions.forEach(function(action, actionName) {

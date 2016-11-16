@@ -17,9 +17,12 @@ class ObjectPool
         this._createObject  = createObjectFunc;
         this._resetObject   = options.resetObject;
         this._maxSize       = options.maxSize || 0;
+        this._totalCount    = 0;
 
         // Pre-allocate objects
         this.allocate( options.initialSize || 0 );
+
+        console.log( `Max size: ${this._maxSize}` );
     };
 
     // Pre-allocates the pool with the specified number of objects
@@ -27,8 +30,10 @@ class ObjectPool
     {
         while( size-- ) 
         {
-            if( this._maxSize === 0 || this._pool.length < this._maxSize )
+            if( this._maxSize === 0 || this._totalCount < this._maxSize )
             {
+                this._totalCount++;
+
                 this._pool.push( this._createObject() );
             }
             else
@@ -47,8 +52,10 @@ class ObjectPool
             // Provide an existing resource
             return this._pool.pop();
         }
-        else if( this._maxSize === 0 || this._pool.length < this._maxSize )
+        else if( this._maxSize === 0 || this._totalCount < this._maxSize )
         {
+            this._totalCount++;
+
             // Create new object
             return this._createObject();
         }
@@ -75,7 +82,7 @@ class ObjectPool
     // Makes sure that the pool has at least the given size
     reserve( size )
     {
-        var diff = size - this._pool.length;
+        var diff = size - this._totalCount;
 
         if( diff > 0 ) 
         {

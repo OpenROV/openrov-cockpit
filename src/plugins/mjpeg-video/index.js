@@ -116,6 +116,12 @@
                     }
                 }),
 
+                scanForCameras: new Listener( this.cockpitBus, "plugin.mjpegVideo.scanForCameras", false, () =>
+                {
+                    log( "Scanning" );
+                    this.supervisor.emit( "scan" );
+                }),
+
                 svConnect: new Listener( this.supervisor, 'connect', false, () =>
                 {
                     log( 'Successfully connected to mjpg-streamer supervisor' );
@@ -167,6 +173,8 @@
             this.listeners.svError.enable();
             this.listeners.svReconnect.enable();
             this.listeners.svStreamRegistration.enable();
+
+            this.listeners.scanForCameras.enable();
 
             // Start the supervisor process
             this.svMonitor.start();

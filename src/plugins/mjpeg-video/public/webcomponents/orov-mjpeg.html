@@ -1,0 +1,46 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../orov-behaviors/orov-behavior.html">
+
+<dom-module id="orov-mjpeg">
+  <style>	  
+  </style>
+  
+  <template>
+	  
+	<h4>Scan for Cameras</h4>
+	<paper-button raised id="scanButton" on-tap="_scanForCameras">Scan</paper-button>
+
+  </template>
+  
+  <script>
+    Polymer(
+	{
+		is: 'orov-mjpeg',
+		properties: 
+		{
+			settings:
+			{
+				type: Object,
+				value: {}
+			}
+		},
+		
+		behaviors: [namespace('behaviors').oROVStandard],
+		
+		registerEmitterHandlers: function(emitter) 
+		{
+			var self = this;
+		},
+	  
+      	attached: function() 
+		{
+		},
+	  
+		_scanForCameras: function()
+		{
+			this.eventEmitter.emit( "plugin.mjpegVideo.scanForCameras" );
+		}
+    });
+  </script>
+</dom-module>

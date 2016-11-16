@@ -141,7 +141,7 @@
             {{__('Click on the button you want to change in the table below')}}
         </p>        
         
-        <h3> {{__('Buttons')}} </h3>
+        <h3> {{__('Button Controls')}} </h3>
         <section>      
             <div id="tableContainer">
                 <table>
@@ -175,7 +175,7 @@
             </div>
         </section>
 
-        <h3> {{__('Axes)}} </h3>
+        <h3> {{__('Axis Controls')}} </h3>
 
         <section>      
             <div id="tableContainer">
@@ -184,9 +184,6 @@
                         <tr>
                             <th>
                                 <div>{{__('Description')}}</div>
-                            </th>
-                            <th>
-                                <div>{{__('Keyboard')}}</div>
                             </th>
                             <th>
                                 <div>{{__('Gamepad')}}</div>
@@ -200,7 +197,6 @@
                         <template is="dom-repeat" items="[[presetArray]]">
                             <tr>
                                 <td id="descriptionRow">{{__(item.description)}}</td>
-                                <td><kbd class="light" on-tap="handleKeyboardChange">{{item.bindings.keyboard.name}}&nbsp;</kbd></td>
                                 <td><kbd on-tap="handleGamepadChange">{{item.bindings.gamepad.name}}&nbsp;</kbd></td>
                                 <td>{{__(item.name)}}</td>
                             </tr>

@@ -84,7 +84,10 @@
     //update function with the last copy of this message that had been sent.
     //The settings manager sends a change message for each section when
     //first read in.
+
     this.rov.withHistory.on('settings-change.ic', function (settings) {
+      //TODO: Refactor this so that the settings dont trigger a new connection without first cleaning up the old onevent
+      console.assert('false','Code needs refactoring');
       console.log('Settings changed for IC');
       self.settings = settings.ic;
       //TODO: Move to a pattern that can retry the connection when the setting changes

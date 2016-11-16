@@ -27,24 +27,30 @@
       self.saveSettings();
     });
     this.rov.on('settings-change.pluginmgr', function (settings) {
+      //TODO: Complete this. This is currently never called because the there are no settings defined for the pluginmgr
+      console.assert(false,'Pluginmgr settings should not be defined');
+      //Only process the settings change if it is different than what we had.
+      if (self.settings == settings.pluginmgr){
+        return;
+      }
+      self.settings = settings.pluginmgr;
       var that = self;
       clearPluginCache();
       self.EnumerateControllablePlugins(function (plugins) {
         that.cockpit.emit('plugin-manager.ControllablePluginsChanged', plugins);
       });
+
+      //TODO: zip the server saved config of plugins over the defaults
+      _plugins.forEach(function (item) {
+        if (item.name in settings.pluginmgr) {
+          Object.assign(item, settings.pluginmgr[item.name]);
+        }
+      });
+
+      self.startPlugins();
+
     });
     this.startPlugins();
-    //TODO: zip the server saved config of plugins over the defaults
-    this.rov.withHistory.on('settings-change.pluginmgr', function (settings) {
-      if ('pluginmgr' in settings) {
-        _plugins.forEach(function (item) {
-          if (item.name in settings.pluginmgr) {
-            Object.assign(item, settings.pluginmgr[item.name]);
-          }
-        });
-        self.startPlugins();
-      }
-    });
   };
   PluginManager.prototype.startPlugins = function startPlugins(fn) {
     this.EnumerateControllablePlugins(function (items) {

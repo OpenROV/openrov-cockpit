@@ -62,6 +62,9 @@
             --paper-toast-color: white;
         }
 
+        #toasts {
+            margin-top: 15%;
+        }
         #stickyHeader {
             background-color: white;
         }
@@ -177,8 +180,8 @@
             <p> {{__('Click REMAP and then enter the desired key to set this control')}} </p>
             <p> {{__('Click CLEAR to remove inputs associated with this command')}} </p>
             <h3>
-                {{__('Current Mapping')}}: <kbd class="light">{{selectedItem.bindings.keyboard.name}}</kbd>
-                <paper-spinner active={{isListeningToKeyboard}} text="Waiting for keyboard input"></paper-spinner>
+                {{__('Current Mapping')}}: <paper-button on-tap="handleKeyboardRemapping"><kbd class="light">{{selectedItem.bindings.keyboard.name}}</kbd> </paper-button>
+                <paper-spinner active={{isListeningToKeyboard}} text="Waiting for keyboard input">{{__('Waiting for keyboard input')}}</paper-spinner>
             </h3>
             
             <h3>
@@ -345,13 +348,13 @@
            
             <paper-listbox class="dropdown-content">
                 <paper-item>
-                    <paper-checkbox id="invertLeftYAxisCheckbox">Invert Left Y Axis</paper-checkbox>
+                    <paper-checkbox id="invertLeftYAxisCheckbox">{{__('Invert Left Y Axis')}}</paper-checkbox>
                 </paper-item>
                 <paper-item>
-                    <paper-checkbox id="invertRightYAxisCheckbox">Invert Right Y Axis</paper-checkbox>
+                    <paper-checkbox id="invertRightYAxisCheckbox">{{__('Invert Right Y Axis')}}</paper-checkbox>
                 </paper-item>
                 <paper-item>
-                    <paper-checkbox id="exponentialSticksCheckbox">Enable Exponential Sticks</paper-checkbox>
+                    <paper-checkbox id="exponentialSticksCheckbox">{{__('Enable Exponential Sticks')}}</paper-checkbox>
                 </paper-item>
             </paper-listbox>
 
@@ -363,10 +366,10 @@
         </paper-dialog>
 
         <div class="buttons">
-            <paper-button raised id="savePresetButton" on-tap="openSavePresetModal"><iron-icon icon="save"></iron-icon>Save Preset </paper-button>
-            <paper-button raised id="loadPresetButton" on-tap="openLoadPresetModal"><iron-icon icon="file-upload"></iron-icon> Load Preset </paper-button>
-            <paper-button raised id="deletePresetButton" on-tap="openDeletePresetModal"><iron-icon icon="delete"></iron-icon> Delete Preset </paper-button>
-            <paper-button raised id="extraOptionsButton" on-tap="openExtraOptionsModal"><iron-icon icon="icons:settings"></iron-icon> Extra Options </paper-button>
+            <paper-button raised id="savePresetButton" on-tap="openSavePresetModal"><iron-icon icon="save"></iron-icon> {{__('Save Preset')}} </paper-button>
+            <paper-button raised id="loadPresetButton" on-tap="openLoadPresetModal"><iron-icon icon="file-upload"></iron-icon> {{__('Load Preset')}}</paper-button>
+            <paper-button raised id="deletePresetButton" on-tap="openDeletePresetModal"><iron-icon icon="delete"></iron-icon> {{__('Delete Preset')}} </paper-button>
+            <paper-button raised id="extraOptionsButton" on-tap="openExtraOptionsModal"><iron-icon icon="icons:settings"></iron-icon> {{__('Extra Options')}} </paper-button>
         </div>
 
         <paper-dialog id="cannotOverwriteDefaultModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation"> 
@@ -382,6 +385,10 @@
             </template>
         </p>
 
+        <div class="buttons" id="toasts">
+            <p></p>
+        </div>
+
 
         <!--Toasts-->
         <paper-toast id="updatedPresetToast" text="Updated Preset! Remember to save your new preset!"></paper-toast>
@@ -389,7 +396,9 @@
         <paper-toast id="savedPresetToast" text="Saved preset!"></paper-toast>
         <paper-toast id="loadedPresetToast" text="Loaded preset!"></paper-toast>
         <paper-toast id="deletedPresetToast" text="Deleted preset!"></paper-toast>
-        <paper-toast id="duplicateInputToast" class="fit-bottom" text="Duplicate found."></paper-toast>
+        <paper-toast id="duplicateInputToast" text="Duplicate found."></paper-toast>
+
+        <paper-toast id="waitingForKeyboardInputToast"duration="0" text="Waiting for keyboard input"></paper-toast>
 
     </template>
     <script>
@@ -557,8 +566,12 @@
                     if(self.preset == undefined)
                     {
                         self.eventEmitter.emit('plugin.inputController.sendPreset');
-                    }
-                    
+                    }                    
+
+                    //Fit the  most important toasts up
+                    self.$.updatedPresetToast.fitInto = self.$.toasts;
+                    self.$.duplicateInputToast.fitInto = self.$.toasts;
+                    self.$.waitingForKeyboardInputToast.fitInto = self.$.toasts;
                     //Get the list of saved presets from disk
                     self.eventEmitter.emit('plugin.inputConfigurator.getSavedPresets', self.preset);  
                 },
@@ -879,6 +892,9 @@
                     //Start listening for keyboard inputs
                     self.isListeningToKeyboard = true;
 
+                    //Open the toast
+                    self.$.waitingForKeyboardInputToast.open();
+
                     Mousetrap.record( function(sequence) {
                         self.isListeningToKeyboard = false;
                         self.candidateBinding = sequence.join(' ');
@@ -1004,6 +1020,7 @@
 
                 onKeyboardModalClosed : function() {
                     var self = this;
+                    self.$.waitingForKeyboardInputToast.close();
                 },
 
                 onGamepadModalClosed : function() {

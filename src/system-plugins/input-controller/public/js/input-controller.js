@@ -186,7 +186,7 @@
         var defaultPreset = self.presets.get("defaults");
         defaultPreset = self.convertToObject(defaultPreset);
         self.cockpit.emit('plugin.inputConfigurator.savePreset', defaultPreset);  
-      }, 1500);
+      }, 3000);
     };
 
     convertToObject(presetIn)

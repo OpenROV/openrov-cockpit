@@ -51,6 +51,6 @@ if [ ! -f /var/swapfile ]; then
 fi
 
 #Disabled pending optimized solution that does not slam kernel 
-#nice -n 19 /opt/openrov/system/scripts/knight-rider.js &
+nice -n 19 bbb-ledstatus &
 
 exit 0

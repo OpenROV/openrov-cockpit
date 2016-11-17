@@ -1,5 +1,6 @@
 const Mode = Object.freeze( { "interval":1, "timeout":2, "scheduled":3 } );
 
+// TODO: Properly handle promise based functions
 class Periodic
 {
     constructor( interval_ms, mode, func )

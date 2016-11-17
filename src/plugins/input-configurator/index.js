@@ -28,38 +28,41 @@
 		{
 			//From http://json-schema.org/examples.html
 			return [{
-				'title': 'Input Configurator',
-				'type': 'object',
-				'id': 'inputConfigurator',
-				'properties': {
-					'extraOptions': {
-						type: 'object',
-						default: {
-							'rovPilot': {
-								type: 'object',
-								default: {
-									'exponentialSticks': {
-										type: 'boolean',
-										default: 'false'
-									},
-									'invertLeft': {
-										type: 'boolean',
-										default: 'false'
-									},
-									'invertRight': {
-										type: 'boolean',
-										default: 'false'
-									}
-								}
+				"title": "Input Configurator",
+				"type": "object",
+				"properties": {
+					"extraOptions": {
+						"type": "object",
+						"rovPilot": {
+							"type": "object",
+							"exponentialSticks": {
+								"type": "boolean",
+								"default": "false"
+							},
+							"invertLeftX": {
+								"type": "boolean",
+								"default": "false"
+							},
+							"invertLeftY": {
+								"type": "boolean",
+								"default": "false"
+							},
+							"invertRightX": {
+								"type": "boolean",
+								"default": "false"
+							},
+							"invertRightY": {
+								"type": "boolean",
+								"default": "false"
 							}
 						}
 					},
-					'lastPreset': {
-						type: 'string',
-						default: 'undefined'
+					"lastPreset": {
+						"type": "string",
+						"default": "undefined"
 					},
-					'presets': {
-						'type': 'array'
+					"presets": {
+						"type": "array"
 					}
 				}
 			}];

@@ -16,6 +16,23 @@
 
   var recordPluginNeeded = true;
 
+  //Mapping of axis to inversions actions
+  var axisInversions = [
+      ["LEFT_STICK_X", {
+          plugin: "rovPilot",
+          item: "invertLeftX"}],
+      ["LEFT_STICK_Y", {
+          plugin: "rovPilot",
+          item: "invertLeftY"}],
+      ["RIGHT_STICK_X", {
+          plugin: "rovPilot",
+          item: "invertRightX"}],
+      ["RIGHT_STICK_Y", {
+          plugin: "rovPilot",
+          item: "invertRightY"}]
+  ];
+
+  var inversionMap = new Map(axisInversions);
   var inputController = namespace('systemPlugin.inputController');
   inputController.InputController = class InputController
   {
@@ -136,11 +153,10 @@
 
       //Listen for server setting changes
       this.cockpit.rov.on('settings-change.inputConfigurator', function(settings) {
-          
           self.settings = settings.inputConfigurator;
           if(self.checkForLastPreset)
           {
-            var lastPresetName = JSON.parse(self.settings.lastPreset, 'utf8');
+            var lastPresetName = self.settings.lastPreset;
             if(lastPresetName !== undefined && lastPresetName !== self.defaultPresetName)
             {
               //Load the last preset 
@@ -206,7 +222,7 @@
         var defaultPreset = self.presets.get("defaults");
         defaultPreset = self.convertToObject(defaultPreset);
         self.cockpit.emit('plugin.inputConfigurator.savePreset', defaultPreset);  
-      }, 3000);
+      }, 2500);
     };
 
     convertToObject(presetIn)
@@ -447,10 +463,20 @@
 
       var input = inputIn.input;
       var hardware = self.controllers.get(input.controller);
+      var invert = false;
+      
+      if(self.settings.extraOptions !== undefined && input.type == "axis")
+      {
+        var inversion = inversionMap.get(input.name);
+        var plugin = self.settings.extraOptions[inversion.plugin];
+        
+        invert = plugin[inversion.item];
+      }
 
       var inputForHardware = {
         action: self.actions.get(inputIn.action).controls[input.type],
-        input: input
+        input: input,
+        invert: invert
       };
 
       hardware.registerInput(inputForHardware);
@@ -557,9 +583,9 @@
         if(self.assignments.has(axis))
         {
           var assignment = self.assignments.get(axis);
-          if(typeof assignment.update == 'function')
+          if(typeof assignment.action.update == 'function')
           {
-            assignment.update(e.value);
+            assignment.action.update(e.value, assignment.invert);
           }
         }
       });
@@ -570,9 +596,9 @@
         if(self.assignments.has(control))
         {
           var button = self.assignments.get(control);
-          if(typeof button.down == 'function')
+          if(typeof button.action.down == 'function')
           {
-            button.down();
+            button.action.down();
           }
         }
       });
@@ -583,9 +609,9 @@
         if(self.assignments.has(control))
         {
           var button = self.assignments.get(control);
-          if(typeof button.up == 'function')
+          if(typeof button.action.up == 'function')
           {
-            button.up();
+            button.action.up();
           }
         }
       });
@@ -628,8 +654,12 @@
       var self = this;
 
       var input = inputIn.input;
+      var inputToRegister = {
+        action: inputIn.action,
+        invert: inputIn.invert
+      };
 
-      self.gamepadAbstraction.assignments.set(input.name, inputIn.action);
+      self.gamepadAbstraction.assignments.set(input.name, inputToRegister);
     };
 
     reset()

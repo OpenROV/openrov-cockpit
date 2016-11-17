@@ -109,7 +109,7 @@
       for(var i = 0; i < self.settings.presets.length; ++i)
       {
         //Get the object
-        var preset = JSON.parse(self.settings.presets[i], 'utf8');
+        var preset = self.settings.presets[i];
 
         if(preset.name == presetToDelete)
         {
@@ -126,8 +126,6 @@
       var self = this;
       //Search the settings for the preset requested
       var result = $.grep(self.settings.presets, function(preset){ 
-        //Convert to Object
-        preset = JSON.parse(preset, 'utf8');
         return preset.name == presetNameIn; 
       });
 
@@ -139,11 +137,11 @@
       else if(result.length == 1)
       {
 
-        var presetOut = JSON.parse(result[0], 'utf8');
+        var presetOut = result[0];
         self.cockpit.emit('plugin.inputConfigurator.loadedPreset', presetOut);
 
         //They loaded a preset, set the lastPreset to this name
-        self.settings.lastPreset = JSON.stringify(presetNameIn,null,2);
+        self.settings.lastPreset = presetNameIn;
 
         //Update the server settings to reflect this new preset
         self.cockpit.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
@@ -165,8 +163,7 @@
       for(var i = 0; i < self.settings.presets.length; ++i)
       {
         //Get the object
-        var tmpPreset = JSON.parse(self.settings.presets[i], 'utf8');
-
+        var tmpPreset = self.settings.presets[i];
         if(tmpPreset.name == presetName)
         {
           self.settings.presets.splice(i, 1);
@@ -175,11 +172,8 @@
       }
 
       //Add the preset
-      var stringPreset = JSON.stringify(presetIn);
-      self.settings.presets.push(stringPreset);
-
-      var lastPreset = presetIn.name;
-      self.settings.lastPreset = JSON.stringify(lastPreset,null,2);
+      self.settings.presets.push(presetIn);
+      self.settings.lastPreset = presetIn.name;
 
       //Update the server settings to reflect this new preset
       self.cockpit.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
@@ -195,7 +189,7 @@
       //Update the saved preset name lists
       for(var i = 0; i < self.settings.presets.length; ++i)
       {
-        var preset = JSON.parse(self.settings.presets[i], 'utf8');
+        var preset = self.settings.presets[i];
         self.savedPresets.push(preset.name);
       }
       

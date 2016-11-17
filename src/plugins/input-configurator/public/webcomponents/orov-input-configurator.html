@@ -267,10 +267,6 @@
                         <paper-item value="DPAD_DOWN">{{__('DPAD_DOWN')}}</paper-item>
                         <paper-item value="DPAD_LEFT">{{__('DPAD_LEFT')}}</paper-item>
                         <paper-item value="DPAD_RIGHT">{{__('DPAD_RIGHT')}}</paper-item>
-                        <paper-item value="LEFT_STICK_X">{{__('LEFT_STICK_X')}}</paper-item>
-                        <paper-item value="LEFT_STICK_Y">{{__('LEFT_STICK_Y')}}</paper-item>
-                        <paper-item value="RIGHT_STICK_X">{{__('RIGHT_STICK_X')}}</paper-item>
-                        <paper-item value="RIGHT_STICK_Y">{{__('RIGHT_STICK_Y')}}</paper-item>
                     </paper-listbox>
                 </paper-dropdown-menu>      
             </div>
@@ -281,7 +277,7 @@
             </div>
         </paper-dialog>
         
-        <paper-dialog id="axisOptionsModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation"on-iron-overlay-opened="handleGamepadFocus">
+        <paper-dialog id="axisModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation"on-iron-overlay-opened="handleGamepadFocus">
             <h1>{{__('Gamepad mapping:')}} {{selectedItem.name}}</h1>
             <p> {{__('Choose a control from the dropdown to remap this command to')}} </p>
             <p> {{__('Click CLEAR to remove inputs associated with this command')}} </p>
@@ -292,7 +288,7 @@
 
             <div>
                 <paper-dropdown-menu id="candidategamepad" label="gamepad control">
-                    <paper-listbox class="dropdown-content" attr-for-selected="value" selected="{{candidateBinding}}" on-iron-select="handleGamepadRemapping">
+                    <paper-listbox class="dropdown-content" attr-for-selected="value" selected="{{candidateBinding}}" on-iron-select="openAxisOptionsModal">
                         <paper-item value="LEFT_STICK_X">{{__('LEFT_STICK_X')}}</paper-item>
                         <paper-item value="LEFT_STICK_Y">{{__('LEFT_STICK_Y')}}</paper-item>
                         <paper-item value="RIGHT_STICK_X">{{__('RIGHT_STICK_X')}}</paper-item>
@@ -300,10 +296,13 @@
                     </paper-listbox>
                 </paper-dropdown-menu>      
             </div>
+            <paper-item>
+                <paper-checkbox id="exponentialSticksCheckbox" checked="{{extraOptions.rovPilot.exponentialSticks}}" on-click="handleEnableExponentialSticks">{{__('Enable Exponential Sticks')}}</paper-checkbox>
+            </paper-item>
             <div class="buttons">
                 <paper-button disabled$={{isValidGamepadReplacement}} on-tap="openClearGamepadDuplicateWarning">{{__('Clear conflicting binding')}}</paper-button>
                 <paper-button on-tap="handleClearGamepadBinding" dialog-confirm>{{__('Clear')}}</paper-button>
-                <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
+                <paper-button dialog-dismiss>{{__('Close')}}</paper-button>
             </div>
         </paper-dialog>
 
@@ -316,6 +315,23 @@
             </div>
         </paper-dialog>
 
+        <paper-dialog id="axisOptionsModal">
+            <h2>{{__('Axis Options')}}</h2>
+
+            <h3> {{__('Selected:')}} <kbd>{{candidateBinding}}</kbd> </h3>
+
+            <paper-listbox class="dropdown-content">
+                <paper-item>
+                    <paper-checkbox id="invertAxisCheckbox" checked="{{currentInversionSetting}}" on-tap="handleChangeInvert">{{__('Invert')}}</paper-checkbox>
+                </paper-item>
+            </paper-listbox>
+
+            <div class="buttons">
+                <paper-button dialog-confirm on-tap="handleAxisRemapping" class="green-button">{{__('Save')}}</paper-button>
+                <paper-button dialog-dismiss>{{__('Close')}}</paper-button>
+            </div>
+        </paper-dialog>
+
         <paper-dialog id="invalidGamepadTypeModal">
             <h2>{{__('Type mismatch!')}}</h2>
             <p><kbd>{{candidateBinding}}</kbd>  {{__(' is not a valid input command for ')}} <b>{{selectedItem.name}}</b> </p>
@@ -324,7 +340,6 @@
                 <paper-button dialog-dismiss class="blue-button">{{__('OK')}}</paper-button>
             </div>
         </paper-dialog>
-
 
         <paper-dialog id="savePresetModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation" on-iron-overlay-closed="onSavePresetModalClosed">
             <h1>{{__('Save your current configuration')}}</h1>
@@ -400,33 +415,10 @@
             </paper-dialog>
         </paper-dialog>
 
-        <paper-dialog id="extraOptionsModal">
-            <h2>{{__('Extra Options')}}</h2>
-           
-            <paper-listbox class="dropdown-content">
-                <paper-item>
-                    <paper-checkbox id="invertLeftYAxisCheckbox">{{__('Invert Left Y Axis')}}</paper-checkbox>
-                </paper-item>
-                <paper-item>
-                    <paper-checkbox id="invertRightYAxisCheckbox">{{__('Invert Right Y Axis')}}</paper-checkbox>
-                </paper-item>
-                <paper-item>
-                    <paper-checkbox id="exponentialSticksCheckbox">{{__('Enable Exponential Sticks')}}</paper-checkbox>
-                </paper-item>
-            </paper-listbox>
-
-            <div class="buttons">
-                <paper-button dialog-confirm on-tap="handleExtraOptions">{{__('Confirm')}}</paper-button>
-                <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
-            </div>
-
-        </paper-dialog>
-
         <div class="buttons">
             <paper-button raised id="savePresetButton" on-tap="openSavePresetModal"><iron-icon icon="save"></iron-icon> {{__('Save Preset')}} </paper-button>
             <paper-button raised id="loadPresetButton" on-tap="openLoadPresetModal"><iron-icon icon="file-upload"></iron-icon> {{__('Load Preset')}}</paper-button>
             <paper-button raised id="deletePresetButton" on-tap="openDeletePresetModal"><iron-icon icon="delete"></iron-icon> {{__('Delete Preset')}} </paper-button>
-            <paper-button raised id="extraOptionsButton" on-tap="openExtraOptionsModal"><iron-icon icon="icons:settings"></iron-icon> {{__('Extra Options')}} </paper-button>
         </div>
 
         <paper-dialog id="cannotOverwriteDefaultModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation"> 
@@ -454,6 +446,7 @@
         <paper-toast id="loadedPresetToast" text="Loaded preset!"></paper-toast>
         <paper-toast id="deletedPresetToast" text="Deleted preset!"></paper-toast>
         <paper-toast id="duplicateInputToast" text="Duplicate found."></paper-toast>
+        <paper-toast id="updatedExtraOptionsToast" text="Updated extra options!"></paper-toast>
 
         <paper-toast id="waitingForKeyboardInputToast"duration="0" text="Waiting for keyboard input"></paper-toast>
 
@@ -505,6 +498,23 @@
             ];
             var gamepadMap = new Map(gamepadTypes);
 
+            //Mapping of axis to inversions actions
+            var axisInversions = [
+                ["LEFT_STICK_X", {
+                    plugin: "rovPilot",
+                    item: "invertLeftX"}],
+                ["LEFT_STICK_Y", {
+                    plugin: "rovPilot",
+                    item: "invertLeftY"}],
+                ["RIGHT_STICK_X", {
+                    plugin: "rovPilot",
+                    item: "invertRightX"}],
+                ["RIGHT_STICK_Y", {
+                    plugin: "rovPilot",
+                    item: "invertRightY"}]
+            ];
+            var inversionMap = new Map(axisInversions);
+
             Polymer({
                 is: "orov-input-configurator",
                 properties: {
@@ -529,9 +539,23 @@
                         type: String,
                         value: undefined
                     },
+                    currentInversionSetting: {
+                        type: Boolean,
+                        value: undefined
+                    },
                     defaultPresetName: {
                         type: String,
                         value: "defaults"
+                    },
+                    enableExponentialSticks: {
+                        type: Boolean,
+                        value: false,
+                        observer: "enableExponentialSticksChanged"
+                    },
+
+                    extraOptions: {
+                        type: Object,
+                        value: {}
                     },
                     presetToDelete: {
                         type: String,
@@ -564,7 +588,10 @@
                         type: Object,
                         value: undefined
                     },
-
+                    settings: {
+                        type: Object,
+                        value: undefined
+                    },
                     isListeningToKeyboard: {
                         type: Boolean,
                         value: false
@@ -616,13 +643,25 @@
                         
                     }.bind(this);
 
+                    this.getSettings = function(settings) {
+                        self.set("settings", settings.inputConfigurator);
+
+                        var extraOptions = self.settings.extraOptions;
+                        if(self.settings.extraOptions !== undefined)
+                        {
+                            self.set("extraOptions", self.settings.extraOptions);
+                        }
+                    }.bind(this);
+
                     emitter.on('plugin.inputController.updatedPreset', this.presetFunction );
                     emitter.on('plugin.inputConfigurator.savedPresets', this.getSavedPresetListFunction );
+                    emitter.rov.on('settings-change.inputConfigurator', this.getSettings );
                 },
                 
                 detached: function(){
                     this.eventEmitter.off('plugin.inputController.updatedPreset',this.presetFunction);
                     this.eventEmitter.off('plugin.inputConfigurator.savedPresets',this.getSavedPresetListFunction);
+                    this.eventEmitter.rov.off('settings-change.inputConfigurator', this.getSettings );
                 },
 
                 attached: function() {
@@ -639,6 +678,16 @@
                     self.$.waitingForKeyboardInputToast.fitInto = self.$.toasts;
                     //Get the list of saved presets from disk
                     self.eventEmitter.emit('plugin.inputConfigurator.getSavedPresets', self.preset);  
+
+                    //Get our settings as well
+                    if(self.settings == undefined)
+                    {
+                        self.eventEmitter.rov.emit('plugin.settings-manager.getSettings', "inputConfigurator", function(settings) {
+                            self.set("settings", settings.inputConfigurator);
+                            self.set("extraOptions", self.settings.extraOptions);
+                        });
+                    }
+                    
                 },
                 copyPreset: function(presetIn)
                 {
@@ -660,6 +709,40 @@
                         returnPreset.actions.set(actionName, actionToAdd);
                     });
                     return returnPreset;
+                },
+
+                enableExponentialSticksChanged: function(newValue, oldValue)
+                {
+                    var self = this;
+                    
+                },
+
+                extraOptionsChanged: function(newValue, oldValue)
+                {
+                    var self = this;
+                    
+                },
+
+                handleEnableExponentialSticks: function()
+                {
+                    var self = this;
+                    self.extraOptions.rovPilot.exponentialSticks = self.$.exponentialSticksCheckbox.checked;    
+                    self.settings.extraOptions = self.extraOptions;
+                    self.eventEmitter.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
+                    self.$.updatedExtraOptionsToast.open();
+                },
+
+                handleChangeInvert: function()
+                {
+                    var self = this;
+
+                    var inversion = inversionMap.get(self.candidateBinding);
+                    var extraOptionsPlugin = self.extraOptions[inversion.plugin];
+                    extraOptionsPlugin[inversion.item] = self.$.invertAxisCheckbox.checked;;
+                    
+                    self.settings.extraOptions = self.extraOptions;
+                    self.eventEmitter.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
+                    self.$.updatedExtraOptionsToast.open();
                 },
 
                 //Check if enter was pressed
@@ -752,7 +835,7 @@
 
                     //And close the modal
                     self.$.gamepadModal.close();
-                    self.$.axisOptionsModal.close();
+                    self.$.axisModal.close();
                 },
 
                 //Update an existing keyboard binding
@@ -884,7 +967,7 @@
                 handleAxisChange: function(e) {
                     var self = this;
                     self.selectedItem = e.model.item;
-                    self.openAxisOptionsModal()
+                    self.openAxisModal()
                 },
 
                 //Gamepad modal has opened
@@ -937,11 +1020,11 @@
                     };
                     self.eventEmitter.emit('plugin.inputConfigurator.extraOptionsChanged', extraOptionsPayload);
                 },
-                openAxisOptionsModal: function()
+                openAxisModal: function()
                 {
                     var self = this;
 
-                    self.$.axisOptionsModal.open();
+                    self.$.axisModal.open();
                 },
 
                 //User has clicked a keyboard symbol
@@ -1061,6 +1144,23 @@
                     self.$.deletePresetModal.open();
                 },
                 
+                openAxisOptionsModal: function()
+                {
+                    var self = this;
+
+                    //Get the settings for this inversion
+                    var inversion = inversionMap.get(self.candidateBinding);
+                    var extraOptionsPlugin = self.extraOptions[inversion.plugin];
+                    self.currentInversionSetting = extraOptionsPlugin[inversion.item];
+
+                    self.$.axisOptionsModal.open();
+                },
+
+                handleAxisRemapping: function()
+                {
+                    var self = this;
+                    self.handleGamepadRemapping();
+                },
                 openDeletePresetWarningModal: function(oEvent)
                 {
                     var self = this;

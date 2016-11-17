@@ -25,17 +25,40 @@
       strafe: 0
     };
 
+    this.extraOptions = {
+      rovPilot: {
+        exponentialSticks: true,
+        invertLeftX: false,
+        invertLeftY: false,
+        invertRightX: false,
+        invertRightY: false
+      }
+    };
+
     var self = this;
 
     //Get the stick values
     self.cockpit.withHistory.on('settings-change.inputConfigurator', function (settings) {
-      self.settings = settings.inputConfigurator.extraOptions.rovPilot;
+      self.settings = settings.inputConfigurator;
+
+      //Init extra options with defaults
+      if(self.settings.extraOptions == undefined)
+      {
+        self.settings.extraOptions = self.extraOptions;
+        self.cockpit.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
+      }
+      else
+      {
+        //get the settings
+        var options = self.settings.extraOptions;
+        self.extraOptions = options;
+      }
     });
 
     //Helper function to set the exponentialRate value
     function postProcessStickValues(input) 
     {
-      if (self.settings.exponentialSticks) 
+      if (self.extraOptions.rovPilot.exponentialSticks) 
       {
         var s = Math.sign(input);
 
@@ -89,8 +112,11 @@
         {
           axis: 
           {
-            update: function(value) {
-              rov.cockpit.emit('plugin.rovpilot.setThrottle', -1 * postProcessStickValues(value));
+            update: function(value, invert) {
+              var inversion = invert ? 1 : -1;
+              var result = inversion * postProcessStickValues(value);
+
+              rov.cockpit.emit('plugin.rovpilot.setThrottle', result);
             }
           }
         }
@@ -102,8 +128,11 @@
         {
           axis: 
           {
-            update: function(value) {
-              rov.cockpit.emit('plugin.rovpilot.setYaw', postProcessStickValues(value));
+            update: function(value, invert) {
+               var inversion = invert ? -1 : 1;
+               var result = inversion * postProcessStickValues(value);
+
+               rov.cockpit.emit('plugin.rovpilot.setYaw', result);
             }
           }
         }
@@ -147,8 +176,11 @@
         {
           axis: 
           {
-            update: function(value) {
-              rov.cockpit.emit('plugin.rovpilot.setLift', -1 * postProcessStickValues(value));
+            update: function(value, invert) {
+               var inversion = invert ? 1 : -1;
+               var result = inversion * postProcessStickValues(value);
+
+               rov.cockpit.emit('plugin.rovpilot.setLift', result);
             }
           }
         }

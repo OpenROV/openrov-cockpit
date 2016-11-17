@@ -28,6 +28,7 @@
     this.extraOptions = {
       rovPilot: {
         exponentialSticks: true,
+        exponentialRate: 1,
         invertLeftX: false,
         invertLeftY: false,
         invertRightX: false,
@@ -58,11 +59,11 @@
     //Helper function to set the exponentialRate value
     function postProcessStickValues(input) 
     {
-      if (self.extraOptions.rovPilot.exponentialSticks) 
+      if(self.extraOptions.rovPilot.exponentialSticks) 
       {
         var s = Math.sign(input);
 
-        input = Math.pow(input, self.settings.exponentialRate);
+        input = Math.pow(input, self.extraOptions.rovPilot.exponentialRate);
         if (Math.sign(input) !== s) 
         {
           input = input * s;

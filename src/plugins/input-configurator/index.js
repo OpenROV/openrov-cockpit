@@ -35,6 +35,9 @@
 						"type": "object",
 						"rovPilot": {
 							"type": "object",
+							"exponentialRate": {
+								"type": "number"
+							},
 							"exponentialSticks": {
 								"type": "boolean",
 								"default": "false"

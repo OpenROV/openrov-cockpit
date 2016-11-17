@@ -83,15 +83,10 @@ $(function() {
     var tokenOption = force == false ? localStorage.sessionID : 'reset';
 
     var handlePageLoaded = function() {
-        console.log("connection: in handlePageLoad")
         var socket = window.io.connect(window.location.protocol + '//' + window.location.hostname + ':' + window.location.port, {
             path: '/cockpitsocket',
             query: 'token=' + tokenOption
         });
-
-
-
-
 
         socket = new window.SocketIOStoreAndForward(socket);
         // socket=new window.SocketIOEmitter(socket);

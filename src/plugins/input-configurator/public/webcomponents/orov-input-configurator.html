@@ -12,7 +12,6 @@
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../neon-animation/neon-animation.html">
-<link rel="import" href="../paper-slider/paper-slider.html">
 
 <dom-module name="orov-input-configurator">
 
@@ -68,10 +67,6 @@
         }
         #stickyHeader {
             background-color: white;
-        }
-
-        #expRateSlider {
-
         }
 
         .green-button {
@@ -304,9 +299,7 @@
             <paper-item>
                 <paper-checkbox id="exponentialSticksCheckbox" checked="{{extraOptions.rovPilot.exponentialSticks}}" on-click="handleEnableExponentialSticks">{{__('Enable Exponential Sticks')}}</paper-checkbox>
             </paper-item>
-            <div id="expRateSliderContainer">
-                <paper-slider disabled="{{!extraOptions.rovPilot.exponentialSticks}}" id="expRateSlider" min="0" max="10" pin value="{{exponentialRate.current}}"></paper-slider>
-            </div>
+
             <div class="buttons">
                 <paper-button disabled$={{isValidGamepadReplacement}} on-tap="openClearGamepadDuplicateWarning">{{__('Clear conflicting binding')}}</paper-button>
                 <paper-button on-tap="handleClearGamepadBinding" dialog-confirm>{{__('Clear')}}</paper-button>
@@ -438,7 +431,7 @@
 
         <p> {{__('Current Preset:')}} <b>{{preset.name}}</b>
             <template is="dom-if" if="{{isCustomConfig}}">
-               <i>{{__('unsaved')}}</i>
+               (<i>{{__('unsaved')}}</i>)
             </template>
         </p>
 
@@ -583,23 +576,6 @@
                         type: Map
                     },
 
-                    exponentialRate: {
-                        type: Object,
-                        value: {
-                            current: {
-                                type: Number,
-                                value: 0
-                            },
-                            previous: {
-                                type: Number,
-                                value: 0
-                            }
-                        }
-                    },
-                    previousExpRate: {
-                        type: Number,
-                        value: undefined
-                    },
                     presetArray: {
                         type: Array,
                         value: []
@@ -637,7 +613,6 @@
 
                 listeners: {
                     'tableContainer.scroll': 'tableContainerScroll',
-                    'expRateSlider.value-change': 'expRateSliderHandler'
                 },
 
 
@@ -676,15 +651,6 @@
                         if(self.settings.extraOptions !== undefined)
                         {
                             self.set("extraOptions", self.settings.extraOptions);
-                            if(self.settings.extraOptions.rovPilot.exponentialRate == self.exponentialRate.previous)
-                            {
-                                //Don't do nothing
-                            }
-                            else
-                            {
-                                self.set("exponentialRate.current", self.settings.extraOptions.rovPilot.exponentialRate);
-                                self.set("exponentialRate.previous", self.settings.extraOptions.rovPilot.exponentialRate);
-                            }
 
                         }
                     }.bind(this);
@@ -726,21 +692,6 @@
                     
                 },
 
-                expRateSliderHandler: function(e) {
-                    var self = this;
-                    
-                    var sliderValue = self.$.expRateSlider.value;
-                    //Save this setting
-                    if(self.settings !== undefined)
-                    {
-                        self.extraOptions.rovPilot.exponentialRate = sliderValue;
-                        self.settings.extraOptions = self.extraOptions;
-
-                        self.eventEmitter.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
-                        self.$.updatedExtraOptionsToast.open();
-                    }
-
-                },
                 copyPreset: function(presetIn)
                 {
                     var self = this;
@@ -1123,7 +1074,9 @@
                     //Request the node module to send up the preset requested
                     self.eventEmitter.emit('plugin.inputConfigurator.loadPreset', self.candidatePreset);
 
-                    self.candidatePreset = undefined;
+                    self.set(self.candidatePreset, undefined);
+                    self.isCustomConfig = false;
+
                     self.openLoadedPresetToast();
                     self.$.loadPresetModal.close();
                 },
@@ -1161,7 +1114,7 @@
                 onLoadPresetModalClose: function()
                 {
                     var self = this;
-                    self.candidatePreset = undefined;
+                    self.set(self.candidatePreset, undefined);
                 },
 
                 openOverridePresetModal: function(oEvent)
@@ -1248,17 +1201,20 @@
 
                 onKeyboardModalClosed : function() {
                     var self = this;
+                    self.set(self.candidateBinding, undefined);
                     self.$.waitingForKeyboardInputToast.close();
                 },
 
                 onGamepadModalClosed : function() {
                     var self = this;  
+                    self.set(self.candidateBinding, undefined);
+                    console.log(self.candidateBingind);
                 },
                 onSavePresetModalClosed: function() {
                     var self = this;
 
                     //Reset the candidatePreset
-                    self.candidatePreset = undefined;
+                    self.set(self.candidatePreset, undefined);
                 },
 
                 //Toasts and modals
@@ -1280,7 +1236,7 @@
                 openUpdatePresetToast: function() {
                     var self = this;
 
-                    self.candidateBinding = undefined;
+                    self.set(self.candidateBinding, undefined);
                     self.isCustomConfig = true;
 
                     self.$.updatedPresetToast.open();

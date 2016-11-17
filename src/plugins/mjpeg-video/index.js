@@ -32,7 +32,7 @@
             this.supervisorLaunchOptions = 
             [
                 "nice",
-                "1",
+                "-1",
                 "node",
                 require.resolve( 'mjpeg-video-server' ),
                 "-p",

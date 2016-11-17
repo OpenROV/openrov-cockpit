@@ -15,6 +15,9 @@ if (process.env.NODE_PATH !== undefined) {
 process.env.NODE_PATH = __dirname + '/lib:' + oldpath;
 require('module').Module._initPaths();
 
+// Add cockpit source dir to the environment variables
+process.env[ "COCKPIT_PATH" ] = __dirname;
+
 // Set default logging options
 process.env.DEBUG = "log*,error*," + process.env.DEBUG;
 

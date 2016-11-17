@@ -1,149 +1,272 @@
-const exec = require('child_process').exec;
-const fs = require('fs');
-const respawn = require('respawn');
-const util = require('util');
-const Q = require('q');
-const io = require('socket.io-client');
-var log = require('debug')('app:log:mjpeg');
-var server = require('debug')('app:log:mjpeg:server');
-var error = require('debug')('app:error:mjpeg');
-var mjpegvideo = function mjpegvideo(name, deps) {
-  console.log('The mjpeg-video plugin.');
-  //state variables
-  this.deps = deps;
-  var self = this;
-  this.services = {};
-};
-var defaults = {
-    port: 8090,
-    wspath: '/mjpeg-video'
-  };
-mjpegvideo.prototype.enumerateDevices = function enumerateDevices() {
-  var deferred = Q.defer();
-  var launch_options = [
-      'node',
-      require.resolve('mjpeg-video-server'),
-      '-e',
-      'true'
-    ];
+(function() 
+{
+    const fs        = require('fs');
+    const respawn   = require('respawn');
+    const util      = require('util');
+    const io        = require('socket.io-client');
+    const assert    = require('assert');
+    const Listener  = require( 'Listener' );
 
-  if (process.env.MJPG_MOCK === 'true') {
-    launch_options.push('-m');
-    launch_options.push('true');
- //   launch_options.splice(1,0,'--debug-brk=15858');
-  }
+    var log         = require('debug')('app:mjpeg:log');
+    var debug       = require('debug')('app:mjpeg:debug');
+    var error       = require('debug')('app:mjpeg:error');
 
-  exec(launch_options.join(' '), { env: { DEBUG: process.env.DEBUG } }, function (error, stdout, stderr) {
-    if (error) {
-      deferred.reject(error);
-    }
-    var cameras = [];
-    try {
-      cameras = JSON.parse(stdout);
-    } catch (e) {
-    }
-    if (cameras && util.isArray(cameras) && cameras.length > 0) {
-      deferred.resolve(cameras);
-    } else {
-      var cameras = [];
-      deferred.resolve(cameras);
-    }
-  });
-  return deferred.promise;
-};
-mjpegvideo.prototype.start = function start() {
-  var self = this;
-    // self.deps.cockpit.on('plugin.mjpeg-video.start', function(device) {
-    //   self.startCamera('/dev/' + device);
-    //   self.connectVideoServer();
-    // });
-    self.enumerateDevices().then(function (cameras) {
-      if (cameras && cameras.length > 0) {
-        self.startVideoServer();
-        self.connectVideoServer();  // log('Found cameras ' + JSON.stringify(cameras));
-        //self.deps.cockpit.emit("plugin.mjpeg-video.cameraInfo", cameras);
-      }
-    });
+    var defaults = 
+    {
+        port: 8300,
+        wspath: '/mjpeg'
+    };
 
-};
-mjpegvideo.prototype.connectVideoServer = function () {
-  var self = this;
-  log('Connecting to video server');
-  var videoServer = io.connect('http://localhost:' + defaults.port, {
-      path: defaults.wspath,
-      reconnection: true,
-      reconnectionAttempts: Infinity,
-      reconnectionDelay: 10
-    });
-  self.deps.cockpit.on('plugin.mjpeg-video.start', function (device) {
-    videoServer.emit('video.start', device);
-  });
-  videoServer.on('video-deviceRegistration', function (result) {
-    self.deps.cockpit.emit('plugin.mjpeg-video.deviceRegistration', result);
-    log('mjpeg-video got device registration: ' + JSON.stringify(result));
-  });
-  // Video endpoint announcement
-  videoServer.on('mjpeg-video.channel.announcement', function (camera, info) {
-    log('Announcement info: ' + JSON.stringify(info));
-    // Emit message on global event loop to register with the Video plugin
-    self.deps.globalEventLoop.emit('CameraRegistration', {
-      location: info.txtRecord.cameraLocation,
-      videoMimeType: info.txtRecord.videoMimeType,
-      resolution: info.txtRecord.resolution,
-      framerate: info.txtRecord.framerate,
-      wspath: info.txtRecord.wspath,
-      relativeServiceUrl: info.txtRecord.relativeServiceUrl,
-      sourcePort: info.port,
-      sourceAddress: '',
-      connectionType: 'socket.io'
-    });
-  });
-};
-mjpegvideo.prototype.startVideoServer = function startVideoServer(device) {
-  var launch_options = [
-      'node',
-      require.resolve('mjpeg-video-server')
-    ];
-  var mock = false;
-  if (process.env.MJPG_MOCK === 'true') {
-    launch_options.push('-m');
-    launch_options.push('true');
-    launch_options.push('-u');
-    launch_options.push(':8090/?action=stream');
-  //  launch_options.splice(1,0,'--debug-brk=15858');
-    launch_options.splice(1,0,'--debug=15858');
-  }
-  const infinite = -1;
-  log('Starting mjpeg-video-server ' + launch_options);
-  var monitor = respawn(launch_options, {
-      name: 'mjpegserver',
-      maxRestarts: infinite,
-      sleep: 1000,
-      env: { DEBUG: process.env.DEBUG }
-    });
-  monitor.on('stdout', function (data) {
-    server(data.toString('utf-8'));
-  });
-  var self = this;
-  monitor.on('stderr', function (data) {
-    var msg = data.toString('utf-8');
-    var service;
-    try {
-      service = JSON.parse(msg);
-    } catch (e) {
-      server('mjpeg-video-server STDERR: ' + msg);
-      return;  //abort, not a json message
+    class MjpgStreamer
+    {
+        constructor( name, deps )
+        {
+            log( "Loaded Cockpit Plugin: MjpgStreamer" );
+
+            this.globalBus  = deps.globalEventLoop;
+            this.cockpitBus = deps.cockpit;
+
+            this.settings   = {};
+            this.camera     = null;
+
+            this.supervisorLaunchOptions = 
+            [
+                "nice",
+                "-1",
+                "node",
+                require.resolve( 'mjpeg-video-server' ),
+                "-p",
+                defaults.port,
+                "-c",
+                "/etc/openrov/STAR_openrov_net.chained.crt",
+                "-k",
+                "/etc/openrov/star_openrov_net.key",
+            ];
+
+            // Handle mock options
+            if( process.env.USE_MOCK === 'true' ) 
+            {
+                if( process.env.MOCK_VIDEO_TYPE === "MJPEG" )
+                {
+                    log( "Using MJPEG video format in Mock Mode.");
+
+                    this.supervisorLaunchOptions.push( '-m' );
+                    this.supervisorLaunchOptions.push( 'true' );
+
+                    if( process.env.MOCK_VIDEO_HARDWARE === 'false' )
+                    {
+                        log( "Using actual MJPEG video source.");
+
+                        this.supervisorLaunchOptions.push( '-h' );
+                        this.supervisorLaunchOptions.push( 'true' );
+                    }
+                    else
+                    {
+                        log( "Using mocked MJPEG video source.");
+                    }
+                }
+                else
+                {
+                    this.disabled = true;
+                    return;
+                }
+            }
+
+            this.supervisor = io.connect( 'http://localhost:' + defaults.port,
+            {
+                path: defaults.wspath,
+                reconnection: true,
+                reconnectionAttempts: Infinity,
+                reconnectionDelay: 1000
+            });
+
+            this.svMonitor = respawn( this.supervisorLaunchOptions, 
+            {
+                name: 'mjpeg-video-server',
+                env: 
+                {
+                    'COCKPIT_PATH': process.env[ "COCKPIT_PATH" ],
+                    'DEBUG': 'app*'
+                },
+                maxRestarts: -1,
+                sleep: 1000
+            });
+
+            this.svMonitor.on( "stdout", (data) =>
+            {
+                log( data.toString() );
+            });
+
+            this.svMonitor.on( "stderr", (data) =>
+            {
+                error( data.toString() );
+            });      
+
+            // Set up listeners
+            this.listeners = 
+            {
+                settings: new Listener( this.globalBus, 'settings-change.mjpegVideo', true, (settings) =>
+                {
+                    try
+                    {
+                        // Check for settings changes
+                        assert.notDeepEqual( settings.mjpegVideo, this.settings );
+
+                        // Update settings
+                        this.settings = settings.mjpegVideo;
+
+                        log( `Updating MJPEG streamer settings to: \n${this.settings}` );
+
+                        // Send update to supervisor so it restarts the stream
+                        this.supervisor.emit( "updateSettings", this.settings );
+                    }
+                    catch( err )
+                    {
+                        // Do nothing
+                    }
+                }),
+
+                scanForCameras: new Listener( this.cockpitBus, "plugin.mjpegVideo.scanForCameras", false, () =>
+                {
+                    log( "Scanning" );
+                    this.supervisor.emit( "scan" );
+                }),
+
+                svConnect: new Listener( this.supervisor, 'connect', false, () =>
+                {
+                    log( 'Successfully connected to mjpg-streamer supervisor' );
+
+                    // Start listening for settings changes (gets the latest settings)
+                    this.listeners.settings.enable();
+                }),
+
+                svDisconnect: new Listener( this.supervisor, 'disconnect', false, function()
+                {
+                    log( 'Disconnected from mjpg-streamer supervisor' );
+                }),
+
+                svError: new Listener( this.supervisor, 'error', false, function(err)
+                {
+                    error( 'Mjpg-streamer supervisor connection error: ' + err );
+                }),
+
+                svReconnect: new Listener( this.supervisor, 'reconnect', false, function()
+                {
+                    log('Reconnecting to mjpg-streamer supervisor...');
+                }),
+
+                svStreamRegistration: new Listener( this.supervisor, 'stream.registration', false, ( serial, info ) =>
+                {
+                    log('Stream Registration: ' + JSON.stringify(info) );
+
+                    this.globalBus.emit( 'CameraRegistration', 
+                    {
+                        location:           "forward",               // TODO: Lookup location based on serial ID
+                        videoMimeType: 		"video/x-motion-jpeg",
+                        resolution:         info.resolution,
+                        framerate:          info.framerate, 
+                        wspath:             "",
+                        relativeServiceUrl: `:${info.port}`,
+                        sourcePort:         info.port,
+                        sourceAddress:      "",
+                        connectionType:     info.connectionType
+                    });
+                })
+            }
+        }
+
+        start()
+        {
+            if( this.disabled )
+            {
+                return;
+            }
+
+            // Enable listeners
+            this.listeners.svConnect.enable();
+            this.listeners.svDisconnect.enable();
+            this.listeners.svError.enable();
+            this.listeners.svReconnect.enable();
+            this.listeners.svStreamRegistration.enable();
+
+            this.listeners.scanForCameras.enable();
+
+            // Start the supervisor process
+            this.svMonitor.start();
+        }
+
+        stop()
+        {
+            if( this.disabled )
+            {
+                return;
+            }
+            
+            // Stop the supervisor process
+            this.svMonitor.stop();
+
+            // Disable all listeners
+            for( var listener in this.listeners ) 
+            {
+                if( this.listeners.hasOwnProperty( listener ) ) 
+                {
+                    listener.disable();
+                }
+            }
+        }
+
+        getSettingSchema()
+        {
+            return [
+            {
+                'title':    'MJPEG Video',
+                'type':     'object',
+                'id':       'mjpegVideo',
+                'category' : 'video',
+
+                'properties': {
+                    'framerate': 
+                    {
+                        'type': 'string',
+                        'enum': 
+                        [
+                            '30',
+                            '15',
+                            '10'
+                        ],
+                        'title': 'Framerate (FPS)',
+                        'default': '30'
+                    },
+                    'resolution': 
+                    {
+                        'type': 'string',
+                        'enum': 
+                        [
+                            '1920x1080',
+                            '1280x720',
+                            '800x600',
+                            '640x480',
+                            '352x288',
+                            '320x240',
+                            '176x144',
+                            '160x120'
+                        ],
+                        'title': 'Resolution',
+                        'default': '800x600'
+                    }                    
+                },
+
+                'required': 
+                [
+                    'framerate',    // Framerate setting for camera
+                    'resolution'    // Resolution setting for camera
+                ]
+            }];
+        }
     }
-  });
-  monitor.on('exit', function () {
-    log('mjpeg-video-server exit');
-  });
-  monitor.on('crash', function () {
-    log('mjpeg-video-server crash');
-  });
-  monitor.start();
-};
-//Export provides the public interface
-module.exports = function (name, deps) {
-  return new mjpegvideo(name, deps);
-};
+
+    module.exports = function( name, deps ) 
+    {
+        return new MjpgStreamer( name, deps );
+    };
+}());

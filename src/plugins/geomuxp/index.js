@@ -2,17 +2,18 @@ var log = require('debug')('log:system');
 var error = require('debug')('error:system');
 var debug = require('debug')('debug:system');
 
-const exec = require('child_process')
-    .exec;
+const exec = require('child_process').exec;
 const fs = require('fs');
 const path = require('path');
 const respawn = require('respawn');
 const io = require('socket.io-client');
 const events = require('events');
+
 var defaults = {
     port: 8099,
     wspath: '/geovideo'
 };
+
 var geomux = function geomux(name, deps) {
     log('The geo-mux plugin.');
     var self = this;
@@ -35,7 +36,7 @@ var geomux = function geomux(name, deps) {
         videoServer.emit('geomux.command', camera, command, params);
     });
     videoServer.on('video-deviceRegistration', function(update) {
-        debug('Got device update'); // self.deps.globalEventLoop.emit('video-deviceRegistration',update);
+        debug('Got device update');
     });
     // Video endpoint announcement
     videoServer.on('geomux.video.announcement', function(camera, channel, info) {
@@ -120,10 +121,14 @@ geomux.prototype.start = function start()
     // Figure out which video server to use
     if( process.env.USE_MOCK == 'true' )
     {
-      if (process.env.GEO_MOCK == 'true') 
+      if (process.env.MOCK_VIDEO_TYPE === "GEOMUX")
       {
           geoprogram = require.resolve('geo-video-simulator');
-      } 
+      }
+      else
+      {
+          return;
+      }
     }
     else
     {

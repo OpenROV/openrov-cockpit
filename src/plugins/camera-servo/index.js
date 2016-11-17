@@ -215,33 +215,40 @@
                 'title': 'Camera Servo',
                 'type': 'object',
                 'id': 'cameraServo',
+                'category': 'general',
+
                 'properties': {
                     'speed': {
+                        'title': 'Servo Speed (deg/s)',
                         'type': 'number',
                         'default': 45.0
                     },
                     'controlSensitivity': {
+                        'title': 'Control Sensitivity (multiplier)',
                         'type': 'number',
                         'default': 1.0
                     },
                     'rangeMax': {
+                        'title': 'Max Angle (deg)',
                         'type': 'number',
                         'default': 32.8
                     },
                     'rangeMin': {
+                        'title': 'Min Angle (deg)',
                         'type': 'number',
                         'default': -40.6
                     },
-                    'inverted': {
-                    'type': 'boolean',
-                    'format': 'checkbox',
-                    'default': false
-                    },
                     'stepResolution': {
+                        'title': 'Step Resolution (deg/step)',
                         'type': 'number',
                         'default': 10.0
-                    }
-                    
+                    },
+                    'inverted': {
+                        'title': 'Inverted',
+                        'type': 'boolean',
+                        'format': 'checkbox',
+                        'default': false
+                    }  
                 },
 
                 // TODO: Need to classify which settings are used at various levels: MCU Model, Local Model, UI model
@@ -250,8 +257,8 @@
                     'controlSensitivity',   // When doing joystick or buttonHeld controls, multiplier against servo speed for moving the targetPos
                     'rangeMax',             // Furthest position in positive direction
                     'rangeMin',             // Furthest position in negative direction
-                    'inverted',             // (MCU) Used when remapping angle inputs to microseconds. Unrelated to min and max range
-                    'stepResolution'        // (UI)
+                    'stepResolution',       // (UI)
+                    'inverted'              // (MCU) Used when remapping angle inputs to microseconds. Unrelated to min and max range
                 ]
             }];
         }

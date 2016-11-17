@@ -149,7 +149,7 @@
 
 				onTouchStart: function (e)
 				{
-					e.preventDefault();
+
 					var leftTrack = this._leftTrack;
 					var rightTrack = this._rightTrack;
 					var touches = this._touches;
@@ -162,6 +162,7 @@
 
 						if( ( leftTrack.id < 0 ) && ( touch.clientX < canvasHalfWidth ) && ( touch.clientY > canvasHalfHeight ) )
 						{
+						    e.preventDefault();
 							leftTrack.isVisible = true;
 							leftTrack.id = touch.identifier;
 
@@ -171,6 +172,7 @@
 						}
 						else if( ( rightTrack.id < 0 ) && touch.clientX > canvasHalfWidth && ( touch.clientY > canvasHalfHeight ) )
 						{
+							e.preventDefault();
 							rightTrack.isVisible = true;
 							rightTrack.id = touch.identifier;
 
@@ -189,7 +191,6 @@
 				onTouchMove: function (e)
 				{
 					// Prevent the browser from doing its default thing (scroll, zoom)
-					e.preventDefault();
 					var leftTrack = this._leftTrack;
 					var rightTrack = this._rightTrack;
 					var touches = this._touches;
@@ -200,7 +201,7 @@
 
 						if( leftTrack.id == touch.identifier )
 						{
-
+					       e.preventDefault();
 							leftTrack.currentPos.reset( touch.clientX, touch.clientY );
 							leftTrack.vec.copyFrom( leftTrack.currentPos );
 							leftTrack.vec.minusEq( leftTrack.startPos );
@@ -216,7 +217,8 @@
 							}
 						}
 						else if( rightTrack.id == touch.identifier )
-						{
+						{ 
+							e.preventDefault();
 							rightTrack.currentPos.reset( touch.clientX, touch.clientY );
 							rightTrack.vec.copyFrom( rightTrack.currentPos );
 							rightTrack.vec.minusEq( rightTrack.startPos );

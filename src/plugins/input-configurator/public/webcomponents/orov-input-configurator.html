@@ -823,6 +823,11 @@
                     self.openAxisModal()
                 },
 
+                handleAxisRemapping: function() {
+                    var self = this;
+                    self.handleGamepadRemapping();
+                },
+
                 //User has clicked a gamepad symbol
                 handleGamepadChange: function(e) {
                     var self = this;
@@ -831,7 +836,7 @@
                     
                     this.$.gamepadModal.open();
                 },
-                
+
                 //Gamepad modal has opened
                 handleGamepadFocus: function(e) {
                     var self = this;
@@ -898,8 +903,107 @@
                     self.$.updatedExtraOptionsToast.open();
                 },
 
+                handleExtraOptions: function()
+                {
+                    var self = this;
 
+                    var invertLeft = self.$.invertLeftYAxisCheckbox.checked;
+                    var invertRight = self.$.invertRightYAxisCheckbox.checked;
+                    var exponentialSticks = self.$.exponentialSticksCheckbox.checked;
 
+                    var extraOptionsPayload = {
+                        invertLeft: invertLeft,
+                        invertRight: invertRight,
+                        exponentialSticks: exponentialSticks
+                    };
+                    self.eventEmitter.emit('plugin.inputConfigurator.extraOptionsChanged', extraOptionsPayload);
+                },
+
+                //User has clicked a keyboard symbol
+                handleKeyboardChange: function(e) {
+                    var self = this;
+                    var inputPressed = e.model.item;
+                    self.selectedItem = inputPressed;
+                    
+                    this.$.keyboardModal.open();
+                },
+
+                //Keyboard modal has opened
+                handleKeyboardFocus: function(e) {
+                    var self = this;
+
+                    //Reset our state
+                    self.isListeningToKeyboard = false;
+                    self.isValidKeyboardReplacement = true;
+                },
+
+                handleKeyboardRemapping: function() {
+                    var self = this;
+
+                    //Start listening for keyboard inputs
+                    self.isListeningToKeyboard = true;
+
+                    //Open the toast
+                    self.$.waitingForKeyboardInputToast.open();
+
+                    Mousetrap.record( function(sequence) {
+                        self.isListeningToKeyboard = false;
+                        self.candidateBinding = sequence.join(' ');
+
+                        //Check to see if this is a valid replacement binding for the keyboard
+                        self.checkForKeyboardDuplicates();
+                    });
+                },
+
+                handleLoadPreset: function() {
+                    var self = this;
+                    
+                    //Request the node module to send up the preset requested
+                    self.eventEmitter.emit('plugin.inputConfigurator.loadPreset', self.candidatePreset);
+
+                    self.set("candidatePreset", undefined);
+                    self.isCustomConfig = false;
+
+                    self.openLoadedPresetToast();
+                    self.$.loadPresetModal.close();
+                },
+
+                handleSavePreset: function(presetName) {
+                    var self = this;
+
+                    if(presetName == self.defaultPresetName)
+                    {
+                        self.$.cannotOverwriteDefaultModal.open();
+                    }
+                    else
+                    {
+                        self.set('preset.name', presetName);
+                        
+                        self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.preset);
+                        self.$.savePresetModal.close();
+                        self.openSavedPresetToast();
+                    }
+
+                },
+                
+                //Checks to see if this action accepts this type
+                hasActionType: function(actionName, typeIn) {
+                    var self = this;
+
+                    //Get the action
+                    var action = self.actions.get(actionName);
+
+                    for(var type in action.controls)
+                    {
+                        //If this type is equivalent, we are ok
+                        if(type == typeIn)
+                        {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                },
 
                 //Checks
                 
@@ -1018,223 +1122,11 @@
                     self.$.keyboardModal.close();
                 },
 
-
-
-
-
-
-
-
-                
-
-
-
-
-                openExtraOptionsModal: function()
-                {
-                    var self = this;
-                    self.$.extraOptionsModal.open();
-                },
-
-                handleExtraOptions: function()
-                {
-                    var self = this;
-
-                    var invertLeft = self.$.invertLeftYAxisCheckbox.checked;
-                    var invertRight = self.$.invertRightYAxisCheckbox.checked;
-                    var exponentialSticks = self.$.exponentialSticksCheckbox.checked;
-
-                    var extraOptionsPayload = {
-                        invertLeft: invertLeft,
-                        invertRight: invertRight,
-                        exponentialSticks: exponentialSticks
-                    };
-                    self.eventEmitter.emit('plugin.inputConfigurator.extraOptionsChanged', extraOptionsPayload);
-                },
-                openAxisModal: function()
-                {
-                    var self = this;
-
-                    self.$.axisModal.open();
-                },
-
-                //User has clicked a keyboard symbol
-                handleKeyboardChange: function(e) {
-                    var self = this;
-                    var inputPressed = e.model.item;
-                    self.selectedItem = inputPressed;
-                    
-                    this.$.keyboardModal.open();
-                },
-
-                //Keyboard modal has opened
-                handleKeyboardFocus: function(e) {
-                    var self = this;
-
-                    //Reset our state
-                    self.isListeningToKeyboard = false;
-                    self.isValidKeyboardReplacement = true;
-                },
-
-                handleKeyboardRemapping: function() {
-                    var self = this;
-
-                    //Start listening for keyboard inputs
-                    self.isListeningToKeyboard = true;
-
-                    //Open the toast
-                    self.$.waitingForKeyboardInputToast.open();
-
-                    Mousetrap.record( function(sequence) {
-                        self.isListeningToKeyboard = false;
-                        self.candidateBinding = sequence.join(' ');
-
-                        //Check to see if this is a valid replacement binding for the keyboard
-                        self.checkForKeyboardDuplicates();
-                    });
-
-                },
-
-                handleLoadPreset: function()
-                {
-                    var self = this;
-                    
-                    //Request the node module to send up the preset requested
-                    self.eventEmitter.emit('plugin.inputConfigurator.loadPreset', self.candidatePreset);
-
-                    self.set("candidatePreset", undefined);
-                    self.isCustomConfig = false;
-
-                    self.openLoadedPresetToast();
-                    self.$.loadPresetModal.close();
-                },
-
-                saveNewPreset: function()
-                {
-                    var self = this;
-                    var presetName = self.$.savePresetInput.value;
-                    
-                    if(presetName)
-                    {
-                        self.handleSavePreset(presetName);
-                    }
-                },
-
-                handleSavePreset: function(presetName)
-                {
-                    var self = this;
-
-                    if(presetName == self.defaultPresetName)
-                    {
-                        self.$.cannotOverwriteDefaultModal.open();
-                    }
-                    else
-                    {
-                        self.set('preset.name', presetName);
-                        
-                        self.eventEmitter.emit('plugin.inputConfigurator.savePreset', self.preset);
-                        self.$.savePresetModal.close();
-                        self.openSavedPresetToast();
-                    }
-
-                },
-
-                onLoadPresetModalClose: function()
-                {
-                    var self = this;
-                    self.set("candidatePreset", undefined);
-                },
-
-                openOverridePresetModal: function(oEvent)
-                {
-                    var self = this;
-                    candidatePreset = oEvent.model.get('item');
-                    self.$.overridePresetModal.open();
-                },
-
-                openSavePresetModal: function()
-                {
-                    var self = this;
-                    
-                    self.$.savePresetModal.open();
-                },
-
-                openLoadPresetModal: function()
-                {
-                    var self = this;                
-                    self.$.loadPresetModal.open();
-                },
-
-                overwritePreset: function(oEvent)
-                {
-                    var self = this;
-                    self.handleSavePreset(candidatePreset);  
-                },
-
-                openDeletePresetModal: function()
-                {
-                    var self = this;
-                    self.$.deletePresetModal.open();
-                },
-                
-                openAxisOptionsModal: function()
-                {
-                    var self = this;
-
-                    //Get the settings for this inversion
-                    var inversion = inversionMap.get(self.candidateBinding);
-                    var extraOptionsPlugin = self.extraOptions[inversion.plugin];
-                    self.currentInversionSetting = extraOptionsPlugin[inversion.item];
-
-                    self.$.axisOptionsModal.open();
-                },
-
-                handleAxisRemapping: function()
-                {
-                    var self = this;
-                    self.handleGamepadRemapping();
-                },
-                openDeletePresetWarningModal: function(oEvent)
-                {
-                    var self = this;
-
-                    self.presetToDelete = oEvent.model.get('item');
-                    self.$.deletePresetWarningModal.open();
-                },
-
-                openSaveNewPresetModal: function()
-                {
-                    var self = this;
-                    self.$.saveNewPresetModal.open();
-                },
-
-                //Checks to see if this action accepts this type
-                hasActionType: function(actionName, typeIn) {
-                    var self = this;
-
-                    //Get the action
-                    var action = self.actions.get(actionName);
-
-                    for(var type in action.controls)
-                    {
-                        //If this type is equivalent, we are ok
-                        if(type == typeIn)
-                        {
-                            return true;
-                        }
-                    }
-
-                    return false;
-                },
+                //On events
                 onGamepadModalCancel: function() {
                     var self = this;
                     console.log("Gamepad Modal canceled");
                     self.set("candidateBinding", undefined);
-                },
-                onKeyboardModalClosed : function() {
-                    var self = this;
-                    self.set("candidateBinding", undefined);
-                    self.$.waitingForKeyboardInputToast.close();
                 },
 
                 onGamepadModalClosed : function(e) {
@@ -1247,29 +1139,114 @@
                     self.set("candidateBinding", undefined);
                     console.log("Gamepad modal closed");
                 },
+
+                onKeyboardModalClosed : function() {
+                    var self = this;
+                    self.set("candidateBinding", undefined);
+                    self.$.waitingForKeyboardInputToast.close();
+                },
+
+                onLoadPresetModalClose: function() {
+                    var self = this;
+                    self.set("candidatePreset", undefined);
+                },
+
                 onSavePresetModalClosed: function() {
                     var self = this;
 
                     //Reset the candidatePreset
                     self.set("candidatePreset", undefined);
+                },           
+
+                //Opens
+                openAxisModal: function() {
+                    var self = this;
+
+                    self.$.axisModal.open();
+                },
+                
+                openAxisOptionsModal: function() {
+                    var self = this;
+
+                    //Get the settings for this inversion
+                    var inversion = inversionMap.get(self.candidateBinding);
+                    var extraOptionsPlugin = self.extraOptions[inversion.plugin];
+                    self.currentInversionSetting = extraOptionsPlugin[inversion.item];
+
+                    self.$.axisOptionsModal.open();
                 },
 
-                //Toasts and modals
                 openClearGamepadDuplicateWarning: function() {
                     var self = this;
                     self.$.clearGamepadDuplicateWarningModal.open();
                 },
+
                 openClearKeyboardDuplicateWarning: function() {
                     var self = this;
                     self.$.clearKeyboardDuplicateWarningModal.open();
                 },
+
+                openDeletePresetModal: function() {
+                    var self = this;
+                    self.$.deletePresetModal.open();
+                },
+
+                openDeletePresetWarningModal: function(oEvent) {
+                    var self = this;
+
+                    self.presetToDelete = oEvent.model.get('item');
+                    self.$.deletePresetWarningModal.open();
+                },
+
                 openDuplicateInputToast: function() {
                     this.$.duplicateInputToast.open();
                 },
+
+                openExtraOptionsModal: function() {
+                    var self = this;
+                    self.$.extraOptionsModal.open();
+                },
+
                 openInvalidGamepadTypeModal: function() {
                     var self = this;
                     self.$.invalidGamepadTypeModal.open();
                 },
+
+                openLoadPresetModal: function() {
+                    var self = this;                
+                    self.$.loadPresetModal.open();
+                },
+
+                openLoadedPresetToast: function() {
+                    var self = this;
+
+                    self.$.loadedPresetToast.open();
+                },
+
+                openOverridePresetModal: function(oEvent) {
+                    var self = this;
+                    candidatePreset = oEvent.model.get('item');
+                    self.$.overridePresetModal.open();
+                },
+
+                openSaveNewPresetModal: function() {
+                    var self = this;
+                    self.$.saveNewPresetModal.open();
+                },
+
+                openSavePresetModal: function() {
+                    var self = this;
+                    
+                    self.$.savePresetModal.open();
+                },
+                
+                openSavedPresetToast: function() {
+                    var self = this;
+
+                    self.isCustomConfig = false;
+                    self.$.savedPresetToast.open();
+                },
+
                 openUpdatePresetToast: function() {
                     var self = this;
 
@@ -1278,18 +1255,22 @@
 
                     self.$.updatedPresetToast.open();
                 },
-                openSavedPresetToast: function() {
-                    var self = this;
 
-                    self.isCustomConfig = false;
-                    self.$.savedPresetToast.open();
-                },
-                openLoadedPresetToast: function() {
+                overwritePreset: function(oEvent) {
                     var self = this;
-
-                    self.$.loadedPresetToast.open();
+                    self.handleSavePreset(candidatePreset);  
                 },
 
+                saveNewPreset: function() {
+                    var self = this;
+                    var presetName = self.$.savePresetInput.value;
+                    
+                    if(presetName)
+                    {
+                        self.handleSavePreset(presetName);
+                    }
+                },
+                
                 //Converts a preset object(hash map) to a consumable array for the input configurator
                 presetToArray: function(preset) {
                     var self = this;

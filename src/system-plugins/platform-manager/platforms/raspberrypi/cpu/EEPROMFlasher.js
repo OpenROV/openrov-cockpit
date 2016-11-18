@@ -20,8 +20,10 @@ var EEPROMFlasher = ( productId, revision ) =>
                     var len           = jsonBuffer.length;
                     var lengthBuffer  = new Buffer( 4 );
 
+                    // Write the length of the json data block
                     lengthBuffer.writeUInt32LE( len );
 
+                    // Concat the length and json data into one buffer
                     var output = Buffer.concat( [ lengthBuffer, jsonBuffer ] );
 
                     // Write binary block to eeprom

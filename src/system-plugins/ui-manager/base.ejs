@@ -370,6 +370,9 @@ ga('send', 'pageview');
     console.info("on applet <%= scriplets[i].name %>");
     removeSplashScreen();
     window.removeEventListener('WebComponentsReady',fn);
+    if (window.OROV.startApp){
+      window.OROV.startApp();
+    }
   }
   window.addEventListener('WebComponentsReady', fn);  
   ga('set', 'page', '<%= scriplets[i].name %>');

@@ -1,29 +1,98 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../orov-behaviors/orov-behavior.html">
-<link rel="import" href="grid-menu/grid-menu.html">
-<link rel="import" href="grid-menu/grid-menu-button.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-dialog-scrollable/paper-dialog-scrollable.html">
 <link rel="import" href="../fontawesome-iconset/fa-all.html">
 <link rel="import" href="orov-appletswitcher-behavior.html">
+<link rel="import" href="../neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../neon-animation/animations/scale-down-animation.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../iron-icons/device-icons.html">
+<link rel="import" href="../iron-icons/places-icons.html">
+<link rel="import" href="../iron-icons/image-icons.html">
+<link rel="import" href="../iron-icons/notification-icons.html">
+<link rel="import" href="../iron-icons/social-icons.html">
+<link rel="import" href="../iron-icons/maps-icons.html">
+<link rel="import" href="../iron-icons/hardware-icons.html">
+<link rel="import" href="../iron-icons/av-icons.html">
+<link rel="import" href="../iron-icons/communication-icons.html">
 <dom-module name="orov-appletswitcher">
 <style>
-  grid-menu-button
+  .grid-menu-button
   {
     color:white;
+			display: inline-block;
+			border: .5px solid rgba(166, 160, 160, 0.32);
+			width: 70px;
+			height: 70px;
+			text-align: center;
+      flex-basis: auto;
+      flex-grow: 1;
   }
 
-  grid-menu-button[selected]
+  .grid-menu-button[selected]
   {
     color: black;
     background-color: white;
     --grid-menu-button-fill-color: black;
   }
+
+		#trigger
+		{
+			display: block;
+			color: white;
+			border-radius: 50%;
+			background-color: rgba( 00, 00, 00, 0.5 );
+			
+		}
+
+    #container
+    {
+      display: flex;
+       flex-wrap: wrap;
+       align-items: center;
+       align-content: flex-start;
+       min-width: 200px;
+    }
+
+		.container
+		{
+			display: inline-block;
+			border-radius: 5px;
+			background-color: rgba( 00, 00, 00, 0.8 );
+			min-width: var( --grid-menu-min-width, 210px );
+      width: 40%;
+      min-width: 240px;
+      max-width: 480px;
+
+		}
+    .subcontainer
+    {
+      min-height: 80px;
+      max-height: 600px;
+    }
+
+		grid-menu-button:hover
+		{
+			color: lightslategray;
+		}  
 </style>
 <template>
-    <grid-menu id="gm" trigger-icon="apps" horizontal-offset=[[horizontalOffset]]>
+    <paper-icon-button id="trigger" on-tap="_handleToggleMenu" icon="icons:apps"></paper-icon-button>
+    <paper-dialog id="gm" class="container" horizontal-align="auto" entry-animation="scale-up-animation"
+              exit-animation="scale-down-animation">
+    <paper-dialog-scrollable class="subcontainer">
+      <div id="container">
       <template is="dom-repeat" items="{{applets}}">
-			<grid-menu-button label="{{__(item.name)}}" action="page-change" target="{{item.name}}" icon="{{item.iconMeta}}"></grid-menu-button>
+      <a on-tap="handleMenuSelection" action="page-change" target="{{item.name}}" class="grid-menu-button">
+      <paper-icon-button icon="{{item.iconMeta}}"></paper-icon-button>
+      <div>{{__(item.name)}}</div>
+      </a>
       </template>
-		</grid-menu>
+      </div>
+    </paper-dialog-scrollable>   
+    </paper-dialog>
 </template>
 <script>
 
@@ -38,17 +107,18 @@
   Polymer({
     is:'orov-appletswitcher',
     properties: {
-      showSelection: {type: Boolean, value: true},
-      horizontalOffset: {type: Number}
     },
     listeners:
     {
       'menuSelection': 'handleMenuSelection'
     },
     behaviors: [namespace('behaviors').oROVStandard, namespace('behaviors').oROVAppletSwitcher],
+    _handleToggleMenu: function(e){
+      this.$.gm.toggle();
+    },
     handleMenuSelection: function(e)
     {
-      var options = {target:e.detail.target};
+      var options = {target:e.currentTarget.target};
 
       if (lastMouseEvent.shiftKey){
         options.mode="popout"

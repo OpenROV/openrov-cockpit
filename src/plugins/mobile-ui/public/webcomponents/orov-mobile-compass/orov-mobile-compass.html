@@ -1,5 +1,6 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../orov-behaviors/orov-behavior.html">
+<link rel="import" href="../../new-ui/compass.html">
 <dom-module id="orov-mobile-compass">
   <style>
     #compass-container {
@@ -15,169 +16,16 @@
     }
   </style>
   <template>
-    <div id="compass-container" class="center">
-      <svg id="svg3988" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 989.19 980.61" version="1.2" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/">
-        <metadata id="metadata4078">
-          <rdf:RDF>
-            <cc:Work rdf:about="">
-              <dc:format>image/svg+xml</dc:format>
-              <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-              <dc:title/>
-            </cc:Work>
-          </rdf:RDF>
-        </metadata>
-        <g id="g4986" transform="translate(22.040901,12.197624)">
-          <g id="rose">
-            <circle id="circle" stroke-width="10" d="m 832.5,472.5 c 0,198.82251 -161.17749,360 -360,360 -198.82251,0 -360,-161.17749 -360,-360 0,-198.82251 161.17749,-360 360,-360 198.82251,0 360,161.17749 360,360 z" cy="472.5" stroke$="{{ options.bezel }}" cx="472.5"
-            r="360" fill="none" />
-            <rect id="rect4935" y="96" width="10" x="467.5" height="30" fill$="{{ options.bezel }}" />
-            <rect id="rect4937" transform="matrix(-1,0,0,-1,945,945)" fill$="{{ options.bezel }}" height="30" width="10" y="96" x="467.5" />
-            <rect id="rect4943" transform="matrix(0,1,-1,0,945,0)" fill$="{{ options.bezel }}" height="30" width="10" y="96" x="467.5" />
-            <rect id="rect4949" transform="matrix(0,-1,1,0,0,945)" fill$="{{ options.bezel }}" height="30" width="10" y="96" x="467.5" />
-            <rect id="rect4951" transform="matrix(0.70710678,-0.70710678,0.70710678,0.70710678,-195.71591,472.5)" fill$="{{ options.bezel }}" height="30" width="10" y="96" x="467.5" />
-            <rect id="rect4953" transform="matrix(-0.70710678,-0.70710678,0.70710678,-0.70710678,472.5,1140.7159)" fill$="{{ options.bezel }}" height="30" width="10" y="96" x="467.5" />
-            <rect id="rect4955" transform="matrix(-0.70710678,0.70710678,-0.70710678,-0.70710678,1140.7159,472.5)" fill$="{{ options.bezel }}" height="30" width="10" y="96" x="467.5" />
-            <rect id="rect4957" transform="matrix(0.70710678,0.70710678,-0.70710678,0.70710678,472.5,-195.71591)" fill$="{{ options.bezel }}" height="30" width="10" y="96" x="467.5" />
-            <g id="indicators" font-size="72px" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" style="word-spacing:0;letter-spacing:0;" letter-spacing="0" word-spacing="0" font-weight="bold">
-              <text id="indicator_n" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" line-height="125%" y="90.702766" x="471.9191">{{__('N')}}</text>
-              <text id="text4961" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(-1,0,0,-1,943.74133,945)" line-height="125%" y="80.803268" x="471.90582">{{__('S')}}</text>
-              <text id="text4965" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(0,1,-1,0,0,0)" line-height="125%" y="-864.25293" x="471.84961">{{__('E')}}</text>
-              <text id="text4967" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(0,-1,1,0,0,0)" line-height="125%" y="80.859489" x="-473.15039">{{__('W')}}</text>
-              <text id="text4969" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(0.70710678,-0.70710678,0.70710678,0.70710678,0,0)" line-height="125%" font-size="72px" y="278.64713" x="-4.2105641">{{__('NW')}}</text>
-              <text id="text4971" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(-0.70710678,-0.70710678,0.70710678,-0.70710678,0,0)" line-height="125%" font-size="72px" y="-393.78027" x="-670.0802">{{__('SW')}}</text>
-              <text id="text4973" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(-0.70710678,0.70710678,-0.70710678,-0.70710678,0,0)" line-height="125%" font-size="72px" y="-1060.8452" x="1.1167512">{{__('SE')}}</text>
-              <text id="text4975" fill$="{{ options.bezel }}" style="text-anchor:middle;text-align:center;" transform="matrix(0.70710678,0.70710678,-0.70710678,0.70710678,0,0)" line-height="125%" font-size="72px" y="-391.12482" x="667.26764">{{__('NE')}}</text>
-            </g>
-          </g>
-
-          <text id="lock" fill$="{{ options.bezel }}" style="letter-spacing:0;text-anchor:middle;word-spacing:0;text-align:center;" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="120px" letter-spacing="0" line-height="100%" word-spacing="0" y="280" x="460.67117" title="Heading hold target">{{__('LK')}}</text>
-
-          <text id="heading" fill$="{{ options.headingFill }}" stroke$="{{ options.bezel }}" stroke-width$="{{ options.headingStrokeWidth }}" style="letter-spacing:0;text-anchor:middle;word-spacing:0;text-align:center;" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="250px" letter-spacing="0"
-          line-height="125%" word-spacing="0" y="530" x="460.67117" font-weight="bold">{{heading}}</text>
-
-          <text id="target" fill$="{{ options.bezel }}" style="letter-spacing:0;text-anchor:middle;word-spacing:0;text-align:center;" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="150px" letter-spacing="0" line-height="100%" word-spacing="0" y="680" x="460.67117" font-weight="bold"
-          title="Heading hold target">{{target}}</text>
-
-          <g id="indicator">
-            <path fill$="{{ options.indicator }}" d="m 471.41747,-25.529456 c 35.08805,139.334496 35.04692,139.182386 35.04692,139.182386 l -69.01546,0 z" style="fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-            />
-          </g>
-          <g id="bearing">
-            <path fill$="{{ options.bezel }}" style="fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="m 472.79747,253.34433 c -35.08391,-139.0359 -35.0428,-138.88412 -35.0428,-138.88412 l 69.00736,0 z" />
-          </g>
-        </g>
-      </svg>
-    </div>
+  <orov-newui-compass class="center" heading="0" event-emitter="{{eventEmitter}}"></orov-newui-compass>
   </template>
   <script>
     Polymer({
       is: 'orov-mobile-compass',
       properties: {
-        bearing: {
-          observer: 'setBearing',
-          notify: true
-        },
-        heading: {
-          type: String,
-          value: '000',
-          observer: 'setHeading',
-          notify: true
-        },
-        options: {
-          type: Object,
-          value: {
-              indicator: 'white',
-              bezel: 'white',
-              bearing: 'white',
-              background: 'black',
-              headingFill: 'white',
-              // will be set to options.bezel
-              headingStrokeWidth: 0,
-              headingStrokeWidthTargetHold: 15
-            }
-        },
-        target: {
-          type: Number,
-          value: 0
-        }
       },
       behaviors: [namespace('behaviors').oROVStandard],
       registerEmitterHandlers: function(emitter) {
-        var self = this;
-        emitter.withHistory.on('plugin.rovpilot.headingHold.state', function(state) {
-          if (state.enabled){
-            self.setBearing(state.targetHeading);
-            self.options.headingFill = 'none';
-            self.options.headingStrokeWidth = self.options.headingStrokeWidthTargetHold;
-          } else {
-            self.setBearing(undefined);
-            self.options.headingFill = self.options.bezel;
-            self.options.headingStrokeWidth = 0;
-          }
-        });
-        emitter.on('plugin.navigationData.data', function(data) {
-          self.setHeading(self.pad(parseFloat(data.heading).toFixed(0), 3));
-        });
       },
-      attached: function() {
-        var self = this;
-        self.options.headingFill = self.options.bezel;
-        this.setHeading(this.heading);
-        this.setBearing(this.bearing);
-        this.format(this.options);
-      },
-      format: function(newOptions) {
-        this.set('options.indicator', newOptions.indicator ? newOptions.indicator : this.options.indicator);
-        this.set('options.bezel', newOptions.bezel ? newOptions.bezel : this.options.bezel);
-        this.set('options.bearing', newOptions.bearing ? newOptions.bearing : this.options.bearing);
-        this.set('options.background', newOptions.background ? newOptions.background : this.options.background);
-      },
-      setHeading: function(value) {
-        this.heading = value;
-        $(this.$.indicator).animate({
-          svgTransform: 'rotate(' + value + ', 472.5, 472.5)'
-        }, 20);
-        if (!this.target) {
-          $(this.$.bearing).animate({
-            svgTransform: 'rotate(' + value + ', 472.5, 472.5)'
-          }, 20);
-        }
-      },
-      setBearing: function(value) {
-        this.bearing=value;
-        var bearing = $(this.$.bearing);
-        var target = $(this.$.target);
-        var lock = $(this.$.lock);
-        if (value) {
-          this.target = this.pad(value, 3);
-          bearing.animate({
-            svgTransform: 'rotate(' + value + ', 472.5, 472.5)'
-          }, 20);
-          target.animate({
-            svgOpacity: '100'
-          }, 10);
-          lock.animate({
-            svgOpacity: '100'
-          }, 10);
-        } else {
-          target.animate({
-            svgOpacity: '0'
-          }, 10);
-          lock.animate({
-            svgOpacity: '0'
-          }, 10);
-          bearing.animate({
-            svgTransform: 'rotate(' + this.heading + ', 472.5, 472.5)'
-          }, 20);
-          this.target = undefined;
-        }
-      },
-      pad: function(num, size) {
-        var s = num + '';
-        while (s.length < size)
-          s = '0' + s;
-        return s;
-      }
     });
   </script>
 </dom-module>

@@ -54,7 +54,6 @@
                     this._drawCounter   = 0;
                     var self            = this;
                     var canvas          = this.$.camera1;
-                    var image           = new Image();
 
                     this._OncePerSecondInterval = setInterval( function() 
                     {
@@ -77,6 +76,7 @@
                         var url = URL.createObjectURL( frame );
                         var style = window.getComputedStyle(self.$.videocontainer, null);
 
+                        var image = new Image();
                         image.onload = function() 
                         {
                             var verticalMargin   = 0;
@@ -95,6 +95,8 @@
                             
                             self._drawCounter++;
                             URL.revokeObjectURL( url );
+                            
+                            image = null;
                         }
 
                         image.src = url;

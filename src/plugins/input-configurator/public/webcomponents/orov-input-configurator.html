@@ -133,14 +133,15 @@
         }        
     </style>
 
-    <template>
+    <template id="myAwesomeTemplate">
 
-        
         <h2>{{__('Input Configurator - Beta')}}</h2>
         <p>
             {{__('Click on the button you want to change in the table below')}}
         </p>        
         
+        <p> This is the candidate binding: {{candidateBinding}} </p>
+
         <h3> {{__('Button Controls')}} </h3>
         <section>      
             <div id="tableContainer">
@@ -248,8 +249,9 @@
             </h3>
 
             <div>
-                <paper-dropdown-menu id="candidategamepad" label="gamepad control">
-                    <paper-listbox class="dropdown-content" attr-for-selected="value" selected="{{candidateBinding}}" on-iron-select="handleGamepadRemapping">
+                <paper-dropdown-menu id="gamepadButtonDropdown" label="gamepad control">
+                    <paper-listbox id="gamepadButtonListbox" class="dropdown-content" attr-for-selected="value" selected="{{candidateBinding}}" on-iron-select="handleGamepadRemapping">
+                        <paper-item value="empty"></paper-item>
                         <paper-item value="A">{{__('A')}}</paper-item>
                         <paper-item value="B">{{__('B')}}</paper-item>
                         <paper-item value="X">{{__('X')}}</paper-item>
@@ -273,7 +275,7 @@
             <div class="buttons">
                 <paper-button disabled$={{isValidGamepadReplacement}} on-tap="openClearGamepadDuplicateWarning">{{__('Clear conflicting binding')}}</paper-button>
                 <paper-button on-tap="handleClearGamepadBinding" dialog-confirm>{{__('Clear')}}</paper-button>
-                <paper-button dialog-dismiss>{{__('Cancel')}}</paper-button>
+                <paper-button dialog-dismiss on-tap="onGamepadModalCancel">{{__('Cancel')}}</paper-button>
             </div>
         </paper-dialog>
         
@@ -287,8 +289,9 @@
             </h3>
 
             <div>
-                <paper-dropdown-menu id="candidategamepad" label="gamepad control">
-                    <paper-listbox class="dropdown-content" attr-for-selected="value" selected="{{candidateBinding}}" on-iron-select="openAxisOptionsModal">
+                <paper-dropdown-menu id="axisDropdown" label="axis control">
+                    <paper-listbox id="gamepadAxisListbox" class="dropdown-content" attr-for-selected="value" selected="{{candidateBinding}}" on-iron-select="openAxisOptionsModal">
+                        <paper-item value="empty"></paper-item>
                         <paper-item value="LEFT_STICK_X">{{__('LEFT_STICK_X')}}</paper-item>
                         <paper-item value="LEFT_STICK_Y">{{__('LEFT_STICK_Y')}}</paper-item>
                         <paper-item value="RIGHT_STICK_X">{{__('RIGHT_STICK_X')}}</paper-item>
@@ -382,6 +385,7 @@
             <paper-dropdown-menu id="savedPresetsDropdown" label="presets">
                 <paper-listbox class="dropdown-content" attr-for-selected="value" selected="{{candidatePreset}}" on-iron-select="handleLoadPreset">
                     <template is="dom-repeat" items="[[savedPresets]]">
+                        <paper-item value="empty"></paper-item>
                         <paper-item value="{{item}}">{{item}}</paper-item>
                     </template>
                 </paper-listbox>
@@ -397,6 +401,7 @@
             <paper-dropdown-menu id="savedPresetsDropdown" label="presets">
                 <paper-listbox class="dropdown-content" attr-for-selected="value">
                     <template is="dom-repeat" items="[[savedPresets]]">
+                        <paper-item value="empty"></paper-item>
                         <paper-item value="{{item}}" on-tap="openDeletePresetWarningModal">{{item}}</paper-item>
                     </template>
                 </paper-listbox>
@@ -436,7 +441,7 @@
         </p>
 
         <div class="buttons" id="toasts">
-            <p></p>
+            <!-- Placeholder for elevated toasts -->
         </div>
 
 
@@ -521,91 +526,77 @@
                 properties: {
                     actions: {
                         type: Map,
-                        value: undefined
                     },
                     axisArray: {
                         type: Array,
-                        value: []
+                        value: function(){return [];}
                     },
                     buttonArray: {
                         type: Array,
-                        value: []
+                        value: function(){return [];}
                     },
-
                     candidateBinding: {
-                        type: Object,
-                        value: undefined
+                        type: String,
                     },
                     candidatePreset: {
                         type: String,
-                        value: undefined
                     },
                     currentInversionSetting: {
                         type: Boolean,
-                        value: undefined
                     },
                     defaultPresetName: {
                         type: String,
-                        value: "defaults"
+                        value: function(){return "defaults";}
                     },
                     enableExponentialSticks: {
                         type: Boolean,
-                        value: false,
+                        value: function(){return false;},
                         observer: "enableExponentialSticksChanged"
                     },
-
                     extraOptions: {
                         type: Object,
-                        value: {}
+                        value: function(){return {};}
                     },
                     presetToDelete: {
                         type: String,
-                        value: undefined
                     },
                     conflictingBinding: {
                         type: Object,
-                        value: undefined
                     },
 
                     isCustomConfig: {
                         type: Boolean,
-                        value: false
+                        value: function(){return false;}
                     },
-
                     preset: {
                         type: Map
                     },
 
                     presetArray: {
                         type: Array,
-                        value: []
+                        value: function(){return [];}
                     },
                     savedPresets: {
                         type: Array,
-                        value: []
+                        value: function(){return [];}
                     },
-
                     selectedItem: {
                         type: Object,
-                        value: undefined
                     },
                     settings: {
                         type: Object,
-                        value: undefined
                     },
                     isListeningToKeyboard: {
                         type: Boolean,
-                        value: false
+                        value: function(){return false;}
                     },
-
                     isValidKeyboardReplacement: {
                         type: Boolean,
-                        value: true
+                        value: function(){return true;}
                     },
-
                     isValidGamepadReplacement: {
                         type: Boolean,
-                        value: true
+                        value: function(){return true;}
                     }
                 },
                 
@@ -845,7 +836,6 @@
                 updateKeyboardInput: function() {
                     var self = this;
 
-                    
                     var updatedInput = {
                         action: self.selectedItem.name,
                         input: {
@@ -976,14 +966,42 @@
                 //Gamepad modal has opened
                 handleGamepadFocus: function(e) {
                     var self = this;
+                    console.log("Handle gamepad focus");
+                    if (e.currentTarget !== e.target)
+                    {
+                        console.log("ignoring child activation on focus");
+                        return;
+                    }
 
                     //Reset our state
+                    self.async(function(){
+                        //self.candidateBinding="";
+                        // self.set("candidateBinding", "empty");
+                        console.log(self.$.gamepadDropdown.selected);
+                        self.$.gamepadDropdown.selected = null;
+                        console.log("Inside async focus");                        
+                    })
+                    
+                    //self.set("candidateBinding", undefined);
                     self.isValidGamepadReplacement = true;
                 },
 
                 //Handle the selection for the gamepad
                 handleGamepadRemapping: function(e) {
                     var self = this;
+                    console.log("Handle Gamepad Remapping:", self.candidateBinding==undefined?"undefined":self.candidateBinding);
+                    if (e.currentTarget !== e.target)
+                    {
+                        console.log("ignoring child activation in remapping");
+                        return;
+                    }
+
+                    //Check for placeholder
+                    if(e.currentTarget.selected == "empty")
+                    {
+                        return;
+                    }
+                    
 
                     if(self.candidateBinding == null)
                     {
@@ -1074,7 +1092,7 @@
                     //Request the node module to send up the preset requested
                     self.eventEmitter.emit('plugin.inputConfigurator.loadPreset', self.candidatePreset);
 
-                    self.set(self.candidatePreset, undefined);
+                    self.set("candidatePreset", undefined);
                     self.isCustomConfig = false;
 
                     self.openLoadedPresetToast();
@@ -1114,7 +1132,7 @@
                 onLoadPresetModalClose: function()
                 {
                     var self = this;
-                    self.set(self.candidatePreset, undefined);
+                    self.set("candidatePreset", undefined);
                 },
 
                 openOverridePresetModal: function(oEvent)
@@ -1198,23 +1216,32 @@
 
                     return false;
                 },
-
+                onGamepadModalCancel: function() {
+                    var self = this;
+                    console.log("Gamepad Modal canceled");
+                    self.set("candidateBinding", undefined);
+                },
                 onKeyboardModalClosed : function() {
                     var self = this;
-                    self.set(self.candidateBinding, undefined);
+                    self.set("candidateBinding", undefined);
                     self.$.waitingForKeyboardInputToast.close();
                 },
 
-                onGamepadModalClosed : function() {
-                    var self = this;  
-                    self.set(self.candidateBinding, undefined);
-                    console.log(self.candidateBingind);
+                onGamepadModalClosed : function(e) {
+                    var self = this;
+                    if (e.currentTarget !== e.target)
+                    {
+                        console.log("ignoring child activation");
+                        return;
+                    }
+                    self.set("candidateBinding", undefined);
+                    console.log("Gamepad modal closed");
                 },
                 onSavePresetModalClosed: function() {
                     var self = this;
 
                     //Reset the candidatePreset
-                    self.set(self.candidatePreset, undefined);
+                    self.set("candidatePreset", undefined);
                 },
 
                 //Toasts and modals
@@ -1236,7 +1263,7 @@
                 openUpdatePresetToast: function() {
                     var self = this;
 
-                    self.set(self.candidateBinding, undefined);
+                    self.set("candidateBinding", undefined);
                     self.isCustomConfig = true;
 
                     self.$.updatedPresetToast.open();
@@ -1253,10 +1280,10 @@
                     self.$.loadedPresetToast.open();
                 },
 
-
                 //Converts a preset object(hash map) to a consumable array for the input configurator
                 presetToArray: function(preset) {
                     var self = this;
+                    console.log("Preset to array called");
 
                     //array for buttons
                     var buttons = [];

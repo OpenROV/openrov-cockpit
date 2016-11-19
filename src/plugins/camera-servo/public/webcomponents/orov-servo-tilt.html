@@ -10,11 +10,11 @@
       background-repeat: no-repeat;
       background-position: center center;
       position: relative;
-      top: 12px;
+      top: 5px;
       z-index: 1;
 
       /*Hardware acceleration*/
-      transfrom: translate3d(0px,0px,0px);
+      translate3d(0,0,0);
       transition-duration: 0.2s;
       transition-timing-function: ease-out;
     }
@@ -24,50 +24,18 @@
       padding-bottom: 20%;
     }
 
-    #centerLine {
-      width: 28px;
-      height: 2px;
-
-      position: relative;
-      z-index: 0;
-      transform: translate3d(10.469px, -15.667px, 0px);
-
-      background: #FFFFFF;
-      opacity: 1.0;
-    }
-
     #targetPos {
-      width: 20px;
-      height: 2px;
+      width: 6px;
+      height: 6px;
+      -moz-border-radius: 3px;
+      -webkit-border-radius: 3px;
+      border-radius: 2px;
 
       position: relative;
-      z-index: 0;
-      transform: translate3d(3px, -10px, 0px);
-      transform-origin: left;
+      z-index: 3;
 
-      background: #FFFFFF;
-      opacity: 0.75;
-    }
-
-    #semi{
-      height: 15px;
-      width: 30px;
-      transform: rotate(90deg) translate3d(-19px, -15px, 0px);
+      background: #ffb33b;
       opacity: 1.0;
-      border-radius: 90px 90px 0px 0px;
-      border-style: solid;
-      border-color: #7C7474;
-      border-bottom: none;
-    }
-    #semi2{
-      height: 15px;
-      width: 30px;
-      transform: rotate(90deg) translate3d(-19px, -15px, 0px);
-      opacity: 1.0;
-      border-radius: 90px 90px 0px 0px;
-      border-style: solid;
-      border-color: orange;
-      border-bottom: none;
     }
 
   </style>
@@ -75,8 +43,6 @@
     <div style="position: relative; z-index: 1;">
       <iron-icon id="servoTiltImage"icon="av:videocam"></iron-icon>
       <div id="targetPos"></div>
-      <div id="semi"></div>
-      <div id="semi2"></div>
     </div>
   </template>
   <script>
@@ -108,11 +74,15 @@
           this.$.servoTiltImage.style['transform'] = newvalue;
         },
         _targetAngleChanged: function(){
-          var newvalue = 'translate3d(20px, -10px, 0px) rotate('+ -this.targetAngle +'deg)';
           
-          this.$.targetPos.style['-webkit-transform'] = newvalue;
-          this.$.targetPos.style['-moz-transform'] = newvalue;
-          this.$.targetPos.style['transform'] = newvalue;
+          var targetAngleRads = this.targetAngle * Math.PI / 180;
+
+          //Empirical because it looks nice and smooth
+          var xPos = -7.788*(targetAngleRads*targetAngleRads) - 0.973*targetAngleRads + 31.469;
+          var yPos = -19.47*targetAngleRads - 18.667;
+
+          var translateTo = 'translate3d(' + xPos + 'px,' + yPos + 'px,0px)';
+          this.$.targetPos.style['transform'] = translateTo;
         },
 
         ready: function () {

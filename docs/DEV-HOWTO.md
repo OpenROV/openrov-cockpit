@@ -121,3 +121,9 @@ https://docs.npmjs.com/cli/update
 Do this when readying the repo for the next release to prevent the dependencies from moving.
 
 `npm run shrinkwrap`
+
+After you upgrade packages with new dependencies or upgrade those dependencies, the shrinkwrap files should automatically regenerate.  Before checking them in to source code be sure to run:
+
+`npm run prepshinkwrap`
+
+which will remove the "OptionalDepenencies" from the shrinkwrap without regenerating the dependencies.

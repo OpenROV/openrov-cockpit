@@ -59,7 +59,6 @@
       });
       
       this.cockpit.on('plugin.inputConfigurator.loadPreset', function(presetNameIn) {
-        console.log("Loading preset:", presetNameIn);
         self.loadPreset(presetNameIn);
       });
 
@@ -149,7 +148,6 @@
       }
       else
       {
-        console.error("Multiple presets with this name found:", presetNameIn);
         return;
       }
     };

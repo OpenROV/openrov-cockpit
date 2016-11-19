@@ -489,7 +489,6 @@
       //If this preset already exists, just update the preset
       if(!self.actions.has(inputIn.action))
       {
-        console.error("Action does not exist", input.action);
         return;
       }
 

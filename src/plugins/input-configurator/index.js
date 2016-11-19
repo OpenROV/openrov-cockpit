@@ -4,7 +4,6 @@
 	{
 		constructor(name, deps)
 		{
-			console.log("InputConfigurator plugin loaded");
 
 			this.globalBus  = deps.globalEventLoop;
             this.cockpitBus = deps.cockpit;

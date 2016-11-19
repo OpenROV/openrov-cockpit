@@ -277,12 +277,12 @@
         </paper-dialog>
 
         <!-- Delete preset modal -->
-        <paper-dialog id="deletePresetModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation">
+        <paper-dialog id="deletePresetModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation" on-iron-overlay-opened="handleDeletePresetModalOpen">
             <h1>{{__('Choose a preset to delete')}}</h1>
-            <paper-dropdown-menu id="savedPresetsDropdown" label="presets">
+            <paper-dropdown-menu id="deletePresetsDropdown" label="presets">
                 <paper-listbox class="dropdown-content" attr-for-selected="value">
+                    <paper-item value="empty"></paper-item>
                     <template is="dom-repeat" items="[[savedPresets]]">
-                        <paper-item value="empty"></paper-item>
                         <paper-item value="{{item}}" on-tap="openDeletePresetWarningModal">{{item}}</paper-item>
                     </template>
                 </paper-listbox>
@@ -353,6 +353,7 @@
             </div>
         </paper-dialog>
 
+        <!-- Main keyboard remap modal -->
         <paper-dialog id="keyboardModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation" on-iron-overlay-closed="onKeyboardModalClosed" on-iron-overlay-opened="handleKeyboardFocus">
             <h1> {{__('Keyboard mapping:')}} {{selectedItem.name}} </h1>
             <p> {{__('Click REMAP and then enter the desired key to set this control')}} </p>
@@ -384,13 +385,13 @@
         </paper-dialog>
 
         <!-- Load preset modal -->
-        <paper-dialog id="loadPresetModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation"  on-iron-overlay-closed="onLoadPresetModalClose">
+        <paper-dialog id="loadPresetModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation"  on-iron-overlay-closed="onLoadPresetModalClose" on-iron-overlay-opened="handleLoadPresetModalOpen">
             <h1>{{__('Choose a preset to load')}}</h1>
-            <paper-dropdown-menu id="savedPresetsDropdown" label="presets">
-                <paper-listbox class="dropdown-content" attr-for-selected="value" selected="{{candidatePreset}}" on-iron-select="handleLoadPreset">
+            <paper-dropdown-menu id="loadedPresetDropdown" label="loaded presets">
+                <paper-listbox id="loadedPresetListbox" class="dropdown-content" attr-for-selected="value" selected="{{candidatePreset}}">
+                    <paper-item value="empty"></paper-item>
                     <template is="dom-repeat" items="[[savedPresets]]">
-                        <paper-item value="empty"></paper-item>
-                        <paper-item value="{{item}}">{{item}}</paper-item>
+                        <paper-item value="{{item}}" on-tap="handleLoadPreset">{{item}}</paper-item>
                     </template>
                 </paper-listbox>
             </paper-dropdown-menu>
@@ -401,11 +402,12 @@
         </paper-dialog>
 
         <!-- Save preset Modal -->
-        <paper-dialog id="savePresetModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation" on-iron-overlay-closed="onSavePresetModalClosed">
+        <paper-dialog id="savePresetModal" modal entry-animation="scale-up-animation" exit-animation="scale-down-animation" on-iron-overlay-closed="onSavePresetModalClosed" on-iron-overlay-opened="handleSavePresetModalOpen">
             <h1>{{__('Save your current configuration')}}</h1>
 
-            <paper-dropdown-menu id="savedPresetsDropdown" label="presets">
-                <paper-listbox class="dropdown-content" attr-for-selected="value" selected="{{item.name}}" >
+            <paper-dropdown-menu id="savedPresetsDropdown" label="saved presets">
+                <paper-listbox id="savedPresetListbox" class="dropdown-content" attr-for-selected="value" selected="{{candidatePreset}}">
+                    <paper-item value="empty"></paper-item>
                     <template is="dom-repeat" items="[[savedPresets]]">
                         <paper-item value="{{item}}" on-tap="openOverridePresetModal">{{item}}</paper-item>
                     </template>
@@ -686,6 +688,78 @@
                     
                 },
 
+                //Checks
+                
+                //Check if enter was pressed
+                checkForEnter: function(e) {
+                    var self = this;
+                    if(e.keyCode == 13)
+                    {
+                        //Uncomment this to enable 'enter' key saving
+                        self.saveNewPreset();
+                        self.$.saveNewPresetModal.close();
+                    }
+                },
+                //Check for duplicated gamepad inputs
+                checkForGamepadDuplicates: function() {
+                    var self = this;
+
+                    if(self.presetArray == undefined || self.candidateBinding == undefined)
+                    {
+                        return;
+                    }
+
+                    //Check if this is a valid binding
+                    var isDuplicate = self.presetArray.some(function(element, index, array) {
+                        self.conflictingBinding = element;
+                        if(element.bindings.gamepad !== undefined)
+                        {
+                            return element.bindings.gamepad.name == self.candidateBinding;
+                        }
+                    });
+
+                    if(isDuplicate)
+                    {
+                        self.openDuplicateInputToast();
+                        self.isValidGamepadReplacement = false;                       
+                    }
+                    else
+                    {
+                        self.isValidGamepadReplacement = true;
+                        self.updateGamepadInput();
+                    }
+                },
+
+                //Check for duplicated keyboard inputs
+                checkForKeyboardDuplicates: function() {
+                    var self = this;
+
+                    //If there is no array present to check with, return
+                    if(self.presetArray == undefined || self.candidateBinding == undefined)
+                    {
+                        return;
+                    }
+
+                    //Check if this is a valid binding
+                    var isDuplicate = self.presetArray.some(function(element, index, array) {
+                        self.conflictingBinding = element;
+                        if(element.bindings.keyboard !== undefined)
+                        {
+                            return element.bindings.keyboard.name == self.candidateBinding;
+                        } 
+                    });
+
+                    if( isDuplicate )
+                    {
+                        self.isValidKeyboardReplacement = false;                       
+                        self.openDuplicateInputToast();
+                    }
+                    else
+                    {
+                        self.isValidKeyboardReplacement = true;
+                        self.updateKeyboardInput();
+                    }
+                },
 
                 copyPreset: function(presetIn)
                 {
@@ -823,9 +897,41 @@
                     self.openAxisModal()
                 },
 
-                handleAxisRemapping: function() {
+                handleAxisRemapping: function(e) {
                     var self = this;
-                    self.handleGamepadRemapping();
+                    self.handleGamepadRemapping(e);
+                },
+
+                handleDeletePresetModalOpen: function(e) {
+                    var self = this;
+                    if(e.currentTarget !== e.target)
+                    {
+                        return;
+                    }
+                    self.set("candidatePreset", "empty");
+                },
+
+                handleEnableExponentialSticks: function() {
+                    var self = this;
+                    self.extraOptions.rovPilot.exponentialSticks = self.$.exponentialSticksCheckbox.checked;    
+                    self.settings.extraOptions = self.extraOptions;
+                    self.eventEmitter.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
+                    self.$.updatedExtraOptionsToast.open();
+                },
+
+                handleExtraOptions: function() {
+                    var self = this;
+
+                    var invertLeft = self.$.invertLeftYAxisCheckbox.checked;
+                    var invertRight = self.$.invertRightYAxisCheckbox.checked;
+                    var exponentialSticks = self.$.exponentialSticksCheckbox.checked;
+
+                    var extraOptionsPayload = {
+                        invertLeft: invertLeft,
+                        invertRight: invertRight,
+                        exponentialSticks: exponentialSticks
+                    };
+                    self.eventEmitter.emit('plugin.inputConfigurator.extraOptionsChanged', extraOptionsPayload);
                 },
 
                 //User has clicked a gamepad symbol
@@ -840,33 +946,23 @@
                 //Gamepad modal has opened
                 handleGamepadFocus: function(e) {
                     var self = this;
-                    console.log("Handle gamepad focus");
+
                     if (e.currentTarget !== e.target)
                     {
-                        console.log("ignoring child activation on focus");
                         return;
                     }
 
                     //Reset our state
-                    self.async(function(){
-                        //self.candidateBinding="";
-                        // self.set("candidateBinding", "empty");
-                        console.log(self.$.gamepadDropdown.selected);
-                        self.$.gamepadDropdown.selected = null;
-                        console.log("Inside async focus");                        
-                    })
-                    
-                    //self.set("candidateBinding", undefined);
+                    self.set("candidateBinding", "empty");
                     self.isValidGamepadReplacement = true;
                 },
 
                 //Handle the selection for the gamepad
                 handleGamepadRemapping: function(e) {
                     var self = this;
-                    console.log("Handle Gamepad Remapping:", self.candidateBinding==undefined?"undefined":self.candidateBinding);
-                    if (e.currentTarget !== e.target)
+
+                    if(e.currentTarget !== e.target)
                     {
-                        console.log("ignoring child activation in remapping");
                         return;
                     }
 
@@ -894,30 +990,6 @@
                     
                 },
 
-                handleEnableExponentialSticks: function()
-                {
-                    var self = this;
-                    self.extraOptions.rovPilot.exponentialSticks = self.$.exponentialSticksCheckbox.checked;    
-                    self.settings.extraOptions = self.extraOptions;
-                    self.eventEmitter.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
-                    self.$.updatedExtraOptionsToast.open();
-                },
-
-                handleExtraOptions: function()
-                {
-                    var self = this;
-
-                    var invertLeft = self.$.invertLeftYAxisCheckbox.checked;
-                    var invertRight = self.$.invertRightYAxisCheckbox.checked;
-                    var exponentialSticks = self.$.exponentialSticksCheckbox.checked;
-
-                    var extraOptionsPayload = {
-                        invertLeft: invertLeft,
-                        invertRight: invertRight,
-                        exponentialSticks: exponentialSticks
-                    };
-                    self.eventEmitter.emit('plugin.inputConfigurator.extraOptionsChanged', extraOptionsPayload);
-                },
 
                 //User has clicked a keyboard symbol
                 handleKeyboardChange: function(e) {
@@ -955,18 +1027,38 @@
                     });
                 },
 
-                handleLoadPreset: function() {
+                handleLoadPreset: function(e) {
                     var self = this;
+
+                    if(e.currentTarget !== e.target) {
+                        return;
+                    }
+
+                    if(e.model.item !== "empty") {
+                        self.set("candidatePreset", e.model.item)
+                    }
+
+                    if(self.candidatePreset == "empty" || self.candidatePreset == undefined) {
+                        return;
+                    }
                     
                     //Request the node module to send up the preset requested
                     self.eventEmitter.emit('plugin.inputConfigurator.loadPreset', self.candidatePreset);
 
-                    self.set("candidatePreset", undefined);
                     self.isCustomConfig = false;
 
                     self.openLoadedPresetToast();
                     self.$.loadPresetModal.close();
                 },
+
+                handleLoadPresetModalOpen: function(e) {
+                    var self = this;
+                    if(e.currentTarget !== e.target)
+                    {
+                        return;
+                    }
+                    self.set("candidatePreset", "empty");
+                },    
 
                 handleSavePreset: function(presetName) {
                     var self = this;
@@ -984,6 +1076,14 @@
                         self.openSavedPresetToast();
                     }
 
+                },
+
+                handleSavePresetModalOpen: function(e) {
+                    var self = this;
+                    if(e.currentTarget !== e.target) {
+                        return;
+                    }
+                    self.set("candidatePreset", "empty");
                 },
                 
                 //Checks to see if this action accepts this type
@@ -1005,127 +1105,9 @@
                     return false;
                 },
 
-                //Checks
-                
-                //Check if enter was pressed
-                checkForEnter: function(e) {
-                    var self = this;
-                    if(e.keyCode == 13)
-                    {
-                        //Uncomment this to enable 'enter' key saving
-                        self.saveNewPreset();
-                    }
-                },
-                //Check for duplicated gamepad inputs
-                checkForGamepadDuplicates: function() {
-                    var self = this;
-
-                    if(self.presetArray == undefined || self.candidateBinding == undefined)
-                    {
-                        return;
-                    }
-
-                    //Check if this is a valid binding
-                    var isDuplicate = self.presetArray.some(function(element, index, array) {
-                        self.conflictingBinding = element;
-                        if(element.bindings.gamepad !== undefined)
-                        {
-                            return element.bindings.gamepad.name == self.candidateBinding;
-                        }
-                    });
-
-                    if(isDuplicate)
-                    {
-                        self.openDuplicateInputToast();
-                        self.isValidGamepadReplacement = false;                       
-                    }
-                    else
-                    {
-                        self.isValidGamepadReplacement = true;
-                        self.updateGamepadInput();
-                    }
-                },
-
-                //Check for duplicated keyboard inputs
-                checkForKeyboardDuplicates: function() {
-                    var self = this;
-
-                    //If there is no array present to check with, return
-                    if(self.presetArray == undefined || self.candidateBinding == undefined)
-                    {
-                        return;
-                    }
-
-                    //Check if this is a valid binding
-                    var isDuplicate = self.presetArray.some(function(element, index, array) {
-                        self.conflictingBinding = element;
-                        if(element.bindings.keyboard !== undefined)
-                        {
-                            return element.bindings.keyboard.name == self.candidateBinding;
-                        } 
-                    });
-
-                    if( isDuplicate )
-                    {
-                        self.isValidKeyboardReplacement = false;                       
-                        self.openDuplicateInputToast();
-                    }
-                    else
-                    {
-                        self.isValidKeyboardReplacement = true;
-                        self.updateKeyboardInput();
-                    }
-                },
-
-                //Updates
-                //Update an existing gamepad binding
-                updateGamepadInput: function() {
-                    var self = this;
-
-                    var updatedInput = {
-                        action: self.selectedItem.name,
-                        input: {
-                            name: self.candidateBinding,
-                            controller: "gamepad",
-                            type: gamepadMap.get(self.candidateBinding)
-                        }
-                    };
-                    self.eventEmitter.emit('plugin.inputController.updateInput', updatedInput);
-
-                    //Open the update toast
-                    self.openUpdatePresetToast();
-
-                    //And close the modal
-                    self.$.gamepadModal.close();
-                    self.$.axisModal.close();
-                },
-
-                //Update an existing keyboard binding
-                updateKeyboardInput: function() {
-                    var self = this;
-
-                    var updatedInput = {
-                        action: self.selectedItem.name,
-                        input: {
-                            name: self.candidateBinding,
-                            controller: "keyboard",
-                            type: "button"
-                        }
-                    };
-
-                    self.eventEmitter.emit('plugin.inputController.updateInput', updatedInput);
-
-                    //Open the update toast
-                    self.openUpdatePresetToast();
-
-                    //And close the modal
-                    self.$.keyboardModal.close();
-                },
-
                 //On events
                 onGamepadModalCancel: function() {
                     var self = this;
-                    console.log("Gamepad Modal canceled");
                     self.set("candidateBinding", undefined);
                 },
 
@@ -1133,11 +1115,9 @@
                     var self = this;
                     if (e.currentTarget !== e.target)
                     {
-                        console.log("ignoring child activation");
                         return;
                     }
-                    self.set("candidateBinding", undefined);
-                    console.log("Gamepad modal closed");
+                    self.set("candidateBinding", "empty");
                 },
 
                 onKeyboardModalClosed : function() {
@@ -1148,14 +1128,10 @@
 
                 onLoadPresetModalClose: function() {
                     var self = this;
-                    self.set("candidatePreset", undefined);
                 },
 
                 onSavePresetModalClosed: function() {
                     var self = this;
-
-                    //Reset the candidatePreset
-                    self.set("candidatePreset", undefined);
                 },           
 
                 //Opens
@@ -1167,6 +1143,11 @@
                 
                 openAxisOptionsModal: function() {
                     var self = this;
+
+                    if(self.candidateBinding == "empty")
+                    {
+                        return;
+                    }
 
                     //Get the settings for this inversion
                     var inversion = inversionMap.get(self.candidateBinding);
@@ -1223,10 +1204,13 @@
                     self.$.loadedPresetToast.open();
                 },
 
-                openOverridePresetModal: function(oEvent) {
+                openOverridePresetModal: function(e) {
                     var self = this;
-                    candidatePreset = oEvent.model.get('item');
-                    self.$.overridePresetModal.open();
+                    if(e.model.item !== "empty")
+                    {
+                        self.set("candidatePreset", e.model.item)
+                        self.$.overridePresetModal.open();
+                    }
                 },
 
                 openSaveNewPresetModal: function() {
@@ -1236,7 +1220,6 @@
 
                 openSavePresetModal: function() {
                     var self = this;
-                    
                     self.$.savePresetModal.open();
                 },
                 
@@ -1258,23 +1241,25 @@
 
                 overwritePreset: function(oEvent) {
                     var self = this;
-                    self.handleSavePreset(candidatePreset);  
+                    if(self.candidatePreset !== undefined && self.candidatePreset !== "empty")
+                    {
+                        self.handleSavePreset(self.candidatePreset);  
+                    }
                 },
 
                 saveNewPreset: function() {
                     var self = this;
                     var presetName = self.$.savePresetInput.value;
                     
-                    if(presetName)
+                    if(presetName && presetName !== "empty")
                     {
                         self.handleSavePreset(presetName);
                     }
                 },
-                
+
                 //Converts a preset object(hash map) to a consumable array for the input configurator
                 presetToArray: function(preset) {
                     var self = this;
-                    console.log("Preset to array called");
 
                     //array for buttons
                     var buttons = [];
@@ -1340,6 +1325,51 @@
                     /*CSS way to do sticky headers*/
                     var translate = "translate(0," + self.$.tableContainer.scrollTop + "px)";
                     self.$.stickyHeader.style.transform = translate;
+                },
+                
+                //Updates
+                //Update an existing gamepad binding
+                updateGamepadInput: function() {
+                    var self = this;
+
+                    var updatedInput = {
+                        action: self.selectedItem.name,
+                        input: {
+                            name: self.candidateBinding,
+                            controller: "gamepad",
+                            type: gamepadMap.get(self.candidateBinding)
+                        }
+                    };
+                    self.eventEmitter.emit('plugin.inputController.updateInput', updatedInput);
+
+                    //Open the update toast
+                    self.openUpdatePresetToast();
+
+                    //And close the modal
+                    self.$.gamepadModal.close();
+                    self.$.axisModal.close();
+                },
+
+                //Update an existing keyboard binding
+                updateKeyboardInput: function() {
+                    var self = this;
+
+                    var updatedInput = {
+                        action: self.selectedItem.name,
+                        input: {
+                            name: self.candidateBinding,
+                            controller: "keyboard",
+                            type: "button"
+                        }
+                    };
+
+                    self.eventEmitter.emit('plugin.inputController.updateInput', updatedInput);
+
+                    //Open the update toast
+                    self.openUpdatePresetToast();
+
+                    //And close the modal
+                    self.$.keyboardModal.close();
                 }
             })
         })();

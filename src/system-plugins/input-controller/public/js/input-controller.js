@@ -269,7 +269,7 @@
       var self = this;
       self.presets.delete(preset.name);
 
-      if(preset == self.currentPresetName)
+      if(preset == self.currentPresetName && preset !== "defaults")
       {
         self.cockpit.emit('plugin.inputConfigurator.loadPreset', "defaults");
       }

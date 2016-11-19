@@ -59,6 +59,7 @@
       });
       
       this.cockpit.on('plugin.inputConfigurator.loadPreset', function(presetNameIn) {
+        console.log("Loading preset:", presetNameIn);
         self.loadPreset(presetNameIn);
       });
 

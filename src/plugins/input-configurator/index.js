@@ -32,30 +32,29 @@
 				"properties": {
 					"extraOptions": {
 						"type": "object",
-						"rovPilot": {
-							"type": "object",
-							"exponentialRate": {
-								"type": "number"
-							},
-							"exponentialSticks": {
+						"exponentialRate": {
+							"type": "number"
+						},
+						"exponentialSticks": {
+							"type": "boolean",
+							"default": "false"
+						},
+						"inversions": {
+							"LEFT_STICK_X": {
 								"type": "boolean",
-								"default": "false"
+								"default": "false"									
 							},
-							"invertLeftX": {
+							"LEFT_STICK_Y": {
 								"type": "boolean",
-								"default": "false"
+								"default": "false"									
+							}, 
+							"RIGHT_STICK_X": {
+								"type": "boolean",
+								"default": "false"									
 							},
-							"invertLeftY": {
+							"RIGHT_STICK_Y": {
 								"type": "boolean",
-								"default": "false"
-							},
-							"invertRightX": {
-								"type": "boolean",
-								"default": "false"
-							},
-							"invertRightY": {
-								"type": "boolean",
-								"default": "false"
+								"default": "false"									
 							}
 						}
 					},

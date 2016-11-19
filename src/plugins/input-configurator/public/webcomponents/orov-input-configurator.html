@@ -511,23 +511,6 @@
             ];
             var gamepadMap = new Map(gamepadTypes);
 
-            //Mapping of axis to inversions actions
-            var axisInversions = [
-                ["LEFT_STICK_X", {
-                    plugin: "rovPilot",
-                    item: "invertLeftX"}],
-                ["LEFT_STICK_Y", {
-                    plugin: "rovPilot",
-                    item: "invertLeftY"}],
-                ["RIGHT_STICK_X", {
-                    plugin: "rovPilot",
-                    item: "invertRightX"}],
-                ["RIGHT_STICK_Y", {
-                    plugin: "rovPilot",
-                    item: "invertRightY"}]
-            ];
-            var inversionMap = new Map(axisInversions);
-
             Polymer({
                 is: "orov-input-configurator",
                 properties: {
@@ -775,7 +758,7 @@
                         var actionToAdd = new Map();
 
                         action.forEach(function(input, controllerName) {
-                        actionToAdd.set(controllerName, jQuery.extend({}, input));  
+                            actionToAdd.set(controllerName, jQuery.extend({}, input));  
                         });
 
                         returnPreset.actions.set(actionName, actionToAdd);
@@ -788,12 +771,11 @@
                 {
                     var self = this;
 
-                    var inversion = inversionMap.get(self.candidateBinding);
-                    var extraOptionsPlugin = self.extraOptions[inversion.plugin];
-                    extraOptionsPlugin[inversion.item] = self.$.invertAxisCheckbox.checked;;
-                    
+                    //save the change to settings
+                    self.extraOptions.inversions[self.candidateBinding] = self.$.invertAxisCheckbox.checked;
                     self.settings.extraOptions = self.extraOptions;
                     self.eventEmitter.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
+
                     self.$.updatedExtraOptionsToast.open();
                 },
 
@@ -912,26 +894,13 @@
                 },
 
                 handleEnableExponentialSticks: function() {
+
                     var self = this;
-                    self.extraOptions.rovPilot.exponentialSticks = self.$.exponentialSticksCheckbox.checked;    
+                    self.extraOptions.exponentialSticks = self.$.exponentialSticksCheckbox.checked;    
                     self.settings.extraOptions = self.extraOptions;
+                    
                     self.eventEmitter.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
                     self.$.updatedExtraOptionsToast.open();
-                },
-
-                handleExtraOptions: function() {
-                    var self = this;
-
-                    var invertLeft = self.$.invertLeftYAxisCheckbox.checked;
-                    var invertRight = self.$.invertRightYAxisCheckbox.checked;
-                    var exponentialSticks = self.$.exponentialSticksCheckbox.checked;
-
-                    var extraOptionsPayload = {
-                        invertLeft: invertLeft,
-                        invertRight: invertRight,
-                        exponentialSticks: exponentialSticks
-                    };
-                    self.eventEmitter.emit('plugin.inputConfigurator.extraOptionsChanged', extraOptionsPayload);
                 },
 
                 //User has clicked a gamepad symbol
@@ -1150,10 +1119,7 @@
                     }
 
                     //Get the settings for this inversion
-                    var inversion = inversionMap.get(self.candidateBinding);
-                    var extraOptionsPlugin = self.extraOptions[inversion.plugin];
-                    self.currentInversionSetting = extraOptionsPlugin[inversion.item];
-
+                    self.set("currentInversionSetting", self.extraOptions.inversions[self.candidateBinding]);
                     self.$.axisOptionsModal.open();
                 },
 

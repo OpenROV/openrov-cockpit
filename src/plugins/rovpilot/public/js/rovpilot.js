@@ -26,13 +26,13 @@
     };
 
     this.extraOptions = {
-      rovPilot: {
-        exponentialSticks: true,
-        exponentialRate: 1,
-        invertLeftX: false,
-        invertLeftY: false,
-        invertRightX: false,
-        invertRightY: false
+      exponentialSticks: true,
+      exponentialRate: 2,
+      inversions: {
+        LEFT_STICK_X: false,
+        LEFT_STICK_Y: false,
+        RIGHT_STICK_X: false,
+        RIGHT_STICK_Y: false
       }
     };
 
@@ -59,11 +59,11 @@
     //Helper function to set the exponentialRate value
     function postProcessStickValues(input) 
     {
-      if(self.extraOptions.rovPilot.exponentialSticks) 
+      if(self.extraOptions.exponentialSticks) 
       {
         var s = Math.sign(input);
 
-        input = Math.pow(input, self.extraOptions.rovPilot.exponentialRate);
+        input = Math.pow(input, self.extraOptions.exponentialRate);
         if (Math.sign(input) !== s) 
         {
           input = input * s;
@@ -113,10 +113,8 @@
         {
           axis: 
           {
-            update: function(value, invert) {
-              var inversion = invert ? 1 : -1;
-              var result = inversion * postProcessStickValues(value);
-
+            update: function(value) {
+              var result = postProcessStickValues(value);
               rov.cockpit.emit('plugin.rovpilot.setThrottle', result);
             }
           }
@@ -129,10 +127,8 @@
         {
           axis: 
           {
-            update: function(value, invert) {
-               var inversion = invert ? -1 : 1;
-               var result = inversion * postProcessStickValues(value);
-
+            update: function(value) {
+               var result = postProcessStickValues(value);
                rov.cockpit.emit('plugin.rovpilot.setYaw', result);
             }
           }
@@ -177,10 +173,8 @@
         {
           axis: 
           {
-            update: function(value, invert) {
-               var inversion = invert ? 1 : -1;
-               var result = inversion * postProcessStickValues(value);
-
+            update: function(value) {
+               var result = postProcessStickValues(value);
                rov.cockpit.emit('plugin.rovpilot.setLift', result);
             }
           }

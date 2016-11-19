@@ -6,7 +6,8 @@ var currentdirectory = process.cwd();
 var packagesToInstall = [];
 var path = require('path');
 
-console.log("==NPM settings:==")
+console.log("==NPM settings:==");
+console.log(exec('npm config ls -l'));
 exec('npm config ls -l')
 finder.on('file', function (file, stat) {
   if (file.indexOf('package.json') > -1) {

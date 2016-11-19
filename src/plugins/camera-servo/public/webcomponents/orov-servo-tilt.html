@@ -10,11 +10,11 @@
       background-repeat: no-repeat;
       background-position: center center;
       position: relative;
-      top: 5px;
+      top: 12px;
       z-index: 1;
 
       /*Hardware acceleration*/
-      translate3d(0,0,0);
+      transfrom: translate3d(0px,0px,0px);
       transition-duration: 0.2s;
       transition-timing-function: ease-out;
     }
@@ -37,23 +37,46 @@
     }
 
     #targetPos {
-      width: 28px;
+      width: 20px;
       height: 2px;
 
       position: relative;
       z-index: 0;
-      transform: translate3d(3.469px, -17.667px, 0px);
+      transform: translate3d(3px, -10px, 0px);
+      transform-origin: left;
 
-      background: #ffb33b;
+      background: #FFFFFF;
+      opacity: 0.75;
+    }
+
+    #semi{
+      height: 15px;
+      width: 30px;
+      transform: rotate(90deg) translate3d(-19px, -15px, 0px);
       opacity: 1.0;
+      border-radius: 90px 90px 0px 0px;
+      border-style: solid;
+      border-color: #7C7474;
+      border-bottom: none;
+    }
+    #semi2{
+      height: 15px;
+      width: 30px;
+      transform: rotate(90deg) translate3d(-19px, -15px, 0px);
+      opacity: 1.0;
+      border-radius: 90px 90px 0px 0px;
+      border-style: solid;
+      border-color: orange;
+      border-bottom: none;
     }
 
   </style>
   <template>
     <div style="position: relative; z-index: 1;">
       <iron-icon id="servoTiltImage"icon="av:videocam"></iron-icon>
-      <div id="centerLine"></div>
       <div id="targetPos"></div>
+      <div id="semi"></div>
+      <div id="semi2"></div>
     </div>
   </template>
   <script>
@@ -85,7 +108,7 @@
           this.$.servoTiltImage.style['transform'] = newvalue;
         },
         _targetAngleChanged: function(){
-          var newvalue = 'translate3d(3.469px, -17.667px, 0px) rotate('+ -this.targetAngle +'deg)';
+          var newvalue = 'translate3d(20px, -10px, 0px) rotate('+ -this.targetAngle +'deg)';
           
           this.$.targetPos.style['-webkit-transform'] = newvalue;
           this.$.targetPos.style['-moz-transform'] = newvalue;

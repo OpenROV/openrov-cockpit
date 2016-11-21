@@ -246,10 +246,10 @@
                     <paper-checkbox id="invertAxisCheckbox" checked="{{currentInversionSetting}}" on-tap="handleChangeInvert">{{__('Invert')}}</paper-checkbox>
                 </paper-item>
                 <paper-item>
-                    <paper-checkbox id="exponentialSticksCheckbox" on-iron-change="handleEnableExponentialSticks">{{__('Enable Exponential Sticks')}}</paper-checkbox> 
+                    <paper-checkbox id="exponentialSticksCheckbox" checked="{{enableExponentialSticks}}" on-iron-change="handleEnableExponentialSticks">{{__('Enable Exponential Sticks')}}</paper-checkbox> 
                 </paper-item>
                 <paper-item>
-                    <paper-input disabled="{{!enableExponentialSticks}}" label="rate" type="number"></paper-input>
+                    <paper-input id="exponentialRateInput" step="0.1" disabled="{{!enableExponentialSticks}}" label="rate" type="number" on-change="handleExponentialRateInput"></paper-input>
                 </paper-item>
             </paper-listbox>
 
@@ -458,7 +458,7 @@
         <!--Toasts-->
         <paper-toast id="clearedInputToast" text="Cleared input!"></paper-toast>
         <paper-toast id="deletedPresetToast" text="Deleted preset!"></paper-toast>
-        <paper-toast id="duplicateInputToast" text="Duplicate found."></paper-toast>
+        <paper-toast id="duplicateInputToast" text="Duplicate found. Clear conflicting binding or cancel"></paper-toast>
         <paper-toast id="loadedPresetToast" text="Loaded preset!"></paper-toast>
         <paper-toast id="savedPresetToast" text="Saved preset!"></paper-toast>
         <paper-toast id="updatedExtraOptionsToast" text="Updated extra options!"></paper-toast>
@@ -546,7 +546,7 @@
                         type: Boolean,
                         value: function(){return false;}
                     },
-                    extraOptions: {
+                    inputConfiguratorSettings: {
                         type: Object,
                         value: function(){return {};}
                     },
@@ -576,6 +576,10 @@
                         type: Array,
                         value: function(){return [];}
                     },
+                    rovPilotSettings: {
+                        type: Object,
+                        value: function(){return {};}
+                    },
                     savedPresets: {
                         type: Array,
                         value: function(){return [];}
@@ -585,7 +589,7 @@
                     },
                     settings: {
                         type: Object,
-                    }
+                    },
                 },
                 
                 behaviors: [namespace('behaviors').oROVStandard],
@@ -614,15 +618,11 @@
                         
                     }.bind(this);
 
-                    this.getSettings = function(settings) {
-                        self.set("settings", settings.inputConfigurator);
-
-                        var extraOptions = self.settings.extraOptions;
-                        if(self.settings.extraOptions !== undefined)
-                        {
-                            self.set("extraOptions", self.settings.extraOptions);
-
-                        }
+                    this.onInputConfiguratorSettingsChanged = function(settings) {
+                        self.set("inputConfiguratorSettings", settings.inputConfigurator);
+                    }.bind(this);
+                    this.onRovPilotSettingsChanged = function(settings) {
+                        self.set("rovPilotSettings", settings.rovPilot);
                     }.bind(this);
                     
                     this.presetFunction = function(preset, actions) {
@@ -635,14 +635,16 @@
                     }.bind(this);
 
                     emitter.on('plugin.inputConfigurator.savedPresets', this.getSavedPresetListFunction );
-                    emitter.rov.on('settings-change.inputConfigurator', this.getSettings );
+                    emitter.rov.on('settings-change.inputConfigurator', this.onInputConfiguratorSettingsChanged );
+                    emitter.rov.on('settings-change.rovPilot', this.onRovPilotSettingsChanged );
                     emitter.on('plugin.inputController.updatedPreset', this.presetFunction );
                 },
                 
                 detached: function(){
                     this.eventEmitter.off('plugin.inputController.updatedPreset',this.presetFunction);
                     this.eventEmitter.off('plugin.inputConfigurator.savedPresets',this.getSavedPresetListFunction);
-                    this.eventEmitter.rov.off('settings-change.inputConfigurator', this.getSettings );
+                    this.eventEmitter.rov.off('settings-change.inputConfigurator', this.onInputConfiguratorSettingsChanged );
+                    this.eventEmitter.off('settings-change.rovPilot', this.onRovPilotSettingsChanged );    
                 },
 
                 attached: function() {
@@ -657,7 +659,7 @@
                     self.$.updatedPresetToast.fitInto = self.$.toasts;
                     self.$.duplicateInputToast.fitInto = self.$.toasts;
                     self.$.waitingForKeyboardInputToast.fitInto = self.$.toasts;
-
+                    
                     //Get the list of saved presets from disk
                     self.eventEmitter.emit('plugin.inputConfigurator.getSavedPresets', self.preset);  
 
@@ -665,8 +667,10 @@
                     if(self.settings == undefined)
                     {
                         self.eventEmitter.rov.emit('plugin.settings-manager.getSettings', "inputConfigurator", function(settings) {
-                            self.set("settings", settings.inputConfigurator);
-                            self.set("extraOptions", self.settings.extraOptions);
+                            self.set("inputConfiguratorSettings", settings.inputConfigurator);
+                        });
+                        self.eventEmitter.rov.emit('plugin.settings-manager.getSettings', "rovPilot", function(settings) {
+                            self.set("rovPilotSettings", settings.rovPilot);
                         });
                     }
                     
@@ -773,9 +777,8 @@
                     var self = this;
 
                     //save the change to settings
-                    self.extraOptions.inversions[self.candidateBinding] = self.$.invertAxisCheckbox.checked;
-                    self.settings.extraOptions = self.extraOptions;
-                    self.eventEmitter.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
+                    self.rovPilotSettings.inversions[self.candidateBinding] = self.$.invertAxisCheckbox.checked;
+                    self.eventEmitter.rov.emit('plugin.settings-manager.saveSettings', {rovPilot: self.rovPilotSettings});
 
                     self.$.updatedExtraOptionsToast.open();
                 },
@@ -906,6 +909,21 @@
 
                     //Set our state
                     self.set("enableExponentialSticks",self.$.exponentialSticksCheckbox.checked);
+                },
+
+                //User has entered a new exponential rate value
+                handleExponentialRateInput: function() {
+                    var self = this;
+                    console.log("in function")
+
+                    //Sanity Checks
+                    if(self.candidateBinding == undefined || !self.enableExponentialSticks)
+                    {
+                        return;
+                    }
+
+                    //Update the settings for this 
+                    console.log(self.$.exponentialRateInput.value);
                 },
 
                 //User has clicked a gamepad symbol
@@ -1124,9 +1142,12 @@
                     }
 
                     //Get the settings for this inversion
-                    self.set("currentInversionSetting", self.extraOptions.inversions[self.candidateBinding]);
+                    self.set("currentInversionSetting", self.rovPilotSettings.inversions[self.candidateBinding]);
 
                     //Get the settings for this exponential sticks
+                    //self.set("enableExponentialSticks", self.extraOptions.)
+
+                    //Actually open the modal
                     self.$.axisOptionsModal.open();
                 },
 

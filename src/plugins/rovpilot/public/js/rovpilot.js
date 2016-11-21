@@ -25,14 +25,30 @@
       strafe: 0
     };
 
-    this.extraOptions = {
-      exponentialSticks: true,
-      exponentialRate: 2,
-      inversions: {
-        LEFT_STICK_X: false,
-        LEFT_STICK_Y: false,
-        RIGHT_STICK_X: false,
-        RIGHT_STICK_Y: false
+    this.settings = {
+      'exponentialSticks': {
+        'LEFT_STICK_X': {
+          'enabled': false,
+          'rate': 1.0
+        },
+        'LEFT_STICK_Y': {
+          'enabled': false,
+          'rate': 1.0
+        },
+        'RIGHT_STICK_X': {
+          'enabled': false,
+          'rate': 1.0
+        },
+        'RIGHT_STICK_Y': {
+          'enabled': false,
+          'rate': 1.0
+        }
+      },
+      'inversions': {
+        'LEFT_STICK_X': false,
+        'LEFT_STICK_Y': false,
+        'RIGHT_STICK_X': false,
+        'RIGHT_STICK_Y': false
       }
     };
 
@@ -40,19 +56,15 @@
 
     //Get the stick values
     self.cockpit.withHistory.on('settings-change.inputConfigurator', function (settings) {
-      self.settings = settings.inputConfigurator;
-
-      //Init extra options with defaults
-      if(self.settings.extraOptions == undefined)
+      //Init settings with defaults
+      if(self.settings.rovPilot == undefined)
       {
-        self.settings.extraOptions = self.extraOptions;
-        self.cockpit.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
+        self.cockpit.rov.emit('plugin.settings-manager.saveSettings', {rovPilot: self.settings});
       }
       else
       {
         //get the settings
-        var options = self.settings.extraOptions;
-        self.extraOptions = options;
+        self.settings = settings.rovPilot;
       }
     });
 

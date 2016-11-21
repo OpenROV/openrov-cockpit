@@ -36,6 +36,15 @@
     this.cockpit.rov.withHistory.on('plugin.navigationData.data', function (navdata) {
       self.cockpit.emit('plugin.navigationData.data', navdata);
     });
+
+    this.cockpit.rov.withHistory.on('plugin.navigationData.state', function (state){
+      self.cockpit.emit('plugin.navigationData.state', state);
+    })
+
+    this.cockpit.on('plugin.navigationData.setState', function (state){
+      self.cockpit.rov.emit('plugin.navigationData.setState', state);
+    })
+
   };
   window.Cockpit.plugins.push(plugins.NavigatoinData);
 }(window));

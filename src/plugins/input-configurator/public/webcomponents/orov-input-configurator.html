@@ -133,14 +133,12 @@
         }        
     </style>
 
-    <template id="myAwesomeTemplate">
+    <template>
 
         <h2>{{__('Input Configurator - Beta')}}</h2>
         <p>
             {{__('Click on the button you want to change in the table below')}}
         </p>        
-        
-        <p> This is the candidate binding: {{candidateBinding}} </p>
 
         <h3> {{__('Button Controls')}} </h3>
         <section>      
@@ -229,9 +227,6 @@
                     </paper-listbox>
                 </paper-dropdown-menu>      
             </div>
-            <paper-item>
-                <paper-checkbox id="exponentialSticksCheckbox" checked="{{extraOptions.rovPilot.exponentialSticks}}" on-click="handleEnableExponentialSticks">{{__('Enable Exponential Sticks')}}</paper-checkbox>
-            </paper-item>
 
             <div class="buttons">
                 <paper-button disabled$={{isValidGamepadReplacement}} on-tap="openClearGamepadDuplicateWarning">{{__('Clear conflicting binding')}}</paper-button>
@@ -249,6 +244,12 @@
             <paper-listbox class="dropdown-content">
                 <paper-item>
                     <paper-checkbox id="invertAxisCheckbox" checked="{{currentInversionSetting}}" on-tap="handleChangeInvert">{{__('Invert')}}</paper-checkbox>
+                </paper-item>
+                <paper-item>
+                    <paper-checkbox id="exponentialSticksCheckbox" on-iron-change="handleEnableExponentialSticks">{{__('Enable Exponential Sticks')}}</paper-checkbox> 
+                </paper-item>
+                <paper-item>
+                    <paper-input disabled="{{!enableExponentialSticks}}" label="rate" type="number"></paper-input>
                 </paper-item>
             </paper-listbox>
 
@@ -893,14 +894,18 @@
                     self.set("candidatePreset", "empty");
                 },
 
-                handleEnableExponentialSticks: function() {
+                handleEnableExponentialSticks: function(event) {
 
                     var self = this;
-                    self.extraOptions.exponentialSticks = self.$.exponentialSticksCheckbox.checked;    
-                    self.settings.extraOptions = self.extraOptions;
-                    
-                    self.eventEmitter.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
-                    self.$.updatedExtraOptionsToast.open();
+
+                    //If there is no binding to change, dont' do anything
+                    if(self.candidateBinding == undefined)
+                    {
+                        return;
+                    }
+
+                    //Set our state
+                    self.set("enableExponentialSticks",self.$.exponentialSticksCheckbox.checked);
                 },
 
                 //User has clicked a gamepad symbol
@@ -1120,6 +1125,8 @@
 
                     //Get the settings for this inversion
                     self.set("currentInversionSetting", self.extraOptions.inversions[self.candidateBinding]);
+
+                    //Get the settings for this exponential sticks
                     self.$.axisOptionsModal.open();
                 },
 

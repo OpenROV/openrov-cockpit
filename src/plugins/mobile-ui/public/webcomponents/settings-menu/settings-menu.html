@@ -21,19 +21,19 @@
             border-radius: 5px;
             background-color: rgba( 00, 00, 00, 0.7);
         }
-        
+
         modal ::content>* {
             margin: 0;
         }
-        
+
         grid-menu {
             --grid-menu-max-width: 235px;
         }
-        
+
         grid-menu-button {
             color: white;
         }
-        
+
         grid-menu-button[active] {
             color: black;
             background-color: white;
@@ -149,7 +149,7 @@
                     });
 
         			 emitter.withHistory.on('plugin.navigationData.state', function(state){
-            			if (state.imuMode){					
+            			if (state.imuMode){
                         	self.set("compassMode", state.imuMode);
                     	};
 		  			 });

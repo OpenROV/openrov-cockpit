@@ -44,6 +44,9 @@
         if(!self.isSavingSettings)
         {
           self.settings = settings.inputConfigurator;
+          if (self.settings.presets==undefined){
+            self.settings.presets=[];
+          }
 
           //Update the saved preset name lists
           self.updateSavedPresetList();
@@ -147,16 +150,16 @@
       var presetName = presetIn.name;
       
       //Remove this preset, if found
-      for(var i = 0; i < self.settings.presets.length; ++i)
-      {
-        //Get the object
-        var tmpPreset = self.settings.presets[i];
-        if(tmpPreset.name == presetName)
+        for(var i = 0; i < self.settings.presets.length; ++i)
         {
-          self.settings.presets.splice(i, 1);
-          break;
+          //Get the object
+          var tmpPreset = self.settings.presets[i];
+          if(tmpPreset.name == presetName)
+          {
+            self.settings.presets.splice(i, 1);
+            break;
+          }
         }
-      }
 
       //Add the preset
       self.settings.presets.push(presetIn);
@@ -174,11 +177,11 @@
       self.savedPresets.length = 0;
 
       //Update the saved preset name lists
-      for(var i = 0; i < self.settings.presets.length; ++i)
-      {
-        var preset = self.settings.presets[i];
-        self.savedPresets.push(preset.name);
-      }
+        for(var i = 0; i < self.settings.presets.length; ++i)
+        {
+          var preset = self.settings.presets[i];
+          self.savedPresets.push(preset.name);
+        }
       
       self.cockpit.emit('plugin.inputConfigurator.savedPresets', self.savedPresets);
     }

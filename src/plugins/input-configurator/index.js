@@ -35,7 +35,8 @@
 						"default": "undefined"
 					},
 					"presets": {
-						"type": "array"
+						"type": "array",
+						"default": []
 					}
 				}
 			}];

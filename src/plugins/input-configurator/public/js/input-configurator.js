@@ -1,160 +1,189 @@
 /*jshint multistr: true*/
-(function (window, $, undefined) {
+(function(window, document) 
+{
   'use strict';
-  const plugin = 'plugin.inputConfigurator';
 
-  var InputConfigurator;
-  InputConfigurator = function InputConfigurator(cockpit) {
-    console.log('Loading InputConfigurator in the browser.');
-    this.cockpit = cockpit;
-    var self = this;
-    self.settings = undefined;
+  //Necessary for debug utils
+  var log;
+  var trace;
+  var log_debug;
+  $.getScript('components/visionmedia-debug/dist/debug.js', function() {
+    log = debug('input-controller:log');
+    trace = debug('input-controller:trace');
+    log_debug = debug('input-controller:debug');
+  });
 
-    self.rov = self.cockpit.rov.withHistory;
+  var inputConfigurator = namespace('plugin.inputConfigurator');
+  inputConfigurator.InputConfigurator = class InputConfigurator
+  {
+    constructor(cockpit)
+    {
+      this.cockpit = cockpit;
 
-    self.savingSettings = false;
-
-  };
-
-  InputConfigurator.prototype.listen = function listen() {
-    var self = this;
-
-    self.cockpit.on(plugin + '.updateBinding', function(arg, callback) {
-      var mapping = self.settings.currentMap.find(function(item) { return item.name == arg.name });
-      if (mapping) {
-        mapping.bindings = arg.bindings;
-        self.savingSettings = true;
-        self.cockpit.rov.emit('plugin.settings-manager.saveSettings', { inputConfigurator: self.settings }, function() {
-          callback();
-          self.savingSettings = false;
-        });
-
-        // apply to inputConfigurator
-        //self.sendToInputController(mapping);
-      }
-      // else handle error?
-    });
-
-    self.cockpit.on(plugin + '.loadPreset', function(preset, fn) {
-      preset.map.forEach(function(item) {
-        self.sendToInputController(item);
-      });
-      self.settings.currentMap = JSON.parse( JSON.stringify(preset.map)); //clone
-      self.cockpit.emit(plugin + '.currentMap.update', self.settings.currentMap);
-      if (fn) {fn();}
-    });
-
-    self.cockpit.on(plugin + '.deletePreset', function(preset, fn) {
-      var preset = self.settings.maps.find(function(map) {return map.name == preset.name});
-      if (preset) {
-        var index = self.settings.maps.indexOf(preset);
-        self.settings.maps.splice(index, 1);
-      }
-      self.cockpit.emit(plugin + '.presets.update', self.settings.maps);
-      self.cockpit.rov.emit('plugin.settings-manager.saveSettings', { inputConfigurator: self.settings }, fn);
+      var self = this;
       
-      if (fn) {fn();}
-    });
+      self.settings = {
+        presets: []
+      };
 
-    self.cockpit.on(plugin + '.saveNewPreset', function(presetName, fn){
-        self.settings.maps.push({ name: presetName, map: JSON.parse(JSON.stringify(self.settings.currentMap))})
-        self.cockpit.emit(plugin + '.presets.update', self.settings.maps);
-        self.cockpit.rov.emit('plugin.settings-manager.saveSettings', { inputConfigurator: self.settings }, fn);
+      self.savedPresets = [];
+      self.defaultPresetName = "defaults";
 
-        if (fn) {fn();}
-    });
+      self.rov = self.cockpit.rov.withHistory;
+      self.isSavingSettings = false;
+      self.checkForLastPreset = true;
+    };
 
-    self.cockpit.on(plugin + '.savePreset', function(preset, fn){
-        var preset = self.settings.maps.find(function(map) {return map.name == preset.name});
-        if (preset) {
-          var index = self.settings.maps.indexOf(preset);
-          self.settings.maps.splice(index, 1);
+
+    listen()
+    {
+      var self = this;
+
+      //Listen for server setting changes
+      this.rov.on('settings-change.inputConfigurator', function(settings) {
+        if(!self.isSavingSettings)
+        {
+          self.settings = settings.inputConfigurator;
+
+          //Update the saved preset name lists
+          self.updateSavedPresetList();
         }
-
-        self.settings.maps.push({ name: preset.name, map: JSON.parse(JSON.stringify(self.settings.currentMap))})
-        self.cockpit.emit(plugin + '.presets.update', self.settings.maps);
-        self.cockpit.rov.emit('plugin.settings-manager.saveSettings', { inputConfigurator: self.settings }, fn);
-
-        if (fn) {fn();} 
-    });
-
-    self.rov.on('settings-change.inputConfigurator', function (settings) {
-      if (!self.savingSettings) {
-        self.loadSettings(settings.inputConfigurator, function(loadedSettings) {
-          self.settings = loadedSettings;
-          self.cockpit.emit(plugin + '.currentMap.update', loadedSettings.currentMap);
-          self.cockpit.emit(plugin + '.presets.update', loadedSettings.maps);
-
-          //load mapping into input controller
-          loadedSettings.currentMap.forEach(function(item) {
-            self.sendToInputController(item);
-          });
-        });
-      }
-    });
-  };
-
-  InputConfigurator.prototype.sendToInputController = function (mapping) {
-    var self = this;
-    var control = { name: mapping.name, bindings: {}};
-    mapping.bindings.forEach(function(aBinding) { control.bindings[aBinding.name] = aBinding.binding })
-    self.cockpit.emit('InputController.updateBinding', control, function() { 
-      // console.log('done');  
-    });
-  };
-
-  InputConfigurator.prototype.loadSettings = function (settings, loaded) {
-    var self = this;
-    var current = settings.currentMap;
-    var result = settings;
-
-    //TODO: What happens when another mapping from a new plugin is added after
-    //the default has been generated.  I suspect we need to regenerate the OpenROV default each
-    //time we load.
-    self.loadDefaultMapping(function(defaultMap) {
-      if (current.length == 1 && current[0] === null) { // the default mapping isn't setup as the current map yet.
-        result = { 
-          currentMap: defaultMap, 
-          maps: [
-            { 
-              name: 'OpenROV Default',
-              default: true,
-              map: JSON.parse(JSON.stringify(defaultMap)) 
-            }
-          ]
-        };
-        self.cockpit.rov.emit('plugin.settings-manager.saveSettings', { inputConfigurator: result });
-      }
-      else {
-        result = settings;
-        result.currentMap.forEach(function(mapping) {
-          var defaultItem = defaultMap.find(function(item) {
-            return mapping.name == item.name;
-          });
-          if (defaultItem) { 
-            mapping.description = defaultItem.description;
-            mapping.defaults = defaultItem.defaults; 
-          } // copy description and defaults
-        });
-      }
-      loaded(result);
-    });
-  };
-
-  InputConfigurator.prototype.loadDefaultMapping = function (callback) {
-    var self = this;
-    self.cockpit.emit('InputController.getCommands', function (commands) {
-      var currentMap = commands.map(function (command) {
-        var result = { name: command.name, bindings: [], description: command.description, defaults: command.defaults };
-        for (var bindingName in command.bindings) {
-          result.bindings.push({ name: bindingName, binding: command.bindings[bindingName] });
-        }
-        return result;
       });
-      callback(currentMap);
-    });
 
-  }
+      this.cockpit.on('plugin.inputConfigurator.deletePreset', function(presetToDelete) {
+        self.deletePreset(presetToDelete);
+      });
 
-  window.Cockpit.plugins.push(InputConfigurator);
-} (window, jQuery));
+      this.cockpit.on('plugin.inputConfigurator.savePreset', function(presetIn) {
+        self.savePreset(presetIn);
+      });
+      
+      this.cockpit.on('plugin.inputConfigurator.loadPreset', function(presetNameIn) {
+        self.loadPreset(presetNameIn);
+      });
+
+      this.cockpit.on('plugin.inputConfigurator.getSavedPresets', function() {
+        self.updateSavedPresetList();
+      });
+
+    };
+
+    copyPreset(presetIn)
+    {
+        var self = this;
+
+        var returnPreset = {
+            name: presetIn.name,
+            actions: new Map(),
+        };
+        
+        //Iterate through actions
+        presetIn.actions.forEach(function(action, actionName) {
+            var actionToAdd = new Map();
+
+            action.forEach(function(input, controllerName) {
+              actionToAdd.set(controllerName, jQuery.extend({}, input));  
+            });
+            returnPreset.actions.set(actionName, actionToAdd);
+        });
+        return returnPreset;
+    };
+    //Class methods
+    deletePreset(presetToDelete)
+    {
+      var self = this;
+
+      //Remove this preset, if found
+      for(var i = 0; i < self.settings.presets.length; ++i)
+      {
+        //Get the object
+        var preset = self.settings.presets[i];
+
+        if(preset.name == presetToDelete)
+        {
+          self.settings.presets.splice(i, 1);
+          break;
+        }
+      }
+      
+      //Update the server settings to reflect this new preset
+      self.cockpit.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
+    }
+    loadPreset(presetNameIn)
+    {
+      var self = this;
+      //Search the settings for the preset requested
+      var result = $.grep(self.settings.presets, function(preset){ 
+        return preset.name == presetNameIn; 
+      });
+
+      if(result.length == 0)
+      {
+        //No preset found with that name found. Don't load
+        return;
+      }
+      else if(result.length == 1)
+      {
+
+        var presetOut = result[0];
+        self.cockpit.emit('plugin.inputConfigurator.loadedPreset', presetOut);
+
+        //They loaded a preset, set the lastPreset to this name
+        self.settings.lastPreset = presetNameIn;
+
+        //Update the server settings to reflect this new preset
+        self.cockpit.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
+      }
+      else
+      {
+        return;
+      }
+    };
+    savePreset(presetIn)
+    {
+      var self = this;
+    
+      //Add this preset to our settings object
+      var presetName = presetIn.name;
+      
+      //Remove this preset, if found
+      for(var i = 0; i < self.settings.presets.length; ++i)
+      {
+        //Get the object
+        var tmpPreset = self.settings.presets[i];
+        if(tmpPreset.name == presetName)
+        {
+          self.settings.presets.splice(i, 1);
+          break;
+        }
+      }
+
+      //Add the preset
+      self.settings.presets.push(presetIn);
+      self.settings.lastPreset = presetIn.name;
+
+      //Update the server settings to reflect this new preset
+      self.cockpit.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
+    }
+
+    updateSavedPresetList()
+    {
+      var self = this;
+      
+      //Clear the array
+      self.savedPresets.length = 0;
+
+      //Update the saved preset name lists
+      for(var i = 0; i < self.settings.presets.length; ++i)
+      {
+        var preset = self.settings.presets[i];
+        self.savedPresets.push(preset.name);
+      }
+      
+      self.cockpit.emit('plugin.inputConfigurator.savedPresets', self.savedPresets);
+    }
+  };
+
+  
+  window.Cockpit.plugins.push(inputConfigurator.InputConfigurator);
+}(window, document)); 

@@ -22,6 +22,8 @@
   head.appendChild(js);
   var Blackbox = function Blackbox(cockpit) {
     console.log('Loading Blackbox plugin.');
+    var self = this;
+
     this.cockpit = cockpit;
     this.recording = false;
     this.idb;
@@ -29,19 +31,42 @@
     this.eventBuffer = [];
     this.otherBuffer = [];
     this.sessions_cache = [];
-  };
-  plugins.Blackbox = Blackbox;
-  Blackbox.prototype.inputDefaults = function inputDefaults() {
-    var self = this;
-    return [{
-        name: 'blackbox.record',
-        description: 'Start recording telemetry data.',
-        defaults: { keyboard: 'r' },
-        down: function () {
-          self.toggleRecording();
+
+    this.actions =
+    {
+      "plugin.blackbox.record":
+      {
+        description: 'Toggle recording of telemetry data.',
+        controls:
+        {
+          button:
+          {
+            down: function() {
+              self.toggleRecording();
+            }
+          }
         }
-      }];
+      }
+    };
+
+
+
+    this.inputDefaults =
+    {
+      keyboard:
+      {
+        r: { type: "button",
+             action: "plugin.blackbox.record" }
+      }
+    };
+
+
+    //If this was loaded after the input manager, let it know we are ready to be loaded
+    cockpit.emit('plugin.inputController.defaults', self.inputDefaults);
   };
+
+  plugins.Blackbox = Blackbox;
+
   Blackbox.prototype.listen = function listen() {
     var self = this;
     if (window.Dexie === undefined || window.CSV === undefined) {

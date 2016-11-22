@@ -31,48 +31,70 @@
                 "max": 5
             }
 
+            this.actions =
+            {
+                'plugin.lights.stepPositive':
+                {
+                    description: 'Make the ROV lights brighter.',
+                    controls:
+                    {
+                        button:
+                        {
+                            down: function() {
+                                cockpit.emit( 'plugin.lights.stepPositive' );
+                            }                            
+                        }
+                    }
+                },
+                'plugin.lights.stepNegative':
+                {
+                    description: 'Make the ROV lights dimmer.',
+                    controls:
+                    {
+                        button:
+                        {
+                            down: function() {
+                                cockpit.emit( 'plugin.lights.stepNegative' );
+                            }                            
+                        }
+                    }
+                },
+                'plugin.lights.toggle':
+                {
+                    description: 'Toggle the ROV lights on/off.',
+                    controls:
+                    {
+                        button:
+                        {
+                            down: function() {
+                                cockpit.emit( 'plugin.lights.toggle' );
+                            }                            
+                        }
+                    }
+                }
+            };
+
             // Setup input handlers
             this.inputDefaults = 
-            [
-              {
-                name: 'plugin.lights.stepPositive',
-                description: 'Makes the ROV lights brighter.',
-                defaults: 
+            {
+                keyboard: 
                 {
-                  keyboard: 'p',
-                  gamepad: 'DPAD_UP'
+                    "p": { type: "button",
+                           action: 'plugin.lights.stepPositive' },
+                    "o": { type: "button",
+                           action: 'plugin.lights.stepNegative' },
+                    "i": { type: "button",
+                           action: 'plugin.lights.toggle' },
                 },
-                down: function () 
+                gamepad: 
                 {
-                  cockpit.emit( 'plugin.lights.stepPositive' );
+                    "DPAD_UP": { type: "button",
+                           action: 'plugin.lights.stepPositive' },
+                    "DPAD_DOWN": { type: "button",
+                           action: 'plugin.lights.stepNegative' },
                 }
-              },
-              {
-                name: 'plugin.lights.stepNegative',
-                description: 'Makes the ROV lights dimmer.',
-                defaults: 
-                {
-                  keyboard: 'o',
-                  gamepad: 'DPAD_DOWN'
-                },
-                down: function () 
-                {
-                  cockpit.emit( 'plugin.lights.stepNegative' );
-                }
-              },
-              {
-                name: 'plugin.lights.toggle',
-                description: 'Toggles the ROV lights on/off.',
-                defaults: 
-                { 
-                  keyboard: 'i' 
-                },
-                down: function () 
-                {
-                  cockpit.emit( 'plugin.lights.toggle' );
-                }
-              }
-            ];
+            };
+               
         };
 
         updateFromStep()

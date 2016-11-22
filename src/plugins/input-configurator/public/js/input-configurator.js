@@ -66,18 +66,6 @@
         self.updateSavedPresetList();
       });
 
-      this.cockpit.on('plugin.inputConfigurator.extraOptionsChanged', function(extraOptions) {
-        self.updateExtraOptions(extraOptions);
-      });
-    };
-
-    updateExtraOptions(extraOptions)
-    {
-      var self = this;
-      self.settings.extraOptions.rovPilot = JSON.stringify(extraOptions, null, 2);
-
-      //Update the server settings to reflect this new preset
-      self.cockpit.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});
     };
 
     copyPreset(presetIn)

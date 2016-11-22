@@ -122,7 +122,8 @@
                 input: {
                   name: inputName,
                   controller: controllerName,
-                  type: input.type
+                  type: input.type,
+                  options: input.options
                 }
               };
 
@@ -398,7 +399,8 @@
       {
         var previousInput = {
           action: inputIn.action,
-          input: oldPreset.get(newInput.controller)
+          input: oldPreset.get(newInput.controller),
+          options: oldPreset.get(newInput.options)
         };
 
         var action = self.actions.get(inputIn.action).controls[newInput.type];
@@ -421,7 +423,7 @@
       var self = this;
 
 
-      //Grab the input object from the passed object      
+      //Grab the input object from the passed object     
       var newInput = inputIn.input;
       
       self.currentPreset.updateInput(inputIn.action, newInput);
@@ -454,14 +456,6 @@
 
       var hardware = self.controllers.get(input.controller);
       
-      //Check for inversions
-      if(self.rovPilotSettings.inversions !== undefined && input.type == "axis")
-      {
-        action.update = self.wrapInInversionCheck(inputIn, action.update);
-        action.update = self.wrapInExponentialStickCheck(inputIn, action.update);
-      }
-
-
       var inputForHardware = {
         action: action,
         input: input
@@ -538,56 +532,6 @@
 
       self.currentPreset.unregisterInput(inputIn.action, inputToUnregister);
     };
-
-    isInputInverted(inputIn)
-    {
-      var self = this;
-      return self.rovPilotSettings.inversions[inputIn.input.name];
-    };
-
-    exponentialSticksEnabled(inputIn)
-    {
-      var self = this;
-      return self.rovPilotSettings.exponentialSticks[inputIn.input.name].enabled;
-    };
-
-    getExponentialRate(inputIn)
-    {
-      var self = this;
-      return self.rovPilotSettings.exponentialSticks[inputIn.input.name].rate;
-    }
-    wrapInInversionCheck(inputIn, update)
-    {
-      var self = this;
-
-      //Check for inversion setting
-      return function(value) {
-        if(self.isInputInverted(inputIn))
-        {
-          value = -1 * value;
-        }
-        return update(value);
-      }
-    };
-    wrapInExponentialStickCheck(inputIn, update)
-    {
-      var self = this;
-      
-      //Check for exp sticks
-      return function(value)
-      {
-        if(self.exponentialSticksEnabled(inputIn))
-        {
-          var s = Math.sign(value);
-          value = Math.pow(value, self.getExponentialRate(inputIn));
-          if(Math.sign(value) !== s)
-          {
-            value = value * s;
-          }
-        }
-        return value;
-      }
-    };
   };
 
   //Helper classes
@@ -622,7 +566,17 @@
           var assignment = self.assignments.get(axis);
           if(typeof assignment.action.update == 'function')
           {
-            assignment.action.update(e.value);
+            var value = e.value;
+
+            if(assignment.options.inverted)
+            {
+              value = value * -1;
+            }
+            if(assignment.options.exponentialSticks.enabled)
+            {
+              value = self.applyExponentialSticks(value, assignment.options.exponentialSticks.rate);
+            }
+            assignment.action.update(value);
           }
         }
       });
@@ -673,6 +627,17 @@
         return;
       }
     };
+
+    applyExponentialSticks(value, rate)
+    {
+      var s = Math.sign(value);
+      value = Math.pow(value, rate);
+      if(Math.sign(value) !== s)
+      {
+        value = value * s;
+      }
+      return value;
+    };
   };
 
   /*Gamepad interface*/
@@ -689,10 +654,11 @@
     registerInput(inputIn)
     {
       var self = this;
-
       var input = inputIn.input;
+
       var inputToRegister = {
-        action: inputIn.action
+        action: inputIn.action,
+        options: input.options
       };
 
       self.gamepadAbstraction.assignments.set(input.name, inputToRegister);
@@ -738,7 +704,6 @@
 
       self.registerInput(inputToRegister);     
     };
-
   };
 
   /*Keyboard Interface*/

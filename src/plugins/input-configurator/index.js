@@ -30,34 +30,6 @@
 				"title": "Input Configurator",
 				"type": "object",
 				"properties": {
-					"extraOptions": {
-						"type": "object",
-						"exponentialRate": {
-							"type": "number"
-						},
-						"exponentialSticks": {
-							"type": "boolean",
-							"default": "false"
-						},
-						"inversions": {
-							"LEFT_STICK_X": {
-								"type": "boolean",
-								"default": "false"									
-							},
-							"LEFT_STICK_Y": {
-								"type": "boolean",
-								"default": "false"									
-							}, 
-							"RIGHT_STICK_X": {
-								"type": "boolean",
-								"default": "false"									
-							},
-							"RIGHT_STICK_Y": {
-								"type": "boolean",
-								"default": "false"									
-							}
-						}
-					},
 					"lastPreset": {
 						"type": "string",
 						"default": "undefined"

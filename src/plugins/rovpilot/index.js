@@ -151,6 +151,12 @@
         'id': 'rovPilot',
         'type': "object",
         'properties': {
+          'currentConfiguration':{
+            'type': 'string'
+          },
+          'configurations': {
+            'type': 'array'
+          },
           'exponentialSticks': {
             'LEFT_STICK_X': {
               'enabled': {

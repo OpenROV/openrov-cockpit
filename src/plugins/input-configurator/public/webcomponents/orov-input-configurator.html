@@ -630,6 +630,7 @@
                     }.bind(this);
                     
                     this.presetFunction = function(preset, actions) {
+                        
                         //Shallow copy to aviod references
                         self.preset = self.copyPreset(preset);
                         self.actions = actions;
@@ -761,7 +762,6 @@
                         name: presetIn.name,
                         actions: new Map(),
                     };
-                    
                     //Iterate through actions
                     presetIn.actions.forEach(function(action, actionName) {
                         var actionToAdd = new Map();
@@ -780,11 +780,8 @@
                 {
                     var self = this;
 
-                    //save the change to settings
-                    self.set(['rovPilotSettings.inversions', self.candidateBinding], self.$.invertAxisCheckbox.checked);
-                    self.eventEmitter.rov.emit('plugin.settings-manager.saveSettings', {rovPilot: self.rovPilotSettings});
-
-                    self.$.updatedExtraOptionsToast.open();
+                    //Set the value
+                    self.set("currentInversionSetting", self.$.invertAxisCheckbox.checked);
                 },
 
                 //Clear a conflicting gamepad binding
@@ -905,7 +902,7 @@
 
                     var self = this;
 
-                    //If there is no binding to change, dont' do anything
+                    //If there is no binding to change, don't do anything
                     if(self.candidateBinding == undefined)
                     {
                         return;
@@ -913,13 +910,6 @@
 
                     //Set our state
                     self.set("enableExponentialSticks",self.$.exponentialSticksCheckbox.checked);
-
-                    //Update our settings
-                    self.set(['rovPilotSettings.exponentialSticks', self.candidateBinding,'enabled'], self.$.exponentialSticksCheckbox.checked);
-                    self.eventEmitter.rov.emit('plugin.settings-manager.saveSettings', {rovPilot: self.rovPilotSettings});
-
-                    //Open the toast
-                    self.$.updatedExtraOptionsToast.open();
                 },
 
                 //User has entered a new exponential rate value
@@ -933,12 +923,7 @@
                     }
 
                     //Update our settings
-                    self.set(['rovPilotSettings.exponentialSticks', self.candidateBinding,'rate'], self.$.exponentialRateInput.value);
-                    self.eventEmitter.rov.emit('plugin.settings-manager.saveSettings', {rovPilot: self.rovPilotSettings});
-                    
-                    //Open the toast
-                    self.$.updatedExtraOptionsToast.open();
-
+                    self.set('rovPilotSettings.currentExponentialRate', self.$.exponentialRateInput.value);
                 },
 
                 //User has clicked a gamepad symbol
@@ -1156,14 +1141,25 @@
                         return;
                     }
 
-                    //Get the settings for this inversion
-                    self.set("currentInversionSetting", self.rovPilotSettings.inversions[self.candidateBinding]);
+                    //If this command is registered
+                    var action = self.preset.actions.get(self.selectedItem.name);
+                    if(action.has("gamepad"))
+                    {
+                        //Get the settings for this comand 
+                        var options = action.get("gamepad").options;
+                        self.set("currentInversionSetting", options.inverted);
+                        self.set("enableExponentialSticks", options.exponentialSticks.enabled);
+                        self.set("currentExponentialRate", options.exponentialSticks.rate);
+                    }
+                    else
+                    {
+                        //Set these to the defacto defaults
+                        self.set("currentInversionSetting", false);
+                        self.set("enableExponentialSticks", false);
+                        self.set("currentExponentialRate", 0.0);
+                    }
 
-                    //Get the settings for this exponential sticks
-                    self.set("enableExponentialSticks", self.rovPilotSettings.exponentialSticks[self.candidateBinding].enabled);
-                    self.set("currentExponentialRate", self.rovPilotSettings.exponentialSticks[self.candidateBinding].rate);
-
-                    //Actually open the modal
+                    //Open the modal
                     self.$.axisOptionsModal.open();
                 },
 
@@ -1296,10 +1292,8 @@
                         };
 
                         action.forEach(function(input, controllerName) {
-
                             binding[controllerName] = input;
                         }); 
-
                         var arrayInput = {
                             name: actionName,
                             description: self.actions.get(actionName).description,
@@ -1342,14 +1336,29 @@
                 updateGamepadInput: function() {
                     var self = this;
 
+                    var type = gamepadMap.get(self.candidateBinding);
                     var updatedInput = {
                         action: self.selectedItem.name,
                         input: {
                             name: self.candidateBinding,
                             controller: "gamepad",
-                            type: gamepadMap.get(self.candidateBinding)
+                            type: type
                         }
                     };
+
+                    if(type == "axis")
+                    {
+                        //Decorate the options for an axis command
+                        var options = {
+                            inverted: self.currentInversionSetting,
+                            exponentialSticks: {
+                                enabled: self.enableExponentialSticks,
+                                rate: self.currentExponentialRate
+                            }
+                        };
+                        updatedInput.input.options = options;
+                    }
+
                     self.eventEmitter.emit('plugin.inputController.updateInput', updatedInput);
 
                     //Open the update toast

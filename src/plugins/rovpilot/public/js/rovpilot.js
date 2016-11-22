@@ -25,64 +25,16 @@
       strafe: 0
     };
 
-    this.settings = {
-      exponentialSticks: {
-        LEFT_STICK_X: {
-          enabled: false,
-          rate: 1.0
-        },
-        LEFT_STICK_Y: {
-          enabled: false,
-          rate: 1.0
-        },
-        RIGHT_STICK_X: {
-          enabled: false,
-          rate: 1.0
-        },
-        RIGHT_STICK_Y: {
-          enabled: false,
-          rate: 1.0
-        }
-      },
-      inversions: {
-        LEFT_STICK_X: false,
-        LEFT_STICK_Y: false,
-        RIGHT_STICK_X: false,
-        RIGHT_STICK_Y: false
-      }
-    };
+    this.settings = {};
 
     var self = this;
 
     //Get the stick values
     self.cockpit.withHistory.on('settings-change.rovPilot', function (settings) {
+      
       //Init settings with defaults
-      if(settings.rovPilot == undefined)
-      {
-        self.cockpit.rov.emit('plugin.settings-manager.saveSettings', {rovPilot: self.settings});
-      }
-      else
-      {
-        //get the settings
-        self.settings = settings.rovPilot;
-      }
+      self.settings = settings.rovPilot;
     });
-
-    // //Helper function to set the exponentialRate value
-    // function postProcessStickValues(input) 
-    // {
-    //   if(self.extraOptions.exponentialSticks) 
-    //   {
-    //     var s = Math.sign(input);
-
-    //     input = Math.pow(input, self.extraOptions.exponentialRate);
-    //     if (Math.sign(input) !== s) 
-    //     {
-    //       input = input * s;
-    //     }
-    //   }
-    //   return input;
-    // }
 
     self.actions = 
     {
@@ -184,7 +136,6 @@
           axis: 
           {
             update: function(value) {
-               console.log(value);
                rov.cockpit.emit('plugin.rovpilot.setLift', value);
             }
           }
@@ -319,11 +270,35 @@
       gamepad:
       {
         "LEFT_STICK_Y": { type: "axis",
-                          action: 'rovPilot.moveThrottle' },
+                          action: 'rovPilot.moveThrottle',
+                          options: {
+                            inverted: false,
+                            exponentialSticks: {
+                              enabled: false,
+                              rate: 1.0
+                            }
+                          } 
+                        },
         "LEFT_STICK_X": { type: "axis",
-                          action: 'rovPilot.moveYaw' },
+                          action: 'rovPilot.moveYaw',
+                          options: {
+                            inverted: false,
+                            exponentialSticks: {
+                              enabled: false,
+                              rate: 1.0
+                            }
+                           } 
+                         },
         "RIGHT_STICK_Y": { type: "axis",
-                          action: 'rovPilot.moveLift' },
+                           action: 'rovPilot.moveLift',
+                           options: {
+                            inverted: false,
+                            exponentialSticks: {
+                              enabled: false,
+                              rate: 1.0
+                            }
+                          } 
+                         },
       }
     };
   };

@@ -640,16 +640,12 @@
                     }.bind(this);
 
                     emitter.on('plugin.inputConfigurator.savedPresets', this.getSavedPresetListFunction );
-                    emitter.rov.on('settings-change.inputConfigurator', this.onInputConfiguratorSettingsChanged );
-                    emitter.rov.on('settings-change.rovPilot', this.onRovPilotSettingsChanged );
+                    emitter.on('settings-change.inputConfigurator', this.onInputConfiguratorSettingsChanged );
+                    emitter.on('settings-change.rovPilot', this.onRovPilotSettingsChanged );
                     emitter.on('plugin.inputController.updatedPreset', this.presetFunction );
                 },
                 
                 detached: function(){
-                    this.eventEmitter.off('plugin.inputController.updatedPreset',this.presetFunction);
-                    this.eventEmitter.off('plugin.inputConfigurator.savedPresets',this.getSavedPresetListFunction);
-                    this.eventEmitter.rov.off('settings-change.inputConfigurator', this.onInputConfiguratorSettingsChanged );
-                    this.eventEmitter.rov.off('settings-change.rovPilot', this.onRovPilotSettingsChanged );    
                 },
 
                 attached: function() {

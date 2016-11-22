@@ -249,7 +249,7 @@
                     <paper-checkbox id="exponentialSticksCheckbox" checked="{{enableExponentialSticks}}" on-iron-change="handleEnableExponentialSticks">{{__('Enable Exponential Sticks')}}</paper-checkbox> 
                 </paper-item>
                 <paper-item>
-                    <paper-input id="exponentialRateInput" step="0.1" disabled="{{!enableExponentialSticks}}" label="rate" type="number" on-change="handleExponentialRateInput"></paper-input>
+                    <paper-input id="exponentialRateInput" step="0.1" value="{{currentExponentialRate}}"disabled="{{!enableExponentialSticks}}" label="rate" type="number" on-change="handleExponentialRateInput"></paper-input>
                 </paper-item>
             </paper-listbox>
 
@@ -535,6 +535,10 @@
                     conflictingBinding: {
                         type: Object,
                     },
+                    currentExponentialRate: {
+                        type: Number,
+                        
+                    },
                     currentInversionSetting: {
                         type: Boolean,
                     },
@@ -644,7 +648,7 @@
                     this.eventEmitter.off('plugin.inputController.updatedPreset',this.presetFunction);
                     this.eventEmitter.off('plugin.inputConfigurator.savedPresets',this.getSavedPresetListFunction);
                     this.eventEmitter.rov.off('settings-change.inputConfigurator', this.onInputConfiguratorSettingsChanged );
-                    this.eventEmitter.off('settings-change.rovPilot', this.onRovPilotSettingsChanged );    
+                    this.eventEmitter.rov.off('settings-change.rovPilot', this.onRovPilotSettingsChanged );    
                 },
 
                 attached: function() {
@@ -664,7 +668,7 @@
                     self.eventEmitter.emit('plugin.inputConfigurator.getSavedPresets', self.preset);  
 
                     //Get our settings as well
-                    if(self.settings == undefined)
+                    if(self.inputConfigurator == undefined)
                     {
                         self.eventEmitter.rov.emit('plugin.settings-manager.getSettings', "inputConfigurator", function(settings) {
                             self.set("inputConfiguratorSettings", settings.inputConfigurator);
@@ -777,7 +781,7 @@
                     var self = this;
 
                     //save the change to settings
-                    self.rovPilotSettings.inversions[self.candidateBinding] = self.$.invertAxisCheckbox.checked;
+                    self.set(['rovPilotSettings.inversions', self.candidateBinding], self.$.invertAxisCheckbox.checked);
                     self.eventEmitter.rov.emit('plugin.settings-manager.saveSettings', {rovPilot: self.rovPilotSettings});
 
                     self.$.updatedExtraOptionsToast.open();
@@ -909,12 +913,18 @@
 
                     //Set our state
                     self.set("enableExponentialSticks",self.$.exponentialSticksCheckbox.checked);
+
+                    //Update our settings
+                    self.set(['rovPilotSettings.exponentialSticks', self.candidateBinding,'enabled'], self.$.exponentialSticksCheckbox.checked);
+                    self.eventEmitter.rov.emit('plugin.settings-manager.saveSettings', {rovPilot: self.rovPilotSettings});
+
+                    //Open the toast
+                    self.$.updatedExtraOptionsToast.open();
                 },
 
                 //User has entered a new exponential rate value
                 handleExponentialRateInput: function() {
                     var self = this;
-                    console.log("in function")
 
                     //Sanity Checks
                     if(self.candidateBinding == undefined || !self.enableExponentialSticks)
@@ -922,8 +932,13 @@
                         return;
                     }
 
-                    //Update the settings for this 
-                    console.log(self.$.exponentialRateInput.value);
+                    //Update our settings
+                    self.set(['rovPilotSettings.exponentialSticks', self.candidateBinding,'rate'], self.$.exponentialRateInput.value);
+                    self.eventEmitter.rov.emit('plugin.settings-manager.saveSettings', {rovPilot: self.rovPilotSettings});
+                    
+                    //Open the toast
+                    self.$.updatedExtraOptionsToast.open();
+
                 },
 
                 //User has clicked a gamepad symbol
@@ -1145,7 +1160,8 @@
                     self.set("currentInversionSetting", self.rovPilotSettings.inversions[self.candidateBinding]);
 
                     //Get the settings for this exponential sticks
-                    //self.set("enableExponentialSticks", self.extraOptions.)
+                    self.set("enableExponentialSticks", self.rovPilotSettings.exponentialSticks[self.candidateBinding].enabled);
+                    self.set("currentExponentialRate", self.rovPilotSettings.exponentialSticks[self.candidateBinding].rate);
 
                     //Actually open the modal
                     self.$.axisOptionsModal.open();

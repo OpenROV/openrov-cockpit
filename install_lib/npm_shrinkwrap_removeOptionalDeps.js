@@ -34,20 +34,10 @@ finder.on('directory', function (dir, stat, stop) {
   currentdirectory = dir;
 });
 finder.on('end', function () {
-  installPackages(0, packagesToInstall);
+  fixPackages(0, packagesToInstall);
 });
-var installPackages = function (index, array) {
+var fixPackages = function (index, array) {
   var dir = array[index];
-  console.log('======== cleaning out old npm-shrinkwrap files if present =======');
-  try{
-    fs.unlinkSync(path.join(dir,'npm-shrinkwrap.json'))
-  }catch(e){
-    //ignore
-  }
-  console.log(dir + '/node_modules');
-  
-  console.log(exec('npm shrinkwrap', { cwd: dir,encoding:'utf8' }));
-
   //Now cleanup NPMs STUPID use of including optional dependencies https://github.com/npm/npm/issues/2679 that is a won't fix
   var package=require(path.join(dir,'package.json'));
   if (package.optionalDependencies){
@@ -61,6 +51,6 @@ var installPackages = function (index, array) {
   }
   index++;
   if (index < array.length) {
-    installPackages(index, array);
+    fixPackages(index, array);
   }
 };

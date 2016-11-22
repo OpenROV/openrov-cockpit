@@ -13,6 +13,7 @@
     "build:dev": "env 'npm_config_unsafe_perm=true' env 'npm_config_shrinkwrap=false' NODE_ENV=production npm install",    
     "test": "./node_modules/grunt-cli/bin/grunt test",
     "shrinkwrap": "NODE_ENV=production node install_lib/npm_shrinkwrap_all.js",
+    "prepshrinkwrap" : "node install_lib/npm_shrinkwrap_removeOptionalDeps.js",
     "install": "node install_lib/bower_install_all.js && node install_lib/npm_install_all.js"
   },
   "dependencies": {

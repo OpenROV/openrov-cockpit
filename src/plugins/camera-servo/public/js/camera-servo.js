@@ -18,47 +18,75 @@
             self.currentStep = 0;   // Alternative representation of targetPos
             self.stepMap = {};      // Automatically generated mapping of integer "steps" to target positions
 
-            // Setup input handlers
-            this.inputDefaults = [{
-                name: 'plugin.cameraServo.stepNegative',
-                description: 'Point the camera further down.',
-                defaults: 
-                {
-                    keyboard: 'z',
-                    gamepad: 'A'
-                },
-                down: function() 
-                {
-                    cockpit.emit( 'plugin.cameraServo.stepNegative' );
-                }
-            }, 
+            this.actions = 
             {
-                name: 'plugin.cameraServo.stepCenter',
-                description: 'Return camera to center position',
-                defaults: 
+                "plugin.cameraServo.stepPositive":
                 {
-                    keyboard: 'a',
-                    gamepad: 'B'
+                    description: 'Step camera up',
+                    controls:
+                    {
+                        button:
+                        {
+                            down: function() {
+                                cockpit.emit('plugin.cameraServo.stepPositive');
+                            }
+                        },
+                    }
+
                 },
-                down: function() 
+                "plugin.cameraServo.center":
                 {
-                    cockpit.emit( 'plugin.cameraServo.center' );
+                    description: 'Center camera',
+                    controls:
+                    {
+                        button:
+                        {
+                            down: function() {
+                                cockpit.emit('plugin.cameraServo.center');
+                            }
+                        }
+                    }
+
+                },
+                "plugin.cameraServo.stepNegative":
+                {
+                    description: 'Step camera down',
+                    controls:
+                    {
+                        button:
+                        {
+                            down: function() {
+                                cockpit.emit('plugin.cameraServo.stepNegative');
+                            }
+                        }
+                    }
                 }
-            }, 
+            };
+
+            this.inputDefaults = 
             {
-                name: 'plugin.cameraServo.stepPositive',
-                description: 'Point the camera further up.',
-                defaults: 
+                keyboard: 
                 {
-                    keyboard: 'q',
-                    gamepad: 'Y'
+                    q: { type: "button",
+                         action: "plugin.cameraServo.stepPositive" },
+                    a: { type: "button",
+                         action: "plugin.cameraServo.center" },
+                    z: { type: "button",
+                         action: "plugin.cameraServo.stepNegative" }
                 },
-                down: function()
+                gamepad: 
                 {
-                    cockpit.emit( 'plugin.cameraServo.stepPositive' );
+                    Y: { type: "button",
+                         action: "plugin.cameraServo.stepPositive" },
+                    B: { type: "button",
+                         action: "plugin.cameraServo.center" },
+                    A: { type: "button",
+                         action: "plugin.cameraServo.stepNegative" }
                 }
-            }];
+            };
         };
+
+        
 
         generateStepMap()
         {

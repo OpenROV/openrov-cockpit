@@ -12,23 +12,33 @@
 
             self.settings = null;     // These get sent by the local model
 
-            // Setup input handlers
-            this.inputDefaults = 
-            [
-              {
-                name: 'plugin.example.sayHello',
-                description: 'Invoke the node plugins sayHello() API',
-                defaults: 
+            //Set up actions associated with this plugin
+            this.actions = 
+            {
+                "plugin.example.sayHello":
                 {
-                  keyboard: 'alt+0'
-                },
-                down: function () 
-                {
-                  // Emit the sayHello message locally
-                  cockpit.emit( 'plugin.example.sayHello' );
+                    description: "Say Hello!",
+                    controls:
+                    {
+                        button:
+                        {
+                            down: function() {
+                                cockpit.emit('plugin.example.sayHello');
+                            }
+                        }
+                    }
                 }
-              }
-            ];
+            };
+
+            // Setup input handlers
+            this.inputDefaults =
+            {
+                keyboard:
+                {
+                    "alt+0": { type: "button",
+                               action: "plugin.example.sayHello"}
+                }
+            };
         };
 
         sayHello()

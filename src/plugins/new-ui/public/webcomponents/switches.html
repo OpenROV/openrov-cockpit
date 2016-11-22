@@ -71,7 +71,6 @@
         </content>
   </template>
   <script>
-
     //Helper functions to cleanly register and unregister event listeners 
     function registerEventListener(obj, params) {
       if(typeof obj._eventListeners == 'undefined')
@@ -99,7 +98,6 @@
 
       obj._eventListeners = [];
     }
-
     (function () {
       Polymer({
         is: 'orov-newui-switches',
@@ -114,8 +112,7 @@
         __oncontentLoaded: function(){
           var self=this;
 
-          this.set("_coveredControls",Polymer.dom(this).children.filter(function(item){return item.collectionDomElement==undefined}));
-          
+          this.set("_coveredControls",Polymer.dom(this).children.filter(function(item){return item.collectionDomElement==undefined}));          
           Polymer.dom(self).children.forEach(function(control){
 
             registerEventListener(control, {
@@ -124,8 +121,15 @@
                 self._swapStateClasses(self.$$("#"+control.shortName),e.detail);
               }
             });
-
             control.style.display="none";
+          });
+          
+        },
+        detached: function() {
+          var self=this;
+
+          Polymer.dom(self).children.forEach(function(control){
+            unRegisterAllEventListeners( control );
           });
         },
         detached: function() {

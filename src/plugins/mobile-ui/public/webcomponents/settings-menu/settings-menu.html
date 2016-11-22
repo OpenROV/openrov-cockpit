@@ -8,50 +8,41 @@
 
 <dom-module id="settings-menu">
 
-	<style type="text/css">
-
-		paper-dialog
-		{
-			color: white;
-			position: fixed;
-
-			top: 0px;
-			right: 0;
-			margin-top: 90px;
-			margin-right: 10px;
-			width: 20%;
-
-			overflow: auto;
-			border-radius: 5px;
-			background-color: rgba( 00, 00, 00, 0.7 );
-    	}
-
-		modal ::content > *
-		{
-			margin: 0;
-		}
-
-		grid-menu
-		{
-			--grid-menu-max-width: 235px;
-		}
-
-		grid-menu-button
-		{
-			color:white;
-		}
-
-		grid-menu-button[active]
-		{
-			color: black;
-			background-color: white;
-			--grid-menu-button-fill-color: black;
-		}
-
-	</style>
+    <style type="text/css">
+        paper-dialog {
+            color: white;
+            position: fixed;
+            top: 0px;
+            right: 0;
+            margin-top: 90px;
+            margin-right: 10px;
+            width: 20%;
+            overflow: auto;
+            border-radius: 5px;
+            background-color: rgba( 00, 00, 00, 0.7);
+        }
+        
+        modal ::content>* {
+            margin: 0;
+        }
+        
+        grid-menu {
+            --grid-menu-max-width: 235px;
+        }
+        
+        grid-menu-button {
+            color: white;
+        }
+        
+        grid-menu-button[active] {
+            color: black;
+            background-color: white;
+            --grid-menu-button-fill-color: black;
+        }
+    </style>
 
 
-	<template strip-whitespace>
+    <template strip-whitespace>
 		<grid-menu id="gridMenu" horizontal-align="left" horizontal-offset="-150" trigger-icon="settings">
 
 				<grid-menu-button action="callback" target="changeToDesktopUI" icon="image:palette" label="Theme"></grid-menu-button>
@@ -64,197 +55,224 @@
 				<grid-menu-button toggles id="heading" action="callback" target="toggleHeading" icon="maps:navigation" label="Heading"></grid-menu-button>
 				<grid-menu-button toggles id="depth" action="callback" target="toggleDepth" icon="icons:swap-vert" label="Depth"></grid-menu-button>
 				<grid-menu-button id="power" action="callback" target="incPower" icon="device:signal-cellular-1-bar" label="M.Power"></grid-menu-button>
-				<grid-menu-button id="compassMode" action="callback" target="compassMode" icon="av:av-timer" label="Comp/Gyro"></grid-menu-button>
+				<grid-menu-button id="compassMode" action="callback" target="toggleCompassMode" icon="av:av-timer" label="Comp/Gyro"></grid-menu-button>
 		</grid-menu>
 
 	</template>
 
 
-	<script>
-		( function()
-		{
-			Polymer(
-			{
-				is: 'settings-menu',
+    <script>
+        (function()
+        {
+            Polymer(
+            {
+                is: 'settings-menu',
+                properties: {
+                    powerLevel: {
+                        type: Number,
+                        value: function() {
+                            return 0
+                        }
+                    },
+                    compassMode: {
+                        type: String,
+                        value: function() {
+                            return "gyro"
+                        }
+                    }
+                },
+                listeners:
+                {
+                    'menuSelection': 'handleMenuSelection'
+                },
 
-				listeners:
-				{
-					'menuSelection': 'handleMenuSelection'
-				},
-
-				behaviors: [namespace('behaviors').oROVStandard],
-				powerLevel: 0,
-
+                behaviors: [namespace('behaviors')
+                    .oROVStandard
+                ],
 				handleMenuSelection: function(e)
-				{
-					if( e.detail.action == "callback" )
-					{
-						if( this[ e.detail.target ] !== undefined )
-						{
-							this[ e.detail.target ]( e );
-						}
-					}
-				},
-				
-				registerEmitterHandlers: function(emitter){
-						var self=this;
-             emitter.withHistory.on('plugin-blackbox-recording-status', function(recording){
-							 if(recording){
-								 self.$.record.active=true;
-							 } else {
-								 self.$.record.active=false;
-							 }
-						 });
-						 
-             emitter.withHistory.on('plugin.lights.currentPower', function(power){
-							 if(power>0){
-								 self.$.lights.active=true;
-							 } else {
-								 self.$.lights.active=false;
-							 }
-						 });
-						 
-             emitter.withHistory.on('plugin.lasers.state', function(state){
-							 if(state.level>0){
-								 self.$.lasers.active=true;
-							 } else {
-								 self.$.lasers.active=false;
-							 }
-						 });
-						 
-             emitter.withHistory.on('plugin.rovpilot.headingHold.state', function(state){
-							 if(state.enabled){
-								 self.$.heading.active=true;
-							 } else {
-								 self.$.heading.active=false;
-							 }
-						 });
+                {
+                    if (e.detail.action == "callback")
+                    {
+                        if (this[e.detail.target] !== undefined)
+                        {
+                            this[e.detail.target](e);
+                        }
+                    }
+                },
 
-             emitter.withHistory.on('plugin.rovpilot.setPowerLevel', function(value){							 
-								 self.$.power.icon = "device:signal-cellular-" + (value-1) + "-bar";
-								 self.powerLevel=value;
-						 });
+                registerEmitterHandlers: function(emitter) {
+                    var self = this;
+                    emitter.withHistory.on('plugin-blackbox-recording-status', function(recording) {
+                        if (recording) {
+                            self.$.record.active = true;
+                        } else {
+                            self.$.record.active = false;
+                        }
+                    });
 
-						 
-             emitter.withHistory.on('plugin.rovpilot.depthHold.state', function(state){
-							 if(state.enabled){
-								 self.$.depth.active=true;
-							 } else {
-								 self.$.depth.active=false;
-							 }
-						 });					 						 						 						 
-				},
+                    emitter.withHistory.on('plugin.lights.currentPower', function(power) {
+                        if (power > 0) {
+                            self.$.lights.active = true;
+                        } else {
+                            self.$.lights.active = false;
+                        }
+                    });
 
-				handleTap: function(e)
-				{
-				},
+                    emitter.withHistory.on('plugin.lasers.state', function(state) {
+                        if (state.level > 0) {
+                            self.$.lasers.active = true;
+                        } else {
+                            self.$.lasers.active = false;
+                        }
+                    });
 
-				toggleFullscreen: function(e)
-				{
-					if (!document.fullscreenElement &&    // alternative standard method
-				      !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {  // current working methods
-				    if (document.documentElement.requestFullscreen) {
-				      document.documentElement.requestFullscreen();
-				    } else if (document.documentElement.msRequestFullscreen) {
-				      document.documentElement.msRequestFullscreen();
-				    } else if (document.documentElement.mozRequestFullScreen) {
-				      document.documentElement.mozRequestFullScreen();
-				    } else if (document.documentElement.webkitRequestFullscreen) {
-				      document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-				    }
-				  } else {
-				    if (document.exitFullscreen) {
-				      document.exitFullscreen();
-				    } else if (document.msExitFullscreen) {
-				      document.msExitFullscreen();
-				    } else if (document.mozCancelFullScreen) {
-				      document.mozCancelFullScreen();
-				    } else if (document.webkitExitFullscreen) {
-				      document.webkitExitFullscreen();
-				    }
-				  }
-				},
+                    emitter.withHistory.on('plugin.rovpilot.headingHold.state', function(state) {
+                        if (state.enabled) {
+                            self.$.heading.active = true;
+                        } else {
+                            self.$.heading.active = false;
+                        }
+                    });
 
-				toggleLights: function( e )
-				{
-					if( e.detail.active )
-					{
-						console.log( "turning lights on" );
-						this.eventEmitter.emit( 'plugin.lights.on' );
-						this.eventEmitter.emit( 'plugin.externalLights.on' );
-					}
-					else
-					{
-						console.log( "turning lights off" );
-						this.eventEmitter.emit( 'plugin.lights.off' );
-						this.eventEmitter.emit( 'plugin.externalLights.off' );
-					}
-				},
+                    emitter.withHistory.on('plugin.rovpilot.setPowerLevel', function(value) {
+                        self.$.power.icon = "device:signal-cellular-" + (value - 1) + "-bar";
+                        self.powerLevel = value;
+                    });
 
-				toggleLasers: function( e )
-				{
-					if( e.detail.active )
-					{
-						this.eventEmitter.emit( 'plugin.laser.set', 1 );
-					}
-					else
-					{
-						this.eventEmitter.emit( 'plugin.laser.set', 0 );
-					}
-				},
-								
-				toggleRecord: function( e )
-				{
-					if( e.detail.active  )
-					{
-						this.eventEmitter.emit( 'plugin-blackbox-recording-start');
-					}
-					else
-					{
-						this.eventEmitter.emit( 'plugin-blackbox-recording-stop' );
-					}
-				},				
 
-				toggleDepth: function( e )
-				{
-					if( e.detail.active  )
-					{
-						this.eventEmitter.emit( 'plugin.rovpilot.depthHold.set-enabled', true );
-					}
-					else
-					{
-						this.eventEmitter.emit( 'plugin.rovpilot.depthHold.set-enabled', false );
-					}
-				},
+                    emitter.withHistory.on('plugin.rovpilot.depthHold.state', function(state) {
+                        if (state.enabled) {
+                            self.$.depth.active = true;
+                        } else {
+                            self.$.depth.active = false;
+                        }
+                    });
 
-				toggleHeading: function( e )
-				{
-					if( e.detail.active  )
-					{
-						this.eventEmitter.emit( 'plugin.rovpilot.headingHold.set-enabled',true );
-					}
-					else
-					{
-						this.eventEmitter.emit( 'plugin.rovpilot.headingHold.set-enabled',false );
-					}
-				},
-				incPower: function(e){
-					this.powerLevel+=1;
-					if (this.powerLevel>5){
-						this.powerLevel=1;
-					}
-					this.eventEmitter.emit('plugin.rovpilot.setPowerLevel',this.powerLevel);
-				},
-				compassMode: function(e){
-					alert("The compass needs to signal the hardware to change modes")
-				},
+        			 emitter.withHistory.on('plugin.navigationData.state', function(state){
+            			if (state.imuMode){					
+                        	self.set("compassMode", state.imuMode);
+                    	};
+		  			 });
 
-				changeToDesktopUI: function( e )
-				{
-					this.eventEmitter.emit( "plugin.settings-manager.persist-data", { "ui-manager": { "selectedUI": "new-ui" } }, function(){ location.reload(); } );
-				}
-			} );
-		}() );
+                },
 
-	</script>
+
+                handleTap: function(e) {},
+
+                toggleFullscreen: function(e)
+                {
+                    if (!document.fullscreenElement && // alternative standard method
+                        !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) { // current working methods
+                        if (document.documentElement.requestFullscreen) {
+                            document.documentElement.requestFullscreen();
+                        } else if (document.documentElement.msRequestFullscreen) {
+                            document.documentElement.msRequestFullscreen();
+                        } else if (document.documentElement.mozRequestFullScreen) {
+                            document.documentElement.mozRequestFullScreen();
+                        } else if (document.documentElement.webkitRequestFullscreen) {
+                            document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+                        }
+                    } else {
+                        if (document.exitFullscreen) {
+                            document.exitFullscreen();
+                        } else if (document.msExitFullscreen) {
+                            document.msExitFullscreen();
+                        } else if (document.mozCancelFullScreen) {
+                            document.mozCancelFullScreen();
+                        } else if (document.webkitExitFullscreen) {
+                            document.webkitExitFullscreen();
+                        }
+                    }
+                },
+
+                toggleLights: function(e)
+                {
+                    if (e.detail.active)
+                    {
+                        console.log("turning lights on");
+                        this.eventEmitter.emit('plugin.lights.on');
+                        this.eventEmitter.emit('plugin.externalLights.on');
+                    }
+                    else
+                    {
+                        console.log("turning lights off");
+                        this.eventEmitter.emit('plugin.lights.off');
+                        this.eventEmitter.emit('plugin.externalLights.off');
+                    }
+                },
+
+                toggleLasers: function(e)
+                {
+                    if (e.detail.active)
+                    {
+                        this.eventEmitter.emit('plugin.laser.set', 1);
+                    }
+                    else
+                    {
+                        this.eventEmitter.emit('plugin.laser.set', 0);
+                    }
+                },
+
+                toggleRecord: function(e)
+                {
+                    if (e.detail.active)
+                    {
+                        this.eventEmitter.emit('plugin-blackbox-recording-start');
+                    }
+                    else
+                    {
+                        this.eventEmitter.emit('plugin-blackbox-recording-stop');
+                    }
+                },
+
+                toggleDepth: function(e)
+                {
+                    if (e.detail.active)
+                    {
+                        this.eventEmitter.emit('plugin.rovpilot.depthHold.set-enabled', true);
+                    }
+                    else
+                    {
+                        this.eventEmitter.emit('plugin.rovpilot.depthHold.set-enabled', false);
+                    }
+                },
+
+                toggleHeading: function(e)
+                {
+                    if (e.detail.active)
+                    {
+                        this.eventEmitter.emit('plugin.rovpilot.headingHold.set-enabled', true);
+                    }
+                    else
+                    {
+                        this.eventEmitter.emit('plugin.rovpilot.headingHold.set-enabled', false);
+                    }
+                },
+                incPower: function(e) {
+                    this.powerLevel += 1;
+                    if (this.powerLevel > 5) {
+                        this.powerLevel = 1;
+                    }
+                    this.eventEmitter.emit('plugin.rovpilot.setPowerLevel', this.powerLevel);
+                },
+                toggleCompassMode: function(e) {
+					if (this.eventEmitter){
+						var newState  = {imuMode:this.compassMode == "compass" ? "gyro" : "compass"}
+                    	this.eventEmitter.emit('plugin.navigationData.setState',newState );
+					}
+                },
+
+                changeToDesktopUI: function(e)
+                {
+                    this.eventEmitter.emit("plugin.settings-manager.persist-data", {
+                        "ui-manager": {
+                            "selectedUI": "new-ui"
+                        }
+                    }, function() {
+                        location.reload();
+                    });
+                }
+            });
+        }());
+    </script>
 </dom-module>

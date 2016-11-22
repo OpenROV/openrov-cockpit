@@ -195,7 +195,10 @@
           'heading.tap': 'toggleHeadingLock'
         },
         toggleMode: function(e) {
-          this.isCompass = !this.isCompass;
+          if (this.eventEmitter){
+						var newState  = {imuMode:this.isCompass? "gyro" : "compass"}
+            this.eventEmitter.emit('plugin.navigationData.setState',newState );
+					}
         },
         toggleHeadingLock: function(e) {
           this.$.headingLock = !this.$.headingLock;
@@ -222,6 +225,21 @@
           emitter.on('plugin.navigationData.data', function(data) {
             newData = data;
           }); 
+
+          emitter.withHistory.on('plugin.navigationData.state', function(state){
+            if (state.imuMode){
+              switch(state.imuMode){
+                case "compass":
+                  self.set("isCompass",true);
+                break;
+                case "gyro":
+                  self.set("isCompass",false);
+                break;
+                default:
+                  throw new Error("Unknown imu_mode: ",mode);
+              }
+            }
+          })
         },
         attached: function() {
           var self = this;

@@ -9,18 +9,29 @@
             var self=this;
             this.cockpit = cockpit;
             this.rov = cockpit.rov;
- 
-            this.inputDefaults = function inputDefaults() {
-                var self = this;
-                return [{
-                    name: 'systemDiagnostics.popup',
+
+            this.actions =  {
+              'systemDiagnostics.popup':{
                     description: 'Opens the diagnostics applet in a new window.',
-                    defaults: { keyboard: 'ctrl+s d i a g' },
-                    down: function () {
-                     window.open('popup?app=_system_diagnostics');
+                    controls: {
+                        button: {
+                            down: function() {
+                              window.open('popup?app=_system_diagnostics');
+                            }         
+                        }
                     }
-                }];
-            };
+                }
+            }
+
+            this.inputDefaults = {
+                keyboard: {
+                    "alt+s d i a g": { 
+                        type: "button",
+                        action: 'systemDiagnostics.popup' }
+                }
+            }
+
+
 
             this.cockpit.on("mcu.ResetMCU",function(){
                 self.rov.emit("mcu.ResetMCU");              

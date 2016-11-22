@@ -39,7 +39,8 @@
       this.needToSaveDefaults = true;
       this.checkForLastPreset = true;
       this.defaultPresetName = "defaults";
-      this.settings = {};
+      this.inputConfiguratorSettings = {};
+      this.rovPilotSettings = {};
 
       this.deferSetupForMousetrap();
     };
@@ -136,10 +137,10 @@
 
       //Listen for server setting changes
       this.cockpit.rov.on('settings-change.inputConfigurator', function(settings) {
-          self.settings = settings.inputConfigurator;
+          self.inputConfiguratorSettings = settings.inputConfigurator;
           if(self.checkForLastPreset)
           {
-            var lastPresetName = self.settings.lastPreset;
+            var lastPresetName = self.inputConfiguratorSettings.lastPreset;
             if(lastPresetName !== undefined && lastPresetName !== self.defaultPresetName)
             {
               //Load the last preset 
@@ -147,6 +148,9 @@
             }
             self.checkForLastPreset = false;
           }
+      });
+      this.cockpit.rov.on('settings-change.rovPilot', function(settings) {
+          self.rovPilotSettings = settings.rovPilot;
       });
 
       this.cockpit.on('plugin.inputController.sendPreset', function() {
@@ -450,10 +454,13 @@
 
       var hardware = self.controllers.get(input.controller);
       
-      if(self.settings.extraOptions !== undefined && input.type == "axis")
+      //Check for inversions
+      if(self.rovPilotSettings.inversions !== undefined && input.type == "axis")
       {
         action.update = self.wrapInInversionCheck(inputIn, action.update);
+        action.update = self.wrapInExponentialStickCheck(inputIn, action.update);
       }
+
 
       var inputForHardware = {
         action: action,
@@ -535,20 +542,50 @@
     isInputInverted(inputIn)
     {
       var self = this;
-      return self.setting.extraOptions.inversions[inputIn.input.name];
+      return self.rovPilotSettings.inversions[inputIn.input.name];
     };
 
+    exponentialSticksEnabled(inputIn)
+    {
+      var self = this;
+      return self.rovPilotSettings.exponentialSticks[inputIn.input.name].enabled;
+    };
+
+    getExponentialRate(inputIn)
+    {
+      var self = this;
+      return self.rovPilotSettings.exponentialSticks[inputIn.input.name].rate;
+    }
     wrapInInversionCheck(inputIn, update)
     {
       var self = this;
 
       //Check for inversion setting
       return function(value) {
-        if(self.isInputInverted)
+        if(self.isInputInverted(inputIn))
         {
           value = -1 * value;
         }
         return update(value);
+      }
+    };
+    wrapInExponentialStickCheck(inputIn, update)
+    {
+      var self = this;
+      
+      //Check for exp sticks
+      return function(value)
+      {
+        if(self.exponentialSticksEnabled(inputIn))
+        {
+          var s = Math.sign(value);
+          value = Math.pow(value, self.getExponentialRate(inputIn));
+          if(Math.sign(value) !== s)
+          {
+            value = value * s;
+          }
+        }
+        return value;
       }
     };
   };

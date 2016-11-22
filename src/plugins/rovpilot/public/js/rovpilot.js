@@ -68,21 +68,21 @@
       }
     });
 
-    //Helper function to set the exponentialRate value
-    function postProcessStickValues(input) 
-    {
-      if(self.extraOptions.exponentialSticks) 
-      {
-        var s = Math.sign(input);
+    // //Helper function to set the exponentialRate value
+    // function postProcessStickValues(input) 
+    // {
+    //   if(self.extraOptions.exponentialSticks) 
+    //   {
+    //     var s = Math.sign(input);
 
-        input = Math.pow(input, self.extraOptions.exponentialRate);
-        if (Math.sign(input) !== s) 
-        {
-          input = input * s;
-        }
-      }
-      return input;
-    }
+    //     input = Math.pow(input, self.extraOptions.exponentialRate);
+    //     if (Math.sign(input) !== s) 
+    //     {
+    //       input = input * s;
+    //     }
+    //   }
+    //   return input;
+    // }
 
     self.actions = 
     {
@@ -126,8 +126,7 @@
           axis: 
           {
             update: function(value) {
-              var result = postProcessStickValues(value);
-              rov.cockpit.emit('plugin.rovpilot.setThrottle', result);
+              rov.cockpit.emit('plugin.rovpilot.setThrottle', value);
             }
           }
         }
@@ -140,8 +139,7 @@
           axis: 
           {
             update: function(value) {
-               var result = postProcessStickValues(value);
-               rov.cockpit.emit('plugin.rovpilot.setYaw', result);
+               rov.cockpit.emit('plugin.rovpilot.setYaw', value);
             }
           }
         }
@@ -186,8 +184,8 @@
           axis: 
           {
             update: function(value) {
-               var result = postProcessStickValues(value);
-               rov.cockpit.emit('plugin.rovpilot.setLift', result);
+               console.log(value);
+               rov.cockpit.emit('plugin.rovpilot.setLift', value);
             }
           }
         }

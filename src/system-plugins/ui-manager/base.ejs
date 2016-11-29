@@ -102,6 +102,7 @@ ga('send', 'pageview');
   <script>window.openrovtheme='<%=theme%>'</script>  
   <link id="lazyScripts" rel="import" href="/all_scripts.html" async>
   <link rel="import" href="components/polymer/polymer.html">
+
 <style>
     body.loading #splash {
         opacity: 1;
@@ -188,12 +189,12 @@ ga('send', 'pageview');
     }
     
     #quote {
-        padding-top: 5em;
+        padding-top: 10em;
         margin: 0.3em;
         font-family: 'Lato', sans-serif; 
         font-style: italic;
-        font-size: 4em;
-        animation: fadein 3s;
+        font-size: 3em;
+        animation: fadein 2.5s;
     }
     @keyframes fadein {
         from { opacity: 0; }
@@ -201,15 +202,17 @@ ga('send', 'pageview');
     }    
     
     #author {
-        font-family: 'Open Sans', sans-serif;
+        font-family: 'Lato', sans-serif; 
         font-size: 1.5em;
-        animation: fadein 6s;
+        animation: fadein 2.5s;
     }
     
     #loading {
-        font-family: 'Open Sans', sans-serif;
-        font-size: 1.0em;
-        padding-top: 15em;
+        padding-top: 5em;
+        margin-bottom: 0.3em;
+
+        font-family: 'Lato', sans-serif; 
+        font-size: 4em;
     }
     /*prevent many large-by-comparison ripples by shrinking the height*/
     
@@ -228,8 +231,8 @@ ga('send', 'pageview');
         margin: 40px auto;
         background-color: white;
         border-radius: 100%;
-        -webkit-animation: sk-pulseScaleOut 1s infinite ease-in-out;
-        animation: sk-pulseScaleOut 1s infinite ease-in-out;
+        -webkit-animation: sk-pulseScaleOut 2s infinite ease-in-out;
+        animation: sk-pulseScaleOut 2s infinite ease-in-out;
     }
     
     @-webkit-keyframes sk-pulseScaleOut {
@@ -279,20 +282,27 @@ ga('send', 'pageview');
     <div class="content">
         <h1> </h1>
 
-        <!--Here we can load quotes and authors from a json file -->
-        <p id="quote">The Sea, once it casts its spell, holds one in its net of wonder forever.</p>
-        <p id="author">- Jacques Cousteau -</p>
-
-        <div id="loading">
-            <p> Connecting to the ROV </p>
-        </div>
-
+        <p id="loading"> Connecting to the ROV </p>
         <div class="sk-spinner sk-spinner-pulse" style="margin: 40px auto;"></div>
 
-
+        <!--Here we can load quotes and authors from a json file, but use the Cousteau quote as a fallback -->
+        <p id="quote">The Sea, once it casts its spell, holds one in its net of wonder forever.</p>
+        <p id="author">-  Jacques Cousteau  -</p>
+        
     </div>
-
 </div>
+<script>
+  //Get from filesystem
+  fetch('./loading_screen_quotes.json').then(function(response) {
+    //convert to json
+    return response.json();
+  }).then(function(obj) {
+    var index = Math.floor(Math.random() * obj.quotes.length);
+    document.getElementById("quote").innerHTML = obj.quotes[index].quote;
+    document.getElementById("author").innerHTML = '-  ' + obj.quotes[index].author + '  -';
+  });
+</script>
+
 <link rel="import" href="components/platinum-sw/platinum-sw-register.html">
 <link rel="import" href="components/platinum-sw/platinum-sw-cache.html">
 <link rel="import" href="components/platinum-sw/platinum-sw-fetch.html">

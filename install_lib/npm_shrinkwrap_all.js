@@ -6,7 +6,7 @@ var currentdirectory = process.cwd();
 var packagesToInstall = [];
 var path = require('path');
 const fs = require('fs');
-
+var OptionalPackagesToInclude=['geo-video-server'];
 finder.on('file', function (file, stat) {
   if (file.indexOf('package.json') > -1) {
     console.log(file + ' |||| ' + process.cwd());
@@ -55,7 +55,12 @@ var installPackages = function (index, array) {
     var optionalDeps = Object.keys(package.optionalDependencies);
     var npmShrinkwrap = require(path.join(dir,'npm-shrinkwrap.json'));
     optionalDeps.forEach(function(optionalDep) {
-          delete npmShrinkwrap.dependencies[optionalDep];
+          if (!OptionalPackagesToInclude.includes(optionalDep)){
+            console.log(`Removing ${optionalDep} as it is an optional dependency`)
+            delete npmShrinkwrap.dependencies[optionalDep];
+          } else {
+            console.log(`Retaining ${optionalDep} per blacklist rules`)
+          }
     });  
     fs.writeFileSync(path.join(dir,'npm-shrinkwrap.json'), JSON.stringify(npmShrinkwrap, null, 4), 'utf8');
   }

@@ -292,6 +292,11 @@
             "from": "fresh@0.3.0",
             "resolved": "https://registry.npmjs.org/fresh/-/fresh-0.3.0.tgz"
         },
+        "geo-video-server": {
+            "version": "0.7.0",
+            "from": "git+https://github.com/OpenROV-Dev/geo-video-server.git",
+            "resolved": "git+https://github.com/OpenROV-Dev/geo-video-server.git#9562dc93db675ddef71be201adfda4e4db3490b9"
+        },
         "geo-video-simulator": {
             "version": "0.9.0",
             "from": "git+https://github.com/OpenROV-Dev/geo-video-simulator.git",

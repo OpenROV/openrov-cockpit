@@ -132,13 +132,6 @@
             unRegisterAllEventListeners( control );
           });
         },
-        detached: function() {
-          var self = this;
-
-          Polymer.dom(self).children.forEach(function(control) {
-            unRegisterAllEventListeners(control);
-          });
-        },
         _getClasses:function(state){
           switch(state){
             case 'on':

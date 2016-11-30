@@ -146,17 +146,18 @@
           this.listeners.setTargetPower.disable();
         }
 
-        // getSettingSchema()
-        // {
-        //     //from http://json-schema.org/examples.html
-        //     return [{
-        //         'title': 'Lights',
-        //         'type': 'object',
-        //         'id': 'lights',
-        //         'properties': {},
-        //         'required': []
-        //     }];
-        // }
+        getSettingSchema()
+        {
+            //from http://json-schema.org/examples.html
+            return [{
+                'title': 'Lights',
+                'type': 'object',
+                'managedBy': '_hidden',                
+                'id': 'lights',
+                'properties': {},
+                'required': []
+            }];
+        }
     }
 
     module.exports = function(name, deps) 

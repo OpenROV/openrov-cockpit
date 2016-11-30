@@ -146,17 +146,18 @@
           this.listeners.setTargetPower.disable();
         }
 
-        // getSettingSchema()
-        // {
-        //     //from http://json-schema.org/examples.html
-        //     return [{
-        //         'title': 'External Lights',
-        //         'type': 'object',
-        //         'id': 'external-lights',
-        //         'properties': {},
-        //         'required': []
-        //     }];
-        // }
+        getSettingSchema()
+        {
+            //from http://json-schema.org/examples.html
+            return [{
+                'title': 'External Lights',
+                'type': 'object',
+                'id': 'external-lights',
+                'managedBy': '_hidden',
+                'properties': {},
+                'required': []
+            }];
+        }
     }
 
     module.exports = function(name, deps) 

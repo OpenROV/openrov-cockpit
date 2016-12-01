@@ -187,35 +187,60 @@ ga('send', 'pageview');
         font-weight: 100;
         font-size: 4em;
     }
-    
-    #quote {
-        padding-top: 10em;
-        margin: 0.3em;
-        font-family: 'Lato', sans-serif; 
-        font-style: italic;
-        font-size: 3em;
-        animation: fadein 2.5s;
-    }
+
     @keyframes fadein {
         from { opacity: 0; }
         to   { opacity: 1; }
     }    
     
-    #author {
-        font-family: 'Lato', sans-serif; 
-        font-size: 1.5em;
-        animation: fadein 2.5s;
-    }
-    
     #loading {
-        padding-top: 5em;
-        margin-bottom: 0.3em;
+      height: 15%;
+      text-align: center;
+      
+      display: flex;
+      justify-content: center;
+      align-items: center;
 
-        font-family: 'Lato', sans-serif; 
-        font-size: 4em;
+      font-family: 'Lato', sans-serif; 
+      font-size: 3.5em;
     }
+
+    #quote {
+      height: auto;
+      text-align: center;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      position: relative;
+      margin: 0 auto;
+      top: 20%;
+
+      font-family: 'Lato', sans-serif; 
+      font-style: italic;
+      font-size: 3em;
+      animation: fadein 2.5s;
+    }
+
+    #author {
+      height: 5%;
+      text-align: center;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      position: relative;
+      margin: auto;
+      top: 25%;
+
+      font-family: 'Lato', sans-serif; 
+      font-size: 1.5em;
+      animation: fadein 2.5s;
+    }
+
     /*prevent many large-by-comparison ripples by shrinking the height*/
-    
     @media (max-width: 50em) {
         .content h1 {
             font-size: 12vmax;
@@ -282,13 +307,18 @@ ga('send', 'pageview');
     <div class="content">
         <h1> </h1>
 
-        <p id="loading"> Connecting to the ROV </p>
-        <div class="sk-spinner sk-spinner-pulse" style="margin: 40px auto;"></div>
+        <div id="loading">
+          Connecting to the ROV
+        </div>
+        <div class="sk-spinner sk-spinner-pulse" style="margin: auto;"></div>
 
         <!--Here we can load quotes and authors from a json file, but use the Cousteau quote as a fallback -->
-        <p id="quote">The Sea, once it casts its spell, holds one in its net of wonder forever.</p>
-        <p id="author">-  Jacques Cousteau  -</p>
-        
+        <div id="quote">
+          The Sea, once it casts its spell, holds one in its net of wonder forever.
+        </div>
+        <div id="author">
+          -  Jacques Cousteau  -
+        </div>
     </div>
 </div>
 <script>

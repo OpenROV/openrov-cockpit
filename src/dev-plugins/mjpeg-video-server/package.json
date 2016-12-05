@@ -1,0 +1,81 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "mjpeg-video-server@git+https://github.com/OpenROV-Dev/mjpeg-video-server.git#4bfe75dd1fd24b9307c78d16171a04dcc5b004cb",
+        "scope": null,
+        "escapedName": "mjpeg-video-server",
+        "name": "mjpeg-video-server",
+        "rawSpec": "git+https://github.com/OpenROV-Dev/mjpeg-video-server.git#4bfe75dd1fd24b9307c78d16171a04dcc5b004cb",
+        "spec": "git+https://github.com/OpenROV-Dev/mjpeg-video-server.git#4bfe75dd1fd24b9307c78d16171a04dcc5b004cb",
+        "type": "hosted",
+        "hosted": {
+          "type": "github",
+          "ssh": "git@github.com:OpenROV-Dev/mjpeg-video-server.git#4bfe75dd1fd24b9307c78d16171a04dcc5b004cb",
+          "sshUrl": "git+ssh://git@github.com/OpenROV-Dev/mjpeg-video-server.git#4bfe75dd1fd24b9307c78d16171a04dcc5b004cb",
+          "httpsUrl": "git+https://github.com/OpenROV-Dev/mjpeg-video-server.git#4bfe75dd1fd24b9307c78d16171a04dcc5b004cb",
+          "gitUrl": "git://github.com/OpenROV-Dev/mjpeg-video-server.git#4bfe75dd1fd24b9307c78d16171a04dcc5b004cb",
+          "shortcut": "github:OpenROV-Dev/mjpeg-video-server#4bfe75dd1fd24b9307c78d16171a04dcc5b004cb",
+          "directUrl": "https://raw.githubusercontent.com/OpenROV-Dev/mjpeg-video-server/4bfe75dd1fd24b9307c78d16171a04dcc5b004cb/package.json"
+        }
+      },
+      "/home/mcpikeda/projects/openrov-cockpit/src/plugins/mjpeg-video"
+    ]
+  ],
+  "_from": "git+https://github.com/OpenROV-Dev/mjpeg-video-server.git",
+  "_id": "mjpeg-video-server@2.0.0",
+  "_inCache": true,
+  "_location": "/mjpeg-video-server",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "mjpeg-video-server@git+https://github.com/OpenROV-Dev/mjpeg-video-server.git#4bfe75dd1fd24b9307c78d16171a04dcc5b004cb",
+    "scope": null,
+    "escapedName": "mjpeg-video-server",
+    "name": "mjpeg-video-server",
+    "rawSpec": "git+https://github.com/OpenROV-Dev/mjpeg-video-server.git#4bfe75dd1fd24b9307c78d16171a04dcc5b004cb",
+    "spec": "git+https://github.com/OpenROV-Dev/mjpeg-video-server.git#4bfe75dd1fd24b9307c78d16171a04dcc5b004cb",
+    "type": "hosted",
+    "hosted": {
+      "type": "github",
+      "ssh": "git@github.com:OpenROV-Dev/mjpeg-video-server.git#4bfe75dd1fd24b9307c78d16171a04dcc5b004cb",
+      "sshUrl": "git+ssh://git@github.com/OpenROV-Dev/mjpeg-video-server.git#4bfe75dd1fd24b9307c78d16171a04dcc5b004cb",
+      "httpsUrl": "git+https://github.com/OpenROV-Dev/mjpeg-video-server.git#4bfe75dd1fd24b9307c78d16171a04dcc5b004cb",
+      "gitUrl": "git://github.com/OpenROV-Dev/mjpeg-video-server.git#4bfe75dd1fd24b9307c78d16171a04dcc5b004cb",
+      "shortcut": "github:OpenROV-Dev/mjpeg-video-server#4bfe75dd1fd24b9307c78d16171a04dcc5b004cb",
+      "directUrl": "https://raw.githubusercontent.com/OpenROV-Dev/mjpeg-video-server/4bfe75dd1fd24b9307c78d16171a04dcc5b004cb/package.json"
+    }
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "git+https://github.com/OpenROV-Dev/mjpeg-video-server.git#4bfe75dd1fd24b9307c78d16171a04dcc5b004cb",
+  "_shasum": "d502c9cf5860d1de7843a2c9646ac2b291715714",
+  "_shrinkwrap": null,
+  "_spec": "mjpeg-video-server@git+https://github.com/OpenROV-Dev/mjpeg-video-server.git#4bfe75dd1fd24b9307c78d16171a04dcc5b004cb",
+  "_where": "/home/mcpikeda/projects/openrov-cockpit/src/plugins/mjpeg-video",
+  "author": "",
+  "dependencies": {
+    "bluebird": "^1.0.0",
+    "child-process-promise": "^2.0.2",
+    "debug": "^2.2.0",
+    "eventemitter3": "^2.0.2",
+    "express": "^4.13.4",
+    "fast-pool": "^0.9.0",
+    "glob": "^6.0.4",
+    "respawn": "^1.0.0",
+    "socket.io": "^1.4.5",
+    "ws": "1.1.1",
+    "yargs": "^4.7.1"
+  },
+  "devDependencies": {},
+  "gitHead": "4bfe75dd1fd24b9307c78d16171a04dcc5b004cb",
+  "license": "ISC",
+  "main": "index.js",
+  "name": "mjpeg-video-server",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "2.0.0"
+}

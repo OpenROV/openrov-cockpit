@@ -44,7 +44,7 @@
             ];
 
             // Handle mock options
-            if( process.env.USE_MOCK === 'true' ) 
+            if( process.env.USE_MOCK === 'true' && (process.env.EXTERNAL_CAM === undefined || process.env.EXTERNAL_CAM === 'false')) 
             {
                 if( process.env.MOCK_VIDEO_TYPE === "MJPEG" )
                 {
@@ -79,7 +79,7 @@
                 reconnectionAttempts: Infinity,
                 reconnectionDelay: 1000
             });
-
+            
             this.svMonitor = respawn( this.supervisorLaunchOptions, 
             {
                 name: 'mjpeg-video-server',
@@ -168,7 +168,7 @@
                         wspath:             "",
                         relativeServiceUrl: `:${info.port}`,
                         sourcePort:         info.port,
-                        sourceAddress:      "",
+                        sourceAddress:      process.env.EXTERNAL_CAM === true ? process.env.EXTERNAL_CAM_URL : "",
                         connectionType:     info.connectionType
                     });
                 })

@@ -85,3 +85,8 @@ location /foo {
   proxy_set_header Host $host;
   proxy_cache_bypass $http_upgrade;
 }
+
+location /custom_50x.html {
+        root /usr/share/nginx/html;
+        internal;
+}

@@ -1,7 +1,8 @@
 {
 	"files":
 	[
-		{ "src": "nginx.location", 	"dest": "/opt/openrov/system/etc" }
+		{ "src": "nginx.location", 	"dest": "/opt/openrov/system/etc" },
+		{ "src": "custom_50x.html", "dest": "/usr/share/nginx/html"}
 	],
 	
 	"preinstall": 

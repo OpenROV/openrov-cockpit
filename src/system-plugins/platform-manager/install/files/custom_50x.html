@@ -5,7 +5,6 @@
         <meta http-equiv="x-ua-compatible" content="ie=edge">
         <title>Welcome</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta http-equiv="refresh" content="7" >
         <style>
 
             /* -------------------------------------------------------------------
@@ -161,8 +160,21 @@
         </div>
 
         <script>
-            //Loads a json file of quotes and authors and places them on the screen for loading.
-            //Other logic can happen here, such as retrying to load cockpit    
+            function checkFetchStatus() {
+                var targetPage = window.location;
+                fetch(targetPage, {method: "HEAD"}).then( function(Response) {
+                    switch(Response.status) {
+                        case 502:
+                            //We are still loading cockpit
+                            setTimeout(checkFetchStatus, 300);
+                            break;
+                        case 200:
+                            //We got the page, load it
+                            location.reload(true);
+                    }
+                })
+            }
+            checkFetchStatus()
         </script>
     </body>
 </html>

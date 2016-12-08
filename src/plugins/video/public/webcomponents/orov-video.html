@@ -33,7 +33,7 @@
       </mjpeg-packet-video>
     </template>        
 
-    <template id="mp4template" is="dom-if" if="{{displayPlayer(videoMimeType,'video|mp4','socket.io/rov',_registerdConnection)}}">
+    <template id="mp4template" is="dom-if" if="{{displayPlayer(videoMimeType,'video/mp4','socket.io|rov',_registerdConnection)}}">
       <packet-video id="camera1" border='1' style='width: 100%; height:100%'
       menuState='on'
       src='{{videoSource}}'

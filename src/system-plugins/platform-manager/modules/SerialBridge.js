@@ -20,8 +20,24 @@ function Bridge(uartPath,uartBaud) {
       autoOpen: true
     });
     
-    var Readline = SerialPort.parsers.Readline;
-    var parser =serialPort.pipe(Readline({delimiter: '\r\n'}));    
+    var Readline 
+    var parser 
+
+    //Work around for influx serialport changes while we have the dependencies moving around a bit.
+    //Remove once the shrinkwrapped version matches the dev version api
+    if (SerialPort.parsers.Readline){
+      Readline= SerialPort.parsers.Readline; 
+      parser=serialPort.pipe(Readline({delimiter: '\r\n'}));   
+    }
+    if (SerialPort.parsers.ReadLine){
+      Readline= SerialPort.parsers.ReadLine; 
+      parser=serialPort.pipe(ReadLine({delimiter: '\r\n'}));   
+    }
+    if (SerialPort.parsers.readline){
+      Readline= SerialPort.parsers.readline; 
+      parser=serialPort.pipe(readline({delimiter: '\r\n'}));   
+    }    
+
 
     serialPort.on('open', function () {
       serialConnected = true;

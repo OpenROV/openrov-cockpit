@@ -82,10 +82,12 @@
       if (state.buffer.length < 35) {
         state.loadingdata = true;
         dataRefillFunction(state.dataoffset, limit).then(function (newdata) {
-          state.buffer = state.buffer.concat(newdata);
-          state.dataoffset = newdata[newdata.length - 1].id;
-          state.loadingdata = false;
-          if (state.buffer.length == 0) {
+          if (newdata.length>0){
+            state.buffer = state.buffer.concat(newdata);
+            state.dataoffset = newdata[newdata.length - 1].id;
+            state.loadingdata = false;
+          } 
+          if (state.buffer.length == 0){
             return false;  //end generator, no more data
           }
         });
@@ -103,6 +105,9 @@
       }
       setTimeout(timedDataGenerator.bind(this, dataRefillFunction, callback, state), nextCheck);
     };
+    
+    window.OROV.startApp = function(){
+    
     idb.telemetry_events.where('sessionID').equals(session).filter(function (item) {
       return item.event == 'x-h264-video.data';
     }).first().then(function (initFrame) {
@@ -130,6 +135,7 @@
         emitter.emit.apply(emitter, [item.event].concat([item.data]));
       });
     });
+  }
   });
 }());  /*
       idb.mp4.collection.filter(function(item){item.sessionID == session}).first(function(item){

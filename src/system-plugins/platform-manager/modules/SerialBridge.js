@@ -31,11 +31,11 @@ function Bridge(uartPath,uartBaud) {
     }
     if (SerialPort.parsers.ReadLine){
       Readline= SerialPort.parsers.ReadLine; 
-      parser=serialPort.pipe(ReadLine({delimiter: '\r\n'}));   
+      parser=serialPort.pipe(Readline({delimiter: '\r\n'}));   
     }
     if (SerialPort.parsers.readline){
       Readline= SerialPort.parsers.readline; 
-      parser=serialPort.pipe(readline({delimiter: '\r\n'}));   
+      parser=serialPort.pipe(Readline({delimiter: '\r\n'}));   
     }    
 
 

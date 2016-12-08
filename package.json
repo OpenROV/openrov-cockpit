@@ -10,11 +10,12 @@
   "scripts": {
     "deploy:dev": "env 'npm_config_unsafe_perm=false' env 'npm_config_shrinkwrap=false' NODE_ENV=development npm install",
     "deploy:prod": "env 'npm_config_unsafe_perm=true' env 'npm_config_shrinkwrap=true' NODE_ENV=production npm install",
-    "build:dev": "env 'npm_config_unsafe_perm=true' env 'npm_config_shrinkwrap=false' NODE_ENV=production npm install",    
+    "build:dev": "env 'npm_config_unsafe_perm=true' env 'npm_config_shrinkwrap=false' NODE_ENV=production npm install",
     "test": "./node_modules/grunt-cli/bin/grunt test",
     "shrinkwrap": "NODE_ENV=production node install_lib/npm_shrinkwrap_all.js",
-    "prepshrinkwrap" : "node install_lib/npm_shrinkwrap_removeOptionalDeps.js",
-    "install": "node install_lib/bower_install_all.js && node install_lib/npm_install_all.js"
+    "prepshrinkwrap": "node install_lib/npm_shrinkwrap_removeOptionalDeps.js",
+    "install": "node install_lib/bower_install_all.js && node install_lib/npm_install_all.js",
+    "flow": "flow; test $? -eq 0 -o $? -eq 2"
   },
   "dependencies": {
     "binary-parser": "1.1.5",
@@ -62,6 +63,7 @@
     "node": ">= 6.0.0"
   },
   "devDependencies": {
+    "flow-bin": "^0.36.0",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
     "grunt-contrib-jshint": "^1.0.0",

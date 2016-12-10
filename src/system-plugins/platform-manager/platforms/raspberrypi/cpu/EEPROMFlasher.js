@@ -2,12 +2,12 @@ const Promise = require( 'bluebird' );
 const fs      = Promise.promisifyAll( require( 'fs' ) );
 const path    = require( 'path' );
 
-var EEPROMFlasher = ( productId, revision ) => 
+var EEPROMFlasher = ( productId, boardRev ) => 
 {
-    var pinoutPath = path.resolve( path.join( __dirname, '../boards', productId, 'eeprom/pinout.json' ) );
+    var boardInfoPath = path.resolve( path.join( __dirname, '../boards', productId, 'eeprom/boardinfo.json' ) );
 
-    // Read pinout file
-    return fs.readFileAsync( pinoutPath )
+    // Read board info file
+    return fs.readFileAsync( boardInfoPath )
         .then( ( data ) =>
         {
             // Open the eeprom file handle

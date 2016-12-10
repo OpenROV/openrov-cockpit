@@ -110,6 +110,15 @@ function LoadBoardInterface(platform)
   })
   .then(function () 
   {
+    try
+    {
+      process.env.PRODUCTID = platform.board.info.productId;
+    }
+    catch( err )
+    {
+
+    }
+    
     return platform;
   });
 }

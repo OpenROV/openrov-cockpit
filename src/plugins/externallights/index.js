@@ -162,6 +162,12 @@
 
     module.exports = function(name, deps) 
     {
+        if( process.env.PRODUCTID == "trident" )
+        {
+            console.log( "Not supported on trident" );
+            return {};
+        }
+
         return new ExternalLights(name, deps);
     };
 }());

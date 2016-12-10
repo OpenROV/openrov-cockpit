@@ -123,7 +123,14 @@
     var item = this.systempower.getSettingSchema();
     return item;
   };
-  module.exports = function (name, deps) {
+  module.exports = function (name, deps)
+   {
+    if( process.env.PRODUCTID == "trident" )
+    {
+        console.log( "Not supported on trident" );
+        return {};
+    }
+
     var result = new Controllerboard2x(name, deps);
     result.systempower = new SystemPower(name, deps);
     result.systemenvionment = new SystemEnvionment(name, deps);

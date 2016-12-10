@@ -1,9 +1,7 @@
 {
 	"files":
 	[
-		{ "src": "BuildFirmware.js", 	"dest": "/opt/openrov/system/scripts" },
-		{ "src": "FlashFirmware.js", 	"dest": "/opt/openrov/system/scripts" },
-		{ "src": "ResetMCU.sh", 		"dest": "/opt/openrov/system/scripts" }
+		{ "src": "FlashFirmware.js", 	"dest": "/opt/openrov/system/scripts" }
 	],
 	
 	"preinstall": 

@@ -2,10 +2,14 @@ var Promise = require('bluebird');
 var readFileAsync = Promise.promisify(require('fs').readFile);
 var execFileAsync = require('child-process-promise').execFile;
 var path = require('path');
-var CPUInterface = function () {
+
+var CPUInterface = function () 
+{
   var self = this;
 };
-CPUInterface.prototype.Compose = function (platform) {
+
+CPUInterface.prototype.Compose = function (platform) 
+{
   console.log('CPU: Composing RPI cpu interface...');
   // Temporary container used for cpu detection and info loading
   var cpu = { targetCPU: platform.cpu };
@@ -13,7 +17,9 @@ CPUInterface.prototype.Compose = function (platform) {
   // Compose the CPU interface object
   return self.LoadInfo(cpu).then(self.CheckSupport).then(self.LoadInterfaceImplementation);
 };
-CPUInterface.prototype.LoadInfo = function (cpu) {
+
+CPUInterface.prototype.LoadInfo = function (cpu) 
+{
   console.log('CPU: Loading RPI cpu info...');
   return GetCpuInfo().then(function (info) {
     // Add revision and serial details to the interface object
@@ -25,6 +31,7 @@ CPUInterface.prototype.LoadInfo = function (cpu) {
     return cpu;
   });
 };
+
 CPUInterface.prototype.CheckSupport = function (cpu) {
   return readFileAsync(path.resolve(__dirname, 'cpu/revisionInfo.json')).then(JSON.parse).then(function (json) {
     console.log('CPU: Checking details against revision file...');
@@ -43,12 +50,14 @@ CPUInterface.prototype.CheckSupport = function (cpu) {
     }
   });
 };
+
 CPUInterface.prototype.LoadInterfaceImplementation = function (cpu) {
   console.log('CPU: Loading RPI CPU interface implementation');
   // Load and apply the interface implementation to the actual CPU interface
   require('./cpu/setup.js')(cpu.targetCPU);
   return cpu;
 };
+
 // Helper function to parse /proc/cpuinfo
 function GetCpuInfo() {
   return execFileAsync('cat', ['/proc/cpuinfo']).then(function (data) {
@@ -70,4 +79,5 @@ function GetCpuInfo() {
     return result;
   });
 }
+
 module.exports = new CPUInterface();

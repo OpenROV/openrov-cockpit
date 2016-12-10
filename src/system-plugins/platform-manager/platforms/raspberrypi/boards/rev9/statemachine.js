@@ -5,11 +5,7 @@ const fs                = Promise.promisifyAll(require('fs-extra'));
 const StateMachine      = require('javascript-state-machine');
 
 const FlashMCUFirmware  = require( "./lib/FlashMCUFirmware.js" );
-const FlashESCFirmware  = require( "./lib/FlashESCFirmware.js" );
 const ResetMCU          = require( "./lib/ResetMCU.js" );
-
-// TODO: Double check
-const mcuBinPath        = "/opt/openrov/firmware/apps/trident/bin/trident-rev10/trident.hex";
 
 module.exports = function( board ) 
 {
@@ -35,33 +31,6 @@ module.exports = function( board )
     {
         board.global.emit( "plugin.updateManager.error", data.toString() );
         console.error( "FIRMWARE UPDATE: " + data.toString().trim() );
-    }
-
-    function flashESCHandler(event, from, to)
-    {
-        var self = this;
-
-        status( "Flashing ESCs...", "InProgress" );
-
-        // Execute the flash firmware script
-        FlashESCFirmware( log, err )
-        .then( function()
-        {
-            // Successm, write to a file to indicate this
-            return fs.writeFileAsync( escConfPath, "flashed" );
-        })
-        .then( function()
-        {   
-            // Success
-            log( "ESCs flashed successfully." );
-            self._e_esc_flash_complete();
-        })
-        .catch( function( error )
-        {
-            // Move to failed state
-            err( "ESC flash failed." );
-            self._e_fail( error );
-        });
     }
 
     function flashMCUHandler(event, from, to)
@@ -136,12 +105,10 @@ module.exports = function( board )
             // Internal events - Should always be called as the final step of a promise chain
             { name: '_e_init',                          from: 'none',                               to: 'complete' },
 
-            { name: '_e_esc_flash_complete',            from: 'flashing_escs',                      to: 'complete' },
             { name: '_e_mcu_flash_complete',            from: 'flashing_mcu',                       to: 'complete' },
             { name: '_e_mcu_reset_complete',            from: 'resetting_mcu',                      to: 'complete' },
 
             // User events (can only be used from the complete state)
-            { name: '_e_trigger_esc_flash_user',        from: 'complete',                           to: 'flashing_escs' },
             { name: '_e_trigger_mcu_flash_user',        from: 'complete',                           to: 'flashing_mcu' },
             { name: '_e_trigger_mcu_reset_user',        from: 'complete',                           to: 'resetting_mcu' },
 
@@ -152,7 +119,6 @@ module.exports = function( board )
         callbacks: 
         {
             // State handlers - We allow states to handle their own transitions to ensure consistency
-            onflashing_escs: flashESCHandler,
             onflashing_mcu: flashMCUHandler,
             onresetting_mcu: resetMCUHandler,
             oncomplete: completeHandler,

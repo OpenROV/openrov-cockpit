@@ -9,7 +9,10 @@ var path = require('path');
 //Fix the issue that npm overwrites the env settings with its current settings after processing the oroginal env settings, but
 //it replaces false with "" so that down stream npm calls then treat "" as true :-(
 process.env["npm_config_shrinkwrap"]=process.env["npm_config_shrinkwrap"]==true?"true":"false";
-process.env["npm_config_unsafe_perm"]=process.env["npm_config_unsafe_perm"]==true?"true":"false";
+
+//node-gyp throws a fit is this is "false" instead of null/true.  Given the default it false, it should
+//not hurt if someone explicitly passes false which will become "" inside this script.
+//process.env["npm_config_unsafe_perm"]=process.env["npm_config_unsafe_perm"]==true?"true":"false";
 
 console.log("==ENV settings:==");
 console.dir(process.env);

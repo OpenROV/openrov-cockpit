@@ -42,6 +42,7 @@ BoardInterface.prototype.LoadInfo = function (board)
   {
     console.log('Board info: ' + JSON.stringify(info));
     board.info = info;
+    board.targetBoard.info = board.info;
     return board;
   });
 };
@@ -59,6 +60,7 @@ BoardInterface.prototype.LoadPinMap = function (board)
       if (pinmap !== undefined) 
       {
         board.pinmap = pinmap;
+        board.targetBoard.pinmap = board.pinmap;
         return board;
       }
     });

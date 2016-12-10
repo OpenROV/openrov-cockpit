@@ -16,6 +16,7 @@ BoardInterface.prototype.LoadInfo = function (board) {
   return fs.readFileAsync(path.resolve('/opt/openrov/system/etc/2xBoardInfo.json')).then(JSON.parse).then(function (info) {
     console.log('Board info: ' + JSON.stringify(info));
     board.info = info;
+    board.targetBoard.info = board.info;
     return board;
   });
 };
@@ -25,6 +26,7 @@ BoardInterface.prototype.LoadPinMap = function (board) {
     var pinmap = json[board.info.rev];
     if (pinmap !== undefined) {
       board.pinmap = pinmap;
+      board.targetBoard.pinmap = board.pinmap;
       return board;
     }
   });

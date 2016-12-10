@@ -13,6 +13,7 @@ BoardInterface.prototype.LoadInfo = function (board) {
   board.info = {};
   return fs.readFileAsync(path.resolve(__dirname, 'boards/mock3000/eepromMock.json'), 'utf8').then(JSON.parse).then(function (info) {
     board.info = info;
+    board.targetBoard.info = board.info;
     return board;
   });
 };
@@ -21,6 +22,7 @@ BoardInterface.prototype.LoadPinMap = function (board) {
     var pinmap = json[board.info.rev];
     if (pinmap !== undefined) {
       board.pinmap = pinmap;
+      board.targetBoard.pinmap = board.pinmap;
       return board;
     }
   });

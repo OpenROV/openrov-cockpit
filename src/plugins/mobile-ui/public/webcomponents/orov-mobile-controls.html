@@ -7,7 +7,13 @@
 	</style>
 
 	<template>
-		<dual-thumbstick id="dualthumbstick" event-emitter="{{eventEmitter}}">
+		<dual-thumbstick 
+			id="dualthumbstick" 
+			event-emitter="{{eventEmitter}}"
+			on-leftTrackX="handleYaw"
+			on-leftTrackY="handleThrottle"
+			on-righttracky="handleVertical"
+		>
 		</dual-thumbstick>
 	</template>
 
@@ -23,15 +29,6 @@
 				},
 
 				behaviors: [namespace('behaviors').oROVStandard],
-
-				attached: function ()
-				{
-					var dualThumbstick = this.$.dualthumbstick;
-
-					dualThumbstick.addEventListener('leftTrackX', this.handleYaw.bind( this ) );
-					dualThumbstick.addEventListener('leftTrackY', this.handleThrottle.bind( this ) );
-		            dualThumbstick.addEventListener('rightTrackY', this.handleVertical.bind( this ) );
-				},
 
 				registerEmitterHandlers: function(emitter)
 				{

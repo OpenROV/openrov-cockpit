@@ -102,6 +102,7 @@ ga('send', 'pageview');
   <script>window.openrovtheme='<%=theme%>'</script>  
   <link id="lazyScripts" rel="import" href="/all_scripts.html" async>
   <link rel="import" href="components/polymer/polymer.html">
+
 <style>
     body.loading #splash {
         opacity: 1;
@@ -171,7 +172,7 @@ ga('send', 'pageview');
     }
     
     .content {
-        background-color: #1D598D;
+        background: linear-gradient(#1D598D, #003851, #00101F);
         text-align: center;
         height: 100%;
         margin: -.1em 0 0 0;
@@ -186,33 +187,60 @@ ga('send', 'pageview');
         font-weight: 100;
         font-size: 4em;
     }
-    
-    #quote {
-        padding-top: 5em;
-        margin: 0.3em;
-        font-family: 'Lato', sans-serif; 
-        font-style: italic;
-        font-size: 4em;
-        animation: fadein 3s;
-    }
+
     @keyframes fadein {
         from { opacity: 0; }
         to   { opacity: 1; }
     }    
     
-    #author {
-        font-family: 'Open Sans', sans-serif;
-        font-size: 1.5em;
-        animation: fadein 6s;
-    }
-    
     #loading {
-        font-family: 'Open Sans', sans-serif;
-        font-size: 1.0em;
-        padding-top: 15em;
+      height: 15%;
+      text-align: center;
+      
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      font-family: 'Lato', sans-serif; 
+      font-size: 3.5em;
     }
+
+    #quote {
+      height: auto;
+      text-align: center;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      position: relative;
+      margin: 0 auto;
+      top: 20%;
+
+      font-family: 'Lato', sans-serif; 
+      font-style: italic;
+      font-size: 3em;
+      animation: fadein 2.5s;
+    }
+
+    #author {
+      height: 5%;
+      text-align: center;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      position: relative;
+      margin: auto;
+      top: 25%;
+
+      font-family: 'Lato', sans-serif; 
+      font-size: 1.5em;
+      animation: fadein 2.5s;
+    }
+
     /*prevent many large-by-comparison ripples by shrinking the height*/
-    
     @media (max-width: 50em) {
         .content h1 {
             font-size: 12vmax;
@@ -228,8 +256,8 @@ ga('send', 'pageview');
         margin: 40px auto;
         background-color: white;
         border-radius: 100%;
-        -webkit-animation: sk-pulseScaleOut 1s infinite ease-in-out;
-        animation: sk-pulseScaleOut 1s infinite ease-in-out;
+        -webkit-animation: sk-pulseScaleOut 2s infinite ease-in-out;
+        animation: sk-pulseScaleOut 2s infinite ease-in-out;
     }
     
     @-webkit-keyframes sk-pulseScaleOut {
@@ -279,20 +307,32 @@ ga('send', 'pageview');
     <div class="content">
         <h1> </h1>
 
-        <!--Here we can load quotes and authors from a json file -->
-        <p id="quote">The Sea, once it casts its spell, holds one in its net of wonder forever.</p>
-        <p id="author">- Jacques Cousteau -</p>
-
         <div id="loading">
-            <p> Connecting to the ROV </p>
+          Connecting to the ROV
         </div>
+        <div class="sk-spinner sk-spinner-pulse" style="margin: auto;"></div>
 
-        <div class="sk-spinner sk-spinner-pulse" style="margin: 40px auto;"></div>
-
-
+        <!--Here we can load quotes and authors from a json file, but use the Cousteau quote as a fallback -->
+        <div id="quote">
+          The Sea, once it casts its spell, holds one in its net of wonder forever.
+        </div>
+        <div id="author">
+          -  Jacques Cousteau  -
+        </div>
     </div>
-
 </div>
+<script>
+  //Get from filesystem
+  fetch('./loading_screen_quotes.json').then(function(response) {
+    //convert to json
+    return response.json();
+  }).then(function(obj) {
+    var index = Math.floor(Math.random() * obj.quotes.length);
+    document.getElementById("quote").innerHTML = obj.quotes[index].quote;
+    document.getElementById("author").innerHTML = '-  ' + obj.quotes[index].author + '  -';
+  });
+</script>
+
 <link rel="import" href="components/platinum-sw/platinum-sw-register.html">
 <link rel="import" href="components/platinum-sw/platinum-sw-cache.html">
 <link rel="import" href="components/platinum-sw/platinum-sw-fetch.html">
@@ -370,6 +410,9 @@ ga('send', 'pageview');
     console.info("on applet <%= scriplets[i].name %>");
     removeSplashScreen();
     window.removeEventListener('WebComponentsReady',fn);
+    if (window.OROV.startApp){
+      window.OROV.startApp();
+    }
   }
   window.addEventListener('WebComponentsReady', fn);  
   ga('set', 'page', '<%= scriplets[i].name %>');

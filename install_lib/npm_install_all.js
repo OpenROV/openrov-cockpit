@@ -6,6 +6,20 @@ var currentdirectory = process.cwd();
 var packagesToInstall = [];
 var path = require('path');
 
+//Fix the issue that npm overwrites the env settings with its current settings after processing the oroginal env settings, but
+//it replaces false with "" so that down stream npm calls then treat "" as true :-(
+process.env["npm_config_shrinkwrap"]=process.env["npm_config_shrinkwrap"]==true?"true":"false";
+
+//node-gyp throws a fit is this is "false" instead of null/true.  Given the default it false, it should
+//not hurt if someone explicitly passes false which will become "" inside this script.
+//process.env["npm_config_unsafe_perm"]=process.env["npm_config_unsafe_perm"]==true?"true":"false";
+
+console.log("==ENV settings:==");
+console.dir(process.env);
+console.log("==NPM settings:==");
+var result = exec('npm config ls -l',{encoding:'utf8'});
+console.log(result);
+
 finder.on('file', function (file, stat) {
   if (file.indexOf('package.json') > -1) {
     console.log(file + ' |||| ' + process.cwd());
@@ -42,7 +56,7 @@ var installPackages = function (index, array) {
   rimraf(dir + '/node_modules', function () {
     console.log('======== installing =======');
     console.log(dir);
-    exec('npm install', { cwd: dir });
+    console.log(exec('npm install', { cwd: dir,encoding:'utf8' }));
     index++;
     if (index < array.length) {
       installPackages(index, array);

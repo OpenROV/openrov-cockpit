@@ -148,19 +148,74 @@
   ROVPilot.prototype.getSettingSchema = function getSettingSchema() {
     return [{
         'title': 'ROV Pilot Settings',
-        'managedBy' : 'nobody',
-        'id': 'rovpilot',
-        'type': 'object',
+        'id': 'rovPilot',
+        'type': "object",
         'properties': {
-          'exponentialSticks': {
-            'type': 'boolean',
-            'title': 'Use exponential gamepad sticks',
-            'default': false
+          'currentConfiguration':{
+            'type': 'string'
           },
-          'exponentialRate': {
-            'type': 'number',
-            'title': 'The expontetial rate for mapping the stick',
-            'default': 3
+          'configurations': {
+            'type': 'array'
+          },
+          'exponentialSticks': {
+            'LEFT_STICK_X': {
+              'enabled': {
+                'type': 'boolean',
+                'default': false,
+              },
+              'rate': {
+                'type': 'number',
+                'default': 1.0
+              }
+            },
+            'LEFT_STICK_Y': {
+              'enabled': {
+                'type': 'boolean',
+                'default': false,
+              },
+              'rate': {
+                'type': 'number',
+                'default': 1.0
+              }
+            },
+            'RIGHT_STICK_X': {
+              'enabled': {
+                'type': 'boolean',
+                'default': false,
+              },
+              'rate': {
+                'type': 'number',
+                'default': 1.0
+              }
+            },
+            'RIGHT_STICK_Y': {
+              'enabled': {
+                'type': 'boolean',
+                'default': false,
+              },
+              'rate': {
+                'type': 'number',
+                'default': 1.0
+              }
+            }
+          },
+          'inversions': {
+            'LEFT_STICK_X': {
+              'type': 'boolean',
+              'default': false
+            },
+            'LEFT_STICK_Y': {
+              'type': 'boolean',
+              'default': false
+            },
+            'RIGHT_STICK_X': {
+              'type': 'boolean',
+              'default': false
+            },
+            'RIGHT_STICK_Y': {
+              'type': 'boolean',
+              'default': false
+            }
           }
         }
       }];

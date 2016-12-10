@@ -1,245 +1,793 @@
-(function (window, document) {
-  var log,trace,log_debug;
-  $.getScript('components/visionmedia-debug/dist/debug.js', function () {  
-    log = debug('input-controlller:log');
-    trace = debug('input-controlller:trace') 
-    log_debug = debug('input-controlller:debug')   
+(function(window, document) 
+{
+  'use strict';
+  loadScript('components/mousetrap-js/mousetrap.js');
+  
+  //Necessary for debug utils
+  var log;
+  var trace;
+  var log_debug;
+
+  $.getScript('components/visionmedia-debug/dist/debug.js', function() {
+    log = debug('input-controller:log');
+    trace = debug('input-controller:trace');
+    log_debug = debug('input-controller:debug');
   });
+
+  var recordPluginNeeded = true;
+
   var inputController = namespace('systemPlugin.inputController');
-  inputController.InputController = function (cockpit) {
-    var self = this;
-    self.cockpit = cockpit;
-    self.model = { commands: [] };
-    self.registerdCommands = {};
-    self.registerdControls = {};
-    self.controllers = [];
-    // add our known controllers
-    self.controllers.push(new inputController.Keyboard(cockpit));
-    self.controllers.push(new inputController.Gamepad(cockpit));
-    self.checkDuplicates = function () {
-      var commandBindings = [];
-      var duplicateInformation = [];
-      for (var command in self.registerdCommands) {
-        if (self.registerdCommands[command].active) {
-          for (var binding in self.registerdCommands[command].bindings) {
-            commandBindings.push({
-              value: binding + ':' + self.registerdCommands[command].bindings[binding],
-              name: self.registerdCommands[command].name
-            });
+  inputController.InputController = class InputController
+  {
+    constructor(cockpit)
+    {
+      this.cockpit = cockpit;
+
+      //Mapping from strings to JS functions
+      this.actions = new Map();
+
+      //Mapping from strings to hardware
+      this.controllers = new Map();
+
+      //Data structure to hold our presets on the browser side
+      this.presets = new Map();
+      this.currentPresetName = "defaults";
+      this.currentPreset = new inputController.Preset(this.currentPresetName);
+      
+      this.presets.set(this.currentPresetName, this.currentPreset);
+
+      this.needToSaveDefaults = true;
+      this.checkForLastPreset = true;
+      this.defaultPresetName = "defaults";
+      this.inputConfiguratorSettings = {};
+      this.rovPilotSettings = {};
+
+      this.deferSetupForMousetrap();
+    };
+
+    deferSetupForMousetrap()
+    {
+        var self = this;
+
+        if ( (typeof Mousetrap !== "undefined") && recordPluginNeeded) {
+          loadScript('components/mousetrap-js/plugins/record/mousetrap-record.js');
+          recordPluginNeeded=false;
+        }
+        
+        if((typeof Mousetrap == "undefined") || (typeof Mousetrap.record == "undefined") || self.setup() == false )
+        {          
+          // Call timeout again
+          setTimeout( self.deferSetupForMousetrap.bind( self ), 100 );
+        }
+    }
+
+    setup()
+    {
+      var self = this;
+
+      if (typeof Mousetrap !== "undefined")
+      {
+
+        self.mousetrap = Mousetrap;
+        
+        //Add our default keyboard controllers
+        self.keyboard = new Keyboard(cockpit, self.mousetrap);
+        self.controllers.set("keyboard", self.keyboard);
+
+        self.gamepad = new Gamepad(cockpit);
+        self.controllers.set("gamepad", self.gamepad);
+        
+        //Crawl plugin directory for inputs
+        self.listen();
+
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+
+    //Member functions
+    listen()
+    {
+      var self = this;
+
+      //Make sure that mousetrap is loaded before loading the plugin defaults
+      if((typeof Mousetrap == "undefined") || (typeof self.mousetrap == "undefined"))
+      {
+        return;
+      }
+
+      self.cockpit.loadedPlugins.forEach(function(plugin) {
+        
+        //Map action strings to functions
+        for(var action in plugin.actions)
+        {
+          self.actions.set(action, plugin.actions[action]);
+        }
+
+        //Add the inputs to our preset
+        if(typeof plugin.inputDefaults !== 'function')
+        {
+          for(var controllerName in plugin.inputDefaults)
+          {
+            var controller = plugin.inputDefaults[controllerName];
+            for(var inputName in controller)
+            {
+              var input = controller[inputName];
+
+              var inputToRegister = {
+                action: input.action,
+                input: {
+                  name: inputName,
+                  controller: controllerName,
+                  type: input.type,
+                  options: input.options
+                }
+              };
+
+              //Add this action
+              self.currentPreset.addAction(input.action);
+
+              self.registerInput(inputToRegister);
+            }
           }
         }
-      }
-      commandBindings.forEach(function (binding) {
-        commandBindings.forEach(function (checkBinding) {
-          if (binding === checkBinding)
-            return;
-          if (binding.value === checkBinding.value) {
-            duplicateInformation.push('Command name: \'' + binding.name + '\' Binding: ' + binding.value);
-          }
-        });
       });
-      if (duplicateInformation.length > 0) {
-        self.cockpit.emit('plugin-input-controller-duplicates', duplicateInformation);
-        trace('Found duplicate commands: \n' + duplicateInformation.join('\n'));
+
+      //Listen for server setting changes
+      this.cockpit.rov.on('settings-change.inputConfigurator', function(settings) {
+          self.inputConfiguratorSettings = settings.inputConfigurator;
+          if(self.checkForLastPreset)
+          {
+            var lastPresetName = self.inputConfiguratorSettings.lastPreset;
+            if(lastPresetName !== undefined && lastPresetName !== self.defaultPresetName)
+            {
+              //Load the last preset 
+              self.cockpit.emit('plugin.inputConfigurator.loadPreset', lastPresetName);
+            }
+            self.checkForLastPreset = false;
+          }
+      });
+      this.cockpit.rov.on('settings-change.rovPilot', function(settings) {
+          self.rovPilotSettings = settings.rovPilot;
+      });
+
+      this.cockpit.on('plugin.inputController.sendPreset', function() {
+
+        if(self.currentPreset !== undefined)
+        {
+          self.cockpit.emit('plugin.inputController.updatedPreset', self.currentPreset, self.actions);
+        }
+      });
+
+      this.cockpit.on('plugin.inputController.resetControllers', function() {
+        self.resetControllers();
+      });
+
+      this.cockpit.on('plugin.inputController.updateInput', function(input) {
+
+        //Try to update that input
+        self.updateInput(input);
+      });
+
+      this.cockpit.on('plugin.inputController.unregisterInput', function(input) {
+
+        //Try to update that input
+        self.unregisterInput(input);
+      });
+
+      this.cockpit.on('plugin.inputConfigurator.deletePreset', function(preset) {
+
+        //Try to remove that preset from the list
+        self.deletePreset(preset);
+      });
+
+      this.cockpit.on('plugin.inputConfigurator.loadedPreset', function(loadedPreset) {
+
+        //Try to update that input
+        self.handleLoadedPreset(loadedPreset);
+      });
+
+
+      this.cockpit.on('plugin.inputConfigurator.savePreset', function(presetToSave) {
+
+        //Try to update that input
+        self.handleSavePreset(presetToSave);
+      });
+
+      self.saveDefaults();
+
+    };
+
+    saveDefaults()
+    {
+      var self = this;
+
+      //Work around for JSON.stringify not working on startup
+      setTimeout( function() {
+        var defaultPreset = self.presets.get("defaults");
+        defaultPreset = self.convertToObject(defaultPreset);
+        self.cockpit.emit('plugin.inputConfigurator.savePreset', defaultPreset);  
+      }, 2500);
+    };
+
+    convertToObject(presetIn)
+    {
+      var self = this;
+      var returnPreset = {
+          name: presetIn.name,
+          actions: new Map()
+      };
+      
+      //Iterate through actions
+      presetIn.actions.forEach(function(action, actionName) {
+          var actionToAdd = new Map();
+
+          action.forEach(function(input, controllerName) {
+            actionToAdd.set(controllerName, input);  
+          });
+          returnPreset.actions.set(actionName, actionToAdd);
+      });
+      return returnPreset;
+    };
+
+    convertToPreset(presetIn)
+    {
+      var self = this;
+
+      var returnPreset = new inputController.Preset(presetIn.name);
+
+      //Iterate through actions
+      presetIn.actions.forEach(function(action, actionName) {
+        var actionToAdd = new Map();
+
+        action.forEach(function(input, controllerName) {
+          actionToAdd.set(controllerName, jQuery.extend({}, input));  
+        });
+
+        returnPreset.actions.set(actionName, actionToAdd);
+      });
+      return returnPreset;
+    };
+
+    deletePreset(preset)
+    {
+      var self = this;
+      self.presets.delete(preset.name);
+
+      if(preset == self.currentPresetName && preset !== "defaults")
+      {
+        self.cockpit.emit('plugin.inputConfigurator.loadPreset', "defaults");
       }
     };
-    return self;
-  };
-  inputController.InputController.prototype.register = function (control) {
-    this._register(control, true);
-  };
-  
-  inputController.InputController.prototype.commands = function() {
-    return this.model.commands();
-  };
 
-  inputController.InputController.prototype.listen = function listen() {
-    var self = this;
-    this.cockpit.on('InputController.activate', function (controls, fn) {
-      self.acticate(controls);
-      if (fn !== undefined) {
-        fn();
-      }
-    });
-    this.cockpit.on('InputController.deactivate', function (controls, fn) {
-      self.deactivate(controls);
-      if (fn !== undefined) {
-        fn();
-      }
-    });
-    this.cockpit.on('InputController.getCommands',function(fn){
-      if (fn!==undefined){
-          // returning a clone of the commands so users can't just change things.
-          // To update a command send a InputController.updateBinding(controls) message.
-          var commands = self.model.commands.map(function(command) {
-            return { name: command.name, description: command.description, bindings: command.bindings, defaults: command.defaults }
-          });
-          fn(commands);
-      }
-    });
-    this.cockpit.on('InputController.register', function (controls, fn) {
-      self.register(controls);
-      if (typeof fn == 'function') {
-        fn();
-      }
-    });
-    this.cockpit.on('InputController.updateBinding', function(controls, fn) {
-      self.updateBinding(controls);
-      if (typeof(fn)=="function") {
-        fn();
-      }
-    });
+    handleLoadedPreset(presetIn)
+    {
+      var self = this;
 
-    this.cockpit.on('InpitController.suspendAll', function(fn) {
-      self.model.commands.forEach(function(command) {
-        self.suspend(command.name);
+      self.deletePreset(presetIn.name);
+
+      self.addPreset(presetIn);
+    };
+
+    handleChangePreset(presetName)
+    {
+      var self = this;
+
+      //Grab a handle to our preset
+      var preset = self.presets.get(presetName);
+      
+      //Unregister the old preset
+      self.unregisterPresetWithHardware(self.currentPreset);
+
+      //And update to the new one
+      self.registerPresetWithHardware(preset);
+
+      self.currentPreset = preset;
+      self.currentPresetName = preset.name;
+      self.cockpit.emit('plugin.inputController.updatedPreset', self.currentPreset, self.actions);
+    };
+
+    handleSavePreset(presetToSave)
+    {
+      var self = this;
+
+      if(presetToSave.name !== "defaults")
+      {
+        var presetToSave = self.convertToPreset(presetToSave);
+
+        self.presets.set(presetToSave.name, presetToSave);
+        self.handleChangePreset(presetToSave.name);
+      }
+    };
+
+    registerPresetWithHardware(preset)
+    {
+      var self = this;
+
+      preset.actions.forEach(function(action, actionName) {
+        action.forEach(function(inputIn){
+          var inputToRegister = {
+            action: actionName,
+            input: inputIn
+          };
+          self.registerInputWithHardware(inputToRegister);
+        })
       });
-      if (fn) {fn();}
-    });
+    };
+    
+    unregisterPresetWithHardware(preset)
+    {
+      var self = this;
 
-    this.cockpit.on('InpitController.resumeAll', function(fn) {
-      var commands = self.model.commands;
-      self.model.commands = [];
-      commands.forEach(function(command) {
-        self.resume(command.name);
+      preset.actions.forEach(function(action, actionName) {
+        action.forEach(function(inputIn){
+          var inputToRegister = {
+            action: actionName,
+            input: inputIn
+          };
+          self.unregisterInputWithHardware(inputToRegister);
+        })
       });
-      if (fn) {fn();}
-    });
 
+    };
+    addPreset(presetIn)
+    {
+      var self = this;
 
-    /* Crawl the plugins looking for those with settings definitions */
-    this.cockpit.loadedPlugins.forEach(function (plugin) {
-      if (plugin.inputDefaults !== undefined) {
-        if (typeof plugin.inputDefaults == 'function') {
-          self.register(plugin.inputDefaults());
-        } else {
-          self.register(plugin.inputDefaults);
+      var newPreset = new inputController.Preset(presetIn.name);
+
+      //Use the default list to init
+      self.presets.get("defaults").actions.forEach(function(action, actionName) {
+        newPreset.addAction(actionName);
+      });
+
+      for(var actionName in presetIn.actions)
+      {
+        var action = presetIn.actions[actionName];
+        
+        for(var controllerName in action[1])
+        {
+          var controller = action[1][controllerName];
+          var actionToRegister = action[0];
+          var inputToRegister = controller[1];
+
+          newPreset.registerInput(actionToRegister, inputToRegister);
         }
       }
-    });
-  };
-  inputController.InputController.prototype._register = function (control, doCheck) {
-    var self = this;
-    if (control === undefined)
-      return;
-    var controlsToRegister = [].concat(control);
-    // control can be a single object or an array
-    controlsToRegister.forEach(function (aControl) {
-      if (aControl === undefined)
+
+      //Add it to our internal Map
+      self.presets.set(newPreset.name, newPreset);
+      self.handleChangePreset(newPreset.name);
+    };
+
+    updateInput(input)
+    {
+      var self = this;
+
+      if(input == null)
+      {
+        trace("Tried to update a null input");
         return;
-      var command = new inputController.Command(aControl);
-      self.registerdCommands[command.name] = command;
-      self.model.commands.push(command);
-      self.cockpit.emit('InputController.registeredCommand', command);
-      trace('InputController: Registering control ' + command.name);
-      self.controllers.forEach(function (controller) {
-        if (command.active) {
-          controller.register(command);
-          for (var property in command.bindings) {
-            self.registerdControls[property + ':' + command.bindings[property]] = command;
+      }
+
+      self.updateInputWithHardware(input);
+      self.updateInputWithPreset(input);
+
+      //Let everyone know we just updated
+      self.cockpit.emit('plugin.inputController.updatedPreset', self.currentPreset, self.actions);
+    };
+    
+    updateInputWithHardware(inputIn)
+    {
+      var self = this;
+
+           
+      //Grab the input object from the passed object
+      var newInput = inputIn.input;
+
+      //Grab a handle to the hardware controller associated with this input
+      var hardware = self.controllers.get(newInput.controller);
+      
+      //The action we are interested in updating
+      var oldPreset = self.currentPreset.actions.get(inputIn.action);
+
+      //If this controller is registered with this controller, proceed with hardware update
+      if(oldPreset.has(newInput.controller))
+      {
+        var previousInput = {
+          action: inputIn.action,
+          input: oldPreset.get(newInput.controller),
+          options: oldPreset.get(newInput.options)
+        };
+
+        var action = self.actions.get(inputIn.action).controls[newInput.type];
+        hardware.updateInput(previousInput, inputIn, action);
+      }
+      else
+      {
+        var inputToRegister = {
+          action: inputIn.action,
+          input: newInput
+        };
+
+        self.registerInput(inputToRegister);
+      }
+ 
+    };
+
+    updateInputWithPreset(inputIn)
+    {
+      var self = this;
+
+
+      //Grab the input object from the passed object     
+      var newInput = inputIn.input;
+      
+      self.currentPreset.updateInput(inputIn.action, newInput);
+    };
+
+    registerInput(input)
+    {
+      var self = this;
+
+      if(input == null)
+      {
+        trace("Tried to register a null input");
+        return;
+      }
+
+      self.registerInputWithPreset(input);
+      self.registerInputWithHardware(input);
+
+      //Let everyone know we just updated
+      self.cockpit.emit('plugin.inputController.updatedPreset', self.currentPreset, self.actions);
+    };
+
+    registerInputWithHardware(inputIn)
+    {
+      var self = this;
+
+      var input = inputIn.input;
+      var action = self.actions.get(inputIn.action).controls[input.type];
+
+
+      var hardware = self.controllers.get(input.controller);
+      
+      var inputForHardware = {
+        action: action,
+        input: input
+      };
+
+      hardware.registerInput(inputForHardware);
+    };
+
+    registerInputWithPreset(inputIn)
+    {
+      var self = this;
+
+      //If this preset already exists, just update the preset
+      if(!self.actions.has(inputIn.action))
+      {
+        return;
+      }
+
+      var input = inputIn.input;
+      self.currentPreset.registerInput(inputIn.action, input);
+    };
+
+    resetControllers()
+    {
+      var self = this;
+      
+      self.controllers.forEach(function(controller) {
+        controller.reset();
+      });
+    };
+
+    unregisterInput(input)
+    {
+      var self = this;
+
+      if(input == null)
+      {
+        trace("Tried to update a null input");
+        return;
+      }
+
+      //Unregister with current preset
+      self.unregisterInputWithPreset(input);
+
+      //And with hardware
+      self.unregisterInputWithHardware(input);
+      
+      //Let everyone know we just updated
+      self.cockpit.emit('plugin.inputController.updatedPreset', self.currentPreset, self.actions);
+    };
+    
+    unregisterInputWithHardware(inputIn)
+    {
+      var self = this;
+
+      var input = inputIn.input;
+      var hardware = self.controllers.get(input.controller);
+      
+      hardware.unregisterInput(input);
+    };
+    
+    unregisterInputWithPreset(inputIn)
+    {
+      var self = this;
+      
+      var currentPreset = self.presets.get(self.currentPreset);
+      var input = inputIn.input;
+
+      var inputToUnregister = {
+        name: input.name,
+        controller: input.controller,
+        type: input.type
+      };
+
+      self.currentPreset.unregisterInput(inputIn.action, inputToUnregister);
+    };
+  };
+
+  //Helper classes
+  /*Gamepad abstraction*/
+  class GamepadAbstraction
+  {
+    constructor(cockpit)
+    {
+      var self = this;
+      log("Starting gamepad abstraction");
+      
+      self.assignments = new Map();
+      self.cockpit = cockpit;
+      self.gamepadHardware = new HTML5Gamepad();
+      
+      self.currentTime = new Date();
+
+      //Ignore until time
+      self.ignoreInputUntil = 0;
+
+      //Bindingsadding
+      self.gamepadHardware.bind(HTML5Gamepad.Event.AXIS_CHANGED, function(e) {
+        if(self.currentTime.getTime() < self.ignoreInputUntil)
+        {
+          //Avoids inacurrate readings when the gamepad has just been connected
+          return;
+        }
+        var axis = e.axis;
+
+        if(self.assignments.has(axis))
+        {
+          var assignment = self.assignments.get(axis);
+          if(typeof assignment.action.update == 'function')
+          {
+            var value = e.value;
+
+            if(assignment.options.inverted)
+            {
+              value = value * -1;
+            }
+            if(assignment.options.exponentialSticks.enabled)
+            {
+              value = self.applyExponentialSticks(value, assignment.options.exponentialSticks.rate);
+            }
+            assignment.action.update(value);
           }
         }
       });
-    });
-    self.controlsToRegister = [];
-    if (doCheck) {
-      self.checkDuplicates();
-    }
-  };
-  inputController.InputController.prototype.unregister = function (controlName) {
-    var self = this;
-    var controlsToRemove = [].concat(controlName);
-    // controlName could be a single object or an array
-    controlsToRemove.forEach(function (control) {
-      delete self.registerdCommands[control];
-      for (var property in control.bindings) {
-        //it is possible that a different control actually owns a particular binding
-        if (self.registerdControls[property + ':' + control.bindings[property]] === control) {
-          delete self.registerdControls[property + ':' + control.bindings[property]];
+
+      self.gamepadHardware.bind(HTML5Gamepad.Event.BUTTON_DOWN, function(e) {
+        var control = e.control;
+        
+        if(self.assignments.has(control))
+        {
+          var button = self.assignments.get(control);
+          if(typeof button.action.down == 'function')
+          {
+            button.action.down();
+          }
         }
-      }
-    });
-    self.controllers.forEach(function (controller) {
-      controller.reset();
-    });
-    var commandsToRegister = [];
-    for (var command in self.registerdCommands) {
-      commandsToRegister.push(self.registerdCommands[command]);
-    }
-    self.model.commands.length = 0;
-    self._register(commandsToRegister, false);
-  };
-  inputController.InputController.prototype.activate = function (controlName) {
-    var self = this;
-    var controlsToActivate = [].concat(controlName);
-    controlsToActivate.forEach(function (commandName) {
-      var command = self.registerdCommands[commandName];
-      command.replaced = [];
-      for (var property in command.bindings) {
-        if (self.registerdControls[property + ':' + command.bindings[property]] !== undefined) {
-          trace('There is a conflict with ' + self.registerdControls[property + ':' + command.bindings[property]].name);
-          command.replaced.push(self.registerdControls[property + ':' + command.bindings[property]]);
+      });
+
+      self.gamepadHardware.bind(HTML5Gamepad.Event.BUTTON_UP, function(e) {
+        var control = e.control;
+
+        if(self.assignments.has(control))
+        {
+          var button = self.assignments.get(control);
+          if(typeof button.action.up == 'function')
+          {
+            button.action.up();
+          }
         }
+      });
+
+      self.gamepadHardware.bind(HTML5Gamepad.Event.CONNECTED, function(device) {
+        self.ignoreInputUntil = self.currentTime + 1000;
+        log("Gamepad connected", device);
+      });
+
+      self.gamepadHardware.bind(HTML5Gamepad.Event.DISCONNECTED, function(device) {
+        log("Gamepad disconnected", device);
+      });
+
+      self.gamepadHardware.bind(HTML5Gamepad.Event.UNSUPPORTED, function(device) {
+        trace("Gamepad unsupported", device);
+      });
+
+
+      if(!self.gamepadHardware.init())
+      {
+        trace("Your browser doesn't support this gamepad");
+        return;
       }
-      command.active = true;
-      self._register(command, false);
-      trace('activated command ' + command.name);
-    });
-  };
-  inputController.InputController.prototype.deactivate = function (controlName) {
-    var self = this;
-    var controlsToDeactivate = [].concat(controlName);
-    controlsToDeactivate.forEach(function (commandName) {
-      var command = self.registerdCommands[commandName];
-      if (command) {
-        command.active = false;
-        self.unregister(command);
-        command.replaced.forEach(function(oldcommand){
-          self._register(oldcommand, false);
-          trace('re-activated ' + oldcommand.name);
-        });
-        command.replaced = [];
-        trace('Deactivated command ' + command.name);
+    };
+
+    applyExponentialSticks(value, rate)
+    {
+      var s = Math.sign(value);
+      value = Math.pow(value, rate);
+      if(Math.sign(value) !== s)
+      {
+        value = value * s;
       }
-    });
+      return value;
+    };
   };
 
-  inputController.InputController.prototype.updateBinding = function(controls) {
-    var self = this;
-    if (controls === undefined)
-      return;
-    var controlsToUpdate = [].concat(controls);
-    controlsToUpdate.forEach(function(control) {
-      self.deactivate(control.name);
-      var command = self.registerdCommands[control.name];
-      if (command) {
-        for(var property in command.bindings) {
-            if (control.bindings[property] != undefined)
-            command.bindings[property] = control.bindings[property];
-        }
-        self.activate(control.name);
+  /*Gamepad interface*/
+  class Gamepad
+  {
+    constructor(cockpit)
+    {
+      log("Starting gamepad interface");
+      
+      var self = this;
+      self.gamepadAbstraction = new GamepadAbstraction(cockpit);
+    };
+
+    registerInput(inputIn)
+    {
+      var self = this;
+      var input = inputIn.input;
+
+      var inputToRegister = {
+        action: inputIn.action,
+        options: input.options
+      };
+
+      self.gamepadAbstraction.assignments.set(input.name, inputToRegister);
+    };
+
+    reset()
+    {
+      var self = this;
+
+      log_debug("Resetting gamepad");
+      self.gamepadAbstraction.assignments.clear();
+    };
+    
+    unregisterInput(inputIn)
+    {
+      var self = this;
+
+      if(inputIn == null)
+      {
+        trace("Tried to unregister an undefined key with gamepad");
+        return;
       }
-    });
 
+      log_debug("Unregistering:", inputIn.name, "from gamepad");
+      self.gamepadAbstraction.assignments.delete(inputIn.name);
+    };
+    
+    updateInput(previousInput, newInput, action)
+    {
+      var self = this;
+
+      //If there was a previous input, unregister
+      if(previousInput !== null)
+      {
+        self.unregisterInput(previousInput);
+      }
+
+      //Register the new input
+      var inputToRegister = {
+        action: action,
+        input: newInput.input
+      };
+
+      self.registerInput(inputToRegister);     
+    };
   };
 
-  inputController.InputController.prototype.suspend = function(controlName) {
-    var self = this;
-    self.previouslyActiveCommands = self.model.commands
-      .filter(function(command) {return command.active});
+  /*Keyboard Interface*/
+  class Keyboard
+  {
+    constructor(cockpit, mousetrap)
+    {
+      var self = this;
+      self.mousetrap = mousetrap;
 
-     self.controllers.forEach(function (controller) {
-       controller.reset();
-     });
+      log("Started keyboard abstraction");
+    };
+
+    registerInput(inputIn)
+    {
+      var self = this;
+
+      var input = inputIn.input;
+      var action = inputIn.action;
+      
+      if(self.mousetrap.modified == undefined) 
+      {
+        var orgStopCalback = self.mousetrap.prototype.stopCallback;
+        self.mousetrap.prototype.stopCallback = function (e, element, combo, sequence) 
+        {
+          if ((' ' + element.className + ' ').indexOf(' no-mousetrap ') > -1) {
+            return true;
+          }
+          return orgStopCalback.call(this, e, element, combo, sequence);
+        };
+        self.mousetrap.modified = true;
+      }
+
+      if(action.up !== undefined)
+      {
+        Mousetrap.bind(input.name, action.up, 'keyup');
+      }
+
+      if(action.down !== undefined)
+      {
+        self.mousetrap.bind(input.name, action.down, 'keydown');
+      }
+      
+    };
+
+    reset()
+    {
+      self.mousetrap.reset();
+    };
+
+    unregisterInput(inputIn)
+    {
+      var self = this;
+
+      if(inputIn == null)
+      {
+        trace("Tried to unregister an undefined key from Mousetrap");
+        return;
+      }
+
+      self.mousetrap.unbind(inputIn.name, 'keydown');
+      self.mousetrap.unbind(inputIn.name, 'keyup');
+    };
+
+
+    updateInput(previousInput, newInput, action)
+    {
+      var self = this;
+
+      //If there was a previous input, unregister
+      if(previousInput !== null)
+      {
+        self.unregisterInput(previousInput.input);
+      }
+
+      var inputToRegister = {
+        action: action,
+        input: newInput.input
+      };
+
+      self.registerInput(inputToRegister);     
+    };
+
   };
-
-  inputController.InputController.prototype.resume = function(controlName) {
-    var self = this;
-    self.previouslyActiveCommands.forEach(function(command) {
-      self.register(command);
-    })
-  };
-
 
   window.Cockpit.plugins.push(inputController.InputController);
 }(window, document));

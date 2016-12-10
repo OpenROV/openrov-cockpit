@@ -48,6 +48,7 @@
 
           el.collectionDomElement=Polymer.dom(self);
 
+          //Todo: Make sure this gets unregistered
           self.eventEmitter.on(el.widgetCollectionEventName,function(widgetArray){
             //TODO: Extend for late binding dynmaic widgets.  Right now
             //not sure what happens if it tries to add a widget a second time.

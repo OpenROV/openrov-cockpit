@@ -54,6 +54,10 @@
           if (args[args.length - 1] === self.senderID) {
             return;
           }
+          // This is the hook to update the socket cache used in app.js to prepopulate the last messages
+           if (self.socket.lvcCache) {
+             self.socket.lvcCache[type]=args;
+           }
           args.push(self.senderID);
           emitter.emit.apply(emitter, [type].concat(args));  //TODO: If this works, use the args pattern for performance.
                                                              // console.log("Socket -2> ",type);                

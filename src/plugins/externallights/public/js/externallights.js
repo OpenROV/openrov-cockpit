@@ -31,46 +31,62 @@
                 "max": 5
             }
 
+            self.actions = 
+            {
+                "plugin.externalLights.stepPositive":
+                {
+                    description: 'Increase External Light Brightness',
+                    controls:
+                    {
+                        button:
+                        {
+                            down: function() {
+                                cockpit.emit( 'plugin.externalLights.stepPositive' );
+                            }                            
+                        }
+                    }
+                },
+                "plugin.externalLights.stepNegative":
+                {
+                    description: "Decrease External Light Brightness",
+                    controls:
+                    {
+                        button:
+                        {
+                            down: function() {
+                                cockpit.emit( 'plugin.externalLights.stepNegative' );
+                            }                            
+                        }
+                    }
+                },
+                "plugin.externalLights.toggle":
+                {
+                    description: "Toggle External Light",
+                    controls:
+                    {
+                        button:
+                        {
+                            down: function() {
+                                cockpit.emit( 'plugin.externalLights.toggle' );
+                            }                            
+                        }
+                    }
+                }
+            };
+
             // Setup input handlers
-            this.inputDefaults = 
-            [
-              {
-                name: 'plugin.externalLights.stepPositive',
-                description: 'Makes the ROV external lights brighter.',
-                defaults: 
+            self.inputDefaults = 
+            {
+                keyboard:
                 {
-                  keyboard: '=',
-                },
-                down: function () 
-                {
-                  cockpit.emit( 'plugin.externalLights.stepPositive' );
+                    "=": { type: "button",
+                           action: "plugin.externalLights.stepPositive" },
+                    "-": { type: "button",
+                           action: "plugin.externalLights.stepNegative" },
+                    "0": { type: "button",
+                           action: "plugin.externalLights.toggle" },
                 }
-              },
-              {
-                name: 'plugin.externalLights.stepNegative',
-                description: 'Makes the ROV external lights dimmer.',
-                defaults: 
-                {
-                  keyboard: '-',
-                },
-                down: function () 
-                {
-                  cockpit.emit( 'plugin.externalLights.stepNegative' );
-                }
-              },
-              {
-                name: 'plugin.externalLights.toggle',
-                description: 'Toggles the ROV external lights on/off.',
-                defaults: 
-                { 
-                  keyboard: '0' 
-                },
-                down: function () 
-                {
-                  cockpit.emit( 'plugin.externalLights.toggle' );
-                }
-              }
-            ];
+            };
         };
 
         updateFromStep()

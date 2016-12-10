@@ -38,6 +38,7 @@ function Bridge()
   bridge.depthHoldEnabled = false;
   bridge.targetHoldEnabled = false;
   bridge.laserEnabled = false;
+  bridge.imuMode = 0;
 
   // -----------------------------------------
   // Methods
@@ -69,6 +70,11 @@ function Bridge()
         }
         
         break;
+      }
+
+      case 'imu_mode':{
+         bridge.imuMode = commandParts[1];
+         bridge.emitStatus(`imu_mode:${bridge.imuMode}`);
       }
 
       case 'ping': 
@@ -340,7 +346,13 @@ function Bridge()
       }
     }
 
-    result += 'imu_y:' + encode( headingOut ) + ';';
+    //Todo: To reduce errors, suggest using different variables for different values rather than relying on code
+    //to have additional knowledge of the IMU mode to interpret values.
+    if (bridge.imuMode==0){
+      result += 'imu_y:' + encode( headingOut ) + ';';
+    } else {
+      result += 'imu_y:' + encode( currentHeading ) + ';';
+    }
     // Generate pitch
     //p(t) = 90*sin(t)
     currentPitch = 90*Math.sin(time);

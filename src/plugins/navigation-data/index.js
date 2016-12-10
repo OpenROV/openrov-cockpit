@@ -9,6 +9,8 @@
         depth: 0,
         heading: 0
       };
+    this.state = {imuMode: 'gyro'}
+    var self=this;
 
     // Encoding helper functions
     function encode( floatIn )
@@ -40,6 +42,14 @@
       if ('fthr' in status) {
         navdata.thrust = status.fthr;
       }
+      if ('imu_mode' in status) {
+        self.state.imuMode = status.imu_mode==0?'gyro':'compass';
+        deps.cockpit.emit('plugin.navigationData.state', self.state);                
+      }
+      if ('imu_level:ack' in status) {
+        navstate.imu_level_ack = Date.now();
+      }
+
     });
 
     deps.cockpit.on('plugin.navigationData.zeroDepth', function () {
@@ -50,6 +60,15 @@
       deps.globalEventLoop.emit('mcu.SendCommand', 'ccal()');
     });
 
+    deps.cockpit.on('plugin.navigationData.setState', function (state) {
+      if (state.imuMode){
+        var mode = 0; //gyro
+        if (state.imuMode=="compass"){
+          mode = 1
+        }
+        deps.globalEventLoop.emit('mcu.SendCommand', `imu_mode(${mode})`);
+      }
+    });
     //TODO: Add API for switching compass to GYRO only mode for relative positioning if the compass is capable.
     //This also implies the UI should be notified so that it can remove the N/S/E/W references.  Perhaps switch to
     //a -180 + 180 coordinate system?

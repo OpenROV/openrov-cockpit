@@ -13,9 +13,9 @@
       "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.2.tgz"
     },
     "debug": {
-      "version": "2.2.0",
+      "version": "2.3.2",
       "from": "debug@>=2.1.0 <3.0.0",
-      "resolved": "https://registry.npmjs.org/debug/-/debug-2.2.0.tgz"
+      "resolved": "https://registry.npmjs.org/debug/-/debug-2.3.2.tgz"
     },
     "event-lite": {
       "version": "0.1.1",
@@ -29,7 +29,7 @@
     },
     "ieee754": {
       "version": "1.1.8",
-      "from": "ieee754@>=1.1.6 <2.0.0",
+      "from": "ieee754@>=1.1.8 <2.0.0",
       "resolved": "https://registry.npmjs.org/ieee754/-/ieee754-1.1.8.tgz"
     },
     "inherits": {
@@ -39,7 +39,7 @@
     },
     "int64-buffer": {
       "version": "0.1.9",
-      "from": "int64-buffer@>=0.1.6 <0.2.0",
+      "from": "int64-buffer@>=0.1.9 <0.2.0",
       "resolved": "https://registry.npmjs.org/int64-buffer/-/int64-buffer-0.1.9.tgz"
     },
     "isarray": {
@@ -48,14 +48,14 @@
       "resolved": "https://registry.npmjs.org/isarray/-/isarray-1.0.0.tgz"
     },
     "ms": {
-      "version": "0.7.1",
-      "from": "ms@0.7.1",
-      "resolved": "https://registry.npmjs.org/ms/-/ms-0.7.1.tgz"
+      "version": "0.7.2",
+      "from": "ms@0.7.2",
+      "resolved": "https://registry.npmjs.org/ms/-/ms-0.7.2.tgz"
     },
     "msgpack-lite": {
-      "version": "0.1.20",
+      "version": "0.1.26",
       "from": "msgpack-lite@>=0.1.17 <0.2.0",
-      "resolved": "https://registry.npmjs.org/msgpack-lite/-/msgpack-lite-0.1.20.tgz"
+      "resolved": "https://registry.npmjs.org/msgpack-lite/-/msgpack-lite-0.1.26.tgz"
     },
     "process-nextick-args": {
       "version": "1.0.7",
@@ -68,9 +68,9 @@
       "resolved": "https://registry.npmjs.org/randombytes/-/randombytes-2.0.3.tgz"
     },
     "readable-stream": {
-      "version": "2.1.5",
+      "version": "2.2.2",
       "from": "readable-stream@>=2.0.5 <3.0.0",
-      "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.1.5.tgz"
+      "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.2.tgz"
     },
     "simple-peer": {
       "version": "6.0.7",

@@ -562,6 +562,10 @@
             if(lastData == data) {return};
             lastData = data;
           });
+          emitter.on('plugin.navigationData.toggleHeadsUpDisplay', function() {
+            $(self.$.svg2).toggleClass('hidden');
+          });
+
           var updateData = function(){
             self.setData(lastData);
             setTimeout(updateData.bind(self),50);
@@ -571,19 +575,8 @@
         attached: function () {
           this.roll = 0;
           this.pitch = 0;
-
           var self = this;
-          if (this.eventEmitter !== undefined){
-            this.eventEmitter.emit('InputController.register',
-            {
-              name: 'main.toggleHeadsUpDisplay',
-              description: 'Toggle the heads-up-display on/off',
-              defaults: { keyboard: '\\' },
-              down: function () {
-                $(self.$.horizon).toggleClass('hidden');
-              }
-            });
-          }
+
           this.draw();
         },
         render: function (data) {
@@ -613,7 +606,6 @@
           {
             mapOrientationToCrosshairPos(this.pitch, this.roll, this.$.crosshair);
           }
-
         }
       });
     }());

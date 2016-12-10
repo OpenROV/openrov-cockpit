@@ -10,13 +10,31 @@ Prerequisites:
 Step 1: Installation
 You need to install all of the dependencies that are needed.  You do need an active internet connection when running this command.
 
+Linuxs/OSX:
+
 ```
 npm run deploy:prod
 ```
 
+Windows:
+```
+set NODE_ENV=production
+set npm_config_shrinkwrap=true
+npm install
+```
+
 > If you want to install the development dependencies for the system you have to ignore the shrinkwrap settings:
+
+Linuxs /OSX:
 ```
 npm run deploy:dev
+```
+
+Windows:
+```
+set NODE_ENV=development
+set npm_config_shrinkwrap=false
+npm install
 ```
 
 
@@ -121,3 +139,9 @@ https://docs.npmjs.com/cli/update
 Do this when readying the repo for the next release to prevent the dependencies from moving.
 
 `npm run shrinkwrap`
+
+After you upgrade packages with new dependencies or upgrade those dependencies, the shrinkwrap files should automatically regenerate.  Before checking them in to source code be sure to run:
+
+`npm run prepshinkwrap`
+
+which will remove the "OptionalDepenencies" from the shrinkwrap without regenerating the dependencies.

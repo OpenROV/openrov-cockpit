@@ -8,6 +8,8 @@ class SerialBridge extends EventEmitter
   {
     super();
 
+    this.uartDevicePath = uartDevicePath;
+    this.uartBaud = uartBaud;
     this.emitRawSerial = false;
     this.serialConnected = false;
     this.serialPort = {};

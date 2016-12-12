@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var flasher = require('/opt/openrov/src/system-plugins/platform-manager/platforms/raspberrypi/cpu/EEPROMFlasher.js');
 
 flasher( 'rev9' )

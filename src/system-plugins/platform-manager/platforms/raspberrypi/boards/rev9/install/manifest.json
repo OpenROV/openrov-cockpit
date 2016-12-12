@@ -1,7 +1,11 @@
 {
 	"files":
 	[
-		{ "src": "FlashFirmware.js", 	"dest": "/opt/openrov/system/scripts" }
+		{ "src": "flashEEPROM.js", 	"dest": "/opt/openrov/system/scripts" },
+		{ "src": "buildSAMD.sh", 	"dest": "/opt/openrov/system/scripts" },
+		{ "src": "flashSAMD.sh", 	"dest": "/opt/openrov/system/scripts" },
+		{ "src": "resetSAMD.sh", 	"dest": "/opt/openrov/system/scripts" },
+		{ "src": "debugSAMD.sh", 	"dest": "/opt/openrov/system/scripts" }
 	],
 	
 	"preinstall": 

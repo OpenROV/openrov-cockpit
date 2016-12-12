@@ -2,7 +2,7 @@ var execFileAsync   = require( 'child-process-promise' ).execFile;
 
 function Reset()
 {
-   return execFileAsync( 'bash', [ __dirname + "/ResetMCU.sh" ] );
+   return execFileAsync( 'bash', [ "/opt/openrov/system/scripts/resetSAMD.sh" ] );
 }
 
 module.exports = Reset;

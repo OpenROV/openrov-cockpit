@@ -46,6 +46,7 @@ class SerialBridge extends EventEmitter
 
     parser.on('data', (data) =>
     {
+      console.log( "DATA:", data );
       var status = this.parseStatus(data);
 
       // If valid status message received, emit status events

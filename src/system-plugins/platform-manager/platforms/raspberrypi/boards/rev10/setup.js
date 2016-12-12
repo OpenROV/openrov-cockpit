@@ -144,6 +144,7 @@ var RegisterFunctions = function(board)
   board.AddMethod('StartSerial', function () 
   {
     // Connect to the MCU
+    console.log( "StartSerial" );
     board.bridge.connect();
   }, false);
 

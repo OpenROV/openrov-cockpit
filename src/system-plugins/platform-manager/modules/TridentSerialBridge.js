@@ -46,7 +46,9 @@ class SerialBridge extends EventEmitter
 
     parser.on('data', (data) =>
     {
-      var status = this.parseStatus(data.toString('utf8'));
+      var rawStatus = data.toString('utf8' );
+      console.log( "RAW: " + rawStatus );
+      var status = this.parseStatus( rawStatus );
 
       // If valid status message received, emit status events
       if( status !== null )

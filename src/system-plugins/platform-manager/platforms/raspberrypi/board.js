@@ -77,6 +77,8 @@ BoardInterface.prototype.LoadPinMap = function (board)
 BoardInterface.prototype.LoadInterface = function( board ) 
 {
   console.log('BOARD: Loading board interface...');
+  console.log( "Loading board: " + './boards/' + board.info.boardId + '/setup.js' );
+
   require('./boards/' + board.info.boardId + '/setup.js')( board.targetBoard );
 
   return board;

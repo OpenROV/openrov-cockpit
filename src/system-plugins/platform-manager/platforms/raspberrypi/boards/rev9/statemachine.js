@@ -4,7 +4,6 @@ const retry             = require('bluebird-retry');
 const fs                = Promise.promisifyAll(require('fs-extra'));
 const StateMachine      = require('javascript-state-machine');
 
-const FlashMCUFirmware  = require( "./lib/FlashMCUFirmware.js" );
 const ResetMCU          = require( "./lib/ResetMCU.js" );
 
 module.exports = function( board ) 
@@ -31,28 +30,6 @@ module.exports = function( board )
     {
         board.global.emit( "plugin.updateManager.error", data.toString() );
         console.error( "FIRMWARE UPDATE: " + data.toString().trim() );
-    }
-
-    function flashMCUHandler(event, from, to)
-    {
-        status( "Flashing MCU firmware...", "InProgress" );
-
-        var self = this;
-
-        // Execute the build firmware script
-        retry( function(){ return FlashMCUFirmware( log, err ); }, {interval: 10000})
-        .then( function()
-        {   
-            // Success
-            log( "Flash succeeded" );
-            self._e_mcu_flash_complete();
-        })
-        .catch( function( error )
-        {
-            // Move to failed state
-            log( "Flash failed" );
-            self._e_fail( error );
-        });
     }
 
     function resetMCUHandler(event, from, to)
@@ -105,11 +82,9 @@ module.exports = function( board )
             // Internal events - Should always be called as the final step of a promise chain
             { name: '_e_init',                          from: 'none',                               to: 'complete' },
 
-            { name: '_e_mcu_flash_complete',            from: 'flashing_mcu',                       to: 'complete' },
             { name: '_e_mcu_reset_complete',            from: 'resetting_mcu',                      to: 'complete' },
 
             // User events (can only be used from the complete state)
-            { name: '_e_trigger_mcu_flash_user',        from: 'complete',                           to: 'flashing_mcu' },
             { name: '_e_trigger_mcu_reset_user',        from: 'complete',                           to: 'resetting_mcu' },
 
             { name: '_e_reset',                         from: ['complete', 'failed'],               to: 'complete' },
@@ -119,7 +94,6 @@ module.exports = function( board )
         callbacks: 
         {
             // State handlers - We allow states to handle their own transitions to ensure consistency
-            onflashing_mcu: flashMCUHandler,
             onresetting_mcu: resetMCUHandler,
             oncomplete: completeHandler,
             onfailed: failHandler,

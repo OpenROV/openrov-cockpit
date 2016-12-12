@@ -62,18 +62,6 @@ var RegisterFunctions = function(board)
     board.fsm._e_trigger_mcu_reset_user();
   }, false);
 
-  board.AddMethod('FlashESCs', function (path) 
-  {
-    // Trigger a reflash of the ESC firmware
-    board.fsm._e_trigger_esc_flash_user();
-  }, false);
-
-  board.AddMethod('UpdateFirmware', function (path) 
-  {
-    // Reset the firmware update state machine. Will check updates for everything
-    board.fsm._e_reset();
-  }, false);
-
   board.AddMethod('SendCommand', function( command ) 
   {
     board.bridge.write( command + ';' );

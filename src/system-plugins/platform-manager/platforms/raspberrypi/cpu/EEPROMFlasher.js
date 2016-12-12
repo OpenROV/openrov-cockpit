@@ -2,9 +2,9 @@ const Promise = require( 'bluebird' );
 const fs      = Promise.promisifyAll( require( 'fs' ) );
 const path    = require( 'path' );
 
-var EEPROMFlasher = ( productId, boardRev ) => 
+var EEPROMFlasher = ( boardID ) => 
 {
-    var boardInfoPath = path.resolve( path.join( __dirname, '../boards', productId, 'eeprom/boardinfo.json' ) );
+    var boardInfoPath = path.resolve( path.join( __dirname, '../boards', boardID, 'eeprom.json' ) );
 
     // Read board info file
     return fs.readFileAsync( boardInfoPath )

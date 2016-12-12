@@ -9,10 +9,14 @@ var SetupBoardInterface = function(board)
 {
     debug = board.debug;
 
+    console.log( "Creating bridge" );
+
     // Decorate the MCU interface with board specific properties
     board.bridge = new SerialBridge( '/dev/ttyAMA0', 1500000 );
 
     board.statusdata = {};
+
+    console.log( "Setting up bridge" );
 
     // ------------------------------------------------
     // Setup private board methods
@@ -30,6 +34,8 @@ var SetupBoardInterface = function(board)
         board.global.emit( board.interface + '.status', status );
     });
 
+    console.log( "Setting up API" );
+
     // ------------------------------------------------
     // Setup Public API	
     RegisterFunctions(board);
@@ -37,9 +43,13 @@ var SetupBoardInterface = function(board)
     // Call initialization routine
     board.global.emit('mcu.Initialize');
 
+    console.log( "Setting up statemachine" );
+
     // Create and start statemachine
     board.fsm = require( './statemachine.js' )( board );
     board.fsm._e_init();
+
+    console.log( "Done" );
 };
 
 // ------------------------------------------------

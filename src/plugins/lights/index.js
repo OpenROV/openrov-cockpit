@@ -41,6 +41,8 @@
                     // Encode floating point to integer representation
                     var command = 'lights_tpow(' + self.targetPower_enc + ')';
 
+                    console.log("LIGHT COMMAND:"+ 'lights_tpow(' + self.targetPower_enc + ')' );
+
                     // Emit command to mcu
                     self.globalBus.emit( 'mcu.SendCommand', command );
                 }

@@ -1,5 +1,6 @@
 const crc           = require('crc');
 const SerialPort    = require('serialport');
+const Delimiter      = SerialPort.parsers.Delimiter;
 const EventEmitter  = require('events').EventEmitter;
 
 class SerialBridge extends EventEmitter

@@ -15,7 +15,7 @@ class SerialBridge extends EventEmitter
 
   connect()
   {
-    this.serialPort = new SerialPort( uartDevicePath, 
+    this.serialPort = new SerialPort( this.uartDevicePath, 
     {
       baudRate: uartBaud,
       autoOpen: true

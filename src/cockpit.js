@@ -19,7 +19,7 @@ require('module').Module._initPaths();
 process.env[ "COCKPIT_PATH" ] = __dirname;
 
 // Set default logging options
-process.env.DEBUG = "log*,error*," + process.env.DEBUG;
+// process.env.DEBUG = "log*,error*," + process.env.DEBUG;
 
 var log = require('debug')('log:system');
 var error = require('debug')('error:system');

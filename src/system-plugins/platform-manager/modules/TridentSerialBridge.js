@@ -109,7 +109,7 @@ class SerialBridge extends EventEmitter
 
   parseStatus( rawStatus )
   {
-    let parts   = rawStatus.split(';').split( ':' );
+    let parts   = rawStatus.split( ':' );
     
     if( parts.length === 2 )
     {

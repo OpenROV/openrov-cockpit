@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var flasher = require('/opt/openrov/src/system-plugins/platform-manager/platforms/raspberrypi/cpu/EEPROMFlasher.js');
+var flasher = require('/opt/openrov/cockpit/src/system-plugins/platform-manager/platforms/raspberrypi/cpu/EEPROMFlasher.js');
 
 flasher( 'rev9' )
 .then( function(){ console.log( "EEPROM Successfully Flashed" ); }  )

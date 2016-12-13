@@ -275,20 +275,30 @@ loaderA.loadPluginsAsync(plugins)
 // Helper function
 function addPluginAssets(result) {
   scripts = scripts.concat(result.scripts);
+
   debug('====== Scripts ======');
   debug(result.scripts);
-  result.scripts.forEach(function (asset) {
+
+  result.scripts.forEach(function (asset) 
+  {
     debug('SCRIPT: ' + asset);
   });
+
   styles = styles.concat(result.styles);
+
   webcomponents = webcomponents.concat(result.webcomponents);
-  result.assets.forEach(function (asset) {
+
+  result.assets.forEach(function (asset) 
+  {
     debug('TEST: ' + asset.path);
     debug( JSON.stringify( asset ) );
     app.use('/' + asset.path, express.static(asset.assets));
   });
+
   applets = applets.concat(result.applets);
-  if (result.plugins !== undefined) {
+
+  if (result.plugins !== undefined) 
+  {
     deps.loadedPlugins = deps.loadedPlugins.concat(result.plugins);
   }
 }  // ------------------------------------------------------------------------

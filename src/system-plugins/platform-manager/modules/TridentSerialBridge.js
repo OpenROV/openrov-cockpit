@@ -111,11 +111,16 @@ class SerialBridge extends EventEmitter
     
     if( parts.length === 2 )
     {
-      let status = {};
-      status[ parts[ 0 ] ] = parts[ 1 ];
-      
-      console.log( status );
-      return status;
+      if( !isNaN( parts[ 1 ] ) )
+      {
+        let status = {};
+        status[ parts[ 0 ] ] = parts[ 1 ];
+        return status;
+      }
+      else
+      {
+        console.log( "NAN RESULT: " + parts[ 1 ] );
+      }
     }
 
     return null;

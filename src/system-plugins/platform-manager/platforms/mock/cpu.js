@@ -20,8 +20,13 @@ CPUInterface.prototype.LoadInfo = function (cpu) {
     return cpu;
   });
 };
-CPUInterface.prototype.CheckSupport = function (cpu) {
-  return readFileAsync(path.resolve(__dirname, 'cpu/revisionInfo.json')).then(JSON.parse).then(function (json) {
+
+CPUInterface.prototype.CheckSupport = function (cpu) 
+{
+  let p = path.resolve(__dirname, 'cpu/revisionInfo.json');
+  return readFileAsync(p)
+  .then(JSON.parse)
+  .then(function (json) {
     // Lookup cpu details in the raspi json file, based on revision
     var details = json[cpu.info.revision];
     if (details !== undefined) {

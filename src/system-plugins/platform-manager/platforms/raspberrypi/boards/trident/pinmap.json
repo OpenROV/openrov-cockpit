@@ -1,8 +1,0 @@
-{
-	"0001": 
-	{
-		"UC_RESETN": 	{ "pin": "P_12", "gpio": 18 },
-		"SWDIO": 		{ "pin": "P_18", "gpio": 24 },
-		"SWCLK": 		{ "pin": "P_22", "gpio": 25 }
-	}
-}

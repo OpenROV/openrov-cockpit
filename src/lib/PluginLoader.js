@@ -35,31 +35,28 @@ class PluginLoader
 
       //These functions are intended to be bound to the overall state of the loadPlugins method
 
-      var instantiatePlugins = function instantiatePlugins(plugins){
-        return plugins.map(function(plugin){
-                console.log('Loading ' + plugin + ' plugin.');
-                return Promise.try(function() {
-                    var pluginInstance;
+      var instantiatePlugins = function instantiatePlugins(plugins)
+      {
+        return Promise.map(plugins, function(plugin)
+        {
+            console.log( "PLUGIN MAP LOAD:" + plugin );
+ 
+            return Promise.try( () =>
+            {
+                return require(path.join(dir, plugin))(plugin, deps);
+            } )
+            .then( ( pluginInstance ) =>
+            {
+                // Check to see if plugin's index.js was loaded
+                if( pluginInstance === undefined ) 
+                {
+                    throw new Error('Plugin:' + plugin + ' is invalid, does not return a plugin object');
+                }
 
-                    try {
-                        pluginInstance = require(path.join(dir, plugin))(plugin, deps)
-                        pluginInstance.name=plugin;
-                        pluginInstance._raw=rawdata[plugin];
-                        result.plugins.push(pluginInstance); 
-                    } catch (ex) {
-                        console.log(JSON.stringify({
-                            message: ex.message,
-                            stack: ex.stack
-                        }));
-                        throw ex;
-                    };
-                    // Check to see if plugin's index.js was loaded
-                    if (pluginInstance == undefined) {
-                        throw new Error('Plugin:' + plugin + ' is invalid, does not return a plugin object');
-                    }
-                    return pluginInstance; //insantiated plugin 
-                });
-
+                pluginInstance.name = plugin;
+                pluginInstance._raw = rawdata[plugin];
+                result.plugins.push( pluginInstance ); 
+            } );
         });
       }
 
@@ -253,7 +250,8 @@ class PluginLoader
 
    }      
 
-   this.loadPluginsAsync = function(){
+   this.loadPluginsAsync = function(loadedPlugins)
+   {
     var self=this;
     return Promise.try(function(){
         var cache = {};
@@ -285,6 +283,11 @@ class PluginLoader
     })
     .then(function(){
       return result;
+    })
+    .then( (plugins) =>
+    {
+        loadedPlugins = loadedPlugins.concat( [ plugins ] );
+        return loadedPlugins;
     })
    }
       

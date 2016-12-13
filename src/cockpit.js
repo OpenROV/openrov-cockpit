@@ -231,38 +231,47 @@ var loaderC = new PluginLoader(pluginFolder, 'community-plugin', deps,options );
 
 // Performance optimization, attempt to read from a cache of the plugins instead, fallback
 // if not available.
-var promises = [];
 
-  promises = [
-    loaderA.loadPluginsAsync(),
-    loaderB.loadPluginsAsync(),
-    loaderC.loadPluginsAsync()
-  ];
+var plugins = [];
 
-// If a required plugin fails to load, cockpit will terminate. Otherwise, the plugin will be skipped.
-Promise.all(promises)
-.each(function(results){
+loaderA.loadPluginsAsync(plugins)
+.then( loaderB.loadPluginsAsync.bind( loaderB ) )
+.then( loaderC.loadPluginsAsync.bind( loaderC ) )
+.each(function(results)
+{
     addPluginAssets(results);
-}).then(function () {
+})
+.then(function () 
+{
   debug('Starting following plugins:');
   debug(deps.loadedPlugins);
+
   // Start each plugin
-  deps.loadedPlugins.forEach(function (plugin) {
-    if (plugin.start !== undefined) {
+  deps.loadedPlugins.forEach(function (plugin) 
+  {
+    if (plugin.start !== undefined) 
+    {
       plugin.start();
     }
   });
-}).then(function () {
+})
+.then(function () 
+{
   debug('Plugin loading successful!');
+
   // Start the web server
-  server.listen(app.get('port'), function () {
+  server.listen(app.get('port'), function () 
+  {
     log('Started listening on port: ' + app.get('port'));
   });
-}).catch(function (err) {
+})
+.catch(function (err)
+{
   error('Error starting plugins: ' + err.message);
   error('Stack trace: ' + err.stack);
   process.abort();
 });
+
 // Helper function
 function addPluginAssets(result) {
   scripts = scripts.concat(result.scripts);

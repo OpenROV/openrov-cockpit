@@ -253,7 +253,8 @@ class PluginLoader
 
    }      
 
-   this.loadPluginsAsync = function(){
+   this.loadPluginsAsync = function(loadedPlugins)
+   {
     var self=this;
     return Promise.try(function(){
         var cache = {};
@@ -285,6 +286,11 @@ class PluginLoader
     })
     .then(function(){
       return result;
+    })
+    .then( (plugins) =>
+    {
+        loadedPlugins = loadedPlugins.concat( [ plugins ] );
+        return loadedPlugins;
     })
    }
       

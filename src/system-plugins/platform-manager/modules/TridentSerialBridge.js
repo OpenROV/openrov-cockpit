@@ -94,6 +94,9 @@ class SerialBridge extends EventEmitter
     {
       this.serialPort.write( messagebuffer );
 
+      console.log( "SERIAL WRITE UTF: " + messagebuffer.toString( "utf8" ) );
+      console.log( "SERIAL WRITE HEX: " + messagebuffer.toString( "hex" ) );
+
       if( this.emitRawSerial ) 
       {
         this.emit('serial-sent', command );

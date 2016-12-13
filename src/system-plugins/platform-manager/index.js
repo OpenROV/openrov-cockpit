@@ -112,6 +112,7 @@ function LoadBoardInterface(platform)
   {
     try
     {
+      console.log( "Setting PRODUCTID to: " + platform.board.info.productId );
       process.env.PRODUCTID = platform.board.info.productId;
     }
     catch( err )

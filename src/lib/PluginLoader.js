@@ -39,35 +39,24 @@ class PluginLoader
       {
         return Promise.map(plugins, function(plugin)
         {
-                console.log('Loading ' + plugin + ' plugin.');
-                return Promise.try( function() 
+            console.log( "PLUGIN MAP LOAD:" + plugin );
+ 
+            return Promise.try( () =>
+            {
+                return require(path.join(dir, plugin))(plugin, deps);
+            } )
+            .then( ( pluginInstance ) =>
+            {
+                // Check to see if plugin's index.js was loaded
+                if( pluginInstance === undefined ) 
                 {
-                    var pluginInstance;
+                    throw new Error('Plugin:' + plugin + ' is invalid, does not return a plugin object');
+                }
 
-                    try 
-                    {
-                        pluginInstance = require(path.join(dir, plugin))(plugin, deps)
-                        pluginInstance.name=plugin;
-                        pluginInstance._raw=rawdata[plugin];
-                        result.plugins.push(pluginInstance); 
-                    } 
-                    catch (ex) 
-                    {
-                        console.log(JSON.stringify({
-                            message: ex.message,
-                            stack: ex.stack
-                        }));
-                        throw ex;
-                    };
-
-                    // Check to see if plugin's index.js was loaded
-                    if (pluginInstance == undefined) 
-                    {
-                        throw new Error('Plugin:' + plugin + ' is invalid, does not return a plugin object');
-                    }
-                    return pluginInstance; //insantiated plugin 
-                });
-
+                pluginInstance.name = plugin;
+                pluginInstance._raw = rawdata[plugin];
+                result.plugins.push( pluginInstance ); 
+            } );
         });
       }
 

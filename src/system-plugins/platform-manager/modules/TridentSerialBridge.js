@@ -112,7 +112,7 @@ class SerialBridge extends EventEmitter
   {
     console.log( "RAW STATUS: " + rawStatus );
 
-    let parts   = rawStatus.split( ':' );
+    let parts   = rawStatus.split( ':' ).trim();
 
     console.log( "SPLIT STATUS: " );
     console.log( parts );

@@ -41,8 +41,6 @@
                     // Encode floating point to integer representation
                     var command = 'lights_tpow(' + self.targetPower_enc + ')';
 
-                    console.log("SYNCING LIGHT COMMAND:"+ 'lights_tpow(' + self.targetPower_enc + ')' );
-
                     // Emit command to mcu
                     self.globalBus.emit( 'mcu.SendCommand', command );
                 }
@@ -76,8 +74,6 @@
                     // Current light power
                     if( 'lights_pow' in data ) 
                     {
-                        console.log("LIGHT CURRENT POW:" + data.lights_pow );
-
                         // Convert from integer to float
                         var power = decode( parseInt( data.lights_pow ) );
 
@@ -88,8 +84,6 @@
                     // Target light power
                     if( 'lights_tpow' in data ) 
                     {
-                        console.log("LIGHT TARGET POW:" + data.lights_tpow );
-
                         // Save encoded version for sync validation purposes
                         self.mcuTargetPower_enc = parseInt( data.lights_tpow );
 
@@ -112,8 +106,6 @@
         setTargetPower( powerIn )
         {
             var self = this;
-
-            console.log("COCKPIT REQUESTED POWER:" + powerIn );
 
             // Validate input
             if( isNaN( powerIn ) )

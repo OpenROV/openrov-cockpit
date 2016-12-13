@@ -35,26 +35,34 @@ class PluginLoader
 
       //These functions are intended to be bound to the overall state of the loadPlugins method
 
-      var instantiatePlugins = function instantiatePlugins(plugins){
-        return plugins.map(function(plugin){
+      var instantiatePlugins = function instantiatePlugins(plugins)
+      {
+        return Promise.map(plugins, function(plugin)
+        {
                 console.log('Loading ' + plugin + ' plugin.');
-                return Promise.try(function() {
+                return Promise.try( function() 
+                {
                     var pluginInstance;
 
-                    try {
+                    try 
+                    {
                         pluginInstance = require(path.join(dir, plugin))(plugin, deps)
                         pluginInstance.name=plugin;
                         pluginInstance._raw=rawdata[plugin];
                         result.plugins.push(pluginInstance); 
-                    } catch (ex) {
+                    } 
+                    catch (ex) 
+                    {
                         console.log(JSON.stringify({
                             message: ex.message,
                             stack: ex.stack
                         }));
                         throw ex;
                     };
+
                     // Check to see if plugin's index.js was loaded
-                    if (pluginInstance == undefined) {
+                    if (pluginInstance == undefined) 
+                    {
                         throw new Error('Plugin:' + plugin + ' is invalid, does not return a plugin object');
                     }
                     return pluginInstance; //insantiated plugin 

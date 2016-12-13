@@ -81,14 +81,23 @@ class SerialBridge extends EventEmitter
 
   write( command )
   {
-    // Create buffer for crc+command
-    let messagebuffer = new Buffer( command.length + 1 );
+    // // Create buffer for crc+command
+    // let messagebuffer = new Buffer( command.length + 1 );
 
-    // Calculate and write crc8
-    messagebuffer[ 0 ] = crc.crc81wire(command);
+    // // Calculate and write crc8
+    // messagebuffer[ 0 ] = crc.crc81wire(command);
 
-    // Write command
-    messagebuffer.write( command, 1, command.length, 'utf-8' );
+    // // Write command
+    // messagebuffer.write( command, 1, command.length, 'utf-8' );
+
+    var crc8 = crc.crc81wire(command);
+    var commandBuffer = new Buffer(command, 'utf8');
+    var crcBuffer = new Buffer(1);
+    crcBuffer[0] = crc8;
+    var messagebuffer = Buffer.concat([
+        crcBuffer,
+        commandBuffer
+      ]);
 
     if( this.serialConnected ) 
     {

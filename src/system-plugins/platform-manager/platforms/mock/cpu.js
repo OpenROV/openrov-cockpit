@@ -25,15 +25,7 @@ CPUInterface.prototype.CheckSupport = function (cpu)
 {
   let p = path.resolve(__dirname, 'cpu/revisionInfo.json');
   return readFileAsync(p)
-  .then( (result) =>
-  {
-    return result;
-  })
   .then(JSON.parse)
-  .then( (json) =>
-  {
-    return json;
-  })
   .then(function (json) {
     // Lookup cpu details in the raspi json file, based on revision
     var details = json[cpu.info.revision];

@@ -6,7 +6,6 @@ class BoardInterface
 {
   constructor()
   {
-    this.board = {};
   }
 
   Compose( platform )
@@ -32,7 +31,6 @@ class BoardInterface
   LoadInfo()
   {
     var self = this;
-    self.board.info = {};
 
     console.log('BOARD: Loading board info from Mock EEPROM...');
 
@@ -77,6 +75,5 @@ class BoardInterface
     require( './boards/' + self.board.info.boardId + '/setup.js' )( self.board.targetBoard );
   };
 }
-
 
 module.exports = new BoardInterface();

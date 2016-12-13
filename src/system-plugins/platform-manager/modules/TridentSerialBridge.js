@@ -114,6 +114,7 @@ class SerialBridge extends EventEmitter
       let status = {};
       status[ parts[ 0 ] ] = parts[ 1 ];
       
+      console.log( status );
       return status;
     }
 

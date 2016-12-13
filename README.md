@@ -39,7 +39,7 @@ Branches:
 * bug/[id] : These are bug branches for quick bug fixes
 
 Tags:
-
+(subject to change)
 * v[version] : These are offical releases
 * release/[named-release] : ex NewCamera2016DevImage, are specific releases that were not targeted twoards the general public.  There may have been trade offs where the code only works in certian configurations.
 

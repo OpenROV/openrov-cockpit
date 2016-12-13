@@ -94,9 +94,6 @@ class SerialBridge extends EventEmitter
     {
       this.serialPort.write( messagebuffer );
 
-      console.log( "SERIAL WRITE UTF: " + messagebuffer.toString( "utf8" ) );
-      console.log( "SERIAL WRITE HEX: " + messagebuffer.toString( "hex" ) );
-
       if( this.emitRawSerial ) 
       {
         this.emit('serial-sent', command );
@@ -110,20 +107,12 @@ class SerialBridge extends EventEmitter
 
   parseStatus( rawStatus )
   {
-    console.log( "RAW STATUS: " + rawStatus );
-
     let parts   = rawStatus.trim().split( ':' );
-
-    console.log( "SPLIT STATUS: " );
-    console.log( parts );
     
     if( parts.length === 2 )
     {
       let status = {};
       status[ parts[ 0 ] ] = parts[ 1 ];
-
-      console.log( "PROC STATUS: " );
-      console.log( status );
       
       return status;
     }

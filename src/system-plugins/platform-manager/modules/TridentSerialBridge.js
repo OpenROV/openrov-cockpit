@@ -81,23 +81,14 @@ class SerialBridge extends EventEmitter
 
   write( command )
   {
-    // // Create buffer for crc+command
-    // let messagebuffer = new Buffer( command.length + 1 );
+    // Create buffer for crc+command
+    let messagebuffer = new Buffer( command.length + 1 );
 
-    // // Calculate and write crc8
-    // messagebuffer[ 0 ] = crc.crc81wire(command);
+    // Calculate and write crc8
+    messagebuffer[ 0 ] = crc.crc81wire(command);
 
-    // // Write command
-    // messagebuffer.write( command, 1, command.length, 'utf-8' );
-
-    var crc8 = crc.crc81wire(command);
-    var commandBuffer = new Buffer(command, 'utf8');
-    var crcBuffer = new Buffer(1);
-    crcBuffer[0] = crc8;
-    var messagebuffer = Buffer.concat([
-        crcBuffer,
-        commandBuffer
-      ]);
+    // Write command
+    messagebuffer.write( command, 1, command.length, 'utf-8' );
 
     if( this.serialConnected ) 
     {
@@ -119,12 +110,21 @@ class SerialBridge extends EventEmitter
 
   parseStatus( rawStatus )
   {
+    console.log( "RAW STATUS: " + rawStatus );
+
     let parts   = rawStatus.split( ':' );
+
+    console.log( "SPLIT STATUS: " );
+    console.log( parts );
     
     if( parts.length === 2 )
     {
       let status = {};
       status[ parts[ 0 ] ] = parts[ 1 ];
+
+      console.log( "PROC STATUS: " );
+      console.log( status );
+      
       return status;
     }
 

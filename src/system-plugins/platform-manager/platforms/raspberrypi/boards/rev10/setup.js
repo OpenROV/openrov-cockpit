@@ -1,7 +1,7 @@
 const fs            = require('fs');
 const path          = require('path');
 const spawn         = require('child_process').spawn;
-const SerialBridge  = require('SerialBridge.js');
+const SerialBridge  = require('TridentSerialBridge.js');
 
 var debug = {};
 

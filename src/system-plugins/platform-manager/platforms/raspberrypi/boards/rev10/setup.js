@@ -12,7 +12,7 @@ var SetupBoardInterface = function(board)
     console.log( "Creating bridge" );
 
     // Decorate the MCU interface with board specific properties
-    board.bridge = new SerialBridge( '/dev/ttyAMA0', 1500000 );
+    board.bridge = new SerialBridge( '/dev/ttyAMA0', 500000 );
 
     board.statusdata = {};
 

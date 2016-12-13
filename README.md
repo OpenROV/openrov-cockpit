@@ -80,3 +80,5 @@ Filing issues: We have centralized all issues in the umbrella [openrov-software 
 Someone on the team will review the pull request and ensure the changes work on the ROVs before approving the pull request.
 
 * Currently developed and tested against Chrome, but should work with Firefox.  Looking for testers to check Edge and Safari.
+
+...

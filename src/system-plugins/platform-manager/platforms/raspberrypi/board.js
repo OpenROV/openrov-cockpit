@@ -9,6 +9,8 @@ class BoardInterface
 {
   constructor()
   {
+    this.board = {};
+    
     // Define a parser for the board information stored on the controller board's eeprom
     this.eepromParser = Parser.start().endianess('little').uint32('length').string('data', 
     {

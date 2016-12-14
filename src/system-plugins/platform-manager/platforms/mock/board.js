@@ -6,6 +6,7 @@ class BoardInterface
 {
   constructor()
   {
+    this.board = {};
   }
 
   Compose( platform )

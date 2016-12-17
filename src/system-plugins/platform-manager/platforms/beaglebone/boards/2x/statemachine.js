@@ -43,7 +43,7 @@ module.exports = function( board )
     {
         var self = this;
 
-        status( "Checking ESCs...", "InProgress" );
+        status( "Checking ESCs...", "Examining" );
 
         // Check to see if ESCs have been flashed before by testing the existence of esc.conf
         fs.statAsync( escConfPath )
@@ -66,6 +66,7 @@ module.exports = function( board )
         var self = this;
 
         status( "Flashing ESCs...", "InProgress" );
+        this.data.flashingAttemped = true;
 
         // First, disconnect the bridge
         self.board.bridge.close();
@@ -101,7 +102,7 @@ module.exports = function( board )
     {
         var self = this;
 
-        status( "Checking if firmware already built...", "InProgress" );
+        status( "Checking if firmware already built...", "Examining" );
 
         // Check to see if ESCs have been flashed before by testing the existence of esc.conf
         fs.statAsync( mcuBinPath )
@@ -122,7 +123,7 @@ module.exports = function( board )
     function buildFirmwareHandler(event, from, to)
     {
         status( "Building firmware...", "InProgress" );
-
+        this.data.flashingAttemped = true;
         var self = this;
 
         // Execute the build firmware script
@@ -143,7 +144,7 @@ module.exports = function( board )
 
     function getHashHandler(event, from, to)
     {
-        status( "Fetching firmware hash...", "InProgress" );
+        status( "Fetching firmware hash...", "Examining" );
 
         var self = this;
 
@@ -182,7 +183,7 @@ module.exports = function( board )
     function flashMCUHandler(event, from, to)
     {
         status( "Flashing MCU firmware...", "InProgress" );
-
+        this.data.flashingAttemped = true;
         var self = this;
 
         // Execute the build firmware script
@@ -203,7 +204,7 @@ module.exports = function( board )
 
     function verifyVersionHandler(event, from, to)
     {
-        status( "Checking current firmware against latest...", "InProgress" );
+        status( "Checking current firmware against latest...", "Examining" );
 
         var self = this;
 
@@ -287,13 +288,17 @@ module.exports = function( board )
     function completeHandler(event, from, to)
     {
         status( "Firmware up to date!", "Complete" );
-        notify( "Firmware update applied");
+        if (this.data.flashingAttemped){
+            notify( "Firmware update applied");
+        }
+        this.data.flashingAttemped = false;
     }
 
     function failHandler(event, from, to)
     {
         status( "Firmware update failed!", "Failed" );
         notify( "Firmware update failed");
+        this.data.flashingAttemped = false;
     }
 
     function eFailHandler(event, from, to, msg) 

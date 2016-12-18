@@ -166,9 +166,9 @@
                         resolution:         info.resolution,
                         framerate:          info.framerate, 
                         wspath:             "",
-                        relativeServiceUrl: `:${info.port}`,
+                        relativeServiceUrl: process.env.EXTERNAL_CAM === 'true' ? process.env.EXTERNAL_CAM_URL : `${info.port}`,
                         sourcePort:         info.port,
-                        sourceAddress:      process.env.EXTERNAL_CAM === true ? process.env.EXTERNAL_CAM_URL : "",
+                        sourceAddress:      process.env.EXTERNAL_CAM === 'true' ? process.env.EXTERNAL_CAM_URL : "",
                         connectionType:     info.connectionType
                     });
                 })

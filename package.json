@@ -33,6 +33,7 @@
     "findit": "^2.0.0",
     "forever-monitor": "",
     "fs-extra": "",
+    "i2c": "",
     "javascript-state-machine": "^2.3.5",
     "jquery-file-upload-middleware": "",
     "json-schema-defaults": "^0.2.0",

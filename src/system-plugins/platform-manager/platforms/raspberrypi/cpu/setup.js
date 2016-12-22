@@ -1,12 +1,11 @@
 const Promise   = require( 'bluebird' );
 const fs        = Promise.promisifyAll( require('fs') );
 const path      = require('path');
-const i2c       = require('i2c');
 const Periodic  = require( 'Periodic' );
-
 const debug = {};
 
 // I2C setup
+var i2c       = require('i2c');
 var lm75Address = 0x48;
 var i2c1  = new i2c( lm75Address, { device: '/dev/i2c-1' } );
 

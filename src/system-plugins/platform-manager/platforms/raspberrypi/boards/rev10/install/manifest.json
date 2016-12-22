@@ -11,7 +11,7 @@
 		{ "src": "selectESCB.sh", 	"dest": "/opt/openrov/system/scripts" },
 		{ "src": "selectESCC.sh", 	"dest": "/opt/openrov/system/scripts" },
 		{ "src": "flashESCS.sh", 	"dest": "/opt/openrov/system/scripts" },
-		{ "src": "openocd-samd.cfg","dest": "/opt/openrov/system/etc" }
+		{ "src": "openocd_samd.cfg","dest": "/opt/openrov/system/etc" }
 	],
 	
 	"preinstall": 

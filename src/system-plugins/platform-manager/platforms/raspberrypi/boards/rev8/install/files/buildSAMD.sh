@@ -8,8 +8,8 @@ mkdir -p /opt/openrov/firmware/deploy
 cd /opt/openrov/firmware/samd/apps/trident
 
 # Build
-make -j BOARD=openrov-trident-rev9
+make -j BOARD=openrov-trident-rev8
 
 # Copy final binaries to deploy folder
-cp bin/openrov-trident-rev9/trident.hex /opt/openrov/firmware/deploy/trident-rev9-samd.bin
-cp bin/openrov-trident-rev9/trident.elf /opt/openrov/firmware/deploy/trident-rev9-samd.elf
+cp bin/openrov-trident-rev8/trident.hex /opt/openrov/firmware/deploy/trident-rev8-samd.bin
+cp bin/openrov-trident-rev8/trident.elf /opt/openrov/firmware/deploy/trident-rev8-samd.elf

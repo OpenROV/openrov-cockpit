@@ -7,8 +7,8 @@ const Periodic  = require( 'Periodic' );
 const debug = {};
 
 // I2C setup
-const lm75Address = 0x48;
-const i2c1  = new i2c( lm75Address, { device: '/dev/i2c-1' } );
+var lm75Address = 0x48;
+var i2c1  = new i2c( lm75Address, { device: '/dev/i2c-1' } );
 
 // Promisify the I2C read operation
 var i2c1ReadAsync = Promise.promisify( i2c1.read, { context: i2c1 } );

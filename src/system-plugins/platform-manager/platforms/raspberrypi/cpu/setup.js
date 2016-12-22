@@ -1,8 +1,8 @@
-const Promise   = require( 'bluebird' );
-const fs        = Promise.promisifyAll( require('fs') );
-const path      = require('path');
-const Periodic  = require( 'Periodic' );
-const debug = {};
+var Promise   = require( 'bluebird' );
+var fs        = Promise.promisifyAll( require('fs') );
+var path      = require('path');
+var Periodic  = require( 'Periodic' );
+var debug = {};
 
 // I2C setup
 var i2c       = require('i2c');

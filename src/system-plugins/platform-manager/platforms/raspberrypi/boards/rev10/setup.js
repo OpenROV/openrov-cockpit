@@ -47,7 +47,7 @@ var SetupBoardInterface = function(board)
         })
         .catch( (err) =>
         {
-          console.log( "Error reading LM75. Stopping task: " + err.message );
+          console.error( "Error reading LM75. Stopping task: " + err.message );
           board.readLM75Temp.stop();
         });
     });

@@ -32,7 +32,7 @@ var SetupCPUInterface = function( cpu )
         // First byte is temperature in C, first bit of second byte is equal to 0.5C
         let temp = result[ 0 ] + ( ( ( result[ 1 ] & 0x80 ) >> 7 ) * 0.5 );
 
-        console.log( "LM75 TEMP: " + temp ):
+        console.log( "LM75 TEMP: " + temp );
 
         // Emit on cockpit bus
         self.cockpit.emit( "cpu.temp.lm75", temp );
@@ -51,7 +51,7 @@ var SetupCPUInterface = function( cpu )
       {
         let temp = parseInt( result, 10 ) / 1000;
 
-        console.log( "CPU TEMP: " + temp ):
+        console.log( "CPU TEMP: " + temp );
 
         // Emit on cockpit bus
         self.cockpit.emit( "cpu.temp.rpi", temp );

@@ -2,4 +2,4 @@
 set -ex
 
 # Run OpenOCD GDB server
-openocd -f /usr/share/openocd/scripts/board/openrov_trident_samd.cfg
+openocd -f /opt/openrov/system/etc/openocd_samd.cfg

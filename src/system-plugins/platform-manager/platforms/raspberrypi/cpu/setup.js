@@ -14,15 +14,13 @@ var i2c1ReadAsync = Promise.promisify( i2c1.read, { context: i2c1 } );
 
 var SetupCPUInterface = function( cpu ) 
 {
-  var self = this;
-  
   debug = cpu.debug;
 
   // Decorate the CPU interface with cpu specific properties
   cpu.stats = {};
 
   // Create periodic functions for reading CPU temp and LM75 temp
-  self.readLM75Temp = new Periodic( 1000, "timeout", () =>
+  cpu.readLM75Temp = new Periodic( 1000, "timeout", () =>
   {
     // Read two bytes to get the temperature bits
     return i2c1ReadAsync( 2 )
@@ -34,16 +32,16 @@ var SetupCPUInterface = function( cpu )
         console.log( "LM75 TEMP: " + temp );
 
         // Emit on cockpit bus
-        self.cockpit.emit( "cpu.temp.lm75", temp );
+        cpu.cockpit.emit( "cpu.temp.lm75", temp );
       })
       .catch( (err) =>
       {
         console.log( "Error reading LM75. Stopping task: " + err.message );
-        self.readLM75Temp.stop();
+        cpu.readLM75Temp.stop();
       });
   });
 
-  self.readCPUTemp = new Periodic( 1000, "timeout", () =>
+  cpu.readCPUTemp = new Periodic( 1000, "timeout", () =>
   {
     return fs.readFileAsync('/sys/class/thermal/thermal_zone0/temp' )
       .then( ( result ) =>
@@ -53,19 +51,19 @@ var SetupCPUInterface = function( cpu )
         console.log( "CPU TEMP: " + temp );
 
         // Emit on cockpit bus
-        self.cockpit.emit( "cpu.temp.rpi", temp );
+        cpu.cockpit.emit( "cpu.temp.rpi", temp );
       })
       .catch( ( err ) =>
       {
         // Error reading file. Stop reading it
         console.error( "Error reading cpu temp. Stopping read task: " + err.message );
-        self.readCPUTemp.stop();
+        cpu.readCPUTemp.stop();
       });
   });
 
   // Start periodic tasks
-  self.readLM75Temp.start();
-  self.readCPUTemp.start();
+  cpu.readLM75Temp.start();
+  cpu.readCPUTemp.start();
 
   // ------------------------------------------------
   // Setup Public API	

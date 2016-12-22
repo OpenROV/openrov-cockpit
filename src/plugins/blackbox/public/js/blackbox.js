@@ -93,7 +93,7 @@
     });
     var OnAnyBlacklist = [
         'cpu.temp.rpi',
-        'cpu.temp.lm75',
+        'board.temp.lm75',
         'plugin.navigationData.data',
         'plugin.gps.data',
         'status',
@@ -123,9 +123,9 @@
         self.logEventData('cpu.temp.rpi', data);
       }
     });
-    this.cockpit.rov.on('cpu.temp.lm75', function (data) {
+    this.cockpit.rov.on('board.temp.lm75', function (data) {
       if (!jQuery.isEmptyObject(data)) {
-        self.logEventData('cpu.temp.lm75', data);
+        self.logEventData('board.temp.lm75', data);
       }
     });
     this.cockpit.rov.on('plugin.navigationData.data', function (data) {

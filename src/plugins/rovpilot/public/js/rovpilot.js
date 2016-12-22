@@ -237,6 +237,36 @@
             }          
           }
         }
+      },
+      'rovPilot.incrementPowerLevel':
+      {
+        description: "Increment ROV Power Level",
+        controls:
+        {
+          button:
+          {
+            down: function() {
+              // Get the ROV's current power level 
+              rov.cockpit.emit('plugin.rovpilot.getState', function(state) {
+                console.log("Got a state: ", state);
+              })
+            }
+          }
+        }
+      },
+      'rovPilot.decrementPowerLevel':
+      {
+        description: "Decrement ROV Power Level",
+        controls:
+        {
+          button:
+          {
+            down: function() {
+              console.log("decrementing power level: ", self.powerLevel);
+              //rov.cockpit.emit('plugin.rovpilot.decrementPowerLevel');
+            }
+          }
+        }
       }
     };
 
@@ -266,6 +296,8 @@
                action: 'rovPilot.powerLevel4' }, 
         "5": { type: "button",
                action: 'rovPilot.powerLevel5' }, 
+        "7": { type: "button",
+               action: 'rovPilot.incrementPowerLevel' }, 
       },
       gamepad:
       {
@@ -299,6 +331,12 @@
                             }
                           } 
                          },
+         "LEFT_TRIGGER": { type: "button",
+                           action: 'rovPilot.decrementPowerLevel'
+         },
+         "RIGHT_TRIGGER": { type: "button",
+                            action: 'rovPilot.incrementPowerLevel'
+         }
       }
     };
   };
@@ -324,7 +362,7 @@
     //and position state.  We send that desired state up to the server when it
     //changes.
     //Ideally, we could put hooks in so that we get verification that a requested state
-    //has been acknoledged by the ROV so that we can automtically retry sending state
+    //has been acknowledged by the ROV so that we can automatically retry sending state
     //if that awk timesout.
     //We can also send our state updates with a timestamp if we figure out a way
     //to deal with the clocks not being in sync between the computer and the ROV.
@@ -334,7 +372,9 @@
     }
     //initial sync of state information
     this.rov.emit('plugin.rovpilot.getState', function (state) {
+      
       this.powerLevel = state.powerLevel;
+      console.log("Got a state: ", state.powerLevel);
       self.cockpit.emit('plugin.rovpilot.setPowerLevel', this.powerLevel);
     });
     this.cockpit.on('plugin.rovpilot.getState', function (callback) {
@@ -345,6 +385,8 @@
       self.cockpit.emit('plugin.rovpilot.controls', controls);
     });
     this.cockpit.on('plugin.rovpilot.setPowerLevel', function (level) {
+      //Set our state to what was requested
+      self.powerLevel = level;
       self.rov.emit('plugin.rovpilot.setPowerLevel', level);
     });
     this.cockpit.on('plugin.rovpilot.setThrottle', function (value) {

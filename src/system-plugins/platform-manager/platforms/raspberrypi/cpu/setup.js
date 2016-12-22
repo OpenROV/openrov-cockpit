@@ -62,8 +62,8 @@ var SetupCPUInterface = function( cpu )
   });
 
   // Start periodic tasks
-  cpu.readLM75Temp.start();
-  cpu.readCPUTemp.start();
+  // cpu.readLM75Temp.start();
+  // cpu.readCPUTemp.start();
 
   // ------------------------------------------------
   // Setup Public API	

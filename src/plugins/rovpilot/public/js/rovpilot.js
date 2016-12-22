@@ -19,7 +19,7 @@
         roll: 0,
         strafe: 0
       };
-      self.powerLevel = 1;
+      self.powerLevel = 2;
       self.priorControls = {};
 
       self.sendToROVEnabled = true;
@@ -29,13 +29,11 @@
 
       //Get the stick values
       self.cockpit.withHistory.on('settings-change.rovPilot', function (settings) {
-        
         //Init settings with defaults
         self.settings = settings.rovPilot;
       });
 
       //Input mappings
-
       self.actions = 
       {
         'rovPilot.moveForward':
@@ -46,7 +44,6 @@
             button:
             {
               down: function() {
-                console.log("Moving forward");
                 self.cockpit.emit('plugin.rovpilot.setThrottle', 1);
               },
               up: function() {
@@ -248,9 +245,14 @@
             {
               down: function() {
                 // Get the ROV's current power level 
-                rov.cockpit.emit('plugin.rovpilot.getState', function(state) {
-                  console.log("Got a state: ", state);
-                })
+                self.cockpit.rov.emit('plugin.rovpilot.getState', function(state) {
+                  self.powerLevel = state.powerLevel;
+                  if(self.powerLevel < 5)
+                  {
+                    self.powerLevel = self.powerLevel + 1;
+                  }
+                  self.cockpit.emit('plugin.rovpilot.setPowerLevel', self.powerLevel);
+                });
               }
             }
           }
@@ -263,8 +265,15 @@
             button:
             {
               down: function() {
-                console.log("decrementing power level: ", self.powerLevel);
-                //rov.cockpit.emit('plugin.rovpilot.decrementPowerLevel');
+                // Get the ROV's current power level 
+                self.cockpit.rov.emit('plugin.rovpilot.getState', function(state) {
+                  self.powerLevel = state.powerLevel;
+                  if(self.powerLevel > 1)
+                  {
+                    self.powerLevel = self.powerLevel - 1;
+                  }
+                  self.cockpit.emit('plugin.rovpilot.setPowerLevel', self.powerLevel);
+                });
               }
             }
           }
@@ -298,6 +307,8 @@
           "5": { type: "button",
                 action: 'rovPilot.powerLevel5' }, 
           "7": { type: "button",
+                action: 'rovPilot.decrementPowerLevel' },
+          "8": { type: "button",
                 action: 'rovPilot.incrementPowerLevel' }, 
         },
         gamepad:
@@ -367,7 +378,7 @@
       //We can also send our state updates with a timestamp if we figure out a way
       //to deal with the clocks not being in sync between the computer and the ROV.
       var self = this;
-      
+
       //Initial sync of state
       self.cockpit.rov.emit('plugin.rovpilot.getState', function(state) {
         self.powerLevel = state.powerLevel;

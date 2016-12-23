@@ -1,4 +1,4 @@
-var log,error,debug,warn;
+var logger;
 const nedb = require('nedb');
 const path = require('path');
 const bluebird = require('bluebird');
@@ -9,11 +9,9 @@ var _announcementScheduled = false;
 class Notifications {
 
     constructor(name, deps) {
-        log = deps.logger.info.bind(deps.logger);
-        error = deps.logger.error.bind(deps.logger);
-        debug = deps.logger.debug.bind(deps.logger);
-        warn = deps.logger.warn.bind(deps.logger);
-        log("Loaded Notifications plugin");
+        logger= deps.logger;
+
+        logger.info("Loaded Notifications plugin");
 
         this.globalBus = deps.globalEventLoop; // This is the server-side messaging bus. The MCU sends messages to server plugins over this
         this.cockpitBus = deps.cockpit; // This is the server<->client messaging bus. This is how the server talks to the browser

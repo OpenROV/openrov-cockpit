@@ -6,9 +6,6 @@
  */
 module.exports = function(frameworkDeps){
 var pino = frameworkDeps.logging.child({module:"config"});
-var log = pino.log;
-var error = pino.error;
-var debug = pino.debug.bind(pino);
 
 var nconf = require('nconf');
 //Add your Mock objects here using this same naming convention of library-mock for the mock version.
@@ -23,7 +20,7 @@ try {
   error('Unable to load the configuration file, resetting to defaults');
   error(err);
 }
-debug(nconf.get());
+pino.debug(nconf.get(),"Settings");
 nconf.env();
 //Also look for overrides in environment settings
 // Do not change these values in this file for an individual ROV, use the ./etc/rovconfig.json instead
@@ -63,7 +60,7 @@ function savePreferences() {
       error(err.message);
       return;
     }
-    debug('Configuration saved successfully.');
+    pino.debug('Configuration saved successfully.');
   });
 }
 var getLibPath = function (lib) {
@@ -94,7 +91,7 @@ var getLibPath = function (lib) {
     systemDirectory: nconf.get('systemDirectory')
   }
 
-  debug('config', finalconfig);
+  pino.debug('config', finalconfig);
 
   return finalconfig;
 

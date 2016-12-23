@@ -157,7 +157,7 @@ var RegisterFunctions = function (board)
 {
   board.AddMethod('Initialize', function () 
   {
-    debug('MCU Interface initialized!');
+    logger.debug('MCU Interface initialized!');
 
     // TODO: Only allow the statemachine to do this
     // Turn on the serial

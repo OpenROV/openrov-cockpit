@@ -1,4 +1,4 @@
-var log, error, debug;
+var logger;
 
 const exec = require('child_process').exec;
 const fs = require('fs');
@@ -13,11 +13,9 @@ var defaults = {
 };
 
 var geomux = function geomux(name, deps) {
-    log = deps.logger.info.bind(deps.logger);
-    error = deps.logger.error.bind(deps.logger);
-    debug = deps.logger.debug.bind(deps.logger);
+    logger= deps.logger;
 
-    log('The geo-mux plugin.');
+    logger.info('The geo-mux plugin.');
     var self = this;
     this.deps = deps;
     this.services = {};
@@ -38,11 +36,11 @@ var geomux = function geomux(name, deps) {
         videoServer.emit('geomux.command', camera, command, params);
     });
     videoServer.on('video-deviceRegistration', function(update) {
-        debug('Got device update');
+        logger.debug('Got device update');
     });
     // Video endpoint announcement
     videoServer.on('geomux.video.announcement', function(camera, channel, info) {
-        debug('Announcement info: ' + JSON.stringify(info));
+        logger.debug('Announcement info: ' + JSON.stringify(info));
         // Emit message on global event loop to register with the Video plugin
         self.deps.globalEventLoop.emit('CameraRegistration', {
             location: info.txtRecord.cameraLocation,
@@ -83,21 +81,21 @@ var geomux = function geomux(name, deps) {
     });
     // Upon connecting to video server, set up listeners
     videoServer.on('connect', function() {
-        log('Successfully connected to geo-video-server');
+        logger.info('Successfully connected to geo-video-server');
         // Tell geo-video-server to start the daemons
         videoServer.emit('geomux.ready');
     });
     // Disconnection
     videoServer.on('disconnect', function() {
-        log('Disconnected from video server.');
+        logger.info('Disconnected from video server.');
     });
     // Error
     videoServer.on('error', function(err) {
-        error('Video Server Connection Error: ' + err);
+        logger.error(err,'Video Server Connection Error');
     });
     // Reconnect attempt
     videoServer.on('reconnect', function() {
-        log('Attempting to reconnect');
+        logger.info('Attempting to reconnect');
     });
     // Helper function to update local store of cameras and channels
     function UpdateCameraInfo(camera, channel) {
@@ -117,7 +115,7 @@ var geomux = function geomux(name, deps) {
 // This gets called when plugins are started
 geomux.prototype.start = function start() 
 {
-    log('Starting geomux program');
+    logger.info('Starting geomux program');
     var geoprogram = '';
 
     // Figure out which video server to use
@@ -141,7 +139,7 @@ geomux.prototype.start = function start()
         } 
         catch (er) 
         {
-            error('geo-video-server not installed');
+            logger.error('geo-video-server not installed');
             return;
         }
     }
@@ -172,15 +170,15 @@ geomux.prototype.start = function start()
         sleep: 1000
     });
     monitor.on('exit', function(code, signal) {
-        error('Geo-video-server exited. Code: [' + code + '] Signal: [' + signal + ']');
+        logger.error('Geo-video-server exited. Code: [' + code + '] Signal: [' + signal + ']');
     });
     monitor.on('stdout', function(data) {
         var msg = data.toString('utf-8');
-        debug('geo-video-server STDOUT: ' + msg);
+        logger.debug('geo-video-server STDOUT: ' + msg);
     });
     monitor.on('stderr', function(data) {
         var msg = data.toString('utf-8');
-        debug('geo-video-server STDERR: ' + msg);
+        logger.debug('geo-video-server STDERR: ' + msg);
     });
     // Start the monitor
     monitor.start();

@@ -1,7 +1,7 @@
 var util      = require('util');
 var Interface = require('Interface.js');
 var debug     = {};
-
+var logger    = require('AppFramework.js').logger;
 function BoardInterface(deps) 
 {
   // Inherit from Interface module
@@ -17,7 +17,7 @@ BoardInterface.prototype.RegisterDefaultAPI = function()
 {
   this.AddMethod('Initialize', function () 
   {
-    debug(this.oName + ' not yet implemented!');
+    logger.debug(this.oName + ' not yet implemented!');
   }, true);
 };
 

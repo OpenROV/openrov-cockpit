@@ -1,6 +1,7 @@
 // Regex expressions for getting function parameters
 var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/gm;
 var ARGUMENT_NAMES = /([^\s,]+)/g;
+var logger;
 function Interface(interfaceName, deps) {
   var self = this;
   this.interface = interfaceName;
@@ -8,7 +9,7 @@ function Interface(interfaceName, deps) {
   this.cockpit = deps.cockpit;
   this.vehicleConfig = deps.config;
   this.functions = {};
-  this.debug = deps.logger.debug.bind(deps.logger);
+  logger = deps.logger;
 }
 // TODO: Use ES6 default parameter for isDefault
 Interface.prototype.AddMethod = function (name, func, isDefault) {

@@ -19,16 +19,14 @@ require('module').Module._initPaths();
 process.env[ "COCKPIT_PATH" ] = __dirname;
 
 // Set default logging options
-// process.env.DEBUG = "log*,error*," + process.env.DEBUG;
+// process.env.logger.debug( = "log*,error*," + process.env.logger.debug(;
 
 
-var pino = require('AppFramework.js').logger;
+var logger = require('AppFramework.js').logger;
 
-var log = pino.info.bind(pino);
-var error = pino.error.bind(pino);
-var debug = pino.debug.bind(pino);
 
-debug('Set NODE_PATH to: ' + process.env.NODE_PATH);
+
+logger.debug('Set NODE_PATH to: ' + process.env.NODE_PATH);
 // Handle linux signals
 if (process.platform === 'linux') {
   process.on('SIGTERM', function () {
@@ -42,7 +40,7 @@ if (process.platform === 'linux') {
 }
 
 var frameworkDeps = {
-  logging: pino
+  logging: logger
 }
 
 require('systemd');
@@ -117,7 +115,7 @@ app.use('/components', express.static(path.join(__dirname, 'plugins/telemetry/pu
 app.use('/components/telemetry', express.static(path.join(__dirname, 'plugins/telemetry/public/webcomponents')));
 app.use('/components/telemetry', serveIndex(path.join(__dirname, 'plugins/telemetry/public/webcomponents')));
 
-debug( '!!!' + path.join(__dirname, 'src/static/bower_components') );
+logger.debug( '!!!' + path.join(__dirname, 'src/static/bower_components') );
 
 app.get('/config.js', function (req, res) {
   res.type('application/javascript');
@@ -152,7 +150,7 @@ var deps = {
     globalEventLoop: globalEventLoop,
     loadedPlugins: [],
     pathInfo: pathInfo,
-    logger: pino
+    logger: logger
   };
 var numConnections = 0;
 var socketConnectToken = null;
@@ -163,7 +161,7 @@ io.on('connection', function (client) {
   }
   numConnections++;
 
-  debug('HASTHEBALL:TRUE');
+  logger.debug('HASTHEBALL:TRUE');
 
   client.hastheball = true;
   client.emit('hastheball', socketConnectToken);
@@ -251,8 +249,8 @@ loaderA.loadPluginsAsync(plugins)
 })
 .then(function () 
 {
-  debug('Starting following plugins:');
-  debug(deps.loadedPlugins);
+  logger.debug('Starting following plugins:');
+  logger.debug(deps.loadedPlugins);
 
   // Start each plugin
   deps.loadedPlugins.forEach(function (plugin) 
@@ -265,18 +263,17 @@ loaderA.loadPluginsAsync(plugins)
 })
 .then(function () 
 {
-  debug('Plugin loading successful!');
+  logger.debug('Plugin loading successful!');
 
   // Start the web server
   server.listen(app.get('port'), function () 
   {
-    log('Started listening on port: ' + app.get('port'));
+    logger.info('Started listening on port: ' + app.get('port'));
   });
 })
 .catch(function (err)
 {
-  error('Error starting plugins: ' + err.message);
-  error('Stack trace: ' + err.stack);
+  logger.error(err,'Error starting plugins: ');
   process.abort();
 });
 
@@ -284,12 +281,12 @@ loaderA.loadPluginsAsync(plugins)
 function addPluginAssets(result) {
   scripts = scripts.concat(result.scripts);
 
-  debug('====== Scripts ======');
-  debug(result.scripts);
+  logger.debug('====== Scripts ======');
+  logger.debug(result.scripts);
 
   result.scripts.forEach(function (asset) 
   {
-    debug('SCRIPT: ' + asset);
+    logger.debug('SCRIPT: ' + asset);
   });
 
   styles = styles.concat(result.styles);
@@ -298,8 +295,8 @@ function addPluginAssets(result) {
 
   result.assets.forEach(function (asset) 
   {
-    debug('TEST: ' + asset.path);
-    debug( JSON.stringify( asset ) );
+    logger.debug('TEST: ' + asset.path);
+    logger.debug( JSON.stringify( asset ) );
     app.use('/' + asset.path, express.static(asset.assets));
   });
 

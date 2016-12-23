@@ -1,4 +1,4 @@
-var log,error,debug;
+var logger;
 
 var Defaults = require('json-schema-defaults');
 var objectAssign = require('object-assign');
@@ -6,10 +6,9 @@ var objectAssign = require('object-assign');
 var PREFERENCES_NS = 'plugins';
 //Modele, everything private by default
 var settingsManager = function settingsManager(name, deps) {
-  log = deps.logger.info.bind(deps.logger);
-  error = deps.logger.error.bind(deps.logger);
-  debug = deps.logger.debug.bind(deps.logger);  
-  log('The settings-manager plugin.');
+  logger = deps.logger;
+ 
+  logger.info('The settings-manager plugin.');
   //state variables
   this.deps = deps;
   this.schema = {};
@@ -46,7 +45,7 @@ var getNameSpacedPreferences = function getNameSpacedPreferences(config) {
     preferences = {};
     config.preferences.set(PREFERENCES_NS, preferences);
   }
-  debug('Plugin Manager loaded preferences: ' + JSON.stringify(preferences));
+  logger.debug('Plugin Manager loaded preferences: ' + JSON.stringify(preferences));
   return preferences;
 };
 //Public Functions

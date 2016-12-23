@@ -7,7 +7,7 @@
     const assert    = require('assert');
     const Listener  = require( 'Listener' );
 
-    var log,debug,error;
+    var logger;
     var defaults = 
     {
         port: 8300,
@@ -18,10 +18,9 @@
     {
         constructor( name, deps )
         {
-            log = deps.logger.info.bind(deps.logger);
-            error = deps.logger.error.bind(deps.logger);
-            debug = deps.logger.debug.bind(deps.logger);
-            log( "Loaded Cockpit Plugin: MjpgStreamer" );
+            logger = deps.logger;
+            
+            logger.info( "Loaded Cockpit Plugin: MjpgStreamer" );
 
             this.globalBus  = deps.globalEventLoop;
             this.cockpitBus = deps.cockpit;
@@ -48,21 +47,21 @@
             {
                 if( process.env.MOCK_VIDEO_TYPE === "MJPEG" )
                 {
-                    log( "Using MJPEG video format in Mock Mode.");
+                    logger.info( "Using MJPEG video format in Mock Mode.");
 
                     this.supervisorLaunchOptions.push( '-m' );
                     this.supervisorLaunchOptions.push( 'true' );
 
                     if( process.env.MOCK_VIDEO_HARDWARE === 'false' )
                     {
-                        log( "Using actual MJPEG video source.");
+                        logger.info( "Using actual MJPEG video source.");
 
                         this.supervisorLaunchOptions.push( '-h' );
                         this.supervisorLaunchOptions.push( 'true' );
                     }
                     else
                     {
-                        log( "Using mocked MJPEG video source.");
+                        logger.info( "Using mocked MJPEG video source.");
                     }
                 }
                 else
@@ -94,12 +93,12 @@
 
             this.svMonitor.on( "stdout", (data) =>
             {
-                log( data.toString() );
+                logger.debug( data.toString() );
             });
 
             this.svMonitor.on( "stderr", (data) =>
             {
-                error( data.toString() );
+                logger.debug( data.toString() );
             });      
 
             // Set up listeners
@@ -115,7 +114,7 @@
                         // Update settings
                         this.settings = settings.mjpegVideo;
 
-                        log( `Updating MJPEG streamer settings to: \n${this.settings}` );
+                        logger.info( `Updating MJPEG streamer settings to: \n${this.settings}` );
 
                         // Send update to supervisor so it restarts the stream
                         this.supervisor.emit( "updateSettings", this.settings );
@@ -128,13 +127,13 @@
 
                 scanForCameras: new Listener( this.cockpitBus, "plugin.mjpegVideo.scanForCameras", false, () =>
                 {
-                    log( "Scanning" );
+                    logger.info( "Scanning" );
                     this.supervisor.emit( "scan" );
                 }),
 
                 svConnect: new Listener( this.supervisor, 'connect', false, () =>
                 {
-                    log( 'Successfully connected to mjpg-streamer supervisor' );
+                    logger.info( 'Successfully connected to mjpg-streamer supervisor' );
 
                     // Start listening for settings changes (gets the latest settings)
                     this.listeners.settings.enable();
@@ -142,22 +141,22 @@
 
                 svDisconnect: new Listener( this.supervisor, 'disconnect', false, function()
                 {
-                    log( 'Disconnected from mjpg-streamer supervisor' );
+                    logger.info( 'Disconnected from mjpg-streamer supervisor' );
                 }),
 
                 svError: new Listener( this.supervisor, 'error', false, function(err)
                 {
-                    error( 'Mjpg-streamer supervisor connection error: ' + err );
+                    logger.error(err, 'Mjpg-streamer supervisor connection error' );
                 }),
 
                 svReconnect: new Listener( this.supervisor, 'reconnect', false, function()
                 {
-                    log('Reconnecting to mjpg-streamer supervisor...');
+                    logger.info('Reconnecting to mjpg-streamer supervisor...');
                 }),
 
                 svStreamRegistration: new Listener( this.supervisor, 'stream.registration', false, ( serial, info ) =>
                 {
-                    log('Stream Registration: ' + JSON.stringify(info) );
+                    logger.info('Stream Registration: ' + JSON.stringify(info) );
 
                     this.globalBus.emit( 'CameraRegistration', 
                     {

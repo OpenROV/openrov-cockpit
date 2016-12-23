@@ -4,10 +4,11 @@
  * Configuration file.  Manage frame rate, port, etc.
  *
  */
-
-var log = require('debug')('log:system');
-var error = require('debug')('error:system');
-var debug = require('debug')('debug:system');
+module.exports = function(frameworkDeps){
+var pino = frameworkDeps.logging.child({module:"config"});
+var log = pino.log;
+var error = pino.error;
+var debug = pino.debug.bind(pino);
 
 var nconf = require('nconf');
 //Add your Mock objects here using this same naming convention of library-mock for the mock version.
@@ -72,23 +73,31 @@ var getLibPath = function (lib) {
   }
   return result;
 };
-module.exports = {
-  debug: nconf.get('debug'),
-  debug_commands: nconf.get('debug_commands'),
-  production: nconf.get('production'),
-  sample_freq: nconf.get('sample_freq'),
-  dead_zone: nconf.get('dead_zone'),
-  video_frame_rate: nconf.get('video_frame_rate'),
-  video_resolution: nconf.get('video_resolution'),
-  video_device: nconf.get('video_device'),
-  video_port: nconf.get('video_port'),
-  video_url: nconf.get('video_url'),
-  port: nconf.get('port'),
-  serial: nconf.get('serial'),
-  serial_baud: nconf.get('serial_baud'),
-  dashboardURL: nconf.get('dashboardURL'),
-  preferences: nconf,
-  savePreferences: savePreferences,
-  systemDirectory: nconf.get('systemDirectory')
+
+  var finalconfig =  {
+    debug: nconf.get('debug'),
+    debug_commands: nconf.get('debug_commands'),
+    production: nconf.get('production'),
+    sample_freq: nconf.get('sample_freq'),
+    dead_zone: nconf.get('dead_zone'),
+    video_frame_rate: nconf.get('video_frame_rate'),
+    video_resolution: nconf.get('video_resolution'),
+    video_device: nconf.get('video_device'),
+    video_port: nconf.get('video_port'),
+    video_url: nconf.get('video_url'),
+    port: nconf.get('port'),
+    serial: nconf.get('serial'),
+    serial_baud: nconf.get('serial_baud'),
+    dashboardURL: nconf.get('dashboardURL'),
+    preferences: nconf,
+    savePreferences: savePreferences,
+    systemDirectory: nconf.get('systemDirectory')
+  }
+
+  debug('config', finalconfig);
+
+  return finalconfig;
+
+
+
 };
-debug('config', module.exports);

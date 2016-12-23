@@ -7,10 +7,7 @@
     const assert    = require('assert');
     const Listener  = require( 'Listener' );
 
-    var log         = require('debug')('app:mjpeg:log');
-    var debug       = require('debug')('app:mjpeg:debug');
-    var error       = require('debug')('app:mjpeg:error');
-
+    var log,debug,error;
     var defaults = 
     {
         port: 8300,
@@ -21,6 +18,9 @@
     {
         constructor( name, deps )
         {
+            log = deps.logger.info.bind(deps.logger);
+            error = deps.logger.error.bind(deps.logger);
+            debug = deps.logger.debug.bind(deps.logger);
             log( "Loaded Cockpit Plugin: MjpgStreamer" );
 
             this.globalBus  = deps.globalEventLoop;
@@ -269,7 +269,7 @@
     {
         if( process.env.PRODUCTID == "trident" )
         {
-            console.log( "Not supported on trident" );
+            deps.logger.debug( "MjpgStreamer Not supported on trident" );
             return {};
         }
 

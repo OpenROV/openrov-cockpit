@@ -1,4 +1,5 @@
 var fs = require('fs');
+var logger=require('AppFramework.js').logger;
 var TranslationResourceManager = function TranslationResourceManager(lang, httpRouter, resourceFilePath, options) {
   this.lang = lang;
   this.router = httpRouter;
@@ -29,7 +30,7 @@ TranslationResourceManager.prototype.monitorMissingData = function monitorMissin
         var _updates = self.updatesCache[key];
         fs.readFile(file, function (err, data) {
           if (err) {
-            return console.log(err);
+            return logger.error(err);
           }
           var itemkeys = Object.keys(_updates);
           var json = JSON.parse(data);
@@ -62,7 +63,7 @@ TranslationResourceManager.prototype.setRoutes = function setRoutes() {
         res.status(500);
         //          res.write(err)
         res.end;
-        return console.log(err);
+        return logger.error(err);
       }
       res.writeHead(200, {
         'Content-Type': 'text/html',

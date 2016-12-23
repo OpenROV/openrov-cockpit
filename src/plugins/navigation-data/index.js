@@ -1,6 +1,6 @@
 (function () {
   function NavigationData(name, deps) {
-    console.log('Navigation Data plugin loaded');
+    deps.logger.debug('Navigation Data plugin loaded');
     var navdata = {
         roll: 0,
         pitch: 0,

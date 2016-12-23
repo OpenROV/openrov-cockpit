@@ -1,7 +1,7 @@
 var path = require('path');
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require('fs-extra'));
-
+var logger=require('AppFramework.js').logger;
 
 /* Closure private functions for script */
 function getFilter(ext) {
@@ -15,8 +15,6 @@ class PluginLoader
 {
     constructor(dir, shareDir, deps, options)
     {
-      console.dir(deps);
-
      // State variables updated by the resource finding functions
       var result = {
           assets: [],
@@ -32,18 +30,25 @@ class PluginLoader
       var required = options.required;
       var cacheFile = options.cacheFile;
       var pluginName;
-
+      var extend = require('util')._extend;
       //These functions are intended to be bound to the overall state of the loadPlugins method
 
       var instantiatePlugins = function instantiatePlugins(plugins)
       {
         return Promise.map(plugins, function(plugin)
         {
-            console.log( "PLUGIN MAP LOAD:" + plugin );
+            logger.debug( "PLUGIN MAP LOAD:" + plugin );
  
             return Promise.try( () =>
             {
-                return require(path.join(dir, plugin))(plugin, deps);
+                var newdeps = extend({},deps);
+                newdeps.logger = deps.logger.child({plugin:plugin});
+                try{
+                  return require(path.join(dir, plugin))(plugin, deps);
+                } catch(ex){
+                    logger.error(ex);
+                    throw ex;
+                }
             } )
             .then( ( pluginInstance ) =>
             {
@@ -221,7 +226,6 @@ class PluginLoader
 
      return derivePluginNamesfromCrawlingFoldersAsync()
      .then(function(r){
-       console.dir(r);
        return r;
      })
       .each(function(_pluginName){

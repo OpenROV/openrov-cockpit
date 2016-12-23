@@ -8,7 +8,7 @@ function Interface(interfaceName, deps) {
   this.cockpit = deps.cockpit;
   this.vehicleConfig = deps.config;
   this.functions = {};
-  this.debug = require('debug')(this.interface);
+  this.debug = deps.logger.debug.bind(deps.logger);
 }
 // TODO: Use ES6 default parameter for isDefault
 Interface.prototype.AddMethod = function (name, func, isDefault) {

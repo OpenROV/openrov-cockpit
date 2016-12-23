@@ -4,6 +4,7 @@ var spawn = require('child_process')
     .spawn;
 var ArduinoHelper = require('ArduinoHelper');
 var Hardware = require('./bridge.js');
+var logger = require('AppFramework.js').logger;
 
 var debug = {};
 
@@ -80,7 +81,7 @@ var SetupBoardInterface = function(board) {
           }
           catch( err )
           {
-            console.error( "Version regex found no matches" )
+            logger.error( "Version regex found no matches" )
           }
         }
 

@@ -8,7 +8,7 @@ function readyAyeReady(name, deps) {
   {
     if (!done) 
     {
-      console.log('The ROV is ready!.');
+      deps.logger.debug('The ROV is ready!.');
       setLight('12.5');
       deps.globalEventLoop.emit('plugin.systemPower.powerOffESCs');
       setTimeout(function () {

@@ -1,6 +1,4 @@
-var log = require('debug')('log:system');
-var error = require('debug')('error:system');
-var debug = require('debug')('debug:system');
+var log, error, debug;
 
 const exec = require('child_process').exec;
 const fs = require('fs');
@@ -15,6 +13,10 @@ var defaults = {
 };
 
 var geomux = function geomux(name, deps) {
+    log = deps.logger.info.bind(deps.logger);
+    error = deps.logger.error.bind(deps.logger);
+    debug = deps.logger.debug.bind(deps.logger);
+
     log('The geo-mux plugin.');
     var self = this;
     this.deps = deps;

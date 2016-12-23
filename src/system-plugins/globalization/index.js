@@ -1,8 +1,10 @@
 var PREFERENCES = 'plugins:globalization';
+var logger;
 function Globalization(name, deps) {
-  console.log('Globalization Finder plugin loaded.');
+  deps.logger.debug('Globalization Finder plugin loaded.');
   var preferences = getPreferences(deps.config);
   this.deps = deps;
+  logger = this.deps.logger;
 }
 function getPreferences(config) {
   var preferences = config.preferences.get(PREFERENCES);
@@ -10,7 +12,6 @@ function getPreferences(config) {
     preferences = {};
     config.preferences.set(PREFERENCES, preferences);
   }
-  console.log('Plugin Finder loaded preferences: ' + JSON.stringify(preferences));
   return preferences;
 }
 Globalization.prototype.getSettingSchema = function getSettingSchema() {

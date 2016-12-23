@@ -2,12 +2,12 @@
   var sharedFunctions = require('./public/js/telemetryToSystemPower.js');
   var PREFERENCES_NS = 'plugins';
   var SystemEnvionment = function SystemEnvironment(name, deps) {
-    console.log('Controllerboard2x:SystemEnvironment plugin loaded');
+    deps.logger.debug('Controllerboard2x:SystemEnvironment plugin loaded');
     deps.globalEventLoop.on('mcu.status', function (data) {
     });
   };
   var SystemPower = function SystemPower(name, deps) {
-    console.log('Controllerboard2x:SystemPower plugin loaded');
+    deps.logger.debug('Controllerboard2x:SystemPower plugin loaded');
     this.config = deps.config;
     this.cockpit = deps.cockpit;
     var self = this;
@@ -115,7 +115,7 @@
 }
 */
   var Controllerboard2x = function Controllerboard2x(name, deps) {
-    console.log('Controllerboard2x plugin loaded');
+    deps.logger.debug('Controllerboard2x plugin loaded');
     deps.globalEventLoop.on('mcu.status', function (data) {
     });
   };
@@ -127,7 +127,7 @@
    {
     if( process.env.PRODUCTID == "trident" )
     {
-        console.log( "Not supported on trident" );
+        deps.logger.debug( "ControllerBoard2x Not supported on trident" );
         return {};
     }
 

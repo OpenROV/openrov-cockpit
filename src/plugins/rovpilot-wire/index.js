@@ -1,7 +1,7 @@
 (function () {
   var DISABLED = 'DISABLED';
   var ROVPilotWire = function ROVPilotWire(deps) {
-    console.log('The rovpilot plugin.');
+    deps.logger.debug('The rovpilot plugin.');
     var self = this;
     self.SAMPLE_PERIOD = 1000 / deps.config.sample_freq;
     self.state = {

@@ -1,10 +1,11 @@
-var log = require('debug')('log:system');
-var error = require('debug')('error:system');
-var debug = require('debug')('debug:system');
+var log,error,debug;
 
 var PREFERENCES = 'plugins:plugin-manager';
 
 function pluginManager(name, deps) {
+  log = deps.logger.info.bind(deps.logger);
+  error = deps.logger.error.bind(deps.logger);
+  debug = deps.logger.debug.bind(deps.logger);
   log('Pugin Manager plugin started.');
   var preferences = getPreferences(deps.config);
   deps.app.get('/addons', function (req, res) {

@@ -1,5 +1,5 @@
 function diveprofile(name, deps) {
-  console.log('This is where DiveProfile plugin.');
+  deps.logger.debug('This is where DiveProfile plugin.');
   //instance variables
   this.cockpit = deps.cockpit;
   this.global = deps.globalEventLoop;

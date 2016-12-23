@@ -1,3 +1,4 @@
+var logger=require('AppFramework.js').logger;
 class ObjectPool
 {
     // Options
@@ -22,7 +23,7 @@ class ObjectPool
         // Pre-allocate objects
         this.allocate( options.initialSize || 0 );
 
-        console.log( `Max size: ${this._maxSize}` );
+        logger.debug( `Max size: ${this._maxSize}` );
     };
 
     // Pre-allocates the pool with the specified number of objects

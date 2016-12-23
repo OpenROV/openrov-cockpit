@@ -1,6 +1,4 @@
-const log = require('debug')('log:Notifications');
-const trace = require('debug')('trace:Notifications');
-const debug = require('debug')('debug:Notifications');
+var log,error,debug,warn;
 const nedb = require('nedb');
 const path = require('path');
 const bluebird = require('bluebird');
@@ -11,7 +9,10 @@ var _announcementScheduled = false;
 class Notifications {
 
     constructor(name, deps) {
-
+        log = deps.logger.info.bind(deps.logger);
+        error = deps.logger.error.bind(deps.logger);
+        debug = deps.logger.debug.bind(deps.logger);
+        warn = deps.logger.warn.bind(deps.logger);
         log("Loaded Notifications plugin");
 
         this.globalBus = deps.globalEventLoop; // This is the server-side messaging bus. The MCU sends messages to server plugins over this
@@ -107,7 +108,7 @@ class Notifications {
                 self.db = new nedb();
                 bluebird.promisifyAll(self.db);
                 //This intentionally does not honor selective debug logging. 
-                console.log('neDB intialized as inMemory -- ONLY USE FOR TESTING');
+                warn('neDB intialized as inMemory -- ONLY USE FOR TESTING');
             } else {
                 var nedbDir = process.env.DATADIR || '/etc'
                 mkdirp.sync(path.join(nedbDir, 'OpenROV'));

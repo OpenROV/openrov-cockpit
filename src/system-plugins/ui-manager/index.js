@@ -1,11 +1,12 @@
-var log = require('debug')('log:system');
-var error = require('debug')('error:system');
-var debug = require('debug')('debug:system');
+var log,error,debug;
 
 var PREFERENCES = 'plugins:ui-manager';
 const path = require('path');
 const fs = require('fs');
 function UIManager(name, deps) {
+  log = deps.logger.info.bind(deps.logger);
+  error = deps.logger.error.bind(deps.logger);
+  debug = deps.logger.debug.bind(deps.logger);  
   log('UI Manager plugin started.');
   var preferences = getPreferences(deps.config);
   this.UIs = [];

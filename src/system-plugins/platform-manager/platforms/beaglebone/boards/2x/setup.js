@@ -6,7 +6,7 @@ var spawn           = require('child_process').spawn;
 var ArduinoBuilder  = require('ArduinoBuilder');
 var ArduinoHelper   = require('ArduinoHelper');
 var Hardware        = require('./bridge.js');
-
+var logger          = require('AppFramework.js');
 var debug           = {};
 
 var SetupBoardInterface = function (board) 
@@ -97,11 +97,11 @@ var SetupBoardInterface = function (board)
       try
       {
         board.hashInfo.fromMCU = matches[1];
-        console.log( "Ver report: " + board.hashInfo.fromMCU );
+        logger.debug( "Ver report: " + board.hashInfo.fromMCU );
       }
       catch( err )
       {
-        console.error( "Version regex found no matches" )
+        logger.error( "Version regex found no matches" )
       }
     }
 

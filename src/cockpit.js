@@ -21,9 +21,12 @@ process.env[ "COCKPIT_PATH" ] = __dirname;
 // Set default logging options
 // process.env.DEBUG = "log*,error*," + process.env.DEBUG;
 
-var log = require('debug')('log:system');
-var error = require('debug')('error:system');
-var debug = require('debug')('debug:system');
+
+var pino = require('AppFramework.js').logger;
+
+var log = pino.info.bind(pino);
+var error = pino.error.bind(pino);
+var debug = pino.debug.bind(pino);
 
 debug('Set NODE_PATH to: ' + process.env.NODE_PATH);
 // Handle linux signals
@@ -37,9 +40,14 @@ if (process.platform === 'linux') {
     process.exit(0);
   });
 }
+
+var frameworkDeps = {
+  logging: pino
+}
+
 require('systemd');
 var includesPollyfill=require("array-includes-pollyfill.js").enable();
-var CONFIG = require('./lib/config');
+var CONFIG = require('./lib/config')(frameworkDeps);
 var fs = require('fs');
 var express = require('express');
 var app = express();
@@ -58,7 +66,6 @@ var CockpitMessaging = require('./lib/CockpitMessaging');
 var Q = require('q');
 var serveIndex = require('serve-index');
 var favicon = require('serve-favicon');
-var logger = require('morgan');
 var methodOverride = require('method-override');
 var session = require('express-session');
 var bodyParser = require('body-parser');
@@ -144,7 +151,8 @@ var deps = {
     config: CONFIG,
     globalEventLoop: globalEventLoop,
     loadedPlugins: [],
-    pathInfo: pathInfo
+    pathInfo: pathInfo,
+    logger: pino
   };
 var numConnections = 0;
 var socketConnectToken = null;

@@ -1,5 +1,5 @@
 function mobileUi(name, deps) {
-  console.log('Mobile UI plugin loaded.');
+  deps.logger.debug('Mobile UI plugin loaded.');
   this.plugin = {
     name: 'mobile-ui',
     type: 'theme'

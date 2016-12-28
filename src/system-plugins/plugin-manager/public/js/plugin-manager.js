@@ -13,11 +13,6 @@
   };
   PluginManager.prototype.listen = function listen() {
     var self = this;
-    this.cockpit.on('plugin-manager.getControllablePlugins', function (fn) {
-      if (typeof fn === 'function') {
-        self.EnumerateControllablePlugins(fn);
-      }
-    });
     this.cockpit.on('plugin-manager.disablePlugin', function (plugin, fn) {
       self.disablePlugin(plugin, fn);
       self.saveSettings();
@@ -27,32 +22,20 @@
       self.saveSettings();
     });
     this.rov.on('settings-change.pluginmgr', function (settings) {
-      //TODO: Complete this. This is currently never called because the there are no settings defined for the pluginmgr
-      console.assert(false,'Pluginmgr settings should not be defined');
       //Only process the settings change if it is different than what we had.
-      if (self.settings == settings.pluginmgr){
+      if (JSON.stringify(self.settings) == JSON.stringify(settings.pluginmgr)){
         return;
       }
       self.settings = settings.pluginmgr;
       var that = self;
       clearPluginCache();
-      self.EnumerateControllablePlugins(function (plugins) {
-        that.cockpit.emit('plugin-manager.ControllablePluginsChanged', plugins);
-      });
-
-      //TODO: zip the server saved config of plugins over the defaults
-      _plugins.forEach(function (item) {
-        if (item.name in settings.pluginmgr) {
-          Object.assign(item, settings.pluginmgr[item.name]);
-        }
-      });
-
       self.startPlugins();
 
     });
     this.startPlugins();
   };
   PluginManager.prototype.startPlugins = function startPlugins(fn) {
+    var self=this;
     this.EnumerateControllablePlugins(function (items) {
       items.forEach(function (p) {
         if (p.isEnabled === true) {
@@ -132,6 +115,7 @@
         return true;
       }
     }).map(function (plugin) {
+
       var plugin_metadata = {};
       if (plugin.Plugin_Meta !== undefined) {
         plugin_metadata = {
@@ -145,9 +129,17 @@
           viewName: plugin.Plugin_Meta.viewName
         };
       }
+   
+      //zip in the saved settings with the defaults defined in the plugin
+      if (self.settings){
+        if (plugin_metadata.name in self.settings) {
+          Object.assign(plugin_metadata, self.settings[plugin_metadata.name]);
+        }
+      }      
       //option to async get additional properies from config here.
       return plugin_metadata;
     });
+    self.cockpit.emit('plugin-manager.ControllablePluginsChanged',_plugins);
     callback(_plugins);
   };
   window.Cockpit.plugins.push(PluginManager);

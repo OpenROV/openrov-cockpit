@@ -82,7 +82,12 @@ $(function() {
     }
     var tokenOption = force == false ? localStorage.sessionID : 'reset';
 
+    var appHasStarted = false;
     var handlePageLoaded = function() {
+        if (appHasStarted){
+            return; //Guard from multiple calls
+        }
+        appHasStarted = true;
         var socket = window.io.connect(window.location.protocol + '//' + window.location.hostname + ':' + window.location.port, {
             path: '/cockpitsocket',
             query: 'token=' + tokenOption

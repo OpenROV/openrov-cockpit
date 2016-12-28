@@ -23,7 +23,7 @@ process.env[ "COCKPIT_PATH" ] = __dirname;
 
 
 var logger = require('AppFramework.js').logger;
-
+//var trace = require('pino-trace')(logger);
 
 
 logger.debug('Set NODE_PATH to: ' + process.env.NODE_PATH);
@@ -169,14 +169,14 @@ io.on('connection', function (client) {
     callback(socketConnectToken);  //TODO: On force, kill the other inbound connections
   });
 
-  log('Connection detected');
-  log('Current connections: ' + numConnections);
+  logger.debug('Connection detected');
+  logger.debug('Current connections: ' + numConnections);
 
   client.on('disconnect', function () {
   });
 });
 io.use(function (socket, next) {
-  log('Auth expecting %s. got %s', socketConnectToken == null ? '<NULL>' : socketConnectToken, socket.handshake.query.token == undefined ? '<UNDEFINED>' : socket.handshake.query.token);
+  logger.debug('Auth expecting %s. got %s', socketConnectToken == null ? '<NULL>' : socketConnectToken, socket.handshake.query.token == undefined ? '<UNDEFINED>' : socket.handshake.query.token);
   
   // return the result of next() to accept the connection.
   if (socketConnectToken == null || socketConnectToken == socket.handshake.query.token || socket.handshake.query.token == 'reset') {
@@ -188,7 +188,7 @@ io.use(function (socket, next) {
       Object.keys(socketCollection).forEach(function (key) {
         var client = socketCollection[key];
         if (client.id !== socket.id) {
-          log('kicking out:', client.id);
+          logger.debug('kicking out:', client.id);
           setTimeout(function () {
             client.emit('forced-disconnect');
             client.disconnect();
@@ -206,8 +206,8 @@ deps.cockpit.on('disconnect', function () {
   if (numConnections == 0) {
     socketConnectToken = null;
   }
-  log('Disconnect detected');
-  log('Current connections: ' + numConnections);
+  logger.debug('Disconnect detected');
+  logger.debug('Current connections: ' + numConnections);
 });
 // Handle global events
 deps.globalEventLoop.on('mcu.rovsys', function (data) {
@@ -276,7 +276,6 @@ loaderA.loadPluginsAsync(plugins)
   logger.error(err,'Error starting plugins: ');
   process.abort();
 });
-
 // Helper function
 function addPluginAssets(result) {
   scripts = scripts.concat(result.scripts);

@@ -106,11 +106,11 @@ class Notifications {
                 self.db = new nedb();
                 bluebird.promisifyAll(self.db);
                 //This intentionally does not honor selective debug logging. 
-                warn('neDB intialized as inMemory -- ONLY USE FOR TESTING');
+                logger.warn('neDB intialized as inMemory -- ONLY USE FOR TESTING');
             } else {
                 var nedbDir = process.env.DATADIR || '/etc'
                 mkdirp.sync(path.join(nedbDir, 'OpenROV'));
-                trace('database: ' + path.join(nedbDir, 'OpenROV/notifications.db'));
+                logger.debug('database: ' + path.join(nedbDir, 'OpenROV/notifications.db'));
                 self.db = new nedb({
                     filename: path.join(nedbDir, 'OpenROV/notifications.db'),
                     autoload: true

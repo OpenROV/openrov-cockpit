@@ -3,9 +3,10 @@ var dir = __dirname;
 function Logger(options) {
 
 var pino = require('pino');
-var pretty = pino.pretty()
-pretty.pipe(process.stdout)
-var log = pino(options,pretty);
+
+//var pretty = pino.pretty()
+//pretty.pipe(process.stdout)
+var log = pino(options);//,pretty);
 var loggers = [log];
 //AOP: Inject trace behavior in all function calls
 /* Should this be handled by an external jstrace instead?
@@ -40,7 +41,7 @@ arbor.on('error', function (err) {
 
 log.on('level-change', function(lvl, val, prevLvl, prevVal){
   if  ((prevLvl !== undefined) && (lvl!==prevLvl)){
-    log[lvl](`logging level changed from ${prevLvl} to ${lvl}`);
+    this[lvl](`logging level changed from ${prevLvl} to ${lvl}`);
   }
   if (!this._tagged){
     //this is the first time we have seen the logger, it could be a child.
@@ -49,6 +50,13 @@ log.on('level-change', function(lvl, val, prevLvl, prevVal){
   }
 })
 
+log.monitor=function(logger,path){
+    var childArbor = new Arborsculpt({
+      path: path,
+      loggers: [logger], //Will this capture children as well? If not we will need Arborsculpt entries for them as well.
+      interval: 60000 // the default
+    })  
+}
 
 return log;
 }

@@ -43,6 +43,7 @@ class PluginLoader
             {
                 var newdeps = extend({},deps);
                 newdeps.logger = deps.logger.child({plugin:plugin});
+                deps.logger.monitor(newdeps.logger,path.join(dir, plugin, 'logging.json'));
                 try{
                   return require(path.join(dir, plugin))(plugin, deps);
                 } catch(ex){

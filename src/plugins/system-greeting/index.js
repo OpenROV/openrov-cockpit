@@ -51,16 +51,17 @@ class SystemGreeting
     
     start()
     {
-      this.mcuStatusListener.enable();
-      this.wakeMCU.start();
-      this.mcuResetListener.start();
+        this.mcuResetListener.enable();
+        this.mcuStatusListener.enable();
+        this.wakeMCU.start();
+      
     }
 
     stop()
     {
-      this.wakeMCU.stop();
-      this.mcuStatusListener.disable();
-      this.mcuResetListener.disable();
+        this.wakeMCU.stop();
+        this.mcuStatusListener.disable();
+        this.mcuResetListener.disable();
     }
 
     getSettingSchema()

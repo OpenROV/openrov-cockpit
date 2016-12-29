@@ -1,13 +1,11 @@
 const Periodic = require( "Periodic" );
 const Listener = require( "Listener" );
 
-var pino = require('pino')();
-
 class SystemGreeting
 {
     constructor( name, deps )
     {
-        pino.info( "SystemGreeting plugin loaded" );
+        console.log( "SystemGreeting plugin loaded" );
 
         this.globalBus        = deps.globalEventLoop;
         this.cockpitBus       = deps.cockpit;
@@ -23,8 +21,6 @@ class SystemGreeting
                 // Stop wakeup
                 this.wakeMCU.stop();
                 this.mcuStatusListener.disable();
-
-                pino.info( "MCU Awake!" );
             }
         });
 
@@ -35,8 +31,6 @@ class SystemGreeting
               // Emit wake command to mcu
               this.globalBus.emit( 'mcu.SendCommand', "wake()" );
               wakeAttempts++;
-
-              pino.info( "Wake!" );
             }
             else
             {
@@ -75,11 +69,5 @@ class SystemGreeting
 
 module.exports = (name, deps) =>
 {
-    if( process.env.PRODUCTID == "trident" )
-    {
-        pino.log( "Not supported on trident" );
-        return {};
-    }
-
-    return new SystemGreeting(name, deps);
+    return new SystemGreeting( name, deps );
 }

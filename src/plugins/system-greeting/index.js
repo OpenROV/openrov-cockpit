@@ -54,7 +54,6 @@ class SystemGreeting
         this.mcuResetListener.enable();
         this.mcuStatusListener.enable();
         this.wakeMCU.start();
-      
     }
 
     stop()

@@ -69,6 +69,7 @@ var cacheFolder = CONFIG.preferences.get('cacheDirectory');
 var Promise = require('bluebird');
 var rimrafAsync = Promise.promisify(require('rimraf'));
 var mkdirpAsync = Promise.promisify(require('mkdirp'));
+var COCKPIT_VERSION;
 
 // Setup required directories
 mkdirp(CONFIG.preferences.get('photoDirectory'));

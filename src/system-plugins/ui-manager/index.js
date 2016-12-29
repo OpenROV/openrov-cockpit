@@ -1,6 +1,7 @@
 var log = require('debug')('log:system');
 var error = require('debug')('error:system');
 var debug = require('debug')('debug:system');
+var COCKPIT_VERSION = require('cockpitversion.js');
 
 var PREFERENCES = 'plugins:ui-manager';
 const path = require('path');
@@ -75,7 +76,8 @@ UIManager.prototype.start = function start() {
       config: self.deps.config,
       scriplets: scriplets,
       theme: theme,
-      cacheMode: process.env.IGNORE_CACHE=='true'?'networkFirst':'fastest'
+      cacheMode: process.env.IGNORE_CACHE=='true'?'networkFirst':'fastest',
+      cockpit_version: COCKPIT_VERSION
     });
   });
 
@@ -120,7 +122,8 @@ UIManager.prototype.start = function start() {
         return item.name == applet;
       }),
       scriplets: scriplets,
-      theme: theme
+      theme: theme,
+      cockpit_version: COCKPIT_VERSION      
     });
   });
 

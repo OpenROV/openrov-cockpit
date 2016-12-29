@@ -24,6 +24,14 @@ class SystemGreeting
             }
         });
 
+        this.mcuResetListener = new Listener( this.globalBus, 'mcu.reset', false, () =>
+        {
+            // Perform another system greeting to show that the MCU has been updated/reset
+            wakeAttempts = 0;
+            this.mcuStatusListener.enable();
+            this.wakeMCU.start();
+        });
+
         this.wakeMCU = new Periodic( 1000, "timeout", () =>
         {
             if( wakeAttempts < maxWakeAttempts )
@@ -45,12 +53,14 @@ class SystemGreeting
     {
       this.mcuStatusListener.enable();
       this.wakeMCU.start();
+      this.mcuResetListener.start();
     }
 
     stop()
     {
       this.wakeMCU.stop();
       this.mcuStatusListener.disable();
+      this.mcuResetListener.disable();
     }
 
     getSettingSchema()

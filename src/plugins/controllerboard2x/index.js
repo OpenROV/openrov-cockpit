@@ -19,7 +19,7 @@ class SystemPower
       this.cockpit  = deps.cockpit;
       var self      = this;
 
-      deps.cockpit.on('plugin.systemPower.powerESCs', function (enable) 
+      deps.cockpit.on('plugin.systemPower.powerESCs', function (enable)
       {
         if (enable)
         {
@@ -49,8 +49,13 @@ class SystemPower
       var BatteryOptions = [
         'TrustFire',
         'LiFePO4 (OpenROV White)',
-        'NMC (OpenROV Blue)'
+        'High-Capacity NMC (OpenROV Blue)'
       ];
+
+      // TODO:
+      // If settings already exist, new defaults aren't available. 
+      // Do we have an idiomatic way for upgrading old settings so that
+      // renamed properties/values and new ones replace them?
 
       return [{
         'id':       'batteryDefinitions',
@@ -104,7 +109,7 @@ class SystemPower
                 'maxVoltage': 10
               },
               {
-                'name': 'NMC (OpenROV Blue)',
+                'name': 'High-Capacity NMC (OpenROV Blue)',
                 'minVoltage': 8,
                 'maxVoltage': 12.6
               }

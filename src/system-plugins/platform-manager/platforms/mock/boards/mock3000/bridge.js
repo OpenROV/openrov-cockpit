@@ -278,7 +278,10 @@ function Bridge()
   };
   var BT1I = 0;
   var BT2I = 0;
-  var BRDV = 11;
+
+  var BRDV = 5.0;
+  var brdvRampUp = true;
+
   bridge.emitStats = function () {
     var data = 'iout:0.2;BT.1.I:0.3;BT.2.I:0.5;BNO055.enabled:true;BNO055.test1.pid:passed;BNO055.test2.zzz:passed;';
     var status = reader.parseStatus(data);
@@ -357,29 +360,48 @@ function Bridge()
     //p(t) = 90*sin(t)
     currentPitch = 90*Math.sin(time);
     result += 'imu_p:' + encode( currentPitch ) + ';';
+
     // Generate roll
     currentRoll = Math.floor(Math.random()*91) - 45;
     result += 'imu_r:' + encode( currentRoll )+ ';';
+
     // Generate battery tube 1 current
     rnd = (Math.random() * 20 - 10) / 100;
     current += current * rnd;
     current = Math.min(Math.max(current, 1), 10);
     result += 'BT1I:' + current + ';';
+
     // Generate battery tube 2 current
     rnd = (Math.random() * 20 - 10) / 100;
     current += current * rnd;
     current = Math.min(Math.max(current, 1), 10);
     result += 'BT2I:' + current + ';';
+
     // Generate board voltage
-    rnd = (Math.random() * 20 - 10) / 100;
-    BRDV += BRDV * rnd;
-    BRDV = Math.min(Math.max(BRDV, 1), 10);
+    if( brdvRampUp )
+    {
+      BRDV += 0.1;
+      if( BRDV >= 12 )
+      {
+        brdvRampUp = false;
+      }
+    }
+    else
+    {
+      BRDV -= 0.1;
+      if( BRDV <= 5 )
+      {
+        brdvRampUp = true;
+      }
+    }
+    
     result += 'BRDV:' + BRDV + ';';
     result += 'vout:' + BRDV + ';';
 
     // Emit status update
     bridge.emit('status', reader.parseStatus(result));
   };
+
   // Listen for firmware settings updates
   // TODO: Has this been deprecated for TSET?
   reader.on('firmwareSettingsReported', function (settings) {

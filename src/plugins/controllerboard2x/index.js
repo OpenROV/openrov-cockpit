@@ -48,8 +48,8 @@ class SystemPower
 
       var BatteryOptions = [
         'TrustFire',
-        'LiFePO4',
-        'NMC'
+        'LiFePO4 (OpenROV White)',
+        'NMC (OpenROV Blue)'
       ];
 
       return [{
@@ -61,6 +61,10 @@ class SystemPower
         'properties': 
         {
           'batteries': {
+            'options': 
+            {
+              hidden: true
+            },
             'id':   'batteries',
             'type': 'array',
 
@@ -74,11 +78,11 @@ class SystemPower
                 },
                 'minVoltage': {
                   'id':   'minVoltage',
-                  'type': 'integer'
+                  'type': 'number'
                 },
                 'maxVoltage': {
                   'id':   'maxVoltage',
-                  'type': 'integer'
+                  'type': 'number'
                 }
               },
               'required': [
@@ -95,14 +99,14 @@ class SystemPower
                 'maxVoltage': 13
               },
               {
-                'name': 'LiFePO4',
+                'name': 'LiFePO4 (OpenROV White)',
                 'minVoltage': 7,
                 'maxVoltage': 10
               },
               {
-                'name': 'NMC',
-                'minVoltage': 7,
-                'maxVoltage': 10
+                'name': 'NMC (OpenROV Blue)',
+                'minVoltage': 8,
+                'maxVoltage': 12.6
               }
             ]
           },
@@ -110,8 +114,8 @@ class SystemPower
           {
             'id':       'selectedBattery',
             'type':     'string',
-            'enum': BatteryOptions,
-            'default':  'LiFePO4'  
+            'enum':     BatteryOptions,
+            'default':  'LiFePO4 (OpenROV White)'
           }
         },
         'required': 

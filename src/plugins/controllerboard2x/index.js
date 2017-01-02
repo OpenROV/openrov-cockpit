@@ -84,6 +84,11 @@
                 'name': 'LiFePO4',
                 'minVoltage': 7,
                 'maxVoltage': 10
+              },
+              {
+                'name': 'NMC',
+                'minVoltage': 7,
+                'maxVoltage': 10.8
               }
             ]
           },

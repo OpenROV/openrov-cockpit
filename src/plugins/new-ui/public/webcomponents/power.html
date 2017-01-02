@@ -210,6 +210,12 @@
           // Calculate fill width
           var fillWidth  = ( percent * 200.0 ).toFixed(2);
 
+          // Set a minimum value for fill width so the user can see some feedback that the value is very low
+          if( fillWidth < 5.0 )
+          {
+            fillWidth = 5.0;
+          }
+
           // Set CSS attributes for indicator fill
           $(this.$.indicator).css({ fill: this.hslColorFromPercent( percent ) });
           $(this.$.indicator).attr('width', fillWidth);

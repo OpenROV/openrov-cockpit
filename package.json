@@ -48,6 +48,7 @@
     "optimist": "",
     "os-utils": "",
     "pino": "^3.0.5",
+    "pino-arborsculpture": "^1.0.0",
     "pino-trace": "^0.1.0",
     "q": "^1.4.1",
     "request": "^2.69.0",

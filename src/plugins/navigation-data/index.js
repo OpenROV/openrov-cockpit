@@ -40,14 +40,13 @@
       navdata.heading = value;
     });
 
+    deps.globalEventLoop.on('plugin.diveProfile.depth', function (value)
+    {
+      navdata.depth = value;
+    });
+
     deps.globalEventLoop.on('mcu.status', function (status)
     {
-      // TODO: Move to depth plugin
-      if ('depth_d' in status) 
-      {
-        navdata.depth = decode( status.depth_d );
-      }
-
       // TODO: Move to IMU plugin
       if ('imu_mode' in status) 
       {

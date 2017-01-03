@@ -61,18 +61,6 @@
       }
     });
 
-    // TODO: Move to Depth plugin
-    deps.cockpit.on('plugin.navigationData.zeroDepth', function () 
-    {
-      deps.globalEventLoop.emit('mcu.SendCommand', 'dzer()');
-    });
-
-    // TODO: Deprecated
-    deps.cockpit.on('plugin.navigationData.calibrateCompass', function () 
-    {
-      deps.globalEventLoop.emit('mcu.SendCommand', 'ccal()');
-    });
-
     // TODO: Move to IMU plugin
     deps.cockpit.on('plugin.navigationData.setState', function (state) 
     {

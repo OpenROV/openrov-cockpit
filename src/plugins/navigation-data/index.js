@@ -23,59 +23,77 @@
         return ( intIn * 0.001 );
     }
       
-    // Arduino
+    // IMU state provided by IMU plugin
+    deps.globalEventLoop.on('plugin.imu.roll', function (value)
+    {
+      navdata.roll = value;
+    });
+
+    deps.globalEventLoop.on('plugin.imu.pitch', function (value)
+    {
+      navdata.pitch = value;
+    });
+
+    deps.globalEventLoop.on('plugin.imu.yaw', function (value)
+    {
+      navdata.yaw     = value;
+      navdata.heading = value;
+    });
+
     deps.globalEventLoop.on('mcu.status', function (status)
     {
-      if ('depth_d' in status) {
+      // TODO: Move to depth plugin
+      if ('depth_d' in status) 
+      {
         navdata.depth = decode( status.depth_d );
       }
-      if ('imu_p' in status) {
-        navdata.pitch = decode( status.imu_p );
-      }
-      if ('imu_r' in status) {
-        navdata.roll = decode( status.imu_r );
-      }
-      if ('imu_y' in status) {
-        navdata.yaw = decode( status.imu_y );
-        navdata.heading = decode( status.imu_y );
-      }
-      if ('fthr' in status) {
-        navdata.thrust = status.fthr;
-      }
-      if ('imu_mode' in status) {
+
+      // TODO: Move to IMU plugin
+      if ('imu_mode' in status) 
+      {
         self.state.imuMode = status.imu_mode==0?'gyro':'compass';
         deps.cockpit.emit('plugin.navigationData.state', self.state);                
       }
-      if ('imu_level:ack' in status) {
-        navstate.imu_level_ack = Date.now();
-      }
 
+      if ('fthr' in status) 
+      {
+        navdata.thrust = status.fthr;
+      }
     });
 
-    deps.cockpit.on('plugin.navigationData.zeroDepth', function () {
+    // TODO: Move to Depth plugin
+    deps.cockpit.on('plugin.navigationData.zeroDepth', function () 
+    {
       deps.globalEventLoop.emit('mcu.SendCommand', 'dzer()');
     });
 
-    deps.cockpit.on('plugin.navigationData.calibrateCompass', function () {
+    // TODO: Deprecated
+    deps.cockpit.on('plugin.navigationData.calibrateCompass', function () 
+    {
       deps.globalEventLoop.emit('mcu.SendCommand', 'ccal()');
     });
 
-    deps.cockpit.on('plugin.navigationData.setState', function (state) {
-      if (state.imuMode){
+    // TODO: Move to IMU plugin
+    deps.cockpit.on('plugin.navigationData.setState', function (state) 
+    {
+      if (state.imuMode)
+      {
         var mode = 0; //gyro
-        if (state.imuMode=="compass"){
+        if (state.imuMode=="compass")
+        {
           mode = 1
         }
         deps.globalEventLoop.emit('mcu.SendCommand', `imu_mode(${mode})`);
       }
     });
-    //TODO: Add API for switching compass to GYRO only mode for relative positioning if the compass is capable.
-    //This also implies the UI should be notified so that it can remove the N/S/E/W references.  Perhaps switch to
-    //a -180 + 180 coordinate system?
-    setInterval(function () {
+
+    // Emit navdata at 10Hz rate
+    setInterval(function () 
+    {
       deps.cockpit.emit('plugin.navigationData.data', navdata);
     }, 100);
   }
+  
   module.exports = function (name, deps) {
     return new NavigationData(name, deps);
   };

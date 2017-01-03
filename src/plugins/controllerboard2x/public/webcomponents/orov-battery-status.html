@@ -67,9 +67,9 @@
           });
 
 
-          emitter.withHistory.on('settings-change.batteryDefintions', function(settings){
-            var selectedBattery = settings.batteryDefintions.selectedBattery;
-            var definition = settings.batteryDefintions.batteries.find(function(element,index,array){
+          emitter.withHistory.on('settings-change.batteryDefinitions', function(settings){
+            var selectedBattery = settings.batteryDefinitions.selectedBattery;
+            var definition = settings.batteryDefinitions.batteries.find(function(element,index,array){
               if(element.name == selectedBattery) return true;
               return false;
             });

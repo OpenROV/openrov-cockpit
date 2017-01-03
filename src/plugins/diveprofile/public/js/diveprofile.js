@@ -56,6 +56,11 @@
             {
                 self.zeroDepth();
             });
+
+            this.cockpit.rov.withHistory.on( "plugin.diveProfile.waterType", function( waterType )
+            {
+                self.cockpit.emit( "plugin.diveProfile.waterType", waterType );
+            } );
         };
     };
 

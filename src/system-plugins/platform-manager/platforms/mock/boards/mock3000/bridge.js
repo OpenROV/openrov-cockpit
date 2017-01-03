@@ -1,6 +1,7 @@
 var EventEmitter = require('events').EventEmitter;
-var debug = require('debug')('bridge');
-var trace = require('debug')('trace:bridge');
+var logger = require('AppFramework.js').logger;
+var debug = logger.debug.bind(logger);
+var trace = logger.trace.bind(logger);
 
 // -----------------------------------------
 // Encoding helper functions

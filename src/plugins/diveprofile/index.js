@@ -16,7 +16,7 @@ class DiveProfile
 {
   constructor(name, deps) 
   {
-    console.log( 'DiveProfile plugin loaded' );
+    deps.logger.debug( 'DiveProfile plugin loaded' );
     var self = this;
 
     // Comm buses

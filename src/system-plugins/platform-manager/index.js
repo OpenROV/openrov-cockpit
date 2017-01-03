@@ -14,7 +14,7 @@ var Promise         = require('bluebird');
 var fs              = Promise.promisifyAll(require('fs'));
 var BoardInterface  = require('BoardInterface.js');
 var CPUInterface    = require('CPUInterface.js');
-
+var logger;
 
 
 function PlatformManager(name, deps) 
@@ -25,8 +25,10 @@ function PlatformManager(name, deps)
   this.platform.systemDirectory = deps.config.systemDirectory;
   this.platform.board = new BoardInterface(deps);
   this.platform.cpu = new CPUInterface(deps);
+  logger = deps.logger;
+  
 
-  console.log('PLATFORM: Loading platform interfaces...');
+  ('PLATFORM: Loading platform interfaces...');
 
   // Load interfaces
   return Promise.try(function () 
@@ -37,7 +39,7 @@ function PlatformManager(name, deps)
   .then(LoadBoardInterface)
   .then(function (platform) 
   {
-    console.log('PLATFORM: Successfully loaded configuration for a supported platform.');
+    logger.info('PLATFORM: Successfully loaded configuration for a supported platform.');
     deps.globalEventLoop.emit('platform.supported');
 
     return self;
@@ -45,7 +47,7 @@ function PlatformManager(name, deps)
   .catch(function (err) 
   {
     //deps.globalEventLoop.emit( "platform.unsupported", error );
-    console.log('PLATFORM: Failed to load platform details for this system: ' + err.message);
+    logger.error('PLATFORM: Failed to load platform details for this system: ' + err.message);
 
     return null;
   });
@@ -57,7 +59,7 @@ function LoadPlatformName(platform)
   {
     // Allow shortcut
     platform.name = process.env.PLATFORM;
-    console.log('PLATFORM: Platform shortcut set to: ' + platform.name);
+    logger.info('PLATFORM: Platform shortcut set to: ' + platform.name);
     return platform;
   } 
   else 
@@ -81,7 +83,7 @@ function LoadPlatformName(platform)
 
 function LoadCPUInterface(platform) 
 {
-  console.log('PLATFORM: Loading CPU interface...');
+  logger.info('PLATFORM: Loading CPU interface...');
 
   var CPUInterfaceLoader = require('./platforms/' + platform.name + '/cpu.js');
 
@@ -89,7 +91,7 @@ function LoadCPUInterface(platform)
   .Compose(platform)
   .catch(function (err) 
   {
-    console.log('Failed to load CPU interface: ' + err.message);
+    logger.error('Failed to load CPU interface: ' + err.message);
     throw err;
   })
   .then(function () 
@@ -100,7 +102,7 @@ function LoadCPUInterface(platform)
 
 function LoadBoardInterface(platform) 
 {
-  console.log('PLATFORM: Loading Board interface...');
+  logger.info('PLATFORM: Loading Board interface...');
 
   var BoardInterfaceLoader = require('./platforms/' + platform.name + '/board.js');
 
@@ -108,13 +110,13 @@ function LoadBoardInterface(platform)
   .Compose(platform)
   .catch(function (err) 
   {
-    console.log('Failed to load board interface: ' + err.message);  // Continue anyway. Board is optional to operation of cockpit
+    logger.error('Failed to load board interface: ' + err.message);  // Continue anyway. Board is optional to operation of cockpit
   })
   .then(function () 
   {
     try
     {
-      console.log( "Setting PRODUCTID to: " + platform.board.info.productId );
+      logger.info( "Setting PRODUCTID to: " + platform.board.info.productId );
       process.env["PRODUCTID"] = platform.board.info.productId;
     }
     catch( err )

@@ -10,10 +10,10 @@
   "scripts": {
     "deploy:dev": "env 'npm_config_unsafe_perm=false' env 'npm_config_shrinkwrap=false' NODE_ENV=development npm install",
     "deploy:prod": "env 'npm_config_unsafe_perm=true' env 'npm_config_shrinkwrap=true' NODE_ENV=production npm install",
-    "build:dev": "env 'npm_config_unsafe_perm=true' env 'npm_config_shrinkwrap=false' NODE_ENV=production npm install",    
+    "build:dev": "env 'npm_config_unsafe_perm=true' env 'npm_config_shrinkwrap=false' NODE_ENV=production npm install",
     "test": "./node_modules/grunt-cli/bin/grunt test",
     "shrinkwrap": "NODE_ENV=production node install_lib/npm_shrinkwrap_all.js",
-    "prepshrinkwrap" : "node install_lib/npm_shrinkwrap_removeOptionalDeps.js",
+    "prepshrinkwrap": "node install_lib/npm_shrinkwrap_removeOptionalDeps.js",
     "install": "node install_lib/bower_install_all.js && node install_lib/npm_install_all.js"
   },
   "dependencies": {
@@ -41,13 +41,14 @@
     "method-override": "^2.3.5",
     "mkdirp": "",
     "moment": "",
-    "morgan": "^1.6.1",
     "multer": "^1.1.0",
     "nconf": "",
     "ncp": "^2.0.0",
     "object-assign": "^4.0.1",
     "optimist": "",
     "os-utils": "",
+    "pino": "^3.0.5",
+    "pino-trace": "^0.1.0",
     "q": "^1.4.1",
     "request": "^2.69.0",
     "respawn": "^2.3.0",

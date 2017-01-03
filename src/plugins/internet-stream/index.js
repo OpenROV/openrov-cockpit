@@ -1,5 +1,5 @@
 var is = function is(name, deps) {
-  console.log('This is where the internet streaming plugin code would execute in the node process.');
+  deps.logger.debug('This is where the internet streaming plugin code would execute in the node process.');
 };
 is.prototype.getSettingSchema = function getSettingSchema() {
   //from http://json-schema.org/examples.html

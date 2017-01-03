@@ -5,7 +5,7 @@ class SystemEnvironment
 {
     constructor(name, deps)
     {
-      console.log('Controllerboard2x:SystemEnvironment plugin loaded');
+      deps.logger.debug('Controllerboard2x:SystemEnvironment plugin loaded');
     }
 }
 
@@ -13,7 +13,7 @@ class SystemPower
 {
     constructor(name, deps)
     {
-      console.log('Controllerboard2x:SystemPower plugin loaded');
+      deps.logger.debug('Controllerboard2x:SystemPower plugin loaded');
 
       this.config   = deps.config;
       this.cockpit  = deps.cockpit;
@@ -137,7 +137,7 @@ class Controllerboard2x
 {
     constructor(name, deps)
     {
-      console.log('Controllerboard2x plugin loaded');
+      deps.logger.debug('Controllerboard2x plugin loaded');
 
       this.systempower        = new SystemPower(name, deps);
       this.systemenvironment  = new SystemEnvironment(name, deps);
@@ -154,7 +154,7 @@ module.exports = function (name, deps)
 {
   if( process.env.PRODUCTID == "trident" )
   {
-      console.log( "Not supported on trident" );
+      deps.logger.debug( "Not supported on trident" );
       return {};
   }
 

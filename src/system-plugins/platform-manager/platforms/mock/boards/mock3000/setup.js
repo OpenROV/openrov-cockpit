@@ -4,6 +4,7 @@ var spawn = require('child_process')
     .spawn;
 var ArduinoHelper = require('ArduinoHelper');
 var Hardware = require('./bridge.js');
+var logger = require('AppFramework.js').logger;
 
 var debug = {};
 
@@ -80,7 +81,7 @@ var SetupBoardInterface = function(board) {
           }
           catch( err )
           {
-            console.error( "Version regex found no matches" )
+            logger.error( "Version regex found no matches" )
           }
         }
 
@@ -123,12 +124,12 @@ var SetupBoardInterface = function(board) {
 // ------------------------------------------------
 var RegisterFunctions = function(board) {
     board.AddMethod('Initialize', function() {
-        debug('MCU Interface initialized!');
+        logger.debug('MCU Interface initialized!');
         board.global.emit('mcu.StartSerial');
     }, false);
 
     board.AddMethod('ResetMCU', function(path) {
-        debug('Resetting MCU: ' + path);
+        logger.debug('Resetting MCU: ' + path);
         board.bridge.close();
         setTimeout(function() {
             board.bridge.connect();

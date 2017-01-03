@@ -1,14 +1,14 @@
 // Dependencies
 const Listener  = require( 'Listener' );
 
-var log         = require('debug')('app:log:video');
-var error       = require('debug')('app:error:video');
+var logger;
 
 class Video
 {
     constructor( name, deps )
     {
-        log( "Loaded Cockpit Plugin: Video" );
+        logger = deps.logger;        
+        logger.info( "Loaded Cockpit Plugin: Video" );
 
         this.globalBus  = deps.globalEventLoop;
         this.cockpitBus = deps.cockpit;

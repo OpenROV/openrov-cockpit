@@ -5,6 +5,7 @@ var path = require('path');
 var exec = require('child_process').exec;
 var platformName = '';
 var Installer = require('/opt/openrov/cockpit/src/lib/Installer.js');
+var logger = require('AppFramework.js').logger;
 fs.readFileAsync('/opt/openrov/system/config/platform.conf').then(function (data) {
   // Parse platform info from configuration file
   var platInfo = JSON.parse(data);
@@ -24,9 +25,9 @@ fs.readFileAsync('/opt/openrov/system/config/platform.conf').then(function (data
   // Install board files
   return Installer.Install(installDir);
 }).catch(function (err) {
-  console.log('Error: ' + err.message);
+  logger.error(err);
   process.exit(1);
 }).then(function () {
-  console.log('Install complete.');
+  logger.debug('Install complete.');
   process.exit(0);
 });

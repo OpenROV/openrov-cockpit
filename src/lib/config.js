@@ -4,10 +4,8 @@
  * Configuration file.  Manage frame rate, port, etc.
  *
  */
-
-var log = require('debug')('log:system');
-var error = require('debug')('error:system');
-var debug = require('debug')('debug:system');
+module.exports = function(frameworkDeps){
+var pino = frameworkDeps.logging.child({module:"config"});
 
 var nconf = require('nconf');
 //Add your Mock objects here using this same naming convention of library-mock for the mock version.
@@ -22,7 +20,7 @@ try {
   error('Unable to load the configuration file, resetting to defaults');
   error(err);
 }
-debug(nconf.get());
+pino.debug(nconf.get(),"Settings");
 nconf.env();
 //Also look for overrides in environment settings
 // Do not change these values in this file for an individual ROV, use the ./etc/rovconfig.json instead
@@ -62,7 +60,7 @@ function savePreferences() {
       error(err.message);
       return;
     }
-    debug('Configuration saved successfully.');
+    pino.debug('Configuration saved successfully.');
   });
 }
 var getLibPath = function (lib) {
@@ -72,23 +70,31 @@ var getLibPath = function (lib) {
   }
   return result;
 };
-module.exports = {
-  debug: nconf.get('debug'),
-  debug_commands: nconf.get('debug_commands'),
-  production: nconf.get('production'),
-  sample_freq: nconf.get('sample_freq'),
-  dead_zone: nconf.get('dead_zone'),
-  video_frame_rate: nconf.get('video_frame_rate'),
-  video_resolution: nconf.get('video_resolution'),
-  video_device: nconf.get('video_device'),
-  video_port: nconf.get('video_port'),
-  video_url: nconf.get('video_url'),
-  port: nconf.get('port'),
-  serial: nconf.get('serial'),
-  serial_baud: nconf.get('serial_baud'),
-  dashboardURL: nconf.get('dashboardURL'),
-  preferences: nconf,
-  savePreferences: savePreferences,
-  systemDirectory: nconf.get('systemDirectory')
+
+  var finalconfig =  {
+    debug: nconf.get('debug'),
+    debug_commands: nconf.get('debug_commands'),
+    production: nconf.get('production'),
+    sample_freq: nconf.get('sample_freq'),
+    dead_zone: nconf.get('dead_zone'),
+    video_frame_rate: nconf.get('video_frame_rate'),
+    video_resolution: nconf.get('video_resolution'),
+    video_device: nconf.get('video_device'),
+    video_port: nconf.get('video_port'),
+    video_url: nconf.get('video_url'),
+    port: nconf.get('port'),
+    serial: nconf.get('serial'),
+    serial_baud: nconf.get('serial_baud'),
+    dashboardURL: nconf.get('dashboardURL'),
+    preferences: nconf,
+    savePreferences: savePreferences,
+    systemDirectory: nconf.get('systemDirectory')
+  }
+
+  pino.debug('config', finalconfig);
+
+  return finalconfig;
+
+
+
 };
-debug('config', module.exports);

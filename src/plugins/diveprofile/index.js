@@ -37,6 +37,7 @@ class DiveProfile
     this.depth        = 0;    // meters
     this.pressure     = 0;    // kPa
     this.temperature  = 0;    // celsius
+    this.waterType    = "Freshwater";
 
     this.SyncSettings = new Periodic( 100, "timeout", function()
     {
@@ -131,6 +132,17 @@ class DiveProfile
             if( 'depth_water' in data ) 
             {
                 self.mcuWaterType = parseInt( data.depth_water );
+
+                if( self.mcuWaterType == 0 )
+                {
+                    this.waterType = "Freshwater";
+                }
+                else
+                {
+                    this.waterType = "Saltwater";
+                }
+
+                self.cockpitBus.emit( "plugin.diveProfile.waterType", self.waterType );
             }
 
             // Depth zero ack

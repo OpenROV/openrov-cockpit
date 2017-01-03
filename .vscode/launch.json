@@ -31,7 +31,7 @@
 				"cacheDirectory": "/tmp/cache",
 				"DATADIR": "/tmp",
 				"IGNORE_CACHE": "true",
-				"LOG_LEVEL":"DEBUG"
+				"LOG_LEVEL":"debug"
 			},
             "console": "internalConsole",			          
 			"sourceMaps": false,

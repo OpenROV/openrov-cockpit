@@ -43,6 +43,11 @@
             this.cockpit.rov.emit( "plugin.diveProfile.zeroDepth" );
         }
 
+        clearDepthOffset()
+        {
+            this.cockpit.rov.emit( "plugin.diveProfile.clearDepthOffset" );
+        }
+
         getTelemetryDefinitions()
         {
             return [];
@@ -55,6 +60,11 @@
             this.cockpit.on('plugin.diveProfile.zeroDepth', function()
             {
                 self.zeroDepth();
+            });
+
+            this.cockpit.on('plugin.diveProfile.clearDepthOffset', function()
+            {
+                self.clearDepthOffset();
             });
 
             this.cockpit.rov.withHistory.on( "plugin.diveProfile.waterType", function( waterType )

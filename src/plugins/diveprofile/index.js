@@ -30,8 +30,9 @@ class DiveProfile
     this.targetWaterType  = 0;      // 0 = Fresh, 1 = Salt
 
     // MCU's reported settings
-    this.mcuWaterType     = NaN;
-    this.zeroDepthAck     = false;
+    this.mcuWaterType           = NaN;
+    this.zeroDepthAck           = false;
+    this.clearDepthOffsetAck    = false;
 
     // State information
     this.depth        = 0;    // meters
@@ -61,6 +62,7 @@ class DiveProfile
 
             // Enable API
             self.listeners.zeroDepth.enable();
+            self.listeners.clearDepthOffset.enable();
         }
     });
 
@@ -78,6 +80,22 @@ class DiveProfile
         {
             // Stop syncing
             self.SyncZeroDepth.stop();
+        }
+    });
+
+    this.SyncClearDepthOffset = new Periodic( 100, "timeout", () =>
+    {
+        // TODO: Max Attempts
+        if( self.clearDepthOffsetAck !== true )
+        {
+            // Emit command to mcu
+            var command = 'depth_clroff()';
+            self.globalBus.emit( 'mcu.SendCommand', command );
+        }
+        else
+        {
+            // Stop syncing
+            self.SyncClearDepthOffset.stop();
         }
     });
 
@@ -154,12 +172,28 @@ class DiveProfile
                     self.zeroDepthAck = true;
                 }
             }
+
+            // Depth offset clear ack
+            if( 'depth_clroff' in data ) 
+            {
+                if( data.depth_clroff == "ack" )
+                {
+                    // Done syncing
+                    self.clearDepthOffsetAck = true;
+                }
+            }
         }),
 
         zeroDepth: new Listener( this.cockpitBus, 'plugin.diveProfile.zeroDepth', false, () =>
         {
             // Zero the depth value by using the current value as the offset
             self.setZeroDepth();
+        }),
+
+        clearDepthOffset: new Listener( this.cockpitBus, 'plugin.diveProfile.clearDepthOffset', false, () =>
+        {
+            // Zero the depth value by using the current value as the offset
+            self.clearDepthOffset();
         })
     }
   }
@@ -171,6 +205,13 @@ class DiveProfile
     this.SyncZeroDepth.start();
   }
 
+  clearDepthOffset()
+  {
+    // Reset the ack and start syncing state
+    this.clearDepthOffsetAck = false;
+    this.SyncClearDepthOffset.start();
+  }
+
   start()
   {
     this.listeners.settings.enable();
@@ -178,11 +219,14 @@ class DiveProfile
 
   stop()
   {
-    self.SyncSettings.stop();
-    self.SyncZeroDepth.stop();
     this.listeners.settings.disable();
     this.listeners.mcuStatus.disable();
     this.listeners.zeroDepth.disable();
+    this.listeners.clearDepthOffset.disable();
+
+    this.SyncSettings.stop();
+    this.SyncZeroDepth.stop();
+    this.SyncClearDepthOffset.stop();
   }
 
   getSettingSchema()

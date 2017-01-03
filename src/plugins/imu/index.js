@@ -33,8 +33,8 @@ class IMU
         this.targetPitchOffset_enc     = 0;
 
         // MCU's reported settings
-        this.mcuRollOffset_enc         = 0;
-        this.mcuPitchOffset_enc        = 0;
+        this.mcuRollOffset_enc         = NaN;
+        this.mcuPitchOffset_enc        = NaN;
         this.zeroYawAck                = false;
 
         // IMU state information

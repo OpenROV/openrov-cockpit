@@ -1,43 +1,81 @@
-(function (window, document, jQuery) {
-  //The function wrapper prevents leaking variables to global space
-  'use strict';
-  var DiveProfile;
-  //These lines register the Example object in a plugin namespace that makes
-  //referencing the plugin easier when debugging.
-  var plugins = namespace('plugins');
-  plugins.DiveProfile = DiveProfile;
-  DiveProfile = function DiveProfile(cockpit) {
-    console.log('Loading DiveProfile plugin in the browser.');
-    //instance variables
-    this.cockpit = cockpit;
-    this.rov = cockpit.rov;
-    // for plugin management:
-    this.Plugin_Meta = {
-      name: 'diveprofile',
-      viewName: 'DiveProfile plugin',
-      defaultEnabled: false
+(function(window) 
+{
+    'use strict';
+    class DiveProfile 
+    {
+        constructor( cockpit )
+        {
+            console.log('DiveProfile Plugin running');
+
+            var self = this;
+            self.cockpit = cockpit;
+
+            this.actions =
+            {
+                'plugin.diveProfile.zeroDepth':
+                {
+                    description: 'Zero the depth gauge using the current depth as an offset',
+                    controls:
+                    {
+                        button:
+                        {
+                            down: function()
+                            {
+                                self.zeroDepth();
+                            }                            
+                        }
+                    }
+                }
+            };
+
+            // Setup input handlers
+            this.inputDefaults = 
+            {
+                keyboard: 
+                {
+                    "alt+d": { type: "button", action: 'plugin.diveProfile.zeroDepth' }
+                }
+            };
+        };
+
+        zeroDepth()
+        {
+            this.cockpit.rov.emit( "plugin.diveProfile.zeroDepth" );
+        }
+
+        clearDepthOffset()
+        {
+            this.cockpit.rov.emit( "plugin.diveProfile.clearDepthOffset" );
+        }
+
+        getTelemetryDefinitions()
+        {
+            return [];
+        };
+
+        listen() 
+        {
+            var self = this;
+
+            this.cockpit.on('plugin.diveProfile.zeroDepth', function()
+            {
+                self.zeroDepth();
+            });
+
+            this.cockpit.on('plugin.diveProfile.clearDepthOffset', function()
+            {
+                self.clearDepthOffset();
+            });
+
+            this.cockpit.rov.withHistory.on( "plugin.diveProfile.waterType", function( waterType )
+            {
+                self.cockpit.emit( "plugin.diveProfile.waterType", waterType );
+            } );
+        };
     };
-  };
-  //private functions and variables (hidden within the function, available via the closure)
-  //listen gets called by the plugin framework after all of the plugins
-  //have loaded.
-  DiveProfile.prototype.listen = function listen() {
-    var self = this;
-    //Wire up plugin.example.namechanged to get sent
-    //when the settings first and last name options get
-    //changed
-    this.rov.withHistory.on('settings-change.diveprofile', function (settings) {
-      self.cockpit.emit('plugin.diveprofile.watertype', { watertype: settings.diveprofile['water-type'] });
-    });
-    this.rov.withHistory.on('plugin.diveprofile.watertype', function (watertype) {
-      self.cockpit.emit('plugin.diveprofile.watertype', watertype);
-    });
-    this.cockpit.on('plugin.diveprofile.watertype.set', function (watertype) {
-      self.rov.emit('plugin.diveprofile.watertype.set', watertype);
-    });
-    this.cockpit.on('plugin.diveprofile.depth.zero', function () {
-      self.rov.emit('plugin.diveprofile.depth.zero');
-    });
-  };
-  window.Cockpit.plugins.push(DiveProfile);
-}(window, document, $));
+
+    var plugins = namespace('plugins');
+    plugins.DiveProfile = DiveProfile;
+    window.Cockpit.plugins.push( plugins.DiveProfile );
+
+}(window));

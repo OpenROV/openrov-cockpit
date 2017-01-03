@@ -42,7 +42,7 @@ var SetupBoardInterface = function(board) {
         command = 'rmtrmod();';
         board.bridge.write(command);
     };
-    // TODO: Move the water setting to diveprofile
+    
     board.updateSetting = function() {
         // This is the multiplier used to make the motor act linear fashion.
         // For example: the props generate twice the thrust in the positive direction than the negative direction.

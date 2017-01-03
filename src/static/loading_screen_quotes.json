@@ -64,6 +64,14 @@
         {
             "author": "Jacques Cousteau",
             "quote": "The Sea, once it casts its spell, holds one in its net of wonder forever."
+        },
+        {
+            "author": "Carl Sagan",
+            "quote": "Somewhere, something incredible is waiting to be known."
+        },
+        {
+            "author": "David Attenborough",
+            "quote": "I just wish the world was twice as big and half of it was still unexplored."
         }
     ]
 }

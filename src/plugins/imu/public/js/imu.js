@@ -33,7 +33,7 @@
             {
                 keyboard: 
                 {
-                    "y": { type: "button", action: 'plugin.imu.zeroYaw' }
+                    "alt+y": { type: "button", action: 'plugin.imu.zeroYaw' }
                 }
             };
         };
@@ -63,7 +63,7 @@
                 self.zeroRollPitch();
             });
 
-            // stepNegative
+            // zeroYaw
             this.cockpit.on('plugin.imu.zeroYaw', function()
             {
                 self.zeroYaw();

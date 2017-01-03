@@ -110,21 +110,21 @@ class DiveProfile
             if( 'depth_d' in data ) 
             {
                 self.depth = decode( parseInt( data.depth_d ) );
-                self.globalBus.emit( "plugin.diveprofile.depth", self.depth );
+                self.globalBus.emit( "plugin.diveProfile.depth", self.depth );
             }
 
             // Pressure
             if( 'depth_p' in data ) 
             {
                 self.pressure = decode( parseInt( data.depth_p ) );
-                self.globalBus.emit( "plugin.diveprofile.pressure", self.pressure );
+                self.globalBus.emit( "plugin.diveProfile.pressure", self.pressure );
             }
 
             // Temperature
             if( 'depth_t' in data ) 
             {
                 self.temperature = decode( parseInt( data.depth_t ) );
-                self.globalBus.emit( "plugin.diveprofile.temp", self.temperature );
+                self.globalBus.emit( "plugin.diveProfile.temp", self.temperature );
             }
     
             // Water type
@@ -144,7 +144,7 @@ class DiveProfile
             }
         }),
 
-        zeroDepth: new Listener( this.cockpitBus, 'plugin.diveprofile.zeroDepth', false, () =>
+        zeroDepth: new Listener( this.cockpitBus, 'plugin.diveProfile.zeroDepth', false, () =>
         {
             // Zero the depth value by using the current value as the offset
             self.setZeroDepth();

@@ -62,9 +62,11 @@ function Bridge()
     time:         0,
     timeDelta_ms: 50,
 
+    waterType:    0,  // 0: Fresh, 1: Salt
     depth:        0,
     depthOffset:  0,
-    temperature:  0
+    temperature:  0,
+    pressure:     0
   }
 
   bridge.depthHoldEnabled   = false;
@@ -131,6 +133,23 @@ function Bridge()
           // Set the current heading as the offset
           imu.yawOffset = imu.yaw;
           bridge.emitStatus(`imu_zyaw:ack;`);
+
+          break;
+      }
+
+      case 'depth_zero':
+      {
+          // Set the current depth as the offset
+          depthSensor.depthOffset = depthSensor.depth;
+          bridge.emitStatus(`depth_zero:ack;`);
+
+          break;
+      }
+
+      case 'depth_water':
+      {
+          depthSensor.waterType = parseInt( parameters[0] );
+          bridge.emitStatus(`depth_water:${depthSensor.waterType};`);
 
           break;
       }
@@ -409,10 +428,14 @@ function Bridge()
     // Generate temperature from 15:25 degrees
     depthSensor.temperature = 20 + ( 5 * Math.sin( depthSensor.time * ( Math.PI / 40000 ) ) );
 
-    // Create result string
+    // Generate pressure from 50:70 kPa
+    depthSensor.pressure = 60 + ( 10 * Math.sin( depthSensor.time * ( Math.PI / 40000 ) ) );
+
+    // Create result string (Note: we don't bother to take into account water type or offsets w.r.t. temperature or pressure )
     var result = "";
     result += 'depth_d:' + encode( depthSensor.depth - depthSensor.depthOffset ) + ';';
     result += 'depth_t:' + encode( depthSensor.temperature ) + ';';
+    result += 'depth_p:' + encode( depthSensor.pressure ) + ';';
 
     // Emit status update
     bridge.emit( 'status', reader.parseStatus( result ) );

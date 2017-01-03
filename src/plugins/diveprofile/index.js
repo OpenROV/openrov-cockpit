@@ -183,11 +183,11 @@ class DiveProfile
         'waterType': {
           'type': 'string',
           'enum': [
-            'salt',
-            'fresh'
+            'Freshwater',
+            'Saltwater'
           ],
           'title': 'Water Type',
-          'default': 'fresh'
+          'default': 'Freshwater'
         }
       }
     }];

@@ -3,12 +3,10 @@ const fs            = Promise.promisifyAll( require('fs') );
 const path          = require('path');
 const spawn         = require('child_process').spawn;
 const SerialBridge  = require('TridentSerialBridge.js');
-<<<<<<< HEAD
-var Periodic        = require( 'Periodic' );
 
-=======
+var Periodic        = require( 'Periodic' );
 var logger          = require('AppFramework.js').logger;
->>>>>>> 12dac8f594489695e8038c96bb62bade09b5f0e3
+
 var debug = {};
 
 // I2C setup

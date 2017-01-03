@@ -69,6 +69,7 @@ class IMU
                 // Enable API
                 self.listeners.zeroRollPitch.enable();
                 self.listeners.zeroYaw.enable();
+                self.listeners.clearRollPitchOffsets.enable();
             }
         });
 
@@ -163,12 +164,28 @@ class IMU
                 self.setNewRollPitchOffsets();
             }),
 
+            clearRollPitchOffsets: new Listener( this.cockpitBus, 'plugin.imu.clearRollPitchOffsets', false, () =>
+            {
+                // Zero the roll and pitch by using current values as offsets.
+                self.clearRollPitchOffsets();
+            }),
+
             zeroYaw: new Listener( this.cockpitBus, 'plugin.imu.zeroYaw', false, () =>
             {
                 // Have the MCU zero the yaw value
                 self.setZeroYaw();
             })
         }
+    }
+
+    clearRollPitchOffsets()
+    {
+        // Clear the offsets
+        this.settings.rollOffset    = 0;
+        this.settings.pitchOffset   = 0;
+
+        // Update offset settings and send to settings manager, which will trigger a settings update
+        this.cockpitBus.emit( 'plugin.settings-manager.saveSettings', { imu: this.settings } );
     }
 
     setNewRollPitchOffsets()
@@ -199,6 +216,10 @@ class IMU
         this.listeners.mcuStatus.disable();
         this.listeners.zeroRollPitch.disable();
         this.listeners.zeroYaw.disable();
+        this.listerners.clearRollPitchOffsets.disable();
+
+        this.SyncSettings.stop();
+        this.SyncZeroYaw.stop();
     }
 
     getSettingSchema()

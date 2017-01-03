@@ -146,6 +146,15 @@ function Bridge()
           break;
       }
 
+      case 'depth_clroff':
+      {
+          // Set the depth offset to 0
+          depthSensor.depthOffset = 0;
+          bridge.emitStatus(`depth_clroff:ack;`);
+
+          break;
+      }
+
       case 'depth_water':
       {
           depthSensor.waterType = parseInt( parameters[0] );

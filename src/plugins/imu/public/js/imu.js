@@ -43,6 +43,11 @@
             this.cockpit.rov.emit( "plugin.imu.zeroRollPitch" );
         }
 
+        clearRollPitchOffsets()
+        {
+            this.cockpit.rov.emit( "plugin.imu.clearRollPitchOffsets" );
+        }
+
         zeroYaw()
         {
             this.cockpit.rov.emit( "plugin.imu.zeroYaw" );
@@ -61,6 +66,11 @@
             this.cockpit.on('plugin.imu.zeroRollPitch', function()
             {
                 self.zeroRollPitch();
+            });
+
+            this.cockpit.on('plugin.imu.clearRollPitchOffsets', function()
+            {
+                self.clearRollPitchOffsets();
             });
 
             // zeroYaw

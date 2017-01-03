@@ -27,14 +27,6 @@
           controlablePlugins: {type: Array, value: []}
         },
         behaviors: [namespace('behaviors').oROVStandard],
-        attached: function () {
-          var self = this;
-          if (this.eventEmitter!==undefined){
-            self.eventEmitter.emit('plugin-manager.getControllablePlugins',function(results){
-              self.controlablePlugins = results;
-            });
-          }
-        },
         registerEmitterHandlers: function(emitter){
           var self = this;
           emitter.on('plugin-manager.ControllablePluginsChanged',function(p){

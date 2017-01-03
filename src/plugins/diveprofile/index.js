@@ -189,7 +189,10 @@ class DiveProfile
           'title': 'Water Type',
           'default': 'Freshwater'
         }
-      }
+      },
+      'required': [
+        'waterType'
+      ]
     }];
   }
 }

@@ -93,6 +93,13 @@ function Bridge()
         break;
       }
 
+      case 'wake': 
+      {
+        bridge.emitStatus('awake:;');
+        
+        break;
+      }
+
       case 'ex_hello': 
       {
         var helloGoodbye = parseInt( parameters[0] );

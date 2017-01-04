@@ -249,8 +249,8 @@ loaderA.loadPluginsAsync(plugins)
 })
 .then(function () 
 {
-  logger.debug('Starting following plugins:');
-  logger.debug(deps.loadedPlugins);
+  //logger.debug('Starting following plugins:');
+  //logger.debug(deps.loadedPlugins);
 
   // Start each plugin
   deps.loadedPlugins.forEach(function (plugin) 

@@ -29,6 +29,7 @@
           powerLevel: self.powerLevel,
           positions: self.positions
         };
+        
       callback(state);
     });
     deps.cockpit.on('plugin.rovpilot.setPowerLevel', function (value) {

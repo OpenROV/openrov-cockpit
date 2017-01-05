@@ -136,24 +136,23 @@
             // Fetch the current client data for the editor
             var data = _self.editor.getValue();
 
-            // Get any errors that are currently occurring in the editor
-            var errors = _self.editor.validate();
-
-            // Handle any errors
-            if( errors.length )
-            {
-              for( let i = 0; i < errors.length; i++ )
-              {
-                if( errors[ i ] )
-                {
-                  // Check type of error
+            // TODO: Handle any errors that are currently occurring in the editor
+            
+            // var errors = _self.editor.validate();
+            // if( errors.length )
+            // {
+            //   for( let i = 0; i < errors.length; i++ )
+            //   {
+            //     if( errors[ i ] )
+            //     {
+            //       // Check type of error
                   
-                  // Find problem elements
+            //       // Find problem elements
 
-                  // Delete/revert problem element
-                }
-              }
-            }
+            //       // Delete/revert problem element
+            //     }
+            //   }
+            // }
 
             // Only commit updates when there have been changes to the values
             if( !deepEquals( data, _self.value ) )

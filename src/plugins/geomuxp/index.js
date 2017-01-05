@@ -83,6 +83,7 @@ var geomux = function geomux(name, deps) {
     videoServer.on('connect', function() {
         log('Successfully connected to geo-video-server');
         // Tell geo-video-server to start the daemons
+        // This can get triggered on reconnect events as well
         videoServer.emit('geomux.ready');
     });
     // Disconnection

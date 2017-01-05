@@ -126,15 +126,40 @@
 
           //JSONEditor.defaults.language = "es"; for localizing local error messages
           var defaults = _self.editor.getValue();
+
           //zips the object properies in to _self.value
           Object.assign(defaults,_self.value); //defaults now overridden with current values where set
           _self.editor.setValue(defaults);
 
-          _self.editor.on('change',function() {
+          _self.editor.on('change',function() 
+          {
+            // Fetch the current client data for the editor
             var data = _self.editor.getValue();
-            if (!deepEquals(data,_self.value)){
-              _self.fire('changed',data);
-              _self.value=data;
+
+            // Get any errors that are currently occurring in the editor
+            var errors = _self.editor.validate();
+
+            // Handle any errors
+            if( errors.length )
+            {
+              for( let i = 0; i < errors.length; i++ )
+              {
+                if( errors[ i ] )
+                {
+                  // Check type of error
+                  
+                  // Find problem elements
+
+                  // Delete/revert problem element
+                }
+              }
+            }
+
+            // Only commit updates when there have been changes to the values
+            if( !deepEquals( data, _self.value ) )
+            {
+              _self.fire( 'changed', data );
+              _self.value = data;
             }
           });
     },

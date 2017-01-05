@@ -1,7 +1,7 @@
 const Promise = require('bluebird');
 const fs      = Promise.promisifyAll(require('fs'));
 const path    = require('path');
-const logger = require('logging.js')
+const logger = require('AppFramework.js').logger;
 
 class BoardInterface
 {

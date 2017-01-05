@@ -53,6 +53,7 @@ class SystemPower
           {
             title:          "Batteries",
             type:           "array",
+            minItems:       1,
             uniqueItems:    true,
             propertyOrder:  1,
 

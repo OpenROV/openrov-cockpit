@@ -29,7 +29,7 @@
         behaviors: [namespace('behaviors').oROVStandard],
         registerEmitterHandlers: function(emitter){
           var self = this;
-          emitter.on('plugin-manager.ControllablePluginsChanged',function(p){
+          emitter.withHistory.on('plugin-manager.ControllablePluginsChanged',function(p){
             self.controlablePlugins = p;
           });
         },

@@ -1,11 +1,7 @@
-const log = require('debug')('log:about');
-const trace = require('debug')('trace:about');
-const debug = require('debug')('debug:about');
-
 const bluebird = require('bluebird');
 const Listener = require('Listener');
 const execFile = require('child_process').execFile;
-
+var logger;
 //private functions
 
 
@@ -43,8 +39,8 @@ function getROVImageVersion(){
 class About {
 
     constructor(name, deps) {
-
-        log("Loaded About plugin");
+        logger = deps.logger;
+        logger.info("Loaded About plugin");
 
         this.globalBus = deps.globalEventLoop; // This is the server-side messaging bus. The MCU sends messages to server plugins over this
         this.cockpitBus = deps.cockpit; // This is the server<->client messaging bus. This is how the server talks to the browser

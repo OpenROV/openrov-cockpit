@@ -3,7 +3,7 @@
   var ROVpilotWire;
   ROVpilotWire = function ROVpilotWire(cockpit) {
     var self = this;
-    console.log('Loading ROVpilot-Wire plugin in the browser.');
+    deps.logger.debug('Loading ROVpilot-Wire plugin in the browser.');
     // Instance variables
     this.cockpit = cockpit;
     this.rov = cockpit.rov;

@@ -1,5 +1,5 @@
 function ClassicControlMapping(name, deps) {
-  console.log('Loaded classic control mapping plugin');
+  deps.logger.debug('Loaded classic control mapping plugin');
 }
 
 ClassicControlMapping.prototype.getControlMappingPreset = function getControlMappingPreset(){

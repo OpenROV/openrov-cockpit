@@ -2,7 +2,7 @@ const crc           = require('crc');
 const SerialPort    = require('serialport');
 const Delimiter      = SerialPort.parsers.Delimiter;
 const EventEmitter  = require('events').EventEmitter;
-
+const logger        = require('AppFramework.js').logger;
 class SerialBridge extends EventEmitter
 {
   constructor( uartDevicePath, uartBaud )
@@ -30,17 +30,17 @@ class SerialBridge extends EventEmitter
     this.serialPort.on('open', () =>
     {
       this.serialConnected = true;
-      console.log('Serial port opened!');
+      logger.debug('Serial port opened!');
     });
 
     this.serialPort.on('error',(err) =>
     {
-      console.log('Serial error',err)
+      logger.debug('Serial error',err)
     })
 
     this.serialPort.on('close', (data) =>
     {
-      console.log('Serial port closed!');
+      logger.debug('Serial port closed!');
       this.serialConnected = false;
     });
 
@@ -101,7 +101,7 @@ class SerialBridge extends EventEmitter
     } 
     else
     {
-      console.log('DID NOT SEND');
+      logger.debug('DID NOT SEND');
     }
   }
 
@@ -119,7 +119,7 @@ class SerialBridge extends EventEmitter
       }
       else
       {
-        console.log( "NAN RESULT: " + parts[ 1 ] );
+        logger.warn( "NAN RESULT: " + parts[ 1 ] );
       }
     }
 

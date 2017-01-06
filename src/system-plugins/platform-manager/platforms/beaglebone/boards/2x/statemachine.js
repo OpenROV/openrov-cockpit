@@ -12,6 +12,7 @@ const ResetMCU          = require( "./lib/ResetMCU.js" );
 const escConfPath       = "/opt/openrov/system/config/esc.conf";
 const mcuLastBuildPath  = "/opt/openrov/system/config/lastBuildHash";
 const mcuBinPath        = "/opt/openrov/firmware/bin/2x/OpenROV2x.hex";
+const logger            = require("AppFramework.js").logger.child({module:"stateMachine"});
 
 module.exports = function( board ) 
 {
@@ -24,19 +25,19 @@ module.exports = function( board )
     function status( message, progress )
     {
         board.global.emit( "plugin.updateManager.status", { message: message.toString(), progress: progress } );
-        console.log( "FIRMWARE UPDATE: " + message.toString().trim() );
+        logger.debug( "FIRMWARE UPDATE: " + message.toString().trim() );
     }
 
     function log( data )
     {
         board.global.emit( "plugin.updateManager.log", data.toString() );
-        console.log( "FIRMWARE UPDATE: " + data.toString().trim() );
+        logger.debug( "FIRMWARE UPDATE: " + data.toString().trim() );
     }
 
     function err( data )
     {
         board.global.emit( "plugin.updateManager.error", data.toString() );
-        console.error( "FIRMWARE UPDATE: " + data.toString().trim() );
+        logger.error(data);
     }
     
     function escCheckHandler(event, from, to)
@@ -219,7 +220,7 @@ module.exports = function( board )
             // Make sure the serial port is open
             if (!self.board.bridge.isConnected())
             {
-                console.log("Serial Port not connected.. opening and retrying in 300ms");
+                logger.debug("Serial Port not connected.. opening and retrying in 300ms");
                 self.board.bridge.connect();
                 setTimeout(RequestHashInfo.bind(this),300);
                 return;
@@ -267,7 +268,6 @@ module.exports = function( board )
 
     function resetMCUHandler(event, from, to)
     {
-        console.log( "test" );
         status( "Resetting MCU...", "InProgress" );
 
         var self = this;

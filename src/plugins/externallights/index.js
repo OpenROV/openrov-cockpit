@@ -18,7 +18,7 @@
     {
         constructor(name, deps)
         {
-            console.log( 'ExternalLights plugin loaded' );
+            deps.logger.debug( 'ExternalLights plugin loaded' );
 
             this.globalBus  = deps.globalEventLoop;
             this.cockpitBus = deps.cockpit;
@@ -164,7 +164,7 @@
     {
         if( process.env.PRODUCTID == "trident" )
         {
-            console.log( "Not supported on trident" );
+            deps.logger.debug( "External Lights Not supported on trident" );
             return {};
         }
 

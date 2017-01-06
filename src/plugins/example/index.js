@@ -6,7 +6,7 @@
     {
         constructor(name, deps)
         {
-            console.log( 'Example plugin loaded!' );
+            deps.logger.debug( 'Example plugin loaded!' );
 
             this.globalBus  = deps.globalEventLoop;   // This is the server-side messaging bus. The MCU sends messages to server plugins over this
             this.cockpitBus = deps.cockpit;           // This is the server<->client messaging bus. This is how the server talks to the browser

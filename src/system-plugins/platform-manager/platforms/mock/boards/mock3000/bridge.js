@@ -1,8 +1,9 @@
 var EventEmitter = require('events').EventEmitter;
-var debug = require('debug')('bridge');
-var trace = require('debug')('trace:bridge');
+var logger = require('AppFramework.js').logger;
+var debug = logger.debug.bind(logger);
+var trace = logger.trace.bind(logger);
 
-
+// -----------------------------------------
 // Encoding helper functions
 function encode( floatIn )
 {
@@ -14,51 +15,94 @@ function decode( intIn )
     return ( intIn * 0.001 );
 }
 
+function mapTo(value, in_min, in_max, out_min, out_max) 
+{
+  return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+};
+
 function Bridge() 
 {
-  var DISABLED = 'DISABLED';
-  var bridge = new EventEmitter();
-  var reader = new StatusReader();
+  var DISABLED      = 'DISABLED';
+  var bridge        = new EventEmitter();
+  var reader        = new StatusReader();
   var emitRawSerial = false;
 
-  // Initial values
-  var time = 1000;
-  var currentDepth = 1;
+  // Controllerboard State
+  var cb = 
+  {
+    time:         0,
+    timeDelta_ms: 1000,
 
-  var currentHeading = 0;
-  var headingClockwise = true;
-  var headingCounter = 0;
-  var headingOut = 0;
+    brdvRampUp:   true,
+    brdv:         5.0,
+    vout:         5.0,
+    iout:         2.0,
+    bt1i:         0.0,
+    bt2i:         0.0
+  }
 
-  var currentPitch = 0;
-  var currentRoll = 0;
-  var currentServo = 1500;
-  var current = 2;
+  // IMU State
+  var imu = 
+  {
+    time:         0,
+    timeDelta_ms: 10,
 
-  bridge.depthHoldEnabled = false;
-  bridge.targetHoldEnabled = false;
-  bridge.laserEnabled = false;
-  bridge.imuMode = 0;
+    mode:         0,    // 0: GYRO, 1:MAG
+    roll:         0,
+    rollOffset:   0,
+    pitch:        0,
+    pitchOffset:  0,
+    yaw:          0,
+    yawOffset:    0,
+    heading:      0
+  }
+
+  // Depth sensor state
+  var depthSensor =
+  {
+    time:         0,
+    timeDelta_ms: 50,
+
+    waterType:    0,  // 0: Fresh, 1: Salt
+    depth:        0,
+    depthOffset:  0,
+    temperature:  0,
+    pressure:     0
+  }
+
+  bridge.depthHoldEnabled   = false;
+  bridge.targetHoldEnabled  = false;
+  bridge.laserEnabled       = false;
 
   // -----------------------------------------
-  // Methods
-  bridge.write = function (command) 
+  // Bridge Methods
+  bridge.write = function( command ) 
   {
-    var commandParts = command.split(/\(|\)/);
-    var commandText = commandParts[0];
+    var commandParts  = command.split(/\(|\)/);
+    var commandText   = commandParts[0];
+    var parameters    = commandParts[ 1 ].split( ',' );
 
+    // Simulate the receipt of the above command
     switch (commandText) 
     {
       case 'version': 
       {
         bridge.emitStatus('ver:<<{{10024121ae3fa7fc60a5945be1e155520fb929dd}}>>');
         debug('ver:<<{{10024121ae3fa7fc60a5945be1e155520fb929dd}}>>');
+        
+        break;
+      }
+
+      case 'wake': 
+      {
+        bridge.emitStatus('awake:;');
+        
         break;
       }
 
       case 'ex_hello': 
       {
-        var helloGoodbye = parseInt( commandParts[1] );
+        var helloGoodbye = parseInt( parameters[0] );
 
         if( helloGoodbye === 1 )
         {
@@ -72,22 +116,72 @@ function Bridge()
         break;
       }
 
-      case 'imu_mode':{
-         bridge.imuMode = commandParts[1];
-         bridge.emitStatus(`imu_mode:${bridge.imuMode}`);
+      case 'imu_mode':
+      {
+         imu.mode = parseInt( parameters[0] );
+         bridge.emitStatus(`imu_mode:${imu.mode};`);
+
+         break;
+      }
+
+      case 'imu_level':
+      {
+          // Echo back requested settings
+          imu.rollOffset = decode( parseInt( parameters[0] ) );
+          bridge.emitStatus("imu_roff:" + encode( imu.rollOffset ) + ";" );
+
+          imu.pitchOffset = decode( parseInt( parameters[1] ) );
+          bridge.emitStatus("imu_poff:" + encode( imu.pitchOffset ) + ";" );
+
+          break;
+      }
+
+      case 'imu_zyaw':
+      {
+          // Set the current heading as the offset
+          imu.yawOffset = imu.yaw;
+          bridge.emitStatus(`imu_zyaw:ack;`);
+
+          break;
+      }
+
+      case 'depth_zero':
+      {
+          // Set the current depth as the offset
+          depthSensor.depthOffset = depthSensor.depth;
+          bridge.emitStatus(`depth_zero:ack;`);
+
+          break;
+      }
+
+      case 'depth_clroff':
+      {
+          // Set the depth offset to 0
+          depthSensor.depthOffset = 0;
+          bridge.emitStatus(`depth_clroff:ack;`);
+
+          break;
+      }
+
+      case 'depth_water':
+      {
+          depthSensor.waterType = parseInt( parameters[0] );
+          bridge.emitStatus(`depth_water:${depthSensor.waterType};`);
+
+          break;
       }
 
       case 'ping': 
       {
-        bridge.emitStatus(`pong:${commandParts[1]}`);
-        trace(`pong:${commandParts[1]}`);
+        bridge.emitStatus(`pong:${parameters[0]}`);
+        trace(`pong:${parameters[0]}`);
         break;
       }      
 
       case 'lights_tpow': 
       {
         // Ack command
-        var power = parseInt( commandParts[1] );
+        var power = parseInt( parameters[0] );
         bridge.emitStatus('lights_tpow:' + power );
 
         setTimeout( function()
@@ -102,7 +196,7 @@ function Bridge()
       case 'elights_tpow': 
       {
         // Ack command
-        var power = parseInt( commandParts[1] );
+        var power = parseInt( parameters[0] );
         bridge.emitStatus('elights_tpow:' + power );
 
         setTimeout( function()
@@ -118,7 +212,7 @@ function Bridge()
       {
         // Ack command
 
-        var pos = parseInt( commandParts[1] );
+        var pos = parseInt( parameters[0] );
         bridge.emitStatus('camServ_tpos:' + pos );
 
         setTimeout( function()
@@ -133,29 +227,29 @@ function Bridge()
       case 'camServ_inv': 
       {
         // Ack command
-        bridge.emitStatus('camServ_inv:' + commandParts[1] );
+        bridge.emitStatus('camServ_inv:' + parameters[0] );
         break;
       }
 
       case 'camServ_spd': 
       {
         // Ack command
-        var speed = parseInt( commandParts[1] );
+        var speed = parseInt( parameters[0] );
         bridge.emitStatus('camServ_spd:' + speed );
         break;
       }
       
       case 'eligt': 
       {
-        bridge.emitStatus('LIGPE:' + commandParts[1] / 100);
-        debug('External light status: ' + commandParts[1] / 100);
+        bridge.emitStatus('LIGPE:' + parameters[0] / 100);
+        debug('External light status: ' + parameters[0] / 100);
         break;
       }
 
       case 'escp': 
       {
-        bridge.emitStatus('ESCP:' + commandParts[1]);
-        debug('ESC status: ' + commandParts[1]);
+        bridge.emitStatus('ESCP:' + parameters[0]);
+        debug('ESC status: ' + parameters[0]);
         break;
       }
 
@@ -224,13 +318,13 @@ function Bridge()
       // Passthrough tests
       case 'example_to_foo': 
       {
-        bridge.emitStatus('example_foo:' + commandParts[1]);
+        bridge.emitStatus('example_foo:' + parameters[0]);
         break;
       }
 
       case 'example_to_bar': 
       {
-        bridge.emitStatus('example_bar:' + commandParts[1]);
+        bridge.emitStatus('example_bar:' + parameters[0]);
         break;
       }
 
@@ -244,191 +338,248 @@ function Bridge()
     bridge.emitStatus('cmd:' + command);
   };
 
-  bridge.emitStatus = function (status) {
+  bridge.emitStatus = function (status) 
+  {
     var txtStatus = reader.parseStatus(status);
     bridge.emit('status', txtStatus);
-    if (emitRawSerial) {
+
+    if (emitRawSerial) 
+    {
       bridge.emit('serial-recieved', status);
     }
   };
-  bridge.connect = function () {
-    debug('!Serial port opened');
-    // Add status interval functions
-    bridge.timeInterval = setInterval(bridge.emitTime, 1000);
-    bridge.statsInterval = setInterval(bridge.emitStats, 3000);
-    bridge.navDataInterval = setInterval(bridge.emitNavData, 100);  // Emit serial port opened event
-  };
-  bridge.close = function () {
-    debug('!Serial port closed');
-    // Remove status interval functions
-    clearInterval(bridge.timeInterval);
-    clearInterval(bridge.statsInterval);
-    clearInterval(bridge.navDataInterval);  // Emit serial port closed event
-  };
-  bridge.startRawSerialData = function startRawSerialData() {
+
+  bridge.startRawSerialData = function startRawSerialData() 
+  {
     emitRawSerial = true;
   };
-  bridge.stopRawSerialData = function stopRawSerialData() {
+
+  bridge.stopRawSerialData = function stopRawSerialData() 
+  {
     emitRawSerial = false;
   };
-  // Set up intervals to emit mocked 
-  bridge.emitTime = function () {
-    bridge.emit('status', reader.parseStatus('time:' + time));
-    time += 1000;
-  };
-  var BT1I = 0;
-  var BT2I = 0;
-  var BRDV = 11;
-  bridge.emitStats = function () {
-    var data = 'iout:0.2;BT.1.I:0.3;BT.2.I:0.5;BNO055.enabled:true;BNO055.test1.pid:passed;BNO055.test2.zzz:passed;';
-    var status = reader.parseStatus(data);
-    bridge.emit('status', status);
-  };
 
-  // Encoding helper functions
-  function encode( floatIn )
+  bridge.connect = function () 
   {
-      return parseInt( floatIn * 1000 );
-  }
+    debug('!Serial port opened');
 
-  function decode( intIn )
-  {
-      return ( intIn * 0.001 );
-  }
-
-  function mapTo(value, in_min, in_max, out_min, out_max) {
-    return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+    // Add status interval functions
+    bridge.imuInterval    = setInterval( bridge.updateIMU,          imu.timeDelta_ms );
+    bridge.depthInterval  = setInterval( bridge.updateDepthSensor,  depthSensor.timeDelta_ms );
+    bridge.cbInterval     = setInterval( bridge.updateCB,           cb.timeDelta_ms );
   };
 
+  bridge.close = function () 
+  {
+    debug('!Serial port closed');
 
-  bridge.emitNavData = function () {
-    var result = '';
-    // Generate depth
-    var rnd = (Math.random() * 20 - 10) / 100;
-    currentDepth += currentDepth * rnd;
-    currentDepth = Math.min(Math.max(currentDepth, 1), 100);
-    result += 'depth_d:' + encode( currentDepth ) + ';';
+    // Remove status interval functions
+    clearInterval( bridge.imuInterval );
+    clearInterval( bridge.depthInterval );
+    clearInterval( bridge.cbInterval );
+  };
+
+  function normalizeAngle360( a )
+  {
+    return ((a > 360.0) ? (a - 360.0) : ((a < 0.0) ? (a + 360.0) : a));
+  } 
+
+  function normalizeAngle180( a ) 
+  {
+    return ((a > 180.0) ? (a - 360.0) : ((a < -180.0) ? (a + 360.0) : a));
+  };
+
+  bridge.updateIMU = function()
+  {
+    // Update time
+    imu.time += imu.timeDelta_ms;
+
+    // Generate pitch -90:90 degrees
+    imu.pitch = 90 * Math.sin( imu.time * ( Math.PI / 10000 ) );
     
-    // Generate heading
-    if(headingClockwise)
-    {
-      //Increment by one
-      currentHeading += 5;
-      headingOut = mapTo(currentHeading, 0, 359, -180, 180);
-      
-      if(currentHeading >= 359)
-      {
-        currentHeading = 0;
-        headingCounter += 1;
-      }
+    // Generate roll -90:90 degrees
+    imu.roll = 90 * Math.sin( imu.time * ( Math.PI / 30000 ) );
+    
+    // Generate yaw between -120:120 degrees
+    var baseYaw = 120 * Math.sin( imu.time * ( Math.PI / 10000 ) );
 
-      if(headingCounter > 2)
+    // Handle mode switches (gyro mode is -180:180, mag mode is 0:360)
+    if( imu.mode === 0 )
+    {
+      imu.yaw = baseYaw;
+    }
+    else if( imu.mode === 1 )
+    {
+      imu.yaw = normalizeAngle360( baseYaw );
+    }
+
+    // Create result string
+    var result = "";
+    result += 'imu_p:' + encode( imu.pitch - imu.pitchOffset ) + ';';
+    result += 'imu_r:' + encode( imu.roll - imu.rollOffset )+ ';';
+
+    // Handle imu mode for yaw/heading
+    if( imu.mode === 0 )
+    {
+      // GYRO mode
+      result += 'imu_y:' + encode( normalizeAngle180( imu.yaw - imu.yawOffset ) ) + ';';
+    }
+    else if( imu.mode === 1 )
+    {
+      // MAG mode
+      result += 'imu_y:' + encode( imu.yaw ) + ';';
+    }
+
+    // Emit status update
+    bridge.emit( 'status', reader.parseStatus( result ) );
+  }
+
+  bridge.updateDepthSensor = function()
+  {
+    // Update time
+    depthSensor.time += depthSensor.timeDelta_ms;
+
+    // Generate depth from -10:10 meters
+    depthSensor.depth = 10 * Math.sin( depthSensor.time * ( Math.PI / 20000 ) );
+
+    // Generate temperature from 15:25 degrees
+    depthSensor.temperature = 20 + ( 5 * Math.sin( depthSensor.time * ( Math.PI / 40000 ) ) );
+
+    // Generate pressure from 50:70 kPa
+    depthSensor.pressure = 60 + ( 10 * Math.sin( depthSensor.time * ( Math.PI / 40000 ) ) );
+
+    // Create result string (Note: we don't bother to take into account water type or offsets w.r.t. temperature or pressure )
+    var result = "";
+    result += 'depth_d:' + encode( depthSensor.depth - depthSensor.depthOffset ) + ';';
+    result += 'depth_t:' + encode( depthSensor.temperature ) + ';';
+    result += 'depth_p:' + encode( depthSensor.pressure ) + ';';
+
+    // Emit status update
+    bridge.emit( 'status', reader.parseStatus( result ) );
+  }
+
+  bridge.updateCB = function()
+  {
+    // Update time
+    cb.time += cb.timeDelta_ms;
+
+    // Generate a current baseline from 1:2 amps
+    var currentBase = ( ( Math.random() * 1 ) + 1 );
+
+    // Generate currents for each battery tube from the base current, deviation of +/- 0.2A
+    cb.bt1i = currentBase + ( ( Math.random() * 0.4 ) - 0.2 );
+    cb.bt2i = currentBase + ( ( Math.random() * 0.4 ) - 0.2 );
+
+    // Get total current by adding the two tube currents
+    cb.iout = cb.bt1i + cb.bt2i;
+
+    // Generate board voltage (ramps up and down between 5V and 12V)
+    if( cb.brdvRampUp )
+    {
+      cb.brdv += 0.5;
+      if( cb.brdv >= 12 )
       {
-        headingClockwise = false;
-        headingCounter = 0;
+        cb.brdvRampUp = false;
       }
     }
     else
     {
-      //Increment by one
-      currentHeading -= 5;
-      headingOut = mapTo(currentHeading, 0, 359, -180, 180);
-
-      if(currentHeading <= 0)
+      cb.brdv -= 0.5;
+      if( cb.brdv <= 5 )
       {
-        currentHeading = 359;
-        headingCounter += 1;
-      }
-      if(headingCounter > 2)
-      {
-        headingClockwise = true;
-        headingCounter = 0;
+        cb.brdvRampUp = true;
       }
     }
 
-    //Todo: To reduce errors, suggest using different variables for different values rather than relying on code
-    //to have additional knowledge of the IMU mode to interpret values.
-    if (bridge.imuMode==0){
-      result += 'imu_y:' + encode( headingOut ) + ';';
-    } else {
-      result += 'imu_y:' + encode( currentHeading ) + ';';
-    }
-    // Generate pitch
-    //p(t) = 90*sin(t)
-    currentPitch = 90*Math.sin(time);
-    result += 'imu_p:' + encode( currentPitch ) + ';';
-    // Generate roll
-    currentRoll = Math.floor(Math.random()*91) - 45;
-    result += 'imu_r:' + encode( currentRoll )+ ';';
-    // Generate battery tube 1 current
-    rnd = (Math.random() * 20 - 10) / 100;
-    current += current * rnd;
-    current = Math.min(Math.max(current, 1), 10);
-    result += 'BT1I:' + current + ';';
-    // Generate battery tube 2 current
-    rnd = (Math.random() * 20 - 10) / 100;
-    current += current * rnd;
-    current = Math.min(Math.max(current, 1), 10);
-    result += 'BT2I:' + current + ';';
-    // Generate board voltage
-    rnd = (Math.random() * 20 - 10) / 100;
-    BRDV += BRDV * rnd;
-    BRDV = Math.min(Math.max(BRDV, 1), 10);
-    result += 'BRDV:' + BRDV + ';';
-    result += 'vout:' + BRDV + ';';
+    cb.vout = cb.brdv;
+
+    // Create result string
+    var result = "";
+    result += 'BT2I:' + cb.bt2i + ';';
+    result += 'BT1I:' + cb.bt1i + ';';
+    result += 'BRDV:' + cb.brdv + ';';
+    result += 'vout:' + cb.vout + ';';
+    result += 'iout:' + cb.iout + ';';
+    result += 'time:' + cb.time + ';';
 
     // Emit status update
-    bridge.emit('status', reader.parseStatus(result));
-  };
+    bridge.emit( 'status', reader.parseStatus( result ) );
+  }
+
   // Listen for firmware settings updates
   // TODO: Has this been deprecated for TSET?
-  reader.on('firmwareSettingsReported', function (settings) {
+  reader.on('firmwareSettingsReported', function (settings) 
+  {
     bridge.emit('firmwareSettingsReported', settings);
   });
+
   return bridge;
 }
+
 // Helper class for parsing status messages
-var StatusReader = function () {
-  var reader = new EventEmitter();
-  var currTemp = 20;
+var StatusReader = function() 
+{
+  var reader    = new EventEmitter();
+  var currTemp  = 20;
   var currDepth = 0;
-  var processSettings = function processSettings(parts) {
+
+  var processSettings = function processSettings(parts) 
+  {
     var setparts = parts.split(',');
     var settingsCollection = {};
-    for (var s = 0; s < setparts.length; s++) {
+
+    for (var s = 0; s < setparts.length; s++) 
+    {
       var lastParts = setparts[s].split('|');
       settingsCollection[lastParts[0]] = lastParts[1];
     }
+
     reader.emit('firmwareSettingsReported', settingsCollection);
     return settingsCollection;
   };
-  var processItemsInStatus = function processItemsInStatus(status) {
-    if ('iout' in status) {
+
+  var processItemsInStatus = function processItemsInStatus(status) 
+  {
+    if ('iout' in status) 
+    {
       status.iout = parseFloat(status.iout);
     }
-    if ('btti' in status) {
+
+    if ('btti' in status) 
+    {
       status.btti = parseFloat(status.btti);
     }
-    if ('vout' in status) {
+
+    if ('vout' in status) 
+    {
       status.vout = parseFloat(status.vout);
     }
   };
-  reader.parseStatus = function parseStatus(rawStatus) {
+
+  reader.parseStatus = function parseStatus(rawStatus) 
+  {
     var parts = rawStatus.split(';');
     var status = {};
-    for (var i = 0; i < parts.length; i++) {
+
+    for (var i = 0; i < parts.length; i++) 
+    {
       var subParts = parts[i].split(':');
-      switch (subParts[0]) {
-      case '*settings':
-        status.settings = processSettings(subParts[1]);
-        break;
-      default:
-        status[subParts[0]] = subParts[1];
+
+      switch (subParts[0]) 
+      {
+        case '*settings':
+          status.settings = processSettings(subParts[1]);
+          break;
+        default:
+          status[subParts[0]] = subParts[1];
       }
     }
+
     processItemsInStatus(status);
     return status;
   };
+
   return reader;
 };
+
 module.exports = Bridge;

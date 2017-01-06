@@ -2,7 +2,7 @@ const fs            = require('fs');
 const path          = require('path');
 const spawn         = require('child_process').spawn;
 const SerialBridge  = require('TridentSerialBridge.js');
-
+var logger          = require('AppFramework.js');
 var debug = {};
 
 var SetupBoardInterface = function(board) 
@@ -59,7 +59,7 @@ var RegisterFunctions = function(board)
 {
    board.AddMethod('Initialize', function () 
   {
-    debug('MCU Interface initialized!');
+    logger.debug('MCU Interface initialized!');
 
     // TODO: Only allow the statemachine to do this
     // Turn on the serial

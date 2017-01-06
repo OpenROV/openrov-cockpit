@@ -674,6 +674,9 @@
                             self.set("rovPilotSettings", settings.rovPilot);
                         });
                     }
+
+                    //Get the configuration state
+                    self.set("isCustomConfig", sessionStorage.getItem("isCustomConfig"));
                     
                 },
 
@@ -793,10 +796,21 @@
                     //Let the input controller know
                     self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
 
-                    self.isCustomConfig = true;
+                    self.setCustomConfigFlag(true);
+
                     self.updateGamepadInput();
                     self.openUpdatePresetToast();
                 }, 
+
+                setCustomConfigFlag: function(state){
+                    var self = this;
+
+                    // Set the polymer element
+                    self.isCustomConfig = state;
+
+                    //Local storage for persistence among pages
+                    sessionStorage.setItem("isCustomConfig", self.isCustomConfig);
+                },
 
                 //Clear a conflicting keyboard binding
                 handleClearConflictingKeyboardBinding: function() {
@@ -811,7 +825,7 @@
                     //Let the input controller know
                     self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
                     
-                    self.isCustomConfig = true;
+                    self.setCustomConfigFlag(true);
                     self.updateKeyboardInput();
                     self.openUpdatePresetToast();
                 },
@@ -832,7 +846,7 @@
                         self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
                     }
 
-                    self.isCustomConfig = true;
+                    self.setCustomConfigFlag(true);
                     this.$.clearedInputToast.open();
                 },
 
@@ -851,7 +865,7 @@
                         self.eventEmitter.emit('plugin.inputController.unregisterInput', clearedInput);
                     }
 
-                    self.isCustomConfig = true;
+                    self.setCustomConfigFlag(true);
                     this.$.clearedInputToast.open();
                 },
 
@@ -1033,7 +1047,7 @@
                     //Request the node module to send up the preset requested
                     self.eventEmitter.emit('plugin.inputConfigurator.loadPreset', self.candidatePreset);
 
-                    self.isCustomConfig = false;
+                    self.setCustomConfigFlag(false);
 
                     self.openLoadedPresetToast();
                     self.$.loadPresetModal.close();
@@ -1228,7 +1242,7 @@
                 openSavedPresetToast: function() {
                     var self = this;
 
-                    self.isCustomConfig = false;
+                    self.setCustomConfigFlag(false);
                     self.$.savedPresetToast.open();
                 },
 
@@ -1236,8 +1250,7 @@
                     var self = this;
 
                     self.set("candidateBinding", undefined);
-                    self.isCustomConfig = true;
-
+                    self.setCustomConfigFlag(true);
                     self.$.updatedPresetToast.open();
                 },
 

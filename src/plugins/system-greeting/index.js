@@ -24,7 +24,7 @@ class SystemGreeting
             }
         });
 
-        this.mcuResetListener = new Listener( this.globalBus, 'mcu.reset', false, () =>
+        this.mcuResetListener = new Listener( this.globalBus, 'mcu.ResetMCU', false, () =>
         {
             // Perform another system greeting to show that the MCU has been updated/reset
             wakeAttempts = 0;

@@ -75,39 +75,44 @@ ga('send', 'pageview');
 
 </script>
 
-  <script type='text/javascript' src="js/libs/eventemitter2.js"></script>
+<script type='text/javascript' src="js/libs/eventemitter2.js"></script>
 
-  <script type='text/javascript' src='js/libs/gamepad.js'></script>
-  <script type='text/javascript' src='js/utilities.js'></script>
+<script type='text/javascript' src='js/libs/gamepad.js'></script>
+<script type='text/javascript' src='js/utilities.js'></script>
 
-  <script type='text/javascript' src="config.js"></script>
-  <script type='text/javascript' src="cockpitsocket/socket.io.js"></script>
-  <script type='text/javascript' src="system-plugin/globalization/js/initGlobalization.js"></script>
-  <script type='text/javascript' src='js/eventEmitterStoreAndForward.js'></script>
-  <script type='text/javascript' src='js/socketIOStoreAndForward.js'></script>
-  <script type='text/javascript' src='js/socketIOtoEmitterBridge.js'></script>  
-  <script type='text/javascript' src="js/cockpit.js"></script>
-  <script type="text/javascript" src="js/app.js"></script>
+<script type='text/javascript' src="config.js"></script>
+<script type='text/javascript' src="cockpitsocket/socket.io.js"></script>
+<script type='text/javascript' src="system-plugin/globalization/js/initGlobalization.js"></script>
+<script type='text/javascript' src='js/eventEmitterStoreAndForward.js'></script>
+<script type='text/javascript' src='js/socketIOStoreAndForward.js'></script>
+<script type='text/javascript' src='js/socketIOtoEmitterBridge.js'></script>  
+<script type='text/javascript' src="js/cockpit.js"></script>
+<script type="text/javascript" src="js/app.js"></script>
 
-  <script type="text/javascript" src="components/webcomponentsjs/webcomponents-lite.js"></script>
-  <script>
-  //  window.Polymer = window.Polymer || {};
-  //  window.Polymer.dom = 'shadow';
-    //TODO: Do we need to look at https://github.com/Polymer/polymer/issues/1844
-    window.Polymer = {
-      dom: 'shadow',
-      lazyRegister: true
-    };
-  </script>
-  <script>window.openrovtheme='<%=theme%>'</script>  
-  <link id="lazyScripts" rel="import" href="/all_scripts.html" async>
-  <link rel="import" href="components/polymer/polymer.html">
+<script type="text/javascript" src="components/webcomponentsjs/webcomponents-lite.js"></script>
+<script>
+//  window.Polymer = window.Polymer || {};
+//  window.Polymer.dom = 'shadow';
+  //TODO: Do we need to look at https://github.com/Polymer/polymer/issues/1844
+  window.Polymer = {
+    dom: 'shadow',
+    lazyRegister: true
+  };
+</script>
+<script>window.openrovtheme='<%=theme%>'</script>  
+<link id="lazyScripts" rel="import" href="/all_scripts.html" async>
+<link rel="import" href="components/polymer/polymer.html">
 
 <style>
+
+    html {
+      font-size: 14px;
+    }
     body.loading #splash {
         opacity: 1;
         z-index: 9000;
-        background: linear-gradient(#CCCCCC, #34A1FF);
+        background: linear-gradient(#1D598D, #003851, #00101F);
+        
         margin: 0;
         padding: 0;
     }    
@@ -129,51 +134,15 @@ ga('send', 'pageview');
         opacity: 0;
         will-change: opacity;
         z-index: 0;
-        background: linear-gradient(#CCCCCC, #34A1FF);
-        background-color: #34A1FF;
-    }
-    /* -------------------------------------------------------------------
-                Credit for the original wave animation and assets: Andy Fitzsimon
-                Link to Codepen: http://codepen.io/andyfitz/pen/akAKdV
-            ------------------------------------------------------------------- */
-    
-    .parallax>use {
-        animation: move-forever 12s linear infinite;
-    }
-    
-    .parallax>use:nth-child(1) {
-        animation-delay: -2s;
-    }
-    
-    .parallax>use:nth-child(2) {
-        animation-delay: -2s;
-        animation-duration: 5s;
-    }
-    
-    .parallax>use:nth-child(3) {
-        animation-delay: -4s;
-        animation-duration: 3s;
-    }
-    
-    @keyframes move-forever {
-        0% {
-            transform: translate(-90px, 0%);
-        }
-        100% {
-            transform: translate(85px, 0%);
-        }
-    }
-    
-    .editorial {
-        display: block;
-        width: 100%;
-        height: 10em;
-        margin: 0;
+        background: linear-gradient(#1D598D, #003851, #00101F);
+
+        font-family: 'Lato', sans-serif; 
+        color: #E2EEF1;
     }
     
     .content {
-        background: linear-gradient(#1D598D, #003851, #00101F);
         text-align: center;
+        top: 50%;
         height: 100%;
         margin: -.1em 0 0 0;
         padding: 2em;
@@ -187,22 +156,18 @@ ga('send', 'pageview');
         font-weight: 100;
         font-size: 4em;
     }
-
-    @keyframes fadein {
-        from { opacity: 0; }
-        to   { opacity: 1; }
-    }    
     
-    #loading {
-      height: 15%;
+    #loading-text {
+      height: 15%; 
+      top: 50%;
+      position: relative;
       text-align: center;
       
       display: flex;
       justify-content: center;
       align-items: center;
 
-      font-family: 'Lato', sans-serif; 
-      font-size: 3.5em;
+      font-size: 4.0vw;
     }
 
     #quote {
@@ -215,16 +180,15 @@ ga('send', 'pageview');
 
       position: relative;
       margin: 0 auto;
-      top: 20%;
+      top: 55%;
 
-      font-family: 'Lato', sans-serif; 
       font-style: italic;
-      font-size: 3em;
+      font-size: 2.8vw;
       animation: fadein 2.5s;
     }
 
     #author {
-      height: 5%;
+      height: 0%;
       text-align: center;
 
       display: flex;
@@ -233,27 +197,20 @@ ga('send', 'pageview');
 
       position: relative;
       margin: auto;
-      top: 25%;
+      top: 60%;
 
-      font-family: 'Lato', sans-serif; 
-      font-size: 1.5em;
+      font-size: 2.0vw;
+
       animation: fadein 2.5s;
     }
 
-    /*prevent many large-by-comparison ripples by shrinking the height*/
-    @media (max-width: 50em) {
-        .content h1 {
-            font-size: 12vmax;
-        }
-        .editorial {
-            height: 17vw;
-        }
-    }
-    
     .sk-spinner-pulse {
         width: 40px;
         height: 40px;
         margin: 40px auto;
+        top: 50%;
+        position: relative;
+        
         background-color: white;
         border-radius: 100%;
         -webkit-animation: sk-pulseScaleOut 2s infinite ease-in-out;
@@ -284,43 +241,26 @@ ga('send', 'pageview');
         }
     }
 </style>
-  </head>
-  <body class="loading">
+
+</head>
+<body class="loading">
 <div id="splash">
-    <svg class="editorial" xmlns="http://www.w3.org/2000/svg" viewBox="0 24 150 28" preserveAspectRatio="none">
-            <defs>
-            <path 
-                id="gentle-wave"
-                d="m -160,44.4 c 30,0 58,
-                    -18 87.7,-18 30.3,0 58.3,
-                    18 87.3,18 30,0 58,-18 88,
-                    -18 30,0 58,18 88,18 l 0,
-                    34.5 -351,0 z" />
-            </defs>
-            <g class="parallax">
-                <use xlink:href="#gentle-wave" x="50" y="0" fill="#34A1FF"/>
-                <use xlink:href="#gentle-wave" x="50" y="3" fill="#2A81CC"/>
-                <use xlink:href="#gentle-wave" x="50" y="6" fill="#1D598D"/>  
-            </g>
-        </svg>
 
-    <div class="content">
-        <h1> </h1>
-
-        <div id="loading">
-          Connecting to the ROV
-        </div>
-        <div class="sk-spinner sk-spinner-pulse" style="margin: auto;"></div>
-
-        <!--Here we can load quotes and authors from a json file, but use the Cousteau quote as a fallback -->
-        <div id="quote">
-          The Sea, once it casts its spell, holds one in its net of wonder forever.
-        </div>
-        <div id="author">
-          -  Jacques Cousteau  -
-        </div>
-    </div>
+      <div class="sk-spinner sk-spinner-pulse" style="margin: auto;"></div>
+      
+      <div id="loading-text">
+        Preparing to dive
+      </div>
+      
+      <!--Here we can load quotes and authors from a json file, but use the Cousteau quote as a fallback -->
+      <div id="quote">
+        The Sea, once it casts its spell, holds one in its net of wonder forever.
+      </div>
+      <div id="author">
+        -  Jacques Cousteau  -
+      </div>
 </div>
+
 <script>
   //Get from filesystem
   fetch('./loading_screen_quotes.json').then(function(response) {
@@ -452,7 +392,9 @@ ga('send', 'pageview');
 function removeSplashScreen() {
     var loadEl = document.getElementById('splash');
     loadEl.addEventListener('transitionend', loadEl.remove);
+
     document.body.classList.remove('loading');  
+    
 }
 
 function setupLazyImportsBundleMetics() {
@@ -482,7 +424,7 @@ function setupLazyScriptBundleMetics() {
   if (lazyBundle) {
     var process = function(){
       if (!window.cockpit){
-        setTimeout(process.bind(this),50);
+        setTimeout(process.bind(this),10);
         return;
       }
       var entry = performance.getEntriesByName(lazyBundle.href)[0];

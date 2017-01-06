@@ -391,6 +391,9 @@ ga('send', 'pageview');
 
 function removeSplashScreen() {
     var loadEl = document.getElementById('splash');
+    if (loadEl===null){
+      return; //Only attempt to proces if the splash screen exists
+    }
     loadEl.addEventListener('transitionend', loadEl.remove);
 
     document.body.classList.remove('loading');  

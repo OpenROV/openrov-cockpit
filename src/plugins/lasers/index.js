@@ -1,6 +1,6 @@
 (function () {
   function Laser(name, deps) {
-    console.log('Laser plugin loaded');
+    deps.logger.debug('Laser plugin loaded');
     var claserstate = 0;
     // Cockpit
     deps.cockpit.on('plugin.laser.set', function (value) {

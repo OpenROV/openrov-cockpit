@@ -1,5 +1,5 @@
 function newUi(name, deps) {
-  console.log('New UI plugin loaded.');
+  deps.logger.debug('New UI plugin loaded.');
   this.plugin = {
     name: 'new-ui',
     type: 'theme'

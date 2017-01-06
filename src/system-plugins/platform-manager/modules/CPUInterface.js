@@ -1,6 +1,7 @@
 var util      = require('util');
 var Interface = require('Interface.js');
 var debug     = {};
+var logger    = require('AppFramework.js').logger;
 
 function CPUInterface(deps) 
 {
@@ -17,7 +18,7 @@ CPUInterface.prototype.RegisterDefaultAPI = function ()
  {
   this.AddMethod('Initialize', function () 
   {
-    debug(this.oName + ' not yet implemented!');
+    logger.debug(this.oName + ' not yet implemented!');
   }, true);
 };
 

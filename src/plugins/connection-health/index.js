@@ -1,5 +1,5 @@
 function ConnectionHealth(name, deps) {
-  console.log('This is where connection-health plugin code would execute in the node process.');
+  deps.logger.debug('This is where connection-health plugin code would execute in the node process.');
   var lastping = 0;
   this.deps = deps;
   var self = this;

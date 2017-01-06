@@ -1,6 +1,6 @@
 var PREFERENCES = 'plugins:software-update';
 function softwareUpdate(name, deps) {
-  console.log('Software update plugin started.');
+  deps.logger.debug('Software update plugin started.');
   var preferences = getPreferences(deps.config);
   showSerialScript = __dirname + '/scripts/' + (process.env.USE_MOCK === 'true' ? 'mock-' : '') + 'showserial.sh';
   deps.app.get('system-plugin/software-update/config', function (req, res) {
@@ -56,7 +56,6 @@ function getPreferences(config) {
     preferences = { showAlerts: { showAlerts: true } };
     config.preferences.set(PREFERENCES, preferences);
   }
-  console.log('Software Update plugin loaded preferences: ' + JSON.stringify(preferences));
   return preferences;
 }
 module.exports = function (name, deps) {

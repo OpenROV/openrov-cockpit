@@ -1,3 +1,4 @@
+var logger = require('AppFramework').logger;
 class Listener
 {
     constructor( bus, event, withHistory, func )
@@ -24,7 +25,7 @@ class Listener
                 }
                 else
                 {
-                    console.warn( "EventEmitter doesn't support withHistory.on(). Using default on(): When registering event: " + this.event );
+                    logger.warn( "EventEmitter doesn't support withHistory.on(). Using default on(): When registering event: " + this.event );
                     this.bus.on( this.event, this.func );
                 }
             }

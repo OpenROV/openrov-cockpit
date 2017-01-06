@@ -1,5 +1,4 @@
 const Mode = Object.freeze( { "interval":1, "timeout":2, "scheduled":3 } );
-
 // TODO: Properly handle promise based functions
 class Periodic
 {
@@ -66,8 +65,7 @@ class Periodic
 
                 default:
                 {
-                    console.error( "Mode not implemented!" );
-                    break;
+                    throw new Error( "Mode not implemented!" );
                 }
             }
         }
@@ -97,8 +95,7 @@ class Periodic
 
                     default:
                     {
-                        console.error( "Mode not implemented!" );
-                        break;
+                        throw new Errpr( "Mode not implemented!" );
                     }
                 }
             }

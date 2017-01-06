@@ -1,6 +1,7 @@
 var crc = require('crc');
 var SerialPort = require('serialport');
 var EventEmitter = require('events').EventEmitter;
+var logger = require('AppFramework.js').logger;
 function Bridge(uartPath,uartBaud) {
   var self = this;
   var bridge = new EventEmitter();
@@ -41,13 +42,13 @@ function Bridge(uartPath,uartBaud) {
 
     serialPort.on('open', function () {
       serialConnected = true;
-      console.log('Serial port opened!');
+      logger.debug('Serial port opened!');
     });
     serialPort.on('error',function(err){
-      console.log('Serial error',err)
+      logger.debug('Serial error',err)
     })
     serialPort.on('close', function (data) {
-      console.log('Serial port closed!');
+      logger.debug('Serial port closed!');
       serialConnected = false;
     });
     parser.on('data', function (data) {
@@ -84,7 +85,7 @@ function Bridge(uartPath,uartBaud) {
         }
       }, delay);
     } else {
-      console.log('DID NOT SEND');
+      logger.debug('DID NOT SEND');
     }
   };
   bridge.startRawSerialData = function startRawSerialData() {

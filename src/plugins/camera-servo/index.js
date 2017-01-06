@@ -19,7 +19,7 @@
     {
         constructor(name, deps)
         {
-            console.log( 'CameraServo plugin loaded' );
+            deps.logger.debug( 'CameraServo plugin loaded' );
 
             this.globalBus  = deps.globalEventLoop;
             this.cockpitBus = deps.cockpit;
@@ -269,7 +269,7 @@
     {
         if( process.env.PRODUCTID == "trident" )
         {
-            console.log( "Not supported on trident" );
+            deps.logger.debug( "Camera Servo Not supported on trident" );
             return {};
         }
 

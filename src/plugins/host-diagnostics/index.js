@@ -1,7 +1,7 @@
   var os = require('os-utils');
 
 function HostDiagnostics(name, deps) {
-  console.log('This is where HostDiagnostics plugin code would execute in the node process.');
+  deps.logger.debug('This is where HostDiagnostics plugin code would execute in the node process.');
     var self = this;
     this.deps = deps;
     this.currCpuUsage=0;

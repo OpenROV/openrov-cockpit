@@ -48,9 +48,6 @@
         }
       }
     };
-
-
-
     this.inputDefaults =
     {
       keyboard:
@@ -59,10 +56,6 @@
              action: "plugin.blackbox.record" }
       }
     };
-
-
-    //If this was loaded after the input manager, let it know we are ready to be loaded
-    cockpit.emit('plugin.inputController.defaults', self.inputDefaults);
   };
 
   plugins.Blackbox = Blackbox;
@@ -92,6 +85,8 @@
       throw new Error(err);
     });
     var OnAnyBlacklist = [
+        'cpu.temp.rpi',
+        'board.temp.lm75',
         'plugin.navigationData.data',
         'plugin.gps.data',
         'status',
@@ -114,6 +109,16 @@
           args[i] = arguments[i];
         }
         self.logOtherData(this.event, args);
+      }
+    });
+    this.cockpit.rov.on('cpu.temp.rpi', function (data) {
+      if (!jQuery.isEmptyObject(data)) {
+        self.logEventData('cpu.temp.rpi', data);
+      }
+    });
+    this.cockpit.rov.on('board.temp.lm75', function (data) {
+      if (!jQuery.isEmptyObject(data)) {
+        self.logEventData('board.temp.lm75', data);
       }
     });
     this.cockpit.rov.on('plugin.navigationData.data', function (data) {

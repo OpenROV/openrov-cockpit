@@ -1,12 +1,13 @@
 var bower = require('bower');
 var PREFERENCES = 'plugins:plugin-finder';
-
+var logger;
 function pluginFinder(name, deps) {
-    console.log('Pugin Finder plugin loaded.');
+    deps.logger.debug('Pugin Finder plugin loaded.');
     //instance variables
     this.cockpit = deps.cockpit;
     this.global = deps.globalEventLoop;
     this.deps = deps;
+    logger = deps.logger;
 }
 pluginFinder.prototype.start = function start() {
     var self = this;
@@ -15,7 +16,7 @@ pluginFinder.prototype.start = function start() {
 
     var searchCache={};
     deps.cockpit.on('plugin.pluginFinder.search', function(name, callback) {
-        console.log('performing search for plugins.');
+        logger.debug('performing search for plugins.');
         
         if (searchCache[name]!==undefined){
           callback(searchCache[name]);
@@ -30,12 +31,11 @@ pluginFinder.prototype.start = function start() {
                 bower.commands.search('openrov-plugin-' + name, {})
                     .on('end', function(results) {
                         for (var result in results) {
-                            //console.log(list.keys());
                             if (results[result].name in list) {
                                 results[result].InstalledOnROV = true;
                             }
                         }
-                        console.log('sending plugins list to browser');
+                        logger.debug('sending plugins list to browser');
                         deps.cockpit.emit('plugin.pluginFinder.searchResults', results);
                         if (typeof callback == 'function') {
                             searchCache[name]=results;
@@ -43,12 +43,12 @@ pluginFinder.prototype.start = function start() {
                         }
                     })
                     .on('error', function(error) {
-                        console.log(error);
+                      logger.error(error);
                     });
 
             })
             .on('error', function(error) {
-                console.log(error);
+                logger.error(error);
             });
     });
     var infoCache={};
@@ -60,7 +60,7 @@ pluginFinder.prototype.start = function start() {
           callback(infoCache[name]);
           return;
         }
-        console.log('performing info for plugins');
+        logger.debug('performing info for plugins');
         bower.commands.info('openrov-plugin-' + name)
             .on('end', function(result) {
                 infoCache[name]=result;
@@ -68,12 +68,12 @@ pluginFinder.prototype.start = function start() {
             });
     });
     deps.cockpit.on('plugin.pluginFinder.list', function(name, callback) {
-        console.log('performing list for plugins');
+        logger.debug('performing list for plugins');
         bower.commands.list({}, {
                 cwd: '/usr/share/cockpit'
             })
             .on('end', function(results) {
-                console.log('sending plugins list to browser');
+                logger.debug('sending plugins list to browser');
                 deps.cockpit.emit('plugin.pluginFinder.installed', results);
                 if (typeof callback == 'function') {
                     callback(results);
@@ -88,18 +88,18 @@ pluginFinder.prototype.start = function start() {
                 force: true
             })
             .on('error', function(err) {
-                console.log(err);
+                logger.error(err);
                 deps.cockpit.emit('plugin.pluginFinder.installStatus', err);
                 if (typeof callback == 'function') {
                     callback(err);
                 }
             })
             .on('log', function(info) {
-                console.log(info);
+                logger.debug(info);
                 deps.cockpit.emit('plugin.pluginFinder.installStatus', info);
             })
             .on('end', function(installed) {
-                console.log('done processing plugin install');
+                logger.debug('done processing plugin install');
                 deps.cockpit.emit('plugin.pluginFinder.installResults', installed);
                 deps.cockpit.emit('plugin.pluginFinder.restartRequired');
                 if (typeof callback == 'function') {
@@ -109,7 +109,7 @@ pluginFinder.prototype.start = function start() {
                 //that causes the CPU to max out forever. This restart
                 //is as much a work-around as it is needed to load the
                 //server-side aspects of the plugin.
-                console.log('intentional restart');
+                logger.debug('intentional restart');
                 setTimeout(process.exit(17), 5000);
             });
     });
@@ -118,14 +118,14 @@ pluginFinder.prototype.start = function start() {
                 cwd: '/usr/share/cockpit'
             })
             .on('error', function(err) {
-                console.log(err);
+                logger.error(err);
             })
             .on('log', function(info) {
-                console.log(info);
+                logger.debug(info);
                 deps.cockpit.emit('plugin.pluginFinder.uninstallStatus', info);
             })
             .on('end', function(uninstalled) {
-                console.log('done processing plugin uninstall');
+                logger.debug('done processing plugin uninstall');
                 deps.cockpit.emit('plugin.pluginFinder.uninstallResults', uninstalled);
                 deps.cockpit.emit('plugin.pluginFinder.restartRequired');
                 if (typeof callback == 'function') {
@@ -135,7 +135,7 @@ pluginFinder.prototype.start = function start() {
                 //that causes the CPU to max out forever. This restart
                 //is as much a work-around as it is needed to load the
                 //server-side aspects of the plugin.
-                console.log('intentional restart');
+                logger.debug('intentional restart');
                 setTimeout(process.exit(17), 5000);
             });
     });

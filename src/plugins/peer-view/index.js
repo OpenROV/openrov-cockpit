@@ -1,6 +1,6 @@
 const express = require('express');
 function peerview(name, deps) {
-  console.log('peer-webrtc plugin started.');
+  deps.logger.debug('peer-webrtc plugin started.');
   //  deps.app.get('/mc', function(req,res){
   //    
   //  });
@@ -13,7 +13,7 @@ function peerview(name, deps) {
   var connections = {};
   var io = require('socket.io')(deps.server, { path: '/peerview' });
   io.on('error', function (err) {
-    console.log('Error:' + err);
+    deps.logger.error(err);
   });
   io.on('connection', function (socket) {
     connections[socket.id] = socket;

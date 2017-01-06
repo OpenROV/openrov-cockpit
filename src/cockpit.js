@@ -19,13 +19,14 @@ require('module').Module._initPaths();
 process.env[ "COCKPIT_PATH" ] = __dirname;
 
 // Set default logging options
-// process.env.DEBUG = "log*,error*," + process.env.DEBUG;
+// process.env.logger.debug( = "log*,error*," + process.env.logger.debug(;
 
-var log = require('debug')('log:system');
-var error = require('debug')('error:system');
-var debug = require('debug')('debug:system');
 
-debug('Set NODE_PATH to: ' + process.env.NODE_PATH);
+var logger = require('AppFramework.js').logger;
+//var trace = require('pino-trace')(logger);
+
+
+logger.debug('Set NODE_PATH to: ' + process.env.NODE_PATH);
 // Handle linux signals
 if (process.platform === 'linux') {
   process.on('SIGTERM', function () {
@@ -37,9 +38,14 @@ if (process.platform === 'linux') {
     process.exit(0);
   });
 }
+
+var frameworkDeps = {
+  logging: logger
+}
+
 require('systemd');
 var includesPollyfill=require("array-includes-pollyfill.js").enable();
-var CONFIG = require('./lib/config');
+var CONFIG = require('./lib/config')(frameworkDeps);
 var fs = require('fs');
 var express = require('express');
 var app = express();
@@ -58,7 +64,6 @@ var CockpitMessaging = require('./lib/CockpitMessaging');
 var Q = require('q');
 var serveIndex = require('serve-index');
 var favicon = require('serve-favicon');
-var logger = require('morgan');
 var methodOverride = require('method-override');
 var session = require('express-session');
 var bodyParser = require('body-parser');
@@ -111,7 +116,7 @@ app.use('/components', express.static(path.join(__dirname, 'plugins/telemetry/pu
 app.use('/components/telemetry', express.static(path.join(__dirname, 'plugins/telemetry/public/webcomponents')));
 app.use('/components/telemetry', serveIndex(path.join(__dirname, 'plugins/telemetry/public/webcomponents')));
 
-debug( '!!!' + path.join(__dirname, 'src/static/bower_components') );
+logger.debug( '!!!' + path.join(__dirname, 'src/static/bower_components') );
 
 app.get('/config.js', function (req, res) {
   res.type('application/javascript');
@@ -145,7 +150,8 @@ var deps = {
     config: CONFIG,
     globalEventLoop: globalEventLoop,
     loadedPlugins: [],
-    pathInfo: pathInfo
+    pathInfo: pathInfo,
+    logger: logger
   };
 var numConnections = 0;
 var socketConnectToken = null;
@@ -156,7 +162,7 @@ io.on('connection', function (client) {
   }
   numConnections++;
 
-  debug('HASTHEBALL:TRUE');
+  logger.debug('HASTHEBALL:TRUE');
 
   client.hastheball = true;
   client.emit('hastheball', socketConnectToken);
@@ -164,14 +170,14 @@ io.on('connection', function (client) {
     callback(socketConnectToken);  //TODO: On force, kill the other inbound connections
   });
 
-  log('Connection detected');
-  log('Current connections: ' + numConnections);
+  logger.debug('Connection detected');
+  logger.debug('Current connections: ' + numConnections);
 
   client.on('disconnect', function () {
   });
 });
 io.use(function (socket, next) {
-  log('Auth expecting %s. got %s', socketConnectToken == null ? '<NULL>' : socketConnectToken, socket.handshake.query.token == undefined ? '<UNDEFINED>' : socket.handshake.query.token);
+  logger.debug('Auth expecting %s. got %s', socketConnectToken == null ? '<NULL>' : socketConnectToken, socket.handshake.query.token == undefined ? '<UNDEFINED>' : socket.handshake.query.token);
   
   // return the result of next() to accept the connection.
   if (socketConnectToken == null || socketConnectToken == socket.handshake.query.token || socket.handshake.query.token == 'reset') {
@@ -183,7 +189,7 @@ io.use(function (socket, next) {
       Object.keys(socketCollection).forEach(function (key) {
         var client = socketCollection[key];
         if (client.id !== socket.id) {
-          log('kicking out:', client.id);
+          logger.debug('kicking out:', client.id);
           setTimeout(function () {
             client.emit('forced-disconnect');
             client.disconnect();
@@ -201,8 +207,8 @@ deps.cockpit.on('disconnect', function () {
   if (numConnections == 0) {
     socketConnectToken = null;
   }
-  log('Disconnect detected');
-  log('Current connections: ' + numConnections);
+  logger.debug('Disconnect detected');
+  logger.debug('Current connections: ' + numConnections);
 });
 // Handle global events
 deps.globalEventLoop.on('mcu.rovsys', function (data) {
@@ -244,8 +250,8 @@ loaderA.loadPluginsAsync(plugins)
 })
 .then(function () 
 {
-  debug('Starting following plugins:');
-  debug(deps.loadedPlugins);
+  //logger.debug('Starting following plugins:');
+  //logger.debug(deps.loadedPlugins);
 
   // Start each plugin
   deps.loadedPlugins.forEach(function (plugin) 
@@ -258,31 +264,29 @@ loaderA.loadPluginsAsync(plugins)
 })
 .then(function () 
 {
-  debug('Plugin loading successful!');
+  logger.debug('Plugin loading successful!');
 
   // Start the web server
   server.listen(app.get('port'), function () 
   {
-    log('Started listening on port: ' + app.get('port'));
+    logger.info('Started listening on port: ' + app.get('port'));
   });
 })
 .catch(function (err)
 {
-  error('Error starting plugins: ' + err.message);
-  error('Stack trace: ' + err.stack);
+  logger.error(err,'Error starting plugins: ');
   process.abort();
 });
-
 // Helper function
 function addPluginAssets(result) {
   scripts = scripts.concat(result.scripts);
 
-  debug('====== Scripts ======');
-  debug(result.scripts);
+  logger.debug('====== Scripts ======');
+  logger.debug(result.scripts);
 
   result.scripts.forEach(function (asset) 
   {
-    debug('SCRIPT: ' + asset);
+    logger.debug('SCRIPT: ' + asset);
   });
 
   styles = styles.concat(result.styles);
@@ -291,8 +295,8 @@ function addPluginAssets(result) {
 
   result.assets.forEach(function (asset) 
   {
-    debug('TEST: ' + asset.path);
-    debug( JSON.stringify( asset ) );
+    logger.debug('TEST: ' + asset.path);
+    logger.debug( JSON.stringify( asset ) );
     app.use('/' + asset.path, express.static(asset.assets));
   });
 

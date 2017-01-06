@@ -18,7 +18,7 @@
     {
         constructor(name, deps)
         {
-            console.log( 'Lights plugin loaded' );
+            deps.logger.debug( 'Lights plugin loaded' );
 
             this.globalBus  = deps.globalEventLoop;
             this.cockpitBus = deps.cockpit;

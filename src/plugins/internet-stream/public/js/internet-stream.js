@@ -55,7 +55,7 @@
     if (!this.enabled) {
       return;
     }
-    this.stoplistening();
+    this.stoplisten();
   };
   InternetStream.prototype.startlisten = function startlisten() {
     var self = this;

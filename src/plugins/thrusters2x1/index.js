@@ -1,5 +1,5 @@
 function thrusters2x1(name, deps) {
-  console.log('The motor_diags plugin.');
+  deps.logger.debug('The motor_diags plugin.');
   //instance variables
   this.cockpit = deps.cockpit;
   this.global = deps.globalEventLoop;
@@ -40,7 +40,7 @@ thrusters2x1.prototype.start = function start() {
   });
   self.cockpit.on('callibrate_escs', function () {
     self.deps.globalEventLoop.emit('mcu.SendCommand', 'mcal()');
-    console.log('mcal() sent');
+    self.deps.logger.debug('mcal() sent');
   });
   self.cockpit.on('plugin.thrusters2x1.motorTest', function (positions) {
     self.deps.globalEventLoop.emit('mcu.SendMotorTest', positions.port, positions.starboard, positions.vertical);

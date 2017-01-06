@@ -2,7 +2,7 @@
   var DISABLED = 'DISABLED';
   var ArduinoHelper = require('../../lib/ArduinoHelper');
   var ROVPilot = function ROVPilot(deps) {
-    console.log('The rovpilot plugin.');
+    deps.logger.debug('The rovpilot plugin.');
     var self = this;
     self.SAMPLE_PERIOD = 1000 / deps.config.sample_freq;
     this.physics = new ArduinoHelper().physics;
@@ -29,6 +29,7 @@
           powerLevel: self.powerLevel,
           positions: self.positions
         };
+        
       callback(state);
     });
     deps.cockpit.on('plugin.rovpilot.setPowerLevel', function (value) {
@@ -65,8 +66,6 @@
     });
     deps.cockpit.on('plugin.rovpilot.desiredControlRates', function (rates, ack, fn) {
       self.positions = rates;
-      //      console.log("this should be a callback!");
-      //      console.dir(fn);
       fn(ack);  //ack
     });
     this.startInterval = function () {
@@ -135,7 +134,7 @@
         for (var control in controls) {
           if (controls[control] != this.priorControls[control]) {
             var command = control + '(' + controls[control] * 100 + ')';
-            self.globalEventLoop.emit('mcu.SendCommand', command);  //  console.log(command);
+            self.globalEventLoop.emit('mcu.SendCommand', command); 
           }
         }
       }

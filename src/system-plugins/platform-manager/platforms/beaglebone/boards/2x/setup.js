@@ -6,7 +6,7 @@ var spawn           = require('child_process').spawn;
 var ArduinoBuilder  = require('ArduinoBuilder');
 var ArduinoHelper   = require('ArduinoHelper');
 var Hardware        = require('./bridge.js');
-
+var logger          = require('AppFramework.js').logger;
 var debug           = {};
 
 var SetupBoardInterface = function (board) 
@@ -51,10 +51,8 @@ var SetupBoardInterface = function (board)
     board.bridge.write(command);
   };
 
-  // TODO: Move the water setting to diveprofile
   board.updateSetting = function () 
   {
-
     // This is the multiplier used to make the motor act linear fashion.
     // For example: the props generate twice the thrust in the positive direction than the negative direction.
     // To make it linear we have to multiply the negative direction * 2.
@@ -97,11 +95,11 @@ var SetupBoardInterface = function (board)
       try
       {
         board.hashInfo.fromMCU = matches[1];
-        console.log( "Ver report: " + board.hashInfo.fromMCU );
+        logger.debug( "Ver report: " + board.hashInfo.fromMCU );
       }
       catch( err )
       {
-        console.error( "Version regex found no matches" )
+        logger.error( "Version regex found no matches" )
       }
     }
 
@@ -157,7 +155,7 @@ var RegisterFunctions = function (board)
 {
   board.AddMethod('Initialize', function () 
   {
-    debug('MCU Interface initialized!');
+    logger.debug('MCU Interface initialized!');
 
     // TODO: Only allow the statemachine to do this
     // Turn on the serial

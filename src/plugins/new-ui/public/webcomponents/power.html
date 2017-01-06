@@ -74,53 +74,6 @@
       Polymer({
         is: 'orov-newui-power',
         properties: {
-          colors: {
-            type: Array,
-            value: function () {
-              return [
-                {
-                  value: 10,
-                  color: '#ff001d'
-                },
-                {
-                  value: 20,
-                  color: '#e87d24'
-                },
-                {
-                  value: 30,
-                  color: '#e87d24'
-                },
-                {
-                  value: 40,
-                  color: '#09531d'
-                },
-                {
-                  value: 50,
-                  color: '#09531d'
-                },
-                {
-                  value: 60,
-                  color: '#09531d'
-                },
-                {
-                  value: 70,
-                  color: '#09531d'
-                },
-                {
-                  value: 80,
-                  color: '#09531d'
-                },
-                {
-                  value: 90,
-                  color: '#09531d'
-                },
-                {
-                  value: 100,
-                  color: '#09531d'
-                }
-              ];
-            }
-          },
           current: {
             type: Object,
             value: function () {
@@ -184,9 +137,9 @@
 
           });
 
-          emitter.withHistory.on('settings-change.batteryDefintions', function(settings){
-            var selectedBattery = settings.batteryDefintions.selectedBattery;
-            var definition = settings.batteryDefintions.batteries.find(function(element,index,array){
+          emitter.withHistory.on('settings-change.batteryDefinitions', function(settings){
+            var selectedBattery = settings.batteryDefinitions.selectedBattery;
+            var definition = settings.batteryDefinitions.batteries.find(function(element,index,array){
               if(element.name == selectedBattery) return true;
               return false;
             });
@@ -216,28 +169,58 @@
           
           element.style.transform=("translate3d(" + config.X + "px," + val + "px,0px )");
         },
-        setVoltage: function (voltage) {
-          voltage = parseFloat(voltage);
-          this.set("voltage",voltage);
-          var change = (this.maxVoltage - this.minVoltage) / (voltage - this.minVoltage);
-          var percentage = 100 / change;
-          var indicatorWidth = 200 / change;
-          indicatorWidth = indicatorWidth.toFixed(2);
-          var fillColor = undefined;
-          this.colors.forEach(function (color) {
-            if (fillColor === undefined && percentage <= color.value) {
-              fillColor = color.color;
-            }
-          });
-          if (fillColor == undefined) {
-            fillColor = this.colors[this.colors.length - 1].color;
-          }
-          ;
-          if (!isNaN(indicatorWidth) && isFinite( indicatorWidth ) && indicatorWidth >= 0) {
-            $(this.$.indicator).css({ fill: fillColor });
-            $(this.$.indicator).attr('width', indicatorWidth);
-          }
+
+        hslColorFromPercent: function( value )
+        {
+            // Maps a decimal percentage 0.0:1.0 to red:green hues
+            var hue = ( ( value ) * 120 ).toString( 10 );
+
+            // Saturation and Lightness are locked
+            return [ "hsl(",hue,",90%,40%)" ].join("");
         },
+
+        setVoltage: function (voltage) 
+        {
+          voltage = parseFloat(voltage);
+
+          this.set("voltage",voltage);
+
+          var percent;
+
+          // Apply floor and ceiling to voltages which fall outside the expected range for the selected battery chemistry
+          if( voltage <= this.minVoltage )
+          {
+            percent = 0.0;
+          }
+          else if( voltage < this.maxVoltage )
+          {
+            percent = (voltage - this.minVoltage) / (this.maxVoltage - this.minVoltage);
+
+            // Handle cases where min and max are equal, causing divide-by-0
+            if( !isFinite( percent ) )
+            {
+              percent = 0.0;
+            }
+          }
+          else
+          {
+            percent = 1.0;
+          }
+
+          // Calculate fill width
+          var fillWidth  = ( percent * 200.0 ).toFixed(2);
+
+          // Set a minimum value for fill width so the user can see some feedback that the value is very low
+          if( fillWidth < 5.0 )
+          {
+            fillWidth = 5.0;
+          }
+
+          // Set CSS attributes for indicator fill
+          $(this.$.indicator).css({ fill: this.hslColorFromPercent( percent ) });
+          $(this.$.indicator).attr('width', fillWidth);
+        },
+
         formatVoltage: function (value) {
           return value.toFixed(2);          
         },

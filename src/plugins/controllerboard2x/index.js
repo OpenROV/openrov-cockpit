@@ -34,96 +34,83 @@ class SystemPower
 
     getSettingSchema()
     {
-      // Technically the json-editor supports "watch" that can be used
-      // to dynamically add items from an array as an ENUM to a select
-      // in the same document.  Have an issue filed as I cannot get it
-      // to work.  
-      
-      // WORKAROUND [REMOVED, SEE NOTE]: Manually parse the config for 
-      // the Battery types and inject them in to the schema.
-      // [NOTE]: Replaced with static configuration.
-
-      // TODO: signal an update to the schema that is caches in several
-      // spots when a Battery is changed.
-
-      var BatteryOptions = [
-        'TrustFire',
-        'LiFePO4 (OpenROV White)',
-        'High-Capacity NMC (OpenROV Blue)'
-      ];
-
       // TODO:
       // If settings already exist, new defaults aren't available. 
       // Do we have an idiomatic way for upgrading old settings so that
       // renamed properties/values and new ones replace them?
 
+      var b = this.config.preferences.get(PREFERENCES_NS);
+
       return [{
-        'id':       'batteryDefinitions',
-        'title':    'Battery Formulas',
-        'category': 'hardware',        
-        'type':     'object',
+        id:       'batteryDefinitions',
+        title:    'Battery Formulas',
+        category: 'power',        
+        type:     'object',
 
-        'properties': 
+        properties: 
         {
-          'batteries': {
-            'options': 
-            {
-              hidden: true
-            },
-            'id':   'batteries',
-            'type': 'array',
+          batteries: 
+          {
+            title:          "Batteries",
+            type:           "array",
+            minItems:       1,
+            uniqueItems:    true,
+            propertyOrder:  1,
 
-            'items': {
-              'id':   '0',
-              'type': 'object',
-              'properties': {
-                'name': {
-                  'id':   'name',
-                  'type': 'string'
-                },
-                'minVoltage': {
-                  'id':   'minVoltage',
-                  'type': 'number'
-                },
-                'maxVoltage': {
-                  'id':   'maxVoltage',
-                  'type': 'number'
-                }
+            items: 
+            {
+              type:           "object",
+              headerTemplate: "{{self.name}}",
+              properties: 
+              {
+                name:         { type: 'string', default: "New Battery" },
+                minVoltage:   { type: 'number', default: 8 },
+                maxVoltage:   { type: 'number', default: 12.6 }
               },
-              'required': [
+              required: 
+              [
                 'name',
                 'minVoltage',
                 'maxVoltage'
               ]
             },
-            'default': 
+            default: 
             [
               {
-                'name': 'TrustFire',
-                'minVoltage': 8,
-                'maxVoltage': 13
+                name:       'TrustFire',
+                minVoltage: 8,
+                maxVoltage: 13
               },
               {
-                'name': 'LiFePO4 (OpenROV White)',
-                'minVoltage': 7,
-                'maxVoltage': 10
+                name:       'LiFePO4 (OpenROV White)',
+                minVoltage: 7,
+                maxVoltage: 10
               },
               {
-                'name': 'High-Capacity NMC (OpenROV Blue)',
-                'minVoltage': 8,
-                'maxVoltage': 12.6
+                name:       'High-Capacity NMC (OpenROV Blue)',
+                minVoltage: 8,
+                maxVoltage: 12.6
               }
             ]
           },
-          'selectedBattery': 
+          selectedBattery: 
           {
-            'id':       'selectedBattery',
-            'type':     'string',
-            'enum':     BatteryOptions,
-            'default':  'LiFePO4 (OpenROV White)'
+            title:      "Selected Battery",
+            type:       'string',
+            propertyOrder: 0,
+
+            enumSource: "possible_batteries",
+            enumValue: "{{item.name}}",
+            watch: 
+            {
+              "possible_batteries": "root.batteryDefinitions.batteries"
+            },
+
+            default:    "LiFePO4 (OpenROV White)"
           }
         },
-        'required': 
+        
+        required: 
         [
           'batteries',
           'selectedBattery'

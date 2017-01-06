@@ -418,7 +418,7 @@ ga('send', 'pageview');
   ga('set', 'page', '<%= scriplets[i].name %>');
   ga('set', 'dimension1', '<%= theme %>');
   ga('send', 'pageview');
-
+  ga('set', 'dimension2', '<%= cockpit_version %>');
 
 </script>
   <%- include(scriplets[i].path,{

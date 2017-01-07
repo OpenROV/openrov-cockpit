@@ -91,18 +91,18 @@
 
         <script>
             function checkFetchStatus() {
-                // var targetPage = window.location;
-                // fetch(targetPage, {method: "HEAD"}).then( function(Response) {
-                //     switch(Response.status) {
-                //         case 502:
-                //             //We are still loading cockpit
-                //             setTimeout(checkFetchStatus, 300);
-                //             break;
-                //         case 200:
-                //             //We got the page, load it
-                //             location.reload(true);
-                //     }
-                // })
+                var targetPage = window.location;
+                fetch(targetPage, {method: "HEAD"}).then( function(Response) {
+                    switch(Response.status) {
+                        case 502:
+                            //We are still loading cockpit
+                            setTimeout(checkFetchStatus, 300);
+                            break;
+                        case 200:
+                            //We got the page, load it
+                            location.reload(true);
+                    }
+                })
             }
             checkFetchStatus()
         </script>

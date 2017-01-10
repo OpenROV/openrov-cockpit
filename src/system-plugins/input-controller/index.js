@@ -41,14 +41,16 @@
         });
 
         //Send to the client
+        var presetAccu = [];
         for(var i = 0; i < self.presetPaths.length; ++i)
         {
           var presetObj = JSON.parse(fs.readFileSync(self.presetPaths[i]), 'utf8');
-          self.cockpitBus.emit('plugin.inputConfigurator.existingPresets', presetObj);
+          presetAccu.push(presetObj);
         }
+        self.cockpitBus.emit('plugin.inputConfigurator.existingPresets', presetAccu);
 
+        presetAccu = [];
         self.presetPaths = [];
-        
       })
 
     }

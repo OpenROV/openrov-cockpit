@@ -676,7 +676,16 @@
                     }
 
                     //Get the configuration state
-                    self.set("isCustomConfig", sessionStorage.getItem("isCustomConfig"));
+                    var cachedCustomConfigStatus = (sessionStorage.getItem("isCustomConfig") === 'true');
+
+                    if(cachedCustomConfigStatus !== undefined)
+                    {
+                        self.set("isCustomConfig", cachedCustomConfigStatus);
+                    }
+                    else
+                    {
+                        self.set("isCustomConfig", false);
+                    }
                     
                 },
 
@@ -807,6 +816,7 @@
 
                     // Set the polymer element
                     self.isCustomConfig = state;
+                    console.log("Setting flag for custom config");
 
                     //Local storage for persistence among pages
                     sessionStorage.setItem("isCustomConfig", self.isCustomConfig);

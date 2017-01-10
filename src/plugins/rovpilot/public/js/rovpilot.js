@@ -316,14 +316,14 @@
           "LEFT_STICK_Y": { type: "axis",
                             action: 'rovPilot.moveThrottle',
                             options: {
-                              inverted: false,
+                              inverted: true,
                               exponentialSticks: {
                                 enabled: false,
                                 rate: 1.0
                               }
                             } 
                           },
-          "LEFT_STICK_X": { type: "axis",
+          "RIGHT_STICK_X": { type: "axis",
                             action: 'rovPilot.moveYaw',
                             options: {
                               inverted: false,

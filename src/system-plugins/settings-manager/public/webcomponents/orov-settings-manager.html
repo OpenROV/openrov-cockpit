@@ -11,48 +11,57 @@
 <!-- Foundation CSS framework (Bootstrap and jQueryUI also supported) -->
 
 <dom-module name="orov-settings-manager">
-    <template>
-<style include="foundation5-styles"></style>
-<style>
-  .container{
-    width:100%;
-    display:flex;
-  }
-  .menu{
-    display:inline;
-    min-width:200px;
-    flex:1;
-    cursor: pointer;
-  }
-  .detail{
-    flex:8;
-    margin:10px;
-  }
-</style>
+<template>
+    <style include="foundation5-styles"></style>
+    <style>
+        .container{
+            width:100%;
+            display:flex;
+        }
+        .menu{
+            display:inline;
+            min-width:200px;
+            flex:1;
+            cursor: pointer;
+        }
+        .detail{
+            flex:8;
+            margin:10px;
+        }
+    </style>
 
-<paper-toast id="toast"></paper-toast>
-<div class="container">
-  <paper-material elevation="0" style="flex:1">    
-  <paper-menu class="menu" att-for-selected="section-name" selected="{{currentSection}}" on-iron-select="_handleSectionSelect">
-    <template is="dom-repeat" items="{{sections}}">
-    <paper-item section-name$="{{item}}">{{__(item)}}</paper-item>
-    </template>
-  </paper-menu>  
-  </paper-material>
-  <paper-material class="detail" elevation="1">  
-  <div id="form2">
-    <json-schema-editor  id="jedit" on-changed="_handleJeditChange"
-      class="no-mousetrap"
-      disable_collapse="true"
-      form_name_root="{{__('Location')}}"
-      theme="foundation5"
-      iconlib="fontawesome4webcomponent"
-    >{{_jsonSchemaforSelection(currentSection)}}</json-schema-editor>       
-  </div>
-  </paper-material>
-</div>
+    <paper-toast id="toast"></paper-toast>
+    
+    <div class="container">
+        <paper-material elevation="0" style="flex:1">
 
+            <paper-item>
+                ROV Settings
+            </paper-item>
+
+            <paper-menu id="dropdownMenu" class="menu" att-for-selected="section-name" selected="{{currentSection}}" on-iron-select="_handleSectionSelect">
+                
+                <template is="dom-repeat" items="{{sections}}">
+                    <paper-item section-name$="{{item}}">{{__(item)}}</paper-item>
+                </template>
+
+            </paper-menu>  
+        </paper-material>
+
+        <paper-material class="detail" elevation="1">  
+            <div id="form2">
+                <json-schema-editor  id="jedit" on-changed="_handleJeditChange"
+                    class="no-mousetrap"
+                    disable_collapse="true"
+                    form_name_root="{{__('Location')}}"
+                    theme="foundation5"
+                    iconlib="fontawesome4webcomponent"
+                >{{_jsonSchemaforSelection(currentSection)}}</json-schema-editor>       
+            </div>
+        </paper-material>
+    </div>
 </template>
+
     <script>
         (function() {
             var editor;
@@ -124,9 +133,12 @@
                            fields.
                         */
 
+                        //Set the default page to open being the first one
+                        self.set("currentSection", 0);
+
                     })
                 },
-                _handleSectionSelect: function(e){
+                _handleSectionSelect: function(e){              
                   this.$.jedit.load(this._schemaForSelectedSections(this.currentSection),this._valueForSelectedSection(this.currentSection));
                 },
                 _handleJeditChange: function(e){

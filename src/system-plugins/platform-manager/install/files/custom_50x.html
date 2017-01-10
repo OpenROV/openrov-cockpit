@@ -3,99 +3,49 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <title>Welcome</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title> Welcome to OpenROV Cockpit </title>
+
         <style>
-
-            /* -------------------------------------------------------------------
-                Credit for the original wave animation and assets: Andy Fitzsimon
-                Link to Codepen: http://codepen.io/andyfitz/pen/akAKdV
-            ------------------------------------------------------------------- */
-            .parallax > use {
-                animation: move-forever 12s linear infinite; 
-            }
-
-            .parallax > use:nth-child(1) {
-                animation-delay: -2s; 
-            }
-            
-            .parallax > use:nth-child(2) {
-                animation-delay: -2s;
-                animation-duration: 5s; 
-            }
-
-            .parallax > use:nth-child(3) {
-                animation-delay: -4s;
-                animation-duration: 3s; 
-            }
-
-            @keyframes move-forever {
-                0% {
-                    transform: translate(-90px, 0%); 
-                }
-                100% {
-                    transform: translate(85px, 0%); 
-                } 
-            }
-
-            .editorial {
-                display: block;
-                width: 100%;
-                height: 10em;
-                margin: 0; 
+            html {
+                height: 100%;
             }
 
             body {
-                /*background-color: #CCCCCC;*/
-                background: linear-gradient(#CCCCCC, #34A1FF);
-                margin: 0;
-                padding: 9em 0 0 0; 
+                background: linear-gradient(#047792,#0A133A);
             }
 
-            .content {
-                background: linear-gradient(#1D598D, #003851, #00101F);
-                text-align: center;
-                min-height: 75vh;
-                margin: -.1em 0 0 0;
-                padding: 2em;
-                color: #eee; 
+            .loading {
+                position: absolute;
+
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
                 
-            }
-            
-            .content h1 {
-                font-family: 'Lato',sans-serif;
-                margin-top:0.7em;
-                font-weight: 100;
-                font-size: 4em; 
-                font-size: 4em;  
+                font-family: 'Lato', sans-serif;
+                color: #E2EEF1;
             }
 
             #message {
-                height: 50%;
+                height: 15%; 
+                top: 50%;
+                position: relative;
                 text-align: center;
                 
                 display: flex;
                 justify-content: center;
                 align-items: center;
 
-                font-family: 'Lato', sans-serif; 
-                font-size: 3.5em;
+                font-size: 4.0vw;
             }
 
-            /*prevent many large-by-comparison ripples by shrinking the height*/
-            @media (max-width: 50em) {
-                .content h1 {
-                    font-size: 12vmax; 
-                }
-
-                .editorial {
-                    height: 17vw; 
-                } 
-            }
             .sk-spinner-pulse {
                 width: 40px;
                 height: 40px;
                 margin: 40px auto;
+                top: 50%;
+                position: relative;
+                
                 background-color: white;
                 border-radius: 100%;
                 -webkit-animation: sk-pulseScaleOut 2s infinite ease-in-out;
@@ -129,35 +79,15 @@
 
     </head>
     <body>
-        <svg class="editorial"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 24 150 28"
-            preserveAspectRatio="none">
-            <defs>
-            <path 
-                id="gentle-wave"
-                d="m -160,44.4 c 30,0 58,
-                    -18 87.7,-18 30.3,0 58.3,
-                    18 87.3,18 30,0 58,-18 88,
-                    -18 30,0 58,18 88,18 l 0,
-                    34.5 -351,0 z" />
-            </defs>
-            <g class="parallax">
-                <use xlink:href="#gentle-wave" x="50" y="0" fill="#34A1FF"/>
-                <use xlink:href="#gentle-wave" x="50" y="3" fill="#2A81CC"/>
-                <use xlink:href="#gentle-wave" x="50" y="6" fill="#1D598D"/>  
-            </g>
-        </svg>
 
-        <div class="content">
-            <h1>  </h1>
-
-            <p id="message"> Getting your ROV ready... </p>
-            
+        <div class="loading">
             <div class="sk-spinner sk-spinner-pulse"></div>
-
-
+            
+            <div id="message">
+                Connecting to the ROV
+            </div>
         </div>
+        
 
         <script>
             function checkFetchStatus() {

@@ -88,9 +88,9 @@
                 },
                 gamepad: 
                 {
-                    "DPAD_UP": { type: "button",
+                    "DPAD_RIGHT": { type: "button",
                            action: 'plugin.lights.stepPositive' },
-                    "DPAD_DOWN": { type: "button",
+                    "DPAD_LEFT": { type: "button",
                            action: 'plugin.lights.stepNegative' },
                 }
             };

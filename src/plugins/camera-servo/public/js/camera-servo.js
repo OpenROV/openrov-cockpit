@@ -76,11 +76,11 @@
                 },
                 gamepad: 
                 {
-                    Y: { type: "button",
+                    "DPAD_UP": { type: "button",
                          action: "plugin.cameraServo.stepPositive" },
-                    B: { type: "button",
+                    "B": { type: "button",
                          action: "plugin.cameraServo.center" },
-                    A: { type: "button",
+                    "DPAD_DOWN": { type: "button",
                          action: "plugin.cameraServo.stepNegative" }
                 }
             };

@@ -35,6 +35,11 @@
       {
         "l": { type: "button",
                action: "plugin.laser.Toggle" }
+      },
+      gamepad:
+      {
+        "X": { type: "button",
+               action: "plugin.laser.Toggle" }
       }
     };
     

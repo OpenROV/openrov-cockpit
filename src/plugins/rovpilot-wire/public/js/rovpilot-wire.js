@@ -54,9 +54,9 @@
     {
       keyboard:
       {
-        "m": { type: "button", 
+        "h": { type: "button", 
                action: 'rovPilot.toggleHeadingHold' },
-        "n": { type: "button", 
+        "g": { type: "button", 
                action: 'rovPilot.toggleDepthHold' }
       }
     };

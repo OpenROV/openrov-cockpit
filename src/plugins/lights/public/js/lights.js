@@ -79,11 +79,11 @@
             {
                 keyboard: 
                 {
-                    "p": { type: "button",
+                    ".": { type: "button",
                            action: 'plugin.lights.stepPositive' },
-                    "o": { type: "button",
+                    ",": { type: "button",
                            action: 'plugin.lights.stepNegative' },
-                    "i": { type: "button",
+                    "/": { type: "button",
                            action: 'plugin.lights.toggle' },
                 },
                 gamepad: 

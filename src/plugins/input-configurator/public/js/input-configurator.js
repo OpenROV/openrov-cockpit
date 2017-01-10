@@ -39,6 +39,8 @@
     {
       var self = this;
 
+      self.cockpit.rov.emit('plugin.inputController.requestCustomPresets', {data: "value"});
+
       //Listen for server setting changes
       this.rov.on('settings-change.inputConfigurator', function(settings) {
         if(!self.isSavingSettings)
@@ -57,7 +59,12 @@
         self.deletePreset(presetToDelete);
       });
 
-      this.cockpit.on('plugin.inputConfigurator.savePreset', function(presetIn) {
+      this.cockpit.withHistory.on('plugin.inputConfigurator.savePreset', function(presetIn) {
+        self.savePreset(presetIn);
+      });
+      
+      this.cockpit.rov.withHistory.on('plugin.inputConfigurator.existingPresets', function(presetIn) {
+        
         self.savePreset(presetIn);
       });
       

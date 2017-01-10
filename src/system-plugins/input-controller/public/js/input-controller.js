@@ -107,7 +107,7 @@
           self.actions.set(action, plugin.actions[action]);
         }
 
-        //Add the inputs to our preset
+        //Add the inputs from code to our preset
         if(typeof plugin.inputDefaults !== 'function')
         {
           for(var controllerName in plugin.inputDefaults)
@@ -198,6 +198,7 @@
       });
 
       self.saveDefaults();
+      
 
     };
 

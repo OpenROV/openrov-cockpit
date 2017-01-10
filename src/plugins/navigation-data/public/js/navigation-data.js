@@ -26,7 +26,7 @@
     {
       keyboard:
       {
-        "\\": { type: "button",
+        "": { type: "button",
                 action: 'plugin.navigationData.toggleHeadsUpDisplay' }
       }
     };

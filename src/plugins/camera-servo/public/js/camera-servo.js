@@ -67,11 +67,11 @@
             {
                 keyboard: 
                 {
-                    q: { type: "button",
+                    "]": { type: "button",
                          action: "plugin.cameraServo.stepPositive" },
-                    a: { type: "button",
+                    "\\": { type: "button",
                          action: "plugin.cameraServo.center" },
-                    z: { type: "button",
+                    "[": { type: "button",
                          action: "plugin.cameraServo.stepNegative" }
                 },
                 gamepad: 

@@ -16,18 +16,6 @@
       this.cockpitBus = deps.cockpit;
 
       this.presetPaths = [];
-
-      var self = this;
-
-
-      this.listeners = 
-      {
-        requestCustomPresets: new Listener(this.cockpitBus, 'plugin.inputController.requestCustomPresets', true, function(data)
-        {
-          self.searchForExistingPresets(presetDirectory);
-        })
-      }
-
     }
 
     searchForExistingPresets( directoryIn )
@@ -57,14 +45,11 @@
 
     start()
     {      
-      this.listeners.requestCustomPresets.enable();
-
       this.searchForExistingPresets( presetDirectory );
     }
 
     stop()
     {
-      this.listeners.requestCustomPresets.disable();
     }
 
   }

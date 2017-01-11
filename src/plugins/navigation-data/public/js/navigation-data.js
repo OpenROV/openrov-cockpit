@@ -4,7 +4,32 @@
   plugins.navigationData = function (cockpit) {
     var self = this;
     self.cockpit = cockpit;
+    
+    this.actions = 
+    {
+      'plugin.navigationData.toggleHeadsUpDisplay':
+      {
+        description: "Toggle HUD",
+        controls:
+        {
+          button:
+          {
+            down: function() {
+              cockpit.emit('plugin.navigationData.toggleHeadsUpDisplay');
+            }           
+          }
+        }
+      }
+    };
 
+    this.inputDefaults = 
+    {
+      keyboard:
+      {
+        "": { type: "button",
+                action: 'plugin.navigationData.toggleHeadsUpDisplay' }
+      }
+    };
   };
   plugins.navigationData.prototype.getTelemetryDefinitions = function getTelemetryDefinitions() {
     return [

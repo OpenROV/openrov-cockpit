@@ -39,8 +39,6 @@
     {
       var self = this;
 
-      self.cockpit.rov.emit('plugin.inputController.requestCustomPresets', {data: "value"});
-
       //Listen for server setting changes
       this.rov.on('settings-change.inputConfigurator', function(settings) {
         if(!self.isSavingSettings)

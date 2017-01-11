@@ -57,7 +57,7 @@
         self.deletePreset(presetToDelete);
       });
 
-      this.cockpit.withHistory.on('plugin.inputConfigurator.savePreset', function(presetIn) {
+      this.cockpit.on('plugin.inputConfigurator.savePreset', function(presetIn) {
         self.savePreset(presetIn);
       });
       

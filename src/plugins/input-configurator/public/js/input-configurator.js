@@ -61,6 +61,14 @@
         self.savePreset(presetIn);
       });
       
+      this.cockpit.rov.withHistory.on('plugin.inputConfigurator.existingPresets', function(presetsIn) {
+        
+        for(var i = 0; i < presetsIn.length; ++i)
+        {
+          self.savePreset(presetsIn[i]);
+        }
+      });
+      
       this.cockpit.on('plugin.inputConfigurator.loadPreset', function(presetNameIn) {
         self.loadPreset(presetNameIn);
       });

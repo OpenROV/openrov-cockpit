@@ -36,7 +36,7 @@
         <paper-material elevation="0" style="flex:1">
 
             <paper-item>
-                ROV Settings
+                <b>ROV Settings</b>
             </paper-item>
 
             <paper-menu id="dropdownMenu" class="menu" att-for-selected="section-name" selected="{{currentSection}}" on-iron-select="_handleSectionSelect">
@@ -133,8 +133,8 @@
                            fields.
                         */
 
-                        //Set the default page to open being the first one
-                        self.set("currentSection", 0);
+                        //Set the default page to open the general settings tab by default
+                        self.set("currentSection", 1);
 
                     })
                 },

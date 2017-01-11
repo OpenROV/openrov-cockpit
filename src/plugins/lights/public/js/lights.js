@@ -79,19 +79,21 @@
             {
                 keyboard: 
                 {
-                    "p": { type: "button",
+                    ".": { type: "button",
                            action: 'plugin.lights.stepPositive' },
-                    "o": { type: "button",
+                    ",": { type: "button",
                            action: 'plugin.lights.stepNegative' },
-                    "i": { type: "button",
+                    "/": { type: "button",
                            action: 'plugin.lights.toggle' },
                 },
                 gamepad: 
                 {
-                    "DPAD_UP": { type: "button",
+                    "DPAD_RIGHT": { type: "button",
                            action: 'plugin.lights.stepPositive' },
-                    "DPAD_DOWN": { type: "button",
+                    "DPAD_LEFT": { type: "button",
                            action: 'plugin.lights.stepNegative' },
+                    "Y": { type: "button",
+                           action: 'plugin.lights.toggle' }
                 }
             };
                

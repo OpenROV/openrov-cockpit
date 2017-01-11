@@ -676,7 +676,16 @@
                     }
 
                     //Get the configuration state
-                    self.set("isCustomConfig", sessionStorage.getItem("isCustomConfig"));
+                    var cachedCustomConfigStatus = (sessionStorage.getItem("isCustomConfig") === 'true');
+
+                    if(cachedCustomConfigStatus !== undefined)
+                    {
+                        self.set("isCustomConfig", cachedCustomConfigStatus);
+                    }
+                    else
+                    {
+                        self.set("isCustomConfig", false);
+                    }
                     
                 },
 

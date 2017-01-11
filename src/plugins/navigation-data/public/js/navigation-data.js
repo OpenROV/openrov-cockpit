@@ -26,11 +26,10 @@
     {
       keyboard:
       {
-        "\\": { type: "button",
+        "": { type: "button",
                 action: 'plugin.navigationData.toggleHeadsUpDisplay' }
       }
     };
-
   };
   plugins.navigationData.prototype.getTelemetryDefinitions = function getTelemetryDefinitions() {
     return [

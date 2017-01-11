@@ -284,17 +284,17 @@
       {
         keyboard:
         {
-          "up": { type: "button",
+          "w": { type: "button",
                 action: 'rovPilot.moveForward' },
-          "down": { type: "button",
+          "s": { type: "button",
                 action: 'rovPilot.moveBackwards' },
-          "left": { type: "button",
+          "a": { type: "button",
                 action: 'rovPilot.moveLeft' },
-          "right": { type: "button",
+          "d": { type: "button",
                 action: 'rovPilot.moveRight' },
-          "shift": { type: "button",
+          "e": { type: "button",
                 action: 'rovPilot.moveUp' },       
-          "ctrl": { type: "button",
+          "c": { type: "button",
                 action: 'rovPilot.moveDown' }, 
           "1": { type: "button",
                 action: 'rovPilot.powerLevel1' }, 
@@ -306,9 +306,9 @@
                 action: 'rovPilot.powerLevel4' }, 
           "5": { type: "button",
                 action: 'rovPilot.powerLevel5' }, 
-          "7": { type: "button",
+          "-": { type: "button",
                 action: 'rovPilot.decrementPowerLevel' },
-          "8": { type: "button",
+          "=": { type: "button",
                 action: 'rovPilot.incrementPowerLevel' }, 
         },
         gamepad:
@@ -316,14 +316,14 @@
           "LEFT_STICK_Y": { type: "axis",
                             action: 'rovPilot.moveThrottle',
                             options: {
-                              inverted: false,
+                              inverted: true,
                               exponentialSticks: {
                                 enabled: false,
                                 rate: 1.0
                               }
                             } 
                           },
-          "LEFT_STICK_X": { type: "axis",
+          "RIGHT_STICK_X": { type: "axis",
                             action: 'rovPilot.moveYaw',
                             options: {
                               inverted: false,

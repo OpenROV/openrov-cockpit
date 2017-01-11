@@ -54,6 +54,11 @@
       {
         r: { type: "button",
              action: "plugin.blackbox.record" }
+      },
+      gamepad:
+      {
+        "A": { type: "button",
+               action: "plugin.blackbox.record" }
       }
     };
   };

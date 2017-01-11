@@ -92,6 +92,8 @@
                            action: 'plugin.lights.stepPositive' },
                     "DPAD_LEFT": { type: "button",
                            action: 'plugin.lights.stepNegative' },
+                    "Y": { type: "button",
+                           action: 'plugin.lights.toggle' }
                 }
             };
                

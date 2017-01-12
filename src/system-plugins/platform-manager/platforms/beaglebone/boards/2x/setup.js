@@ -7,12 +7,9 @@ var ArduinoBuilder  = require('ArduinoBuilder');
 var ArduinoHelper   = require('ArduinoHelper');
 var Hardware        = require('./bridge.js');
 var logger          = require('AppFramework.js').logger;
-var debug           = {};
 
 var SetupBoardInterface = function (board) 
 {
-  debug = board.debug;
-
   // Decorate the MCU interface with board specific properties
   board.physics         = new ArduinoHelper().physics;
   board.bridge          = new Hardware();

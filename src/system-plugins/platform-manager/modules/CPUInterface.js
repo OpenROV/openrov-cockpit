@@ -1,13 +1,11 @@
 var util      = require('util');
 var Interface = require('Interface.js');
-var debug     = {};
 var logger    = require('AppFramework.js').logger;
 
 function CPUInterface(deps) 
 {
   // Inherit from Interface module
   Interface.call(this, 'cpu', deps);
-  debug = this.debug;
   this.RegisterDefaultAPI();
 }
 

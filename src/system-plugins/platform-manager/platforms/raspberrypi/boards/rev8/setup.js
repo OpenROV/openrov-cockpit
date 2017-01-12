@@ -2,21 +2,18 @@ const fs            = require('fs');
 const path          = require('path');
 const spawn         = require('child_process').spawn;
 const SerialBridge  = require('TridentSerialBridge.js');
-
-var debug = {};
+var logger          = require('AppFramework.js').logger;
 
 var SetupBoardInterface = function(board) 
 {
-    debug = board.debug;
-
-    console.log( "Creating bridge" );
+    logger.debug( "Creating bridge" );
 
     // Decorate the MCU interface with board specific properties
     board.bridge = new SerialBridge( '/dev/ttyAMA0', 500000 );
 
     board.statusdata = {};
 
-    console.log( "Setting up bridge" );
+    logger.debug( "Setting up bridge" );
 
     // ------------------------------------------------
     // Setup private board methods
@@ -34,7 +31,7 @@ var SetupBoardInterface = function(board)
         board.global.emit( board.interface + '.status', status );
     });
 
-    console.log( "Setting up API" );
+    logger.debug( "Setting up API" );
 
     // ------------------------------------------------
     // Setup Public API	
@@ -43,13 +40,13 @@ var SetupBoardInterface = function(board)
     // Call initialization routine
     board.global.emit('mcu.Initialize');
 
-    console.log( "Setting up statemachine" );
+    logger.debug( "Setting up statemachine" );
 
     // Create and start statemachine
     board.fsm = require( './statemachine.js' )( board );
     board.fsm._e_init();
 
-    console.log( "Done" );
+    logger.debug( "Done" );
 };
 
 // ------------------------------------------------
@@ -59,7 +56,7 @@ var RegisterFunctions = function(board)
 {
    board.AddMethod('Initialize', function () 
   {
-    debug('MCU Interface initialized!');
+    logger.debug('MCU Interface initialized!');
 
     // TODO: Only allow the statemachine to do this
     // Turn on the serial
@@ -144,7 +141,7 @@ var RegisterFunctions = function(board)
   board.AddMethod('StartSerial', function () 
   {
     // Connect to the MCU
-    console.log( "StartSerial" );
+    logger.debug( "StartSerial" );
     board.bridge.connect();
   }, false);
 

@@ -6,6 +6,8 @@ const StateMachine      = require('javascript-state-machine');
 
 const ResetMCU          = require( "./lib/ResetMCU.js" );
 
+var logger              = require('AppFramework.js').logger;
+
 module.exports = function( board ) 
 {
     const Progress = Object.freeze( { "InProgress":1, "Complete":2, "Failed":3 } );
@@ -17,13 +19,13 @@ module.exports = function( board )
     function status( message, progress )
     {
         board.global.emit( "plugin.updateManager.status", { message: message.toString(), progress: progress } );
-        console.log( "FIRMWARE UPDATE: " + message.toString().trim() );
+        logger.debug( "FIRMWARE UPDATE: " + message.toString().trim() );
     }
 
     function log( data )
     {
         board.global.emit( "plugin.updateManager.log", data.toString() );
-        console.log( "FIRMWARE UPDATE: " + data.toString().trim() );
+        logger.debug( "FIRMWARE UPDATE: " + data.toString().trim() );
     }
 
     function err( data )
@@ -34,7 +36,7 @@ module.exports = function( board )
 
     function resetMCUHandler(event, from, to)
     {
-        console.log( "test" );
+        logger.debug( "test" );
         status( "Resetting MCU...", "InProgress" );
 
         var self = this;

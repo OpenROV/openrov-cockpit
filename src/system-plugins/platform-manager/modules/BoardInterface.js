@@ -1,12 +1,11 @@
 var util      = require('util');
 var Interface = require('Interface.js');
-var debug     = {};
 var logger    = require('AppFramework.js').logger;
+
 function BoardInterface(deps) 
 {
   // Inherit from Interface module
   Interface.call(this, 'mcu', deps);
-  debug = this.debug;
   this.RegisterDefaultAPI();
 }
 

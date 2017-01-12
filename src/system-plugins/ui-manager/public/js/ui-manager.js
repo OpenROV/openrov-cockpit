@@ -1,6 +1,15 @@
 (function (window, $, undefined) {
   'use strict';
   var plugins = namespace('plugins');
+  
+  //The __() function will be overridden once the language translation has loaded. For items
+  //that load before that, this prevents an error from occuring.  
+  var template = $('#t')[0];
+  template.__ = function(value){
+    console.warn(`'${value}' needed translation before the translation libraries were ready`);
+    return value;
+  }  
+  
   plugins.UIManager = function UIManager(cockpit) {
     this.cockpit = cockpit;
     this.rov = cockpit.rov;

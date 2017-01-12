@@ -1,10 +1,11 @@
 (function()
 {
   const fs = require('fs');
+  const path = require('path');
   const Listener = require('Listener');
 
   //Where the presets are located
-  const presetDirectory = './src/static/presets/';
+  const presetDirectory = path.join(__dirname, '../../static/presets/');
 
   class InputController
   {
@@ -23,6 +24,9 @@
       var self = this;
 
       fs.readdir(directoryIn, (err, files) => {
+        if (err) {
+          throw err;
+        }
         files.forEach(file => {
           var filePath = directoryIn + file;
           self.presetPaths.push(filePath);
@@ -61,4 +65,3 @@
 
 
 }());
-

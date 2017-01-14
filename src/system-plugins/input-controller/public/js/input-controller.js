@@ -39,6 +39,7 @@
       this.needToSaveDefaults = true;
       this.checkForLastPreset = true;
       this.defaultPresetName = "defaults";
+      this.lastPresetName = "";
       this.inputConfiguratorSettings = {};
       this.rovPilotSettings = {};
 
@@ -139,16 +140,14 @@
       //Listen for server setting changes
       this.cockpit.rov.on('settings-change.inputConfigurator', function(settings) {
           self.inputConfiguratorSettings = settings.inputConfigurator;
-          if(self.checkForLastPreset)
+          
+          var settingsPresetName = self.inputConfiguratorSettings.lastPreset;
+          if(settingsPresetName != self.defaultPresetName && settingsPresetName !== self.lastPresetName)
           {
-            var lastPresetName = self.inputConfiguratorSettings.lastPreset;
-            if(lastPresetName !== undefined && lastPresetName !== self.defaultPresetName)
-            {
-              //Load the last preset 
-              self.cockpit.emit('plugin.inputConfigurator.loadPreset', lastPresetName);
-            }
-            self.checkForLastPreset = false;
-          }
+            //Load the last preset 
+            self.cockpit.emit('plugin.inputConfigurator.loadPreset', settingsPresetName);
+            self.lastPresetName = settingsPresetName;
+          }     
       });
       this.cockpit.rov.on('settings-change.rovPilot', function(settings) {
           self.rovPilotSettings = settings.rovPilot;

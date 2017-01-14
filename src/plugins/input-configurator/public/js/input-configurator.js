@@ -171,7 +171,6 @@
 
       //Add the preset
       self.settings.presets.push(presetIn);
-      self.settings.lastPreset = presetIn.name;
 
       //Update the server settings to reflect this new preset
       self.cockpit.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});

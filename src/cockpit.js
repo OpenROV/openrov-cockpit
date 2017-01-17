@@ -30,11 +30,11 @@ logger.debug('Set NODE_PATH to: ' + process.env.NODE_PATH);
 // Handle linux signals
 if (process.platform === 'linux') {
   process.on('SIGTERM', function () {
-    error('got SIGTERM, shutting down...');
+    logger.error('got SIGTERM, shutting down...');
     process.exit(0);
   });
   process.on('SIGINT', function () {
-    error('got SIGINT, shutting down...');
+    logger.error('got SIGINT, shutting down...');
     process.exit(0);
   });
 }

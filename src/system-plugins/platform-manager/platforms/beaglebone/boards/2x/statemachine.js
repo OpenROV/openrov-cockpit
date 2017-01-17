@@ -37,7 +37,7 @@ module.exports = function( board )
     function err( data )
     {
         board.global.emit( "plugin.updateManager.error", data.toString() );
-        logger.error(data);
+        logger.error(data.toString());
     }
     
     function escCheckHandler(event, from, to)

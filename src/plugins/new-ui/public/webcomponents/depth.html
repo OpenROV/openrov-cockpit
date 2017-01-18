@@ -49,7 +49,7 @@
         width: 25%;
         text-align: left;
         float: right;
-        margin-top: 0.5vw;
+        margin-top: 0.65vw;
 
         font-size: 1.2vw;
       }
@@ -189,7 +189,7 @@
           },
           depthUnit: {
             type: String,
-            value: function(){return 'm'}
+            value: function(){return 'm';}
           },
           options: {
             type: Object,
@@ -202,7 +202,7 @@
           },
           target: {
             type: Number,
-            value: 0
+            value: function(){return 0;}
           },
           waterType: {
             type: String,
@@ -232,6 +232,9 @@
           emitter.withHistory.on('plugin.diveProfile.waterType', function (waterType) {
             self.waterType = waterType;
           });
+        },
+        listeners: {
+          'depth-unit.tap': 'toggleDepthUnit',
         },
         attached: function(){
           this._dataThrottleInterval=setInterval(function(){
@@ -297,7 +300,26 @@
           clearInterval(this._updateInterval);
         },
         formatDepth : function(depth){
+          var self = this;
+
+          //Format based on setting
+          if(self.depthUnit == "ft")
+          {
+            depth = depth * 3.28084;
+          }
           return depth.toFixed(1);
+          
+        },
+        toggleDepthUnit: function(e) {
+          var self = this;
+          if(self.depthUnit == "m")
+          {
+            self.set("depthUnit", "ft");
+          }
+          else
+          {
+            self.set("depthUnit", "m");
+          }
         }
       });
     }());

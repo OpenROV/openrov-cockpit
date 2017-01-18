@@ -54,7 +54,7 @@
                     this._originalApplet = this.applet;
                 }
                 this.set('applet','_updates');
-            } else {
+            } else if (oldvalue){
                 setTimeout(function(){
                     self.set('applet',self._originalApplet);
                 },3000);

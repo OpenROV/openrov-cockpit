@@ -533,16 +533,33 @@
       switch (options.format) {
       case 'json':
         serializedData = JSON.stringify(dump);
+        downloadInBrowser(serializedData, name + '-' + options.sessionID + '.' + options.format);
         break;
       case 'xml':
         JSON.stringify(dump);
+        downloadInBrowser(serializedData, name + '-' + options.sessionID + '.' + options.format);
         //TODO:
         break;
       case 'csv':
       default:
-        serializedData = new CSV(dump, { header: true }).encode();  //TODO:
+        //bucket by event
+        var buckets = {};
+        dump.forEach(function(item){
+          if (!(item.event in buckets)){
+            buckets[item.event] = [];
+          }
+          item.data.timestamp = item.timestamp;
+          item.data.id = item.id;
+          buckets[item.event].push(item.data);
+        })
+        var i=1;
+        Object.keys(buckets).forEach(function(item){
+          serializedData = new CSV(buckets[item], { header: true }).encode();  //TODO:
+          downloadInBrowser(serializedData, name + '-' + options.sessionID + '-' + i + '.' + options.format);
+          i++;
+        });
       }
-      downloadInBrowser(serializedData, name + '-' + options.sessionID + '.' + options.format);
+      
     }.bind(null, options.collection));
   };
   var lastURL = null;

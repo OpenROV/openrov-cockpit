@@ -145,13 +145,12 @@ geomux.prototype.start = function start()
     }
 
     var launch_options = [];
-    if( process.env.USE_MOCK == 'true' ){
+    if( process.env.USE_MOCK != 'true' ){
         //Don't use platform specific nice in mock mode
-    } else {
-      launch_options= launch_options.concat([
+        launch_options= launch_options.concat([
         'nice',
         '--19'     
-      ])
+        ])
     }
 
     // Create all launch options

@@ -177,9 +177,6 @@
       }
     });
     
-//    this.recordedSessions(function (sessions) {
-//      self.cockpit.emit('plugin-blackbox-sessions', sessions);
-//    });
     setInterval(function () {
       var sessions = self.sessions_cache;
       //plugin-blackbox-sync-sessions

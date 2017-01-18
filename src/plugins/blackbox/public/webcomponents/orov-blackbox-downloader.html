@@ -215,6 +215,9 @@
           return new Date(timestamp);
         },
         millisecondsToStr: function(milliseconds){
+          if (!milliseconds){
+            milliseconds=0;
+          }
           var __ = this.__;
           var seconds=milliseconds/1000;
           var levels = [

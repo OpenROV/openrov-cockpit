@@ -56,14 +56,14 @@
 
             if(inputIn == null)
             {
-                trace("Undefined input trying to register with preset");
+                console.error("Undefined input trying to register with preset");
                 return;
             }
 
             //Make sure the associated controller exists
             if(!self.actions.has(actionIn))
             {
-                trace("Tried to add an input with an unregistered action: ", inputIn);
+                console.error("Tried to add an input with an unregistered action: ", inputIn);
                 return;
             }
 

@@ -43,6 +43,9 @@
       this.rov.on('settings-change.inputConfigurator', function(settings) {
         if(!self.isSavingSettings)
         {
+          if(JSON.stringify(settings.inputConfigurator)==(JSON.stringify(self.settings))){
+            return; //No change, nothing to do
+          }
           self.settings = settings.inputConfigurator;
           if (self.settings.presets==undefined){
             self.settings.presets=[];

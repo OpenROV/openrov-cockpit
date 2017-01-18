@@ -205,12 +205,9 @@
     {
       var self = this;
 
-      //Work around for JSON.stringify not working on startup
-      setTimeout( function() {
-        var defaultPreset = self.presets.get("defaults");
-        defaultPreset = self.convertToObject(defaultPreset);
-        self.cockpit.emit('plugin.inputConfigurator.savePreset', defaultPreset);  
-      }, 2500);
+      var defaultPreset = self.presets.get("defaults");
+      defaultPreset = self.convertToObject(defaultPreset);
+      self.cockpit.emit('plugin.inputConfigurator.savePreset', defaultPreset);
     };
 
     convertToObject(presetIn)
@@ -218,17 +215,17 @@
       var self = this;
       var returnPreset = {
           name: presetIn.name,
-          actions: new Map()
+          actions: []
       };
-      
+
       //Iterate through actions
       presetIn.actions.forEach(function(action, actionName) {
-          var actionToAdd = new Map();
+          var actionToAdd = [];
 
           action.forEach(function(input, controllerName) {
-            actionToAdd.set(controllerName, input);  
+            actionToAdd.push([controllerName, input]);
           });
-          returnPreset.actions.set(actionName, actionToAdd);
+          returnPreset.actions.push([actionName,actionToAdd]);
       });
       return returnPreset;
     };
@@ -255,9 +252,12 @@
     deletePreset(preset)
     {
       var self = this;
-      self.presets.delete(preset.name);
+      if(preset == "defaults"){
+        return; //do not delete defaults
+      }
+      self.presets.delete(preset);
 
-      if(preset == self.currentPresetName && preset !== "defaults")
+      if(preset == self.currentPresetName)
       {
         self.cockpit.emit('plugin.inputConfigurator.loadPreset', "defaults");
       }

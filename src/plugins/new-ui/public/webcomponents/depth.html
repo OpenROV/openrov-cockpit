@@ -18,7 +18,7 @@
       #depth {
         font-size: 1.8vw;
         font-weight: bold;
-        text-align: center;
+        text-align: left;
       }
       #depth.inverted {
         color: black;
@@ -46,9 +46,15 @@
         float: left;
       }
       #depth-unit {
-        width: 35%;
-        text-align: right;
+        width: 25%;
+        text-align: left;
         float: right;
+        margin-top: 0.5vw;
+
+        font-size: 1.2vw;
+      }
+      #depth-unit:hover {
+        cursor: pointer;
       }
       .depth-line-container,
       #depth-change-container {
@@ -131,13 +137,14 @@
       <div id="numberContainer">
         <div id="depth" class="center text-center">
           <span>{{formatDepth(depth)}}</span>
+          <span id="depth-unit"> {{depthUnit}} </span>
+          </div>
         </div>
         <div id="depthTarget" title="Depthhold target depth" class="center text-center hidden">{{target}}</div>
       </div>
 
       <div id="depth-footer">
-        <div id="water-type" class="unit" title="Water type">{{__(waterType)}}</div>
-        <div id="depth-unit" class="unit">{{__('m')}}</div>
+        <div>{{__('Water type: ')}}{{__(waterType)}}</div>
       </div>
       
       <div class="depth-line-container">
@@ -179,6 +186,10 @@
           depth: {
             type: Number,
             value: 0
+          },
+          depthUnit: {
+            type: String,
+            value: function(){return 'm'}
           },
           options: {
             type: Object,

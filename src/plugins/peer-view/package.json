@@ -10,6 +10,6 @@
   "license": "MIT",
   "dependencies": {
     "msgpack-lite": "^0.1.17",
-    "simple-peer": "^6.0.3"
+    "simple-peer": "^6.2.1"
   }
 }

@@ -144,10 +144,17 @@ geomux.prototype.start = function start()
         }
     }
 
-    // Create all launch options
-    var launch_options = [
+    var launch_options = [];
+    if( process.env.USE_MOCK != 'true' ){
+        //Don't use platform specific nice in mock mode
+        launch_options= launch_options.concat([
         'nice',
-        '--19',
+        '--19'     
+        ])
+    }
+
+    // Create all launch options
+   launch_options = launch_options.concat([
         'node',
         geoprogram,
         '--p',
@@ -158,7 +165,7 @@ geomux.prototype.start = function start()
         0,
         '--u',
         process.env.DEV_MODE === 'true' ? ':8099' : ''
-    ];
+   ]);
     const infinite = -1;
     // Set up monitor with specified options
     var monitor = respawn(launch_options, {

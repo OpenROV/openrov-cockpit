@@ -86,7 +86,10 @@
       console.dir(err);
       self.stopRecording();
     });
-    this.idb.open().catch(function (err) {
+    this.idb.open()
+    .then(function(val){
+      self.broadcastAllRecordings();
+    }).catch(function (err) {
       throw new Error(err);
     });
     var OnAnyBlacklist = [
@@ -162,16 +165,18 @@
       self.stopRecording();
     });
     this.cockpit.on('plugin-blackbox-get-sessions', function (callback) {
-      self.recordedSessions(callback);
+      self.recordedSessions(function(recordedSessions){
+        self.currentRecording(function(currentSession){
+          callback(recordedSessions.push(currentSession))
+        })
+      });
     });
     this.cockpit.on('plugin-blackbox-recording?', function (fn) {
       if (typeof fn === 'function') {
         fn(self.recording);
       }
     });
-    this.recordedSessions(function (sessions) {
-      self.cockpit.emit('plugin-blackbox-sessions', sessions);
-    });
+    
     setInterval(function () {
       var sessions = self.sessions_cache;
       //plugin-blackbox-sync-sessions
@@ -185,15 +190,64 @@
           self.cockpit.emit('plugin-blackbox-sync-sessions', syncSessions);
         }
       });
+      if (self.recording){
+        self.broadcastAllRecordings();
+      }
     }, 15000);
   };
   var sessionIDRecorded = false;
   Blackbox.prototype.newSession = function newSession() {
     return generateUUID();
   };
+
+  Blackbox.prototype.broadcastAllRecordings = function broadcastAllRecordings(){
+    var self=this;
+      self.recordedSessions(function(recordedSessions){
+        self.currentRecording(function(currentSession){
+          if (currentSession){
+            recordedSessions.push(currentSession);
+          } 
+          self.cockpit.emit('plugin-blackbox-sessions', recordedSessions);
+        })
+      });    
+  }
+
+  Blackbox.prototype.currentRecording = function currentRecording(callback) {
+    var self = this;
+    this.idb.sessions
+    .where('sessionID').equalsIgnoreCase(this.sessionID)
+    .toArray(function (data) {
+      if (data.length==0){
+        callback(null);
+        return;
+      }
+      var record = data[0];
+      var firstItem,lastItem;
+      firstTelemetryItem(self.idb, self.sessionID)
+      .then(function (firstItem) {
+         return lastTelemetryItem(self.idb, self.sessionID)
+                .then(function (lastItem) {
+                  if (lastItem==null){
+                    record.duration = 0;
+                  } else {
+                    record.duration = lastItem.timestamp - firstItem.timestamp;
+                  }
+                  return;
+                 });
+      })
+      .then(function(){
+         callback(record);
+      })
+
+
+    });
+
+  }
+  
+
   //TODO: Add sessions collection that each unique session is placed
-  var _recordedSessions = function _recordedSessions(idb, callback) {
-    idb.sessions.toArray(function (data) {
+  var _recordedSessions = function _recordedSessions(idb, currentSession, callback) {
+    idb.sessions.where('sessionID').notEqual(currentSession).toArray(function (data) {
       callback(data);
     });
   };
@@ -201,7 +255,7 @@
   //since the recording is complete.
   Blackbox.prototype.recordedSessions = function recordedSessions(callback) {
     var self = this;
-    _recordedSessions(this.idb, function (data) {
+    _recordedSessions(this.idb, this.sessionID, function (data) {
       var sessionsTofix = [];
       data.forEach(function (session) {
         if (self.sessionID == session.sessionID) {
@@ -360,9 +414,7 @@
           sessionID: self.sessionID,
           timestamp: Date.now()
         });
-        self.recordedSessions(function (sessions) {
-          self.cockpit.emit('plugin-blackbox-sessions', sessions);
-        });
+        self.broadcastAllRecordings();
         sessionIDRecorded = true;
       }
       self.recording = true;
@@ -377,6 +429,7 @@
       console.log('Stopping Telemetry');
       this.recording = false;
       this.cockpit.emit('plugin-blackbox-recording-status', false);
+      this.broadcastAllRecordings(); //send latest state of all recordings
     }
   };
   var initFrame = null;
@@ -434,9 +487,7 @@
     this.idb.telemetry_events.where('sessionID').equalsIgnoreCase(sessionID).delete().then(function () {
       return self.idb.sessions.where('sessionID').equalsIgnoreCase(sessionID).delete();
     }).then(function () {
-      self.recordedSessions(function (sessions) {
-        self.cockpit.emit('plugin-blackbox-sessions', sessions);
-      });
+      self.broadcastAllRecordings();
     });
   };
   Blackbox.prototype.syncSession = function syncSession(sessionID) {
@@ -533,16 +584,33 @@
       switch (options.format) {
       case 'json':
         serializedData = JSON.stringify(dump);
+        downloadInBrowser(serializedData, name + '-' + options.sessionID + '.' + options.format);
         break;
       case 'xml':
         JSON.stringify(dump);
+        downloadInBrowser(serializedData, name + '-' + options.sessionID + '.' + options.format);
         //TODO:
         break;
       case 'csv':
       default:
-        serializedData = new CSV(dump, { header: true }).encode();  //TODO:
+        //bucket by event
+        var buckets = {};
+        dump.forEach(function(item){
+          if (!(item.event in buckets)){
+            buckets[item.event] = [];
+          }
+          item.data.timestamp = item.timestamp;
+          item.data.id = item.id;
+          buckets[item.event].push(item.data);
+        })
+        var i=1;
+        Object.keys(buckets).forEach(function(item){
+          serializedData = new CSV(buckets[item], { header: true }).encode();  //TODO:
+          downloadInBrowser(serializedData, name + '-' + options.sessionID + '-' + i + '.' + options.format);
+          i++;
+        });
       }
-      downloadInBrowser(serializedData, name + '-' + options.sessionID + '.' + options.format);
+      
     }.bind(null, options.collection));
   };
   var lastURL = null;

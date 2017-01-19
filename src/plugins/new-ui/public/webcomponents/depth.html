@@ -16,7 +16,7 @@
         margin-top: -0.6vw;
       }
       #depth {
-        font-size: 1.8vw;
+        font-size: 1.35vw;
         font-weight: bold;
         text-align: left;
       }
@@ -33,6 +33,7 @@
         font-size: 0.65vw;
         font-weight: bold;
         text-align: left;
+        margin-top: 0.5vw;
         /*padding-top: 2px;*/
       }
       #depthTarget.hidden {
@@ -40,20 +41,18 @@
       }
       #depth-footer  {
         width: 100%;
-        margin-top: 2vw;
+        margin-top: 1.0vw;
 
         font-size: 1vw;
-
       }
       #water-type {
-        width: 35%;
-        float: left;
+        font-weight: bold;
       }
       #depth-unit {
         width: 15%;
         text-align: left;
         float: right;
-        margin-top: 0.95vw;
+        margin-top: 0.45vw;
 
         font-size: 1.0vw;
       }
@@ -93,7 +92,7 @@
         margin-top: -29px;
       }
       #numberContainer {
-        margin-top: 10px;
+        margin-top: 1.35vw;
         padding-bottom: 14px;
       }
       #depthLock.hidden { opacity: 0; }
@@ -151,7 +150,7 @@
       </div>
 
       <div id="depth-footer">
-        <div>{{__(waterType)}}</div>
+        <span id="water-type">{{__(waterType)}}</span>
       </div>
       
       <div class="depth-line-container">
@@ -174,7 +173,7 @@
         </div>
       </div>
       
-      <div id="depth-change-unit" class="center text-center unit">{{__('m/s')}}</div>
+      <div id="depth-change-unit" class="center text-center unit">{{depthUnit}}{{__('/s')}}</div>
     
     </div>
   </template>
@@ -192,7 +191,7 @@
           },
           depth: {
             type: Number,
-            value: 0
+            value: function(){return 0;}
           },
           depthUnit: {
             type: String,
@@ -226,8 +225,12 @@
           emitter.withHistory.on('plugin.rovpilot.depthHold.state', function (state) {
             if(state.enabled)
             {
-              self.target = Number(state.targetDepth).toFixed(1);
-              console.log("Target", self.target);
+              self.target = Number(state.targetDepth).toFixed(2);
+              //Format based on setting
+              if(self.depthUnit == "ft")
+              {
+                self.target = self.convertToFeet(state.targetDepth).toFixed(2);
+              }
               $(self.$.depth).addClass('inverted');
               $(self.$.depthTarget).removeClass('hidden');
               $(self.$.depthLock).removeClass('hidden');
@@ -292,6 +295,10 @@
             if (difference > 0) {
               changeText = '+';
             }
+            if(self.depthUnit == "ft")
+            {
+              difference = self.convertToFeet(difference);
+            }
             changeText += difference.toFixed(2);
             self.change = changeText;
             oldDepth = currentDepth;
@@ -316,9 +323,12 @@
           //Format based on setting
           if(self.depthUnit == "ft")
           {
-            depth = depth * 3.28084;
+            depth = self.convertToFeet(depth);
           }
           return depth.toFixed(2); 
+        },
+        convertToFeet(numberIn) {
+          return Number(numberIn * 3.28);
         },
         toggleDepthUnit: function(e) {
           var self = this;

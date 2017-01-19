@@ -30,8 +30,9 @@
           1px  1px 0 #fff;
       }
       #depthTarget {
-        font-size: 1vw;
+        font-size: 0.65vw;
         font-weight: bold;
+        text-align: left;
         /*padding-top: 2px;*/
       }
       #depthTarget.hidden {
@@ -39,24 +40,29 @@
       }
       #depth-footer  {
         width: 100%;
-        margin-top: -20px;
+        margin-top: 2vw;
+
+        font-size: 1vw;
+
       }
       #water-type {
         width: 35%;
         float: left;
       }
       #depth-unit {
-        width: 25%;
+        width: 15%;
         text-align: left;
         float: right;
-        margin-top: 0.65vw;
+        margin-top: 0.95vw;
 
-        font-size: 1.2vw;
+        font-size: 1.0vw;
       }
       #depth-unit:hover {
         cursor: pointer;
       }
-      .depth-line-container,
+      .depth-line-container {
+        margin-top: 1.5vw;
+      }
       #depth-change-container {
         position: relative;
         display:table;
@@ -139,12 +145,13 @@
           <span>{{formatDepth(depth)}}</span>
           <span id="depth-unit"> {{depthUnit}} </span>
           </div>
+          <div id="depthTarget" title="Depthhold target depth" class="center text-center hidden">{{__('Target Depth: ')}}{{target}}</div>
         </div>
-        <div id="depthTarget" title="Depthhold target depth" class="center text-center hidden">{{target}}</div>
+        
       </div>
 
       <div id="depth-footer">
-        <div>{{__('Water type: ')}}{{__(waterType)}}</div>
+        <div>{{__(waterType)}}</div>
       </div>
       
       <div class="depth-line-container">
@@ -206,7 +213,7 @@
           },
           waterType: {
             type: String,
-            value: 'salt'
+            value: function(){return 'Saltwater';}
           }
         },
         behaviors: [namespace('behaviors').oROVStandard],
@@ -217,17 +224,22 @@
           });
 
           emitter.withHistory.on('plugin.rovpilot.depthHold.state', function (state) {
-            if(state.enabled){
-            self.target = Number(state.targetDepth).toFixed(1);
-            $(self.$.depth).addClass('inverted');
-            $(self.$.depthTarget).removeClass('hidden');
-            $(self.$.depthLock).removeClass('hidden');
-          } else{
-            self.target = 0;
-            $(self.$.depth).removeClass('inverted');
-            $(self.$.depthTarget).addClass('hidden');
-            $(self.$.depthLock).addClass('hidden');
-          }
+            if(state.enabled)
+            {
+              self.target = Number(state.targetDepth).toFixed(1);
+              console.log("Target", self.target);
+              $(self.$.depth).addClass('inverted');
+              $(self.$.depthTarget).removeClass('hidden');
+              $(self.$.depthLock).removeClass('hidden');
+
+            }
+            else
+            {
+              self.target = 0;
+              $(self.$.depth).removeClass('inverted');
+              $(self.$.depthTarget).addClass('hidden');
+              $(self.$.depthLock).addClass('hidden');
+            }
           });
           emitter.withHistory.on('plugin.diveProfile.waterType', function (waterType) {
             self.waterType = waterType;
@@ -275,7 +287,6 @@
               self.$.upPolygon.style.fill="black";
             }
 
-            
             var changeText = '';
 
             if (difference > 0) {
@@ -307,11 +318,11 @@
           {
             depth = depth * 3.28084;
           }
-          return depth.toFixed(1);
-          
+          return depth.toFixed(2); 
         },
         toggleDepthUnit: function(e) {
           var self = this;
+          
           if(self.depthUnit == "m")
           {
             self.set("depthUnit", "ft");
@@ -320,6 +331,7 @@
           {
             self.set("depthUnit", "m");
           }
+          
         }
       });
     }());

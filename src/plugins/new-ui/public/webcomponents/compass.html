@@ -132,30 +132,6 @@
       var bearingAngle = { angle: null };
       var indicatorAngle = { angle: null };
 
-      // function rotateElement(element, obj, newRotation) {
-      //   var aR;
-
-      //   obj.angle = obj.angle || 0; // if rot undefined or 0, make 0, else rot
-
-      //   aR = obj.angle % 360;
-
-      //   if( aR < 0 )
-      //   {
-      //     aR += 360; 
-      //   }
-      //   if( aR < 180 && (newRotation > (aR + 180)) ) 
-      //   { 
-      //     obj.angle -= 360; 
-      //   }
-      //   if ( aR >= 180 && (newRotation <= (aR - 180)) ) 
-      //   { 
-      //     obj.angle += 360; 
-      //   }
-      //   obj.angle += (newRotation - aR);
-
-      //   element.style.transform = ("rotate( " + obj.angle + "deg )");
-      // }
-
       function nearestNumber(x, a, b) {
         var aDelta = a - x;
         if(aDelta < 0)

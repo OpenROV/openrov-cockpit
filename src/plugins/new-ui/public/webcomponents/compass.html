@@ -16,6 +16,13 @@
       float: none;
     }
 
+    .notransition {
+      -webkit-transition: none !important;
+      -moz-transition: none !important;
+      -o-transition: none !important;
+      transition: none !important;
+    }
+
     #indicator {
       /*Hardware acceleration*/
       translate3d(0,0,0);
@@ -125,28 +132,86 @@
       var bearingAngle = { angle: null };
       var indicatorAngle = { angle: null };
 
-      function rotateElement(element, obj, newRotation) {
-        var aR;
+      // function rotateElement(element, obj, newRotation) {
+      //   var aR;
 
-        obj.angle = obj.angle || 0; // if rot undefined or 0, make 0, else rot
+      //   obj.angle = obj.angle || 0; // if rot undefined or 0, make 0, else rot
 
-        aR = obj.angle % 360;
-        if( aR < 0 )
+      //   aR = obj.angle % 360;
+
+      //   if( aR < 0 )
+      //   {
+      //     aR += 360; 
+      //   }
+      //   if( aR < 180 && (newRotation > (aR + 180)) ) 
+      //   { 
+      //     obj.angle -= 360; 
+      //   }
+      //   if ( aR >= 180 && (newRotation <= (aR - 180)) ) 
+      //   { 
+      //     obj.angle += 360; 
+      //   }
+      //   obj.angle += (newRotation - aR);
+
+      //   element.style.transform = ("rotate( " + obj.angle + "deg )");
+      // }
+
+      function nearestNumber(x, a, b) {
+        var aDelta = a - x;
+        if(aDelta < 0)
         {
-          aR += 360; 
+          aDelta = -aDelta;
         }
-        if( aR < 180 && (newRotation > (aR + 180)) ) 
-        { 
-          obj.angle -= 360; 
-        }
-        if ( aR >= 180 && (newRotation <= (aR - 180)) ) 
-        { 
-          obj.angle += 360; 
-        }
-        obj.angle += (newRotation - aR);
 
-        element.style.transform = ("rotate( " + obj.angle + "deg )");
+        var bDelta = b - x;
+        if(bDelta < 0)
+        {
+          bDelta = -bDelta;
+        }
+
+        if(aDelta < bDelta)
+        {
+          return a;
+        }
+        return b;
       }
+
+      function rotateElement(element, currentPos, newPos) {
+        currentPos.angle = currentPos.angle || 0; // if rot undefined or 0, make 0, else rot
+
+        var diff = 360 - newPos;
+        var dp = newPos + 360;
+        var dm = newPos - 360;
+
+        //Way to visually surpress the jumps between angles on the compass
+        var posDelta = Math.abs(currentPos.angle - newPos);
+        if(posDelta >= 355 )
+        {
+          element.classList.add('notransition');
+        }
+        else
+        {
+          element.classList.remove('notransition');
+        }
+
+        if(nearestNumber(currentPos.angle, newPos, dp) == dp)
+        {
+          element.style.transform = ("rotate( " + dp + "deg )");
+          currentPos.angle = dp;
+        }
+        else if(nearestNumber(currentPos.angle, newPos, dm) == dm)
+        {
+          element.style.transform = ("rotate( " + dm + "deg )");
+          currentPos.angle = dm;
+        }
+        else
+        {
+          element.style.transform = ("rotate( " + newPos + "deg )");
+          currentPos.angle = newPos;
+        }
+      }
+
+
 
       Polymer({
         is: 'orov-newui-compass',
@@ -203,6 +268,43 @@
         toggleHeadingLock: function(e) {
           this.$.headingLock = !this.$.headingLock;
         },
+
+        rotateElement(element, currentPos, newPos) {
+          currentPos.angle = currentPos.angle || 0; // if rot undefined or 0, make 0, else rot
+          
+
+
+          var diff = 360 - newPos;
+          var dp = newPos + 360;
+          var dm = newPos - 360;
+
+          if(180 - Math.abs(currentPos.angle) <= 5 )
+          {
+            element.classList.add('notransition');
+          }
+          else
+          {
+            element.classList.remove('notransition');
+
+          }
+
+          if(nearestNumber(currentPos.angle, newPos, dp) == dp)
+          {
+            element.style.transform = ("rotate( " + dp + "deg )");
+            currentPos.angle = dp;
+          }
+          else if(nearestNumber(currentPos.angle, newPos, dm) == dm)
+          {
+            element.style.transform = ("rotate( " + dm + "deg )");
+            currentPos.angle = dm;
+          }
+          else
+          {
+            element.style.transform = ("rotate( " + newPos + "deg )");
+            currentPos.angle = newPos;
+          }
+        },
+        
 
         behaviors: [namespace('behaviors').oROVStandard],
         registerEmitterHandlers: function(emitter) {

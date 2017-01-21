@@ -160,8 +160,12 @@
         var dm = newPos - 360;
 
         //Way to visually surpress the jumps between angles on the compass
-        var posDelta = Math.abs(currentPos.angle - newPos);
-        if(posDelta >= 355 )
+        var posDelta = (currentPos.angle - newPos);
+        var absPosDelta = Math.abs(currentPos.angle) - Math.abs(newPos);
+
+        var check1 = (posDelta >= 350 && absPosDelta <= 0)
+        var check2 = (posDelta <= -360 && absPosDelta >= 355)
+        if(check1 || check2)
         {
           element.classList.add('notransition');
         }
@@ -170,6 +174,7 @@
           element.classList.remove('notransition');
         }
 
+        //Apply the rotation element
         if(nearestNumber(currentPos.angle, newPos, dp) == dp)
         {
           element.style.transform = ("rotate( " + dp + "deg )");

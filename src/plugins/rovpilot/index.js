@@ -66,7 +66,9 @@
     });
     deps.cockpit.on('plugin.rovpilot.desiredControlRates', function (rates, ack, fn) {
       self.positions = rates;
-      fn(ack);  //ack
+      if (typeof(fn)==="function"){
+        fn(ack);  //ack
+      }
     });
     this.startInterval = function () {
       setInterval(function () {

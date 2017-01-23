@@ -277,7 +277,7 @@ function Bridge()
 
         if (!bridge.depthHoldEnabled) 
         {
-          targetDepth = currentDepth;
+          targetDepth = depthSensor.depth;
           bridge.depthHoldEnabled = true;
         }
 
@@ -298,7 +298,7 @@ function Bridge()
       case 'holdHeading_on': 
       {
         var targetHeading = 0;
-        targetHeading = headingOut;
+        targetHeading = imu.yaw;
         bridge.targetHoldEnabled = true;
         bridge.emitStatus('targetHeading:' + (bridge.targetHoldEnabled ? targetHeading.toString() : DISABLED));
         debug('Heading hold enabled');

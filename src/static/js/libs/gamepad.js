@@ -282,6 +282,7 @@
  */
   Gamepad.prototype.init = function () {
     this.platform = this._resolvePlatform();
+    
     switch (this.platform) {
     case Gamepad.Platform.WEBKIT:
       this._setupWebkit();
@@ -354,6 +355,13 @@
  * Sets up webkit platform.
  */
   Gamepad.prototype._setupWebkit = function () {
+    var self = this;
+    window.addEventListener('webkitgamepadconnected', function(e) {
+      self._connect(e.gamepad);
+    });
+    window.addEventListener('webkitgamepaddisconnected', function(e) {
+      self._disconnect(e.gamepad);
+    });
   };
   /**
  * Sets up filefox platform.
@@ -475,11 +483,44 @@
       return Gamepad.Type.UNSUPPORTED;
     }
   };
+
+  /** Need to do this for Chrome */
+  Gamepad.prototype._scanGamepads = function() {
+    var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
+    for (var i = 0; i < gamepads.length; i++) {
+      
+      let gamepad = gamepads[i];
+
+      //If we get a gamepad
+      if(gamepad != null)
+      {
+        //If this gamepad isn't already registerd, don't do anything
+        if(this.gamepads[i] == null)
+        {
+          //Register it
+          this._connect(gamepad);
+        }
+      }
+      else
+      {
+        //If there is a gamepad registerd in this spot, we need to deregister
+        if(this.gamepads[i] != null)
+        {
+          gamepad = this.gamepads[i];
+          this._disconnect(gamepad);
+        }
+      }
+
+    }
+  }
   /**
  * Updates the controllers, triggering TICK events.
  */
   Gamepad.prototype._update = function () {
     var self = this, controlName, isDown, lastDown, downBtnIndex, mapping, value, i, j;
+    
+    this._scanGamepads();
+
     switch (this.platform) {
     case Gamepad.Platform.WEBKIT:
       this._updateWebkit();
@@ -565,9 +606,6 @@
     window.requestAnimationFrame(function() {
     	self._update();
     });
-    // setTimeout(function () {
-    //   self._update();
-    // }, 100);
   };
   /**
  * Updates webkit platform gamepads.

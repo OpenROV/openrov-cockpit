@@ -2,7 +2,7 @@
 {
   'use strict';
   loadScript('components/mousetrap-js/mousetrap.js');
-  
+
   //Necessary for debug utils
   var log;
   var trace;
@@ -87,6 +87,7 @@
       {
         return false;
       }
+
     }
 
     //Member functions

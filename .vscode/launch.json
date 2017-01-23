@@ -21,7 +21,7 @@
 				"DEV_MODE": "true",
 				"USE_MOCK": "true",
 				"CPU_MOCK": "123MOCK",
-				"MOCK_VIDEO_TYPE": "GEOMUX",
+				"MOCK_VIDEO_TYPE": "MJPEG",
 				"MOCK_VIDEO_HARDWARE": "true",
 				"DEBUG": "bridge, mcu, cpu, *:Notifications, app:mjpeg*",
 				"port": 8080,

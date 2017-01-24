@@ -552,7 +552,7 @@
         for (j = 0; j < this.gamepads[i].downButtons.length; j++) {
           if (this.gamepads[i].downButtons[j] === controlName) {
             lastDown = true;
-            downBtnIndex = i;
+            downBtnIndex = j;
             break;
           }
         }

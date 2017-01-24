@@ -68,7 +68,7 @@
         
         for(var i = 0; i < presetsIn.length; ++i)
         {
-          self.savePreset(presetsIn[i]);
+          self.savePreset(presetsIn[i], false);
         }
       });
       
@@ -153,7 +153,7 @@
         return;
       }
     };
-    savePreset(presetIn)
+    savePreset(presetIn, lastPreset = true)
     {
       var self = this;
     
@@ -174,6 +174,13 @@
 
       //Add the preset
       self.settings.presets.push(presetIn);
+      
+      //They loaded a preset, set the lastPreset to this name
+      if(lastPreset)
+      {
+        self.settings.lastPreset = presetIn.name;
+      }
+      
 
       //Update the server settings to reflect this new preset
       self.cockpit.rov.emit('plugin.settings-manager.saveSettings', {inputConfigurator: self.settings});

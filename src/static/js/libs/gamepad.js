@@ -524,7 +524,14 @@
 
     //Support chrome, scan for gamepads
     this._scanGamepads();
-    
+    switch (this.platform) {
+      case Gamepad.Platform.WEBKIT:
+        this._updateWebkit();
+        break;
+      case Gamepad.Platform.FIREFOX:
+        this._updateFirefox();
+        break;
+    }
     for (i = 0; i < this.gamepads.length; i++) {
       if (typeof this.gamepads[i] === 'undefined') {
         continue;

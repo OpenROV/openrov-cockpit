@@ -582,7 +582,13 @@
       console.log('Not supposed to go here!');
       return;  // should not happen
     }
-    if (gamepads.length !== this.gamepads.length) {
+    gamepads.nonNulllength = 0;
+    for (i = 0; i < gamepads.length; i++) {
+      if (gamepads[i]!==null){
+        gamepads.nonNulllength++;
+      }
+    }
+    if (gamepads.nonNulllength !== this.gamepads.length) {
       var gamepad, i;
       for (i = 0; i < gamepads.length; i++) {
         gamepad = gamepads[i];
@@ -591,7 +597,7 @@
         }
       }
       for (i = 0; i < this.gamepads.length; i++) {
-        if (typeof this.gamepads[i] !== 'undefined' && typeof gamepads[i] === 'undefined') {
+        if (typeof this.gamepads[i] !== 'undefined' && !(gamepads[i])) {
           this._disconnect(this.gamepads[i]);
         }
       }

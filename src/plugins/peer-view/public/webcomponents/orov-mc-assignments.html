@@ -20,7 +20,7 @@
         <table>
         <template is="dom-repeat" items="{{viewers}}">
           <tr>
-            <td>{{item.userName}}</td><td>{{item.remoteAddress}}</td><td>
+            <td>{{item.userName}}</td><td>{{item.remoteAddress}}({{item.ping}}{{__('ms')}})</td><td>
               <paper-button toggles role='viewer' active="{{roleMatches('viewer',item.role)}}" on-click='change_role'>{{__('viewer')}}</paper-button>
               <paper-button toggles role='co-pilot' active="{{roleMatches('co-pilot',item.role)}}" on-click='change_role'>{{__('co-pilot')}}</paper-button>
               <paper-button toggles role='pilot' active="{{roleMatches('pilot',item.role)}}" on-click='change_role'>{{__('pilot')}}</paper-button>

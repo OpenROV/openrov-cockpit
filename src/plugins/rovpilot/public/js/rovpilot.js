@@ -343,10 +343,10 @@
                               }
                             } 
                           },
-          "LEFT_TRIGGER": { type: "button",
+          "LB": { type: "button",
                             action: 'rovPilot.decrementPowerLevel'
           },
-          "RIGHT_TRIGGER": { type: "button",
+          "RB": { type: "button",
                               action: 'rovPilot.incrementPowerLevel'
           }
         }

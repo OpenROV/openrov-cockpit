@@ -44,7 +44,7 @@
     deps.globalEventLoop.on('mcu.status', function (status) {
       if ('targetDepth' in status) {
         self.state.depth.enabled = status.targetDepth != DISABLED;
-        self.state.depth.targetDepth = Number(status.targetDepth);
+        self.state.depth.targetDepth = Number(status.targetDepth) / 100;
         deps.cockpit.emit('plugin.rovpilot.depthHold.state', self.state.depth);
       }
       if ('targetHeading' in status) {

@@ -16,9 +16,9 @@
         margin-top: -0.6vw;
       }
       #depth {
-        font-size: 1.35vw;
+        font-size: 1.85vw;
         font-weight: bold;
-        text-align: left;
+        text-align: center;
       }
       #depth.inverted {
         color: black;
@@ -30,37 +30,31 @@
           1px  1px 0 #fff;
       }
       #depthTarget {
-        font-size: 0.65vw;
+        font-size: 1.0vw;
         font-weight: bold;
-        text-align: left;
-        margin-top: 0.5vw;
-        /*padding-top: 2px;*/
       }
       #depthTarget.hidden {
         opacity: 0;
       }
       #depth-footer  {
         width: 100%;
-        margin-top: 1.0vw;
+        margin-top: 0.75vw;
 
-        font-size: 1vw;
+        font-size: 0.9vw;
       }
       #water-type {
         font-weight: bold;
       }
       #depth-unit {
-        width: 15%;
-        text-align: left;
         float: right;
-        margin-top: 0.45vw;
 
-        font-size: 1.0vw;
+        font-weight: bold;
       }
       #depth-unit:hover {
         cursor: pointer;
       }
       .depth-line-container {
-        margin-top: 1.5vw;
+        margin-top: 0.5vw;
       }
       #depth-change-container {
         position: relative;
@@ -88,11 +82,12 @@
       }
       #depthLock {
         text-align: right;
+        font-weight:bold;
         right: 10px;
-        margin-top: -29px;
+        margin-top: -0.2vw;
       }
       #numberContainer {
-        margin-top: 1.35vw;
+        margin-top: -0.5vw;
         padding-bottom: 14px;
       }
       #depthLock.hidden { opacity: 0; }
@@ -125,11 +120,12 @@
         display: inline-block;
         max-width: 55px;      
         margin: auto;
-        font-size: 1.0vw;
+        font-size: 1.25vw;
         vertical-align: middle; 
       }
       #depth-change-unit {
         margin-top: -6px;
+        font-size: 0.85vw;
       }
       .depth-change-indicator { width: 15px; height: 15px }
       svg { width: 100%; }
@@ -142,15 +138,18 @@
       <div id="numberContainer">
         <div id="depth" class="center text-center">
           <span>{{formatDepth(depth)}}</span>
-          <span id="depth-unit"> {{depthUnit}} </span>
+        </div>
+          <div id="depthTarget" title="Depthhold target depth" class="center text-center hidden">
+            <span>{{__('LK: ')}}</span>
+            <span style="text-align:center">{{target}}</span>
           </div>
-          <div id="depthTarget" title="Depthhold target depth" class="center text-center hidden">{{__('Target Depth: ')}}{{target}}</div>
         </div>
         
       </div>
 
       <div id="depth-footer">
         <span id="water-type">{{__(waterType)}}</span>
+        <span id="depth-unit"> {{depthUnit}} </span>
       </div>
       
       <div class="depth-line-container">
@@ -212,7 +211,7 @@
           },
           waterType: {
             type: String,
-            value: function(){return 'Saltwater';}
+            value: function(){return 'Salt';}
           }
         },
         behaviors: [namespace('behaviors').oROVStandard],

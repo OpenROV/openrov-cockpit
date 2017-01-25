@@ -38,7 +38,7 @@ class DiveProfile
     this.depth        = 0;    // meters
     this.pressure     = 0;    // kPa
     this.temperature  = 0;    // celsius
-    this.waterType    = "Freshwater";
+    this.waterType    = "Fresh";
 
     this.SyncSettings = new Periodic( 100, "timeout", function()
     {
@@ -107,11 +107,11 @@ class DiveProfile
             self.settings = settings.diveProfile;
 
             // Set target water type
-            if( self.settings.waterType == "Freshwater" )
+            if( self.settings.waterType == "Fresh" )
             {
               self.targetWaterType = 0;
             }
-            else if( self.settings.waterType == "Saltwater" )
+            else if( self.settings.waterType == "Salt" )
             {
               self.targetWaterType = 1;
             }
@@ -153,11 +153,11 @@ class DiveProfile
 
                 if( self.mcuWaterType == 0 )
                 {
-                    this.waterType = "Freshwater";
+                    this.waterType = "Fresh";
                 }
                 else
                 {
-                    this.waterType = "Saltwater";
+                    this.waterType = "Salt";
                 }
 
                 self.cockpitBus.emit( "plugin.diveProfile.waterType", self.waterType );
@@ -239,8 +239,8 @@ class DiveProfile
         'waterType': {
           'type': 'string',
           'enum': [
-            'Freshwater',
-            'Saltwater'
+            'Fresh',
+            'Salt'
           ],
           'title': 'Water Type',
           'default': 'Freshwater'

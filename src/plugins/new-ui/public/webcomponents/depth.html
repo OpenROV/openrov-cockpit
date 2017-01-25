@@ -16,7 +16,7 @@
         margin-top: -0.6vw;
       }
       #depth {
-        font-size: 1.8vw;
+        font-size: 1.85vw;
         font-weight: bold;
         text-align: center;
       }
@@ -30,27 +30,32 @@
           1px  1px 0 #fff;
       }
       #depthTarget {
-        font-size: 1vw;
+        font-size: 1.0vw;
         font-weight: bold;
-        /*padding-top: 2px;*/
       }
       #depthTarget.hidden {
         opacity: 0;
       }
       #depth-footer  {
         width: 100%;
-        margin-top: -20px;
+        margin-top: 0.75vw;
+
+        font-size: 0.9vw;
       }
       #water-type {
-        width: 35%;
-        float: left;
+        font-weight: bold;
       }
       #depth-unit {
-        width: 35%;
-        text-align: right;
         float: right;
+
+        font-weight: bold;
       }
-      .depth-line-container,
+      #depth-unit:hover {
+        cursor: pointer;
+      }
+      .depth-line-container {
+        margin-top: 0.5vw;
+      }
       #depth-change-container {
         position: relative;
         display:table;
@@ -77,11 +82,12 @@
       }
       #depthLock {
         text-align: right;
+        font-weight:bold;
         right: 10px;
-        margin-top: -29px;
+        margin-top: -0.2vw;
       }
       #numberContainer {
-        margin-top: 10px;
+        margin-top: -0.5vw;
         padding-bottom: 14px;
       }
       #depthLock.hidden { opacity: 0; }
@@ -114,11 +120,12 @@
         display: inline-block;
         max-width: 55px;      
         margin: auto;
-        font-size: 1.0vw;
+        font-size: 1.25vw;
         vertical-align: middle; 
       }
       #depth-change-unit {
         margin-top: -6px;
+        font-size: 0.85vw;
       }
       .depth-change-indicator { width: 15px; height: 15px }
       svg { width: 100%; }
@@ -132,12 +139,17 @@
         <div id="depth" class="center text-center">
           <span>{{formatDepth(depth)}}</span>
         </div>
-        <div id="depthTarget" title="Depthhold target depth" class="center text-center hidden">{{target}}</div>
+          <div id="depthTarget" title="Depthhold target depth" class="center text-center hidden">
+            <span>{{__('LK: ')}}</span>
+            <span style="text-align:center">{{target}}</span>
+          </div>
+        </div>
+        
       </div>
 
       <div id="depth-footer">
-        <div id="water-type" class="unit" title="Water type">{{__(waterType)}}</div>
-        <div id="depth-unit" class="unit">{{__('m')}}</div>
+        <span id="water-type">{{__(waterType)}}</span>
+        <span id="depth-unit"> {{depthUnit}} </span>
       </div>
       
       <div class="depth-line-container">
@@ -160,7 +172,7 @@
         </div>
       </div>
       
-      <div id="depth-change-unit" class="center text-center unit">{{__('m/s')}}</div>
+      <div id="depth-change-unit" class="center text-center unit">{{depthUnit}}{{__('/s')}}</div>
     
     </div>
   </template>
@@ -178,7 +190,11 @@
           },
           depth: {
             type: Number,
-            value: 0
+            value: function(){return 0;}
+          },
+          depthUnit: {
+            type: String,
+            value: function(){return 'm';}
           },
           options: {
             type: Object,
@@ -191,11 +207,11 @@
           },
           target: {
             type: Number,
-            value: 0
+            value: function(){return 0;}
           },
           waterType: {
             type: String,
-            value: 'salt'
+            value: function(){return 'Salt';}
           }
         },
         behaviors: [namespace('behaviors').oROVStandard],
@@ -206,21 +222,33 @@
           });
 
           emitter.withHistory.on('plugin.rovpilot.depthHold.state', function (state) {
-            if(state.enabled){
-            self.target = Number(state.targetDepth).toFixed(1);
-            $(self.$.depth).addClass('inverted');
-            $(self.$.depthTarget).removeClass('hidden');
-            $(self.$.depthLock).removeClass('hidden');
-          } else{
-            self.target = 0;
-            $(self.$.depth).removeClass('inverted');
-            $(self.$.depthTarget).addClass('hidden');
-            $(self.$.depthLock).addClass('hidden');
-          }
+            if(state.enabled)
+            {
+              self.target = Number(state.targetDepth).toFixed(2);
+              //Format based on setting
+              if(self.depthUnit == "ft")
+              {
+                self.target = self.convertToFeet(state.targetDepth).toFixed(2);
+              }
+              $(self.$.depth).addClass('inverted');
+              $(self.$.depthTarget).removeClass('hidden');
+              $(self.$.depthLock).removeClass('hidden');
+
+            }
+            else
+            {
+              self.target = 0;
+              $(self.$.depth).removeClass('inverted');
+              $(self.$.depthTarget).addClass('hidden');
+              $(self.$.depthLock).addClass('hidden');
+            }
           });
           emitter.withHistory.on('plugin.diveProfile.waterType', function (waterType) {
             self.waterType = waterType;
           });
+        },
+        listeners: {
+          'depth-unit.tap': 'toggleDepthUnit',
         },
         attached: function(){
           this._dataThrottleInterval=setInterval(function(){
@@ -261,11 +289,14 @@
               self.$.upPolygon.style.fill="black";
             }
 
-            
             var changeText = '';
 
             if (difference > 0) {
               changeText = '+';
+            }
+            if(self.depthUnit == "ft")
+            {
+              difference = self.convertToFeet(difference);
             }
             changeText += difference.toFixed(2);
             self.change = changeText;
@@ -286,7 +317,30 @@
           clearInterval(this._updateInterval);
         },
         formatDepth : function(depth){
-          return depth.toFixed(1);
+          var self = this;
+
+          //Format based on setting
+          if(self.depthUnit == "ft")
+          {
+            depth = self.convertToFeet(depth);
+          }
+          return depth.toFixed(2); 
+        },
+        convertToFeet(numberIn) {
+          return Number(numberIn * 3.28);
+        },
+        toggleDepthUnit: function(e) {
+          var self = this;
+          
+          if(self.depthUnit == "m")
+          {
+            self.set("depthUnit", "ft");
+          }
+          else
+          {
+            self.set("depthUnit", "m");
+          }
+          
         }
       });
     }());

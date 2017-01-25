@@ -299,7 +299,7 @@
         var presetToSave = self.convertToPreset(presetToSave);
 
         self.presets.set(presetToSave.name, presetToSave);
-        self.handleChangePreset(presetToSave.name);
+        self.addPreset(presetToSave);
       }
     };
 
@@ -343,6 +343,13 @@
       self.presets.get("defaults").actions.forEach(function(action, actionName) {
         newPreset.addAction(actionName);
       });
+
+      //Check if this is a map object
+      if(!Array.isArray(presetIn.actions))
+      {
+        presetIn = self.convertToObject(presetIn);
+      }
+
 
       for(var actionName in presetIn.actions)
       {

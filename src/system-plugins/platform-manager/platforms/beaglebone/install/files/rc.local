@@ -38,6 +38,10 @@ if [ -f /var/.RESIZE_ROOT_PARTITION ]; then
   echo none > ${led3}/trigger || true
 
   /opt/scripts/tools/grow_partition.sh || true
+  # per https://github.com/OpenROV/openrov-software/issues/628
+  # Cannot fail in rc.local, so best effort try, if the partition is not ready to grow the command does nothing
+  resize2fs /dev/mmcblk0p1 || true
+  resize2fs /dev/mmcblk1p1 || true
   reboot -f
 fi
 

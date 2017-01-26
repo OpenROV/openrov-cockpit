@@ -581,7 +581,9 @@
             }
             if(assignment.options.exponentialSticks.enabled)
             {
+              console.log("Input:", value, assignment.options.exponentialSticks.rate);
               value = self.applyExponentialSticks(value, assignment.options.exponentialSticks.rate);
+              console.log("Output:", value);
             }
             assignment.action.update(value);
           }
@@ -637,11 +639,13 @@
 
     applyExponentialSticks(value, rate)
     {
-      var s = Math.sign(value);
-      value = Math.pow(value, rate);
-      if(Math.sign(value) !== s)
+      if(value >= 0.0)
       {
-        value = value * s;
+        value = Math.pow(value, rate);
+      }
+      else
+      {
+        value = -Math.pow(Math.abs(value), rate);
       }
       return value;
     };

@@ -12,7 +12,7 @@
     self.sendUpdateEnabled = true;
     self.priorControls = {};
     self.powerLevel = 1;
-    self.setPowerLevel(1;
+    self.setPowerLevel(1);
     self.positions = {
       throttle: 0,
       yaw: 0,

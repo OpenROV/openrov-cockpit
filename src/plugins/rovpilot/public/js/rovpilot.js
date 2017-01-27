@@ -394,7 +394,6 @@
       });
 
       self.cockpit.on('plugin.rovpilot.getState', function(callback) {
-        console.log("sending a get state", self.powerLevel);
         var state = { powerLevel: self.powerLevel };
         callback(state);
       });
@@ -446,7 +445,6 @@
     {
       var self = this;
       setTimeout(function() {
-        console.log("Setting power level", self.powerLevel);
         self.cockpit.emit('plugin.rovpilot.setPowerLevel', self.powerLevel);
       }, 2000);
     }

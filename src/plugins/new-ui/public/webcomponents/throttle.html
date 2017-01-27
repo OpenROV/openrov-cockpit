@@ -281,10 +281,6 @@ TODO:  Change the interface for motors to -1/1 with deadzone accounted for to tr
           type: Number,
           value: function(){return 0;}
         },
-        leftThrottleHeight: {
-          type: Number,
-          value: function(){return 131.31982;}
-        },
         maxThrottle: {
           type: Number,
           value: function(){return 100;}
@@ -308,7 +304,6 @@ TODO:  Change the interface for motors to -1/1 with deadzone accounted for to tr
           self.setStarboard(Number(data.starbord));
         });
         emitter.emit('plugin.rovpilot.getState',function(state){
-          console.log("Got a state:", state.powerLevel);
           if (state.powerLevel !== undefined){
             self.setPowerLevel(state.powerLevel);
           }
@@ -327,38 +322,41 @@ TODO:  Change the interface for motors to -1/1 with deadzone accounted for to tr
         self.setStarboard(1500);
 
       },
-      ready: function() {
-        var self = this;
-      },
       setPowerLevel: function (level) {
         var self = this;
-        console.log("Setting power level:", level);
         this.set("powerLevel", level);
+
+        //Check to see if the SVG element is ready to be changed
         var portMaxElement = $(this.$.port).find('#maxThrottle rect');
-        var verticalMaxElement = $(this.$.vertical).find('#maxThrottle rect');
-        var starboardMaxElement = $(this.$.starboard).find('#maxThrottle rect');
-        console.log(this.$.maxThrottle.querySelector('rect#leftThrottleRect'));
+        if(portMaxElement.length != 2)
+        {
+          //If it is not ready, try again soon
+          setTimeout(function() {
+            self.setPowerLevel(level);
+          }, 50);
+        }
+        else
+        {
+          //It is ready, make the draws
+          var verticalMaxElement = $(this.$.vertical).find('#maxThrottle rect');
+          var starboardMaxElement = $(this.$.starboard).find('#maxThrottle rect');
+          
+          //815 is the design height of the throttle SVG element, 200 the min height of the throttle display at power level 1
+          var height = level.map(0, 5, 0, 815);
+          var y = 815 / 2 - height / 2;
+          //This will cause port vertical and starboard max throttles to change using css
+          portMaxElement.attr('height', height);
+          portMaxElement.attr('y', y);
 
-        var something = this.$.maxThrottle.querySelector('rect#leftThrottleRect');
-        
 
-        //815 is the design height of the throttle SVG element, 200 the min height of the throttle display at power level 1
-        var height = level.map(0, 5, 0, 815);
-        var y = 815 / 2 - height / 2;
-        console.log(something.getAttribute("height"));
-        something.setAttribute("height", height);
-        //This will cause port vertical and starboard max throttles to change using css
-        // portMaxElement.attr('height', height);
-        // portMaxElement.attr('y', y);
+          verticalMaxElement.attr('height', height);
+          verticalMaxElement.attr('y', y);
 
+          starboardMaxElement.attr('height', height);
+          starboardMaxElement.attr('y', y);
+          this.height = height;
+        }
 
-        // verticalMaxElement.attr('height', height);
-        // verticalMaxElement.attr('y', y);
-
-        // starboardMaxElement.attr('height', height);
-        // starboardMaxElement.attr('y', y);
-        console.log(self.leftThrottleHeight);
-        this.height = height;
       },
       setVertical: function (lift) {
         var element = $(this.$.vertical).find('#throttle');

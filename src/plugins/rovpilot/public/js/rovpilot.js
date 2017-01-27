@@ -19,7 +19,7 @@
         roll: 0,
         strafe: 0
       };
-      self.powerLevel = 2;
+      self.powerLevel = undefined;
       self.priorControls = {};
 
       self.sendToROVEnabled = true;
@@ -379,11 +379,7 @@
       //to deal with the clocks not being in sync between the computer and the ROV.
       var self = this;
 
-      //Initial sync of state
-      self.cockpit.rov.emit('plugin.rovpilot.getState', function(state) {
-        self.powerLevel = state.powerLevel;
-        self.cockpit.emit('plugin.rovpilot.setPowerLevel', self.powerLevel);
-      });
+
 
       //Get the stick values
       self.cockpit.withHistory.on('settings-change.rovPilot', function (settings) {
@@ -446,6 +442,20 @@
       self.cockpit.on('plugin.rovpilot.sendToROVEnabled', function (value) {
         self.sendToROVEnabled = value;
       });
+
+      //Initial sync of state, for some reason this is not firing on the listen call
+      self.syncState();
+    }
+
+    syncState()
+    {
+      var self = this;
+      setTimeout(function() {
+        self.cockpit.rov.emit('plugin.rovpilot.getState', function(state) {
+          self.powerLevel = state.powerLevel;
+          self.cockpit.emit('plugin.rovpilot.setPowerLevel', self.powerLevel);
+        });
+      }, 2000);
     }
 
     sendPilotingData() 

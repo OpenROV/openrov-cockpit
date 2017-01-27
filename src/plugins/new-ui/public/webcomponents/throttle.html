@@ -280,22 +280,24 @@ TODO:  Change the interface for motors to -1/1 with deadzone accounted for to tr
       properties: {
         height: {
           type: Number,
-          value: 0
+          value: function(){return 0;}
         },
         maxThrottle: {
           type: Number,
-          value: 100
+          value: function(){return 100;}
         },
-        power: {
+        powerLevel: {
           type: Number,
-          value: 0
+          value: function(){return 0;}
         }
       },
       behaviors: [namespace('behaviors').oROVStandard],
       registerEmitterHandlers: function(emitter) {
         var self = this;
         emitter.withHistory.on('plugin.rovpilot.setPowerLevel', function (level) {
-          self.setPowerLevel(level);
+          if (level !== undefined){
+            self.setPowerLevel(level);
+          }
         });
         emitter.withHistory.on('plugin.rovpilot.controls', function (data) {
           self.setVertical(Number(data.vertical));
@@ -319,9 +321,13 @@ TODO:  Change the interface for motors to -1/1 with deadzone accounted for to tr
         self.setVertical(1500);
         self.setPort(1500);
         self.setStarboard(1500);
+
+      },
+      ready: function() {
+        var self = this;
       },
       setPowerLevel: function (level) {
-        this.power = level;
+        this.set("powerLevel", level);
         var portMaxElement = $(this.$.port).find('#maxThrottle rect');
         var verticalMaxElement = $(this.$.vertical).find('#maxThrottle rect');
         var starboardMaxElement = $(this.$.starboard).find('#maxThrottle rect');

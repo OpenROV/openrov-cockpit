@@ -68,6 +68,14 @@
       }
     };
     setInterval(statusUpdate, 1000);
+
+    var pingPeers = function (){
+      self.peers.forEach(function(peer){
+        peer.sendemit('mc-ping',Date.now());
+      })
+    }
+    setInterval(pingPeers,1000);
+
     self.cockpit.on('mc-promote', function (id, role) {
       var peer = self.peers.find(function (item) {
           return item.id = id;
@@ -120,9 +128,13 @@
       self.connecting = false;
     });
     var buffer = [];
+    var rovBlacklistMessages = [
+      'newListener',
+      'sys.pong'
+    ]
     var onAnyHandler = function () {
       var event = this.event;
-      if (event !== 'newListener') {
+      if (rovBlacklistMessages.indexOf(event) ==-1) {
         //  console.log(event);
         var args = new Array(arguments.length);
         for (var i = 0; i < args.length; ++i) {
@@ -180,6 +192,7 @@
       console.log('got new peer connection offer from:', peer_id);
       var p = new Peer(peerOpts);
       p.peer_id = peer_id;
+      p.lastping = null;
       p.withHistory = {
         on: function (event, fn) {
           p.on(event, fn);
@@ -252,14 +265,21 @@
           case 'mission-control-register':
             p.userName = msg[1];
             break;
+          case 'sys.ping':
+            p.sendemit('sys.pong', msg[1]);
+            break;
+          case 'mc-pong':
+            if (Number.isInteger(msg[1])){
+              p.lastping = Date.now() - msg[1];
+            }
+            break; 
           }
           //co-pilot
           var copilot_blacklist = [
               'plugin.rovpilot.desiredControlRates',
-              'ping',
               'sys.ping'
             ];
-          var pilot_blacklist = ['ping'];
+          var pilot_blacklist = ['sys.ping'];
           var cockpit_commands = [
               'plugin.rovpilot.incrementPowerLevel',
               'plugin.rovpilot.setPowerLevel'
@@ -302,6 +322,12 @@
   };
   PeerView.prototype.formatUsersMsg = function formatUsersMsg(peers) {
     var msgData = peers.map(function (peer) {
+        
+        // In the future it might be useful to incorporate some of the WebRTC details
+        //peer.getStats(function(res){
+        //    console.dir(res);
+        //  })
+
         return {
           role: peer.rov_role || 'viewer',
           id: peer.peer_id,
@@ -309,7 +335,8 @@
           localPort: peer.localPort,
           remoteAddress: peer.remoteAddress,
           remotePort: peer.remotePort,
-          userName: peer.userName || 'anonymous'
+          userName: peer.userName || 'anonymous',
+          ping: peer.lastping,
         };
       });
     return msgData;

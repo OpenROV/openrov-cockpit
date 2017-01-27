@@ -121,6 +121,9 @@ $(function () {
           case 'mc-assigned-role':
             $('#t')[0].userRole = payload[1];
             break;
+          case 'mc-ping':
+            p.send(msgpack.encode(['mc-pong',payload[1]]));
+            break;
           case 'x-h264-video.chunk':
             processVideoChunk.apply(this, payload);
             break;

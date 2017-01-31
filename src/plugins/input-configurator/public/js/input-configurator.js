@@ -18,6 +18,7 @@
   {
     constructor(cockpit)
     {
+      console.log("Loading input configurator");
       this.cockpit = cockpit;
 
       var self = this;

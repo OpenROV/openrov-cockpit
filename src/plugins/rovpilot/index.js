@@ -11,9 +11,8 @@
     self.sendToROVEnabled = true;
     self.sendUpdateEnabled = true;
     self.priorControls = {};
-    self.powerLevel = 2;
-    self.setPowerLevel(2);
-    //rov.powerLevel = 2;
+    self.powerLevel = 1;
+    self.setPowerLevel(1);
     self.positions = {
       throttle: 0,
       yaw: 0,
@@ -35,8 +34,6 @@
     deps.cockpit.on('plugin.rovpilot.setPowerLevel', function (value) {
       self.setPowerLevel(value);
     });
-    //Send initial state
-    deps.cockpit.emit('plugin.rovpilot.setPowerLevel', 2);
     deps.cockpit.on('plugin.rovpilot.allStop', function () {
       self.allStop();
     });

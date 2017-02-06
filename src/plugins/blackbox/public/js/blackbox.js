@@ -277,19 +277,22 @@
         }
         if (session.VideoSegments == undefined) {
           fixes.push(new Promise(function (resolve, reject) {
+            var sizeofData = 0;
+            var arrayOfData = [];
             self.idb.telemetry_events.where('sessionID').equalsIgnoreCase(session.sessionID).filter(function (item) {
               return item.event == 'x-h264-video.data';
-            }).toArray(function (dump) {
-              var sizeofData = 0;
-              var arrayOfData = dump.map(function (item) {
-                  var converted = new Uint8Array(item.data);
-                  sizeofData += converted.length;
-                  return {
-                    length: converted.length,
-                    id: item.id,
-                    timestamp: item.timestamp
-                  };
-                });
+            })
+            .each(function(item,cursor){
+              //Each uses side effects to change state. 
+              var converted = new Uint8Array(item.data);
+              sizeofData += converted.length;
+              arrayOfData.push( {
+                length: converted.length,
+                id: item.id,
+                timestamp: item.timestamp
+              });
+            })
+            .then(function () {
               if (arrayOfData.length == 0) {
                 session.VideoSegments = [];
                 session.videoSize = 0;

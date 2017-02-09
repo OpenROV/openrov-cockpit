@@ -71,8 +71,9 @@
           <paper-button on-click='export_xml'>{{__('Export XML')}}</paper-button>
           <paper-button on-click='export_csv'>{{__('Export CSV')}}</paper-button>
           <template is="dom-repeat" items="{{item.VideoSegments}}" outer-id="{{item.sessionID}}">
-            <paper-button on-click='export_video'>{{__('Export Video Segment')}} {{index}}</paper-button>
+            <paper-button hidden$="{{showNativeExport()}}" on-click='export_video'>{{__('Export Video Segment')}} {{index}}</paper-button>
           </template>
+          <paper-button hidden$="{{!showNativeExport()}}" on-click='export_mp4ToNativeFS'>{{__('Export Video')}}</paper-button>
         </div>
       </paper-card>
     </template>
@@ -200,6 +201,11 @@
           var options = {collection: '*', format: 'xml', sessionID: e.model.item.sessionID};
           this.export(options);
         },
+        export_mp4ToNativeFS: function(e){
+          var model = e.model;
+          var options = {collection: 'mp4', format: 'mp4', UseAltStorage: true,sessionID: e.model.item.sessionID};
+          this.export(options);
+        },
         export_video: function(e){
           var model = e.model;
 
@@ -210,6 +216,9 @@
           if(this.eventEmitter !== undefined){
             this.eventEmitter.emit('plugin-blackbox-export',options);
           }
+        },
+        showNativeExport: function(){
+          return window.OROVE && window.OROVE.AltStorage;
         },
         toDate: function(timestamp){
           return new Date(timestamp);

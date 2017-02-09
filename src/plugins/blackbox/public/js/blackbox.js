@@ -616,10 +616,55 @@
       
     }.bind(null, options.collection));
   };
+
+  Blackbox.prototype._exportVideoToNativeFileSystem = function _exportVideoToNativeFileSystem(options,callback){
+    var initFrame;
+    var session_record;
+    var save=null;
+    var self=this;
+
+    return new Promise(function(resolve,reject){
+        window.OROVE.AltStorage.GetFileHandle({defaultPath:'mp4-' + options.sessionID + '.' + 'mp4'},function(err,callback){
+          if (err){
+            reject(err);
+          }
+          save=callback;
+//          save(new Uint8Array(initFrame.data),function(){
+            resolve(self.idb.sessions.where('sessionID').equals(options.sessionID).first());
+//          });          
+        })
+    })
+    .then(function (session) {
+      session_record = session;
+      var sort = 0;
+      self.idb.telemetry_events
+        .where('sessionID').equalsIgnoreCase(options.sessionID)
+        .filter(function (item) {
+          return item.event == 'x-h264-video.data';
+        })
+        .each(function(videoItem){
+          return new Promise(function(resolve,reject){
+            save(new Uint8Array(videoItem.data),function(){
+              resolve();
+            }); 
+          })
+
+        })
+        .then(function(){
+          alert("Export Complete");
+        })
+
+    });
+  }
+
   var lastURL = null;
   //TODO: Track this issue preventing easy download of large amounts of data.
   //https://bugs.chromium.org/p/chromium/issues/detail?id=375297
   Blackbox.prototype._exportVideo = function _exportVideo(options, callback) {
+    if (options.UseAltStorage){
+      this._exportVideoToNativeFileSystem(options,callback)
+      return;
+    }
     var self = this;
     var fakeClick = function fakeClick(anchorObj) {
       if (anchorObj.click) {

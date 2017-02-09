@@ -17,8 +17,7 @@ nconf.argv().env('__');
 try {
   nconf.use('file', { file: nconf.get('configfile') ? nconf.get('configfile') : '/etc/rovconfig.json' });
 } catch (err) {
-  error('Unable to load the configuration file, resetting to defaults');
-  error(err);
+  pino.error(err,'Unable to load the configuration file, resetting to defaults');
 }
 pino.debug(nconf.get(),"Settings");
 nconf.env();

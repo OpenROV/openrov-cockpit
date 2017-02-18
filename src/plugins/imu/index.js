@@ -129,9 +129,9 @@ class IMU
                 }
 
                 // Yaw
-                if( 'imu_y' in data ) 
+                if( 'baro_p' in data ) 
                 {
-                    self.yaw = decode( parseInt( data.imu_y ) );
+                    self.yaw = parseInt( data.baro_p ) / 1000000.0;
                     self.globalBus.emit( "plugin.imu.yaw", self.yaw );
                 }
 

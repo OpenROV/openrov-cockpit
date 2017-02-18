@@ -334,7 +334,7 @@
           this._dataThrottleInterval = setInterval(function(){
             if (newData == lastData) return;
             lastData=newData;
-            self.setHeading(parseFloat(newData.heading).toFixed(0));          
+            self.setHeading(parseFloat(newData.heading).toFixed(2));          
           },100);                 
         },
         detached: function(){

@@ -18,10 +18,10 @@
       var foundData = false;
 
       //convert to typed values
-      if ('vout' in data) 
+      if ('batt_v' in data) 
       {
-        result.board.voltage = parseFloat(data.vout);
-        foundData = true;
+        result.board.voltage = parseFloat(data.batt_v)/1000.0;
+	foundData = true;
       }
 
       if ('btti' in data) 

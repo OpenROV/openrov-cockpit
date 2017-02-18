@@ -30,15 +30,15 @@
         foundData = true;
       }
 
-      if ('BT1I' in data) 
+      if ('batt_i' in data) 
       {
-        result.battery.current.port = parseFloat(data.BT1I);
+        result.battery.current.port = -(parseFloat(data.batt_i) - 65536) / 1000.0;
         foundData = true;
       }
 
-      if ('BT2I' in data) 
+      if ('batt_t' in data) 
       {
-        result.battery.current.starboard = parseFloat(data.BT2I);
+        result.battery.current.starboard = (parseFloat(data.batt_t) / 1000.0);
         foundData = true;
       }
 

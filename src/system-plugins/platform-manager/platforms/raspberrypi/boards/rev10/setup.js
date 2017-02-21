@@ -43,7 +43,7 @@ var SetupBoardInterface = function(board)
           let temp = result[ 0 ] + ( ( ( result[ 1 ] & 0x80 ) >> 7 ) * 0.5 );
 
           // Emit on cockpit bus
-          board.cockpit.emit( "board.temp.lm75", temp );
+          board.cockpit.emit( "board.temp.lm75", { value: temp } );
         })
         .catch( (err) =>
         {

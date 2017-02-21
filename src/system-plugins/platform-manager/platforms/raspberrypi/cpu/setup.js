@@ -19,7 +19,7 @@ var SetupCPUInterface = function( cpu )
         let temp = parseInt( result, 10 ) / 1000;
 
         // Emit on cockpit bus
-        cpu.cockpit.emit( "cpu.temp.rpi", temp );
+        cpu.cockpit.emit( "cpu.temp.rpi", { value: temp } );
       })
       .catch( ( err ) =>
       {

@@ -32,7 +32,7 @@
     "express-session": "^1.13.0",
     "findit": "^2.0.0",
     "forever-monitor": "",
-    "fs-extra": "",
+    "fs-extra": "^2.0.0",
     "javascript-state-machine": "^2.3.5",
     "jquery-file-upload-middleware": "",
     "json-schema-defaults": "^0.2.0",

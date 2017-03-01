@@ -1,4 +1,5 @@
-[![Discord](https://discordapp.com/assets/e4923594e694a21542a489471ecffa50.svg =104x20)](https://openrov.github.io/discord-dev-chat-redirect/)
+[Chat with our developers on Discord](https://openrov.github.io/discord-dev-chat-redirect/)
+
 [![bitHound Overall Score](https://www.bithound.io/github/OpenROV/openrov-cockpit/badges/score.svg)](https://www.bithound.io/github/OpenROV/openrov-cockpit)
 
 # [OpenROV](http://openrov.com/) Cockpit

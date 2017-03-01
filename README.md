@@ -1,4 +1,4 @@
-[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/OpenROV/discuss?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Discord](https://discordapp.com/assets/fc0b01fe10a0b8c602fb0106d8189d9b.png =104x20)](https://openrov.github.io/discord-dev-chat-redirect/)
 [![bitHound Overall Score](https://www.bithound.io/github/OpenROV/openrov-cockpit/badges/score.svg)](https://www.bithound.io/github/OpenROV/openrov-cockpit)
 
 # [OpenROV](http://openrov.com/) Cockpit

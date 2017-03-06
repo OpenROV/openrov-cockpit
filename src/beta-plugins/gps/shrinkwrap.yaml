@@ -1,0 +1,9 @@
+dependencies:
+  node-gpsd: registry.npmjs.org/node-gpsd/0.2.6
+packages:
+  registry.npmjs.org/node-gpsd/0.2.6:
+    resolution:
+      shasum: 157c82fdc910858d023471a536a5e39eb53020e7
+      tarball: 'https://registry.npmjs.org/node-gpsd/-/node-gpsd-0.2.6.tgz'
+      type: tarball
+version: 0

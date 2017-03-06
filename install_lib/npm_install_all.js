@@ -60,7 +60,7 @@ var installPackages = function (index, array) {
     console.log(dir);
 //    fs.copySync(path.join(dir,'package.json'),'package.json');
     try{
-      console.log(exec('pnpm install', {cwd: dir,encoding:'utf8' }));// --modules-folder ' + nodeModulesFolder, { cwd: dir,encoding:'utf8' }));
+      console.log(exec('yarn install', {cwd: dir,encoding:'utf8' }));// --modules-folder ' + nodeModulesFolder, { cwd: dir,encoding:'utf8' }));
       index++;
       if (index < array.length) {
         installPackages(index, array);

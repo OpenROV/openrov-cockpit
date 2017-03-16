@@ -432,6 +432,7 @@
       console.log('Stopping Telemetry');
       this.recording = false;
       this.cockpit.emit('plugin-blackbox-recording-status', false);
+      this.sessionID = this.newSession();
       this.broadcastAllRecordings(); //send latest state of all recordings
     }
   };

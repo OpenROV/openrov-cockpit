@@ -3,6 +3,8 @@
 
 # [OpenROV](http://openrov.com/) Cockpit
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/OpenROV/openrov-cockpit.svg)](https://greenkeeper.io/)
+
 The Cockpit is the UI and control systems for any remote operated vehicle or device.  It is the heart of the OpenROV series of Underwater Robots.  
 Built on the latest and greatest web standards, Cockpit works with embedded Linux and micro-controllers to provide tele-robotic control of those systems.  
 

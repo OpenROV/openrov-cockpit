@@ -432,6 +432,7 @@
       console.log('Stopping Telemetry');
       this.recording = false;
       this.cockpit.emit('plugin-blackbox-recording-status', false);
+      this.sessionID = this.newSession();
       this.broadcastAllRecordings(); //send latest state of all recordings
     }
   };
@@ -637,23 +638,27 @@
     .then(function (session) {
       session_record = session;
       var sort = 0;
+      var promiseChain = Promise.resolve();
       self.idb.telemetry_events
         .where('sessionID').equalsIgnoreCase(options.sessionID)
         .filter(function (item) {
           return item.event == 'x-h264-video.data';
         })
         .each(function(videoItem){
-          return new Promise(function(resolve,reject){
-            save(new Uint8Array(videoItem.data),function(){
-              resolve();
-            }); 
+          promiseChain = promiseChain.then(function(){
+            return new Promise(function(resolve,reject){
+              save(new Uint8Array(videoItem.data),function(){
+                resolve();
+              }); 
+            })
           })
-
+        })
+        .then(function(){
+          return promiseChain;
         })
         .then(function(){
           alert("Export Complete");
         })
-
     });
   }
 

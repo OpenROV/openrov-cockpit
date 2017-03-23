@@ -38,7 +38,9 @@ function Bridge()
     vout:         5.0,
     iout:         2.0,
     bt1i:         0.0,
-    bt2i:         0.0
+    bt2i:         0.0,
+    baro_p:       0,
+    baro_t:       0.0
   }
 
   // IMU State
@@ -68,6 +70,11 @@ function Bridge()
     depthOffset:  0,
     temperature:  0,
     pressure:     0
+  }
+
+  var baraometer = {
+    temperature: 0,
+    pressure:    0
   }
 
   bridge.depthHoldEnabled   = false;
@@ -493,6 +500,12 @@ function Bridge()
 
     cb.vout = cb.brdv;
 
+    //Generate internal pressure values
+    cb.baro_p = 30000000;
+    var num = Math.floor(Math.random()*1000000) + 1; // this will get a number between 1 and 99;
+    num *= Math.floor(Math.random()*2) == 1 ? 1 : -1; // this will add minus sign in 50% of cases
+    cb.baro_p += num;
+
     // Create result string
     var result = "";
     result += 'BT2I:' + cb.bt2i + ';';
@@ -501,6 +514,8 @@ function Bridge()
     result += 'vout:' + cb.vout + ';';
     result += 'iout:' + cb.iout + ';';
     result += 'time:' + cb.time + ';';
+    result += 'baro_p:' + cb.baro_p + ';';
+    result += 'baro_t:' + cb.baro_t + ';';
 
     // Emit status update
     bridge.emit( 'status', reader.parseStatus( result ) );

@@ -9,7 +9,7 @@ class Beacon extends EventEmitter{
         }
         super();
         this.port = options.port || 8088;
-        this.broadcastAddress = options.broadcastAddress || '192.168.1.255';//;'230.185.192.108';
+        this.broadcastAddress = options.broadcastAddress || '10.1.1.255';//;'230.185.192.108';
         this.beaconRate = options.beaconRate || 3000;
        
     }

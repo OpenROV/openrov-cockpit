@@ -1,6 +1,14 @@
 "use strict";
 const dgram = require('dgram');
 const EventEmitter = require('events');
+const os = require('os');
+var ifaces = os.networkInterfaces();
+function getBroadcastAddress(addressString) {
+    var address = addressString.split('.');
+    address[3] = '255';
+    return address.join('.');
+}
+
 class Beacon extends EventEmitter{
 
     constructor (options){
@@ -9,7 +17,7 @@ class Beacon extends EventEmitter{
         }
         super();
         this.port = options.port || 8088;
-        this.broadcastAddress = options.broadcastAddress || '10.1.1.255';//;'230.185.192.108';
+        this.broadcastAddress = options.broadcastAddress || '192.168.1.255';//;'230.185.192.108';
         this.beaconRate = options.beaconRate || 3000;
        
     }
@@ -28,12 +36,21 @@ class Beacon extends EventEmitter{
         this.beaconInterval = setInterval(broadcastNew, this.beaconRate);
 
         function broadcastNew() {
+            
+            //Updated to iterate over all ipv4 interfaces
             var message = new Buffer(JSON.stringify(messageFn()));
-            server.send(message, 0, message.length, self.port,  self.broadcastAddress);
+            Object.keys(ifaces).forEach(function(iface) {
+                ifaces[iface].forEach(function(idetail) {
+                    if('IPv4' !== idetail.family || idetail.internal !== false) {
+                        //Skip over internal (i.e. 127.0.0.1) and non ipv4
+                        return;
+                    }
+                    idetail.broadcastAddress = getBroadcastAddress(idetail.address);
+                    server.send(message, 0, message.length, self.port, idetail.broadcastAddress);
+                });
+            });
         }
-
         server.bind();
-
     }
 
     listen () {

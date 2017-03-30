@@ -1,0 +1,94 @@
+dependencies:
+  msgpack-lite@^0.1.17: registry.npmjs.org/msgpack-lite/0.1.26
+  simple-peer@^6.2.1: registry.npmjs.org/simple-peer/6.4.4
+packages:
+  registry.npmjs.org/buffer-shims/1.0.0:
+    resolution:
+      shasum: 9978ce317388c649ad8793028c3477ef044a8b51
+      tarball: 'https://registry.npmjs.org/buffer-shims/-/buffer-shims-1.0.0.tgz'
+  registry.npmjs.org/core-util-is/1.0.2:
+    resolution:
+      shasum: b5fd54220aa2bc5ab57aab7140c940754503c1a7
+      tarball: 'https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.2.tgz'
+  registry.npmjs.org/debug/2.6.1:
+    dependencies:
+      ms: registry.npmjs.org/ms/0.7.2
+    resolution:
+      shasum: 79855090ba2c4e3115cc7d8769491d58f0491351
+      tarball: 'https://registry.npmjs.org/debug/-/debug-2.6.1.tgz'
+  registry.npmjs.org/event-lite/0.1.1:
+    resolution:
+      shasum: 47cf08a8d37d0b694cdb7b3b17b51faac6576086
+      tarball: 'https://registry.npmjs.org/event-lite/-/event-lite-0.1.1.tgz'
+  registry.npmjs.org/get-browser-rtc/1.0.2:
+    resolution:
+      shasum: bbcd40c8451a7ed4ef5c373b8169a409dd1d11d9
+      tarball: 'https://registry.npmjs.org/get-browser-rtc/-/get-browser-rtc-1.0.2.tgz'
+  registry.npmjs.org/ieee754/1.1.8:
+    resolution:
+      shasum: be33d40ac10ef1926701f6f08a2d86fbfd1ad3e4
+      tarball: 'https://registry.npmjs.org/ieee754/-/ieee754-1.1.8.tgz'
+  registry.npmjs.org/inherits/2.0.3:
+    resolution:
+      shasum: 633c2c83e3da42a502f52466022480f4208261de
+      tarball: 'https://registry.npmjs.org/inherits/-/inherits-2.0.3.tgz'
+  registry.npmjs.org/int64-buffer/0.1.9:
+    resolution:
+      shasum: 9e039da043b24f78b196b283e04653ef5e990f61
+      tarball: 'https://registry.npmjs.org/int64-buffer/-/int64-buffer-0.1.9.tgz'
+  registry.npmjs.org/isarray/1.0.0:
+    resolution:
+      shasum: bb935d48582cba168c06834957a54a3e07124f11
+      tarball: 'https://registry.npmjs.org/isarray/-/isarray-1.0.0.tgz'
+  registry.npmjs.org/ms/0.7.2:
+    resolution:
+      shasum: ae25cf2512b3885a1d95d7f037868d8431124765
+      tarball: 'https://registry.npmjs.org/ms/-/ms-0.7.2.tgz'
+  registry.npmjs.org/msgpack-lite/0.1.26:
+    dependencies:
+      event-lite: registry.npmjs.org/event-lite/0.1.1
+      ieee754: registry.npmjs.org/ieee754/1.1.8
+      int64-buffer: registry.npmjs.org/int64-buffer/0.1.9
+      isarray: registry.npmjs.org/isarray/1.0.0
+    resolution:
+      shasum: dd3c50b26f059f25e7edee3644418358e2a9ad89
+      tarball: 'https://registry.npmjs.org/msgpack-lite/-/msgpack-lite-0.1.26.tgz'
+  registry.npmjs.org/process-nextick-args/1.0.7:
+    resolution:
+      shasum: 150e20b756590ad3f91093f25a4f2ad8bff30ba3
+      tarball: 'https://registry.npmjs.org/process-nextick-args/-/process-nextick-args-1.0.7.tgz'
+  registry.npmjs.org/randombytes/2.0.3:
+    resolution:
+      shasum: 674c99760901c3c4112771a31e521dc349cc09ec
+      tarball: 'https://registry.npmjs.org/randombytes/-/randombytes-2.0.3.tgz'
+  registry.npmjs.org/readable-stream/2.2.3:
+    dependencies:
+      buffer-shims: registry.npmjs.org/buffer-shims/1.0.0
+      core-util-is: registry.npmjs.org/core-util-is/1.0.2
+      inherits: registry.npmjs.org/inherits/2.0.3
+      isarray: registry.npmjs.org/isarray/1.0.0
+      process-nextick-args: registry.npmjs.org/process-nextick-args/1.0.7
+      string_decoder: registry.npmjs.org/string_decoder/0.10.31
+      util-deprecate: registry.npmjs.org/util-deprecate/1.0.2
+    resolution:
+      shasum: 9cf49463985df016c8ae8813097a9293a9b33729
+      tarball: 'https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.3.tgz'
+  registry.npmjs.org/simple-peer/6.4.4:
+    dependencies:
+      debug: registry.npmjs.org/debug/2.6.1
+      get-browser-rtc: registry.npmjs.org/get-browser-rtc/1.0.2
+      inherits: registry.npmjs.org/inherits/2.0.3
+      randombytes: registry.npmjs.org/randombytes/2.0.3
+      readable-stream: registry.npmjs.org/readable-stream/2.2.3
+    resolution:
+      shasum: 4e421f485ac7b13b08077a4476934d52c5ba3bb3
+      tarball: 'https://registry.npmjs.org/simple-peer/-/simple-peer-6.4.4.tgz'
+  registry.npmjs.org/string_decoder/0.10.31:
+    resolution:
+      shasum: 62e203bc41766c6c28c9fc84301dab1c5310fa94
+      tarball: 'https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz'
+  registry.npmjs.org/util-deprecate/1.0.2:
+    resolution:
+      shasum: 450d4dc9fa70de732762fbd2d4a28981419a0ccf
+      tarball: 'https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.2.tgz'
+version: 1

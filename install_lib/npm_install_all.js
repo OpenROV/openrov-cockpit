@@ -5,6 +5,8 @@ const exec = require('child_process').execSync;
 var currentdirectory = process.cwd();
 var packagesToInstall = [];
 var path = require('path');
+var nodeModulesFolder = path.join(process.cwd(),"node_modules");
+var fs = require('fs-extra');
 
 //Fix the issue that npm overwrites the env settings with its current settings after processing the oroginal env settings, but
 //it replaces false with "" so that down stream npm calls then treat "" as true :-(
@@ -19,7 +21,7 @@ console.dir(process.env);
 console.log("==NPM settings:==");
 var result = exec('npm config ls -l',{encoding:'utf8'});
 console.log(result);
-
+//fs.copySync(path.join(currentdirectory,'package.json'),'package.json.orignal');
 finder.on('file', function (file, stat) {
   if (file.indexOf('package.json') > -1) {
     console.log(file + ' |||| ' + process.cwd());
@@ -56,10 +58,18 @@ var installPackages = function (index, array) {
   rimraf(dir + '/node_modules', function () {
     console.log('======== installing =======');
     console.log(dir);
-    console.log(exec('npm install', { cwd: dir,encoding:'utf8' }));
-    index++;
-    if (index < array.length) {
-      installPackages(index, array);
+//    fs.copySync(path.join(dir,'package.json'),'package.json');
+    try{
+      console.log(exec('node /usr/local/bin/yarn install --production', {cwd: dir,encoding:'utf8' }));// --modules-folder ' + nodeModulesFolder, { cwd: dir,encoding:'utf8' }));
+      index++;
+      if (index < array.length) {
+        installPackages(index, array);
+      } else {
+      //  fs.copySync('package.json.orignal','package.json');
+      }
+    } catch (e){
+      console.dir(e);
+    //  fs.copySync('package.json.orignal','package.json');
     }
   });
 };

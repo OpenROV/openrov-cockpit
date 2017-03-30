@@ -1,0 +1,8 @@
+dependencies:
+  json-schema-defaults@^0.2.0: registry.npmjs.org/json-schema-defaults/0.2.0
+packages:
+  registry.npmjs.org/json-schema-defaults/0.2.0:
+    resolution:
+      shasum: 89ceb86ff0537dfbc1a6ddb52f2bd03efa85ff89
+      tarball: 'https://registry.npmjs.org/json-schema-defaults/-/json-schema-defaults-0.2.0.tgz'
+version: 1

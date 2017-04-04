@@ -111,7 +111,7 @@ thrusters2x1.prototype.getSettingSchema = function getSettingSchema() {
             'reversed': {
               'type': 'boolean',
               'format': 'checkbox',
-              'default': false
+              'default': true
             },
             'forward-modifier': {
               'description' : 'Used to adjust the power sent to the motor so that thrusters provide equal thrust',              

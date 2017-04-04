@@ -36,7 +36,7 @@ class Beacon extends EventEmitter{
         this.beaconInterval = setInterval(broadcastNew, this.beaconRate);
 
         function broadcastNew() {
-            
+            ifaces = os.networkInterfaces(); //In case interfaces change;
             //Updated to iterate over all ipv4 interfaces
             var message = new Buffer(JSON.stringify(messageFn()));
             Object.keys(ifaces).forEach(function(iface) {

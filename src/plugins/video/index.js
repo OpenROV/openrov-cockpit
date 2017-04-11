@@ -53,7 +53,16 @@ class Video
                     'id':           'show-stats',
                     'type':         'boolean',
                     'default':      false
+                },
+                'use-geoserve': 
+                {
+                    'title':        'Enabled the experimental raw H264 stream',
+                    'description':  'This only works for the beta clients.  The current web client needs to have this feature disabled.',
+                    'id':           'use-geoserve',
+                    'type':         'boolean',
+                    'default':      false
                 }
+                
             }
         }];
     }

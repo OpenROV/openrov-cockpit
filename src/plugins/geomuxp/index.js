@@ -22,6 +22,8 @@ var geomux = function geomux(name, deps) {
     var emitter = new events.EventEmitter();
     var global = deps.globalEventLoop;
     var cockpit = deps.cockpit;
+    this.flag_experimentH264 = false;
+    this._monitor = null;
     var videoServer = io.connect('http://localhost:' + defaults.port, {
         path: defaults.wspath,
         reconnection: true,
@@ -35,6 +37,15 @@ var geomux = function geomux(name, deps) {
         // Forward to geo-video-server
         videoServer.emit('geomux.command', camera, command, params);
     });
+
+    global.withHistory.on('settings-change.videosettings',function(settings){
+        if ((flag_experimentH264!==settings.videosettings['use-geoserve']) && (_monitor !== null)){
+            this.stop();
+            this.start();
+        }
+        flag_experimentH264=settings.videosettings['use-geoserve'];
+    });
+
     videoServer.on('video-deviceRegistration', function(update) {
         logger.debug('Got device update');
     });
@@ -59,6 +70,7 @@ var geomux = function geomux(name, deps) {
         UpdateCameraInfo(camera, channel);
         self.deps.cockpit.emit('plugin.geomuxp.' + camera + '_' + channel + '.settings', settings);
     });
+
     // Channel health
     videoServer.on('geomux.channel.health', function(camera, channel, health) {
         UpdateCameraInfo(camera, channel);
@@ -112,6 +124,14 @@ var geomux = function geomux(name, deps) {
         }
     }
 };
+
+geomux.prototype.start = function stop() 
+{
+    logger.info('Stopping geomux program');
+    _monitor.stop();
+    _monitor = null;
+}
+
 // This gets called when plugins are started
 geomux.prototype.start = function start() 
 {
@@ -153,6 +173,12 @@ geomux.prototype.start = function start()
         ])
     }
 
+  if (this.flag_experimentH264){
+   launch_options = launch_options.concat([
+       'geoserve'
+   ])
+  } else {
+ 
     // Create all launch options
    launch_options = launch_options.concat([
         'node',
@@ -166,6 +192,7 @@ geomux.prototype.start = function start()
         '--u',
         process.env.DEV_MODE === 'true' ? ':8099' : ''
    ]);
+  }
     const infinite = -1;
     // Set up monitor with specified options
     var monitor = respawn(launch_options, {
@@ -189,6 +216,7 @@ geomux.prototype.start = function start()
     });
     // Start the monitor
     monitor.start();
+    this._monitor = monitor;
 };
 //Export provides the public interface
 module.exports = function(name, deps) {

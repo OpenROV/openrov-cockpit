@@ -39,11 +39,11 @@ var geomux = function geomux(name, deps) {
     });
 
     global.withHistory.on('settings-change.videosettings',function(settings){
-        if ((this.flag_experimentH264!==settings.videosettings['use-geoserve']) && (this._monitor !== null)){
-            this.stop();
-            this.start();
+        if ((self.flag_experimentH264!==settings.videosettings['use-geoserve']) && (self._monitor !== null)){
+            self.stop();
+            self.start();
         }
-        this.flag_experimentH264=settings.videosettings['use-geoserve'];
+        self.flag_experimentH264=settings.videosettings['use-geoserve'];
     });
 
     videoServer.on('video-deviceRegistration', function(update) {

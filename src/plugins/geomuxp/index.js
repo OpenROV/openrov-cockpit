@@ -39,7 +39,7 @@ var geomux = function geomux(name, deps) {
     });
 
     global.withHistory.on('settings-change.videosettings',function(settings){
-        if ((this.flag_experimentH264!==settings.videosettings['use-geoserve']) && (_monitor !== null)){
+        if ((this.flag_experimentH264!==settings.videosettings['use-geoserve']) && (this._monitor !== null)){
             this.stop();
             this.start();
         }
@@ -125,11 +125,11 @@ var geomux = function geomux(name, deps) {
     }
 };
 
-geomux.prototype.start = function stop() 
+geomux.prototype.stop = function stop() 
 {
     logger.info('Stopping geomux program');
-    _monitor.stop();
-    _monitor = null;
+    this._monitor.stop();
+    this._monitor = null;
 }
 
 // This gets called when plugins are started

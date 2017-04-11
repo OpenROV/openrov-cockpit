@@ -41,10 +41,12 @@ var geomux = function geomux(name, deps) {
     global.withHistory.on('settings-change.videosettings',function(settings){
         if ((self.flag_experimentH264!==settings.videosettings['use-geoserve']) && (self._monitor !== null)){
             self.stop(function(){
+                self.flag_experimentH264=settings.videosettings['use-geoserve'];
                 self.start();
             });
+        } else {
+            self.flag_experimentH264=settings.videosettings['use-geoserve'];
         }
-        self.flag_experimentH264=settings.videosettings['use-geoserve'];
     });
 
     videoServer.on('video-deviceRegistration', function(update) {

@@ -4,11 +4,33 @@ function thrusters2x1(name, deps) {
   this.cockpit = deps.cockpit;
   this.global = deps.globalEventLoop;
   this.deps = deps;
+  this.settings;
 }
 thrusters2x1.prototype.start = function start() {
   var self = this;
-  self.global.withHistory.on('settings-change.thrusters2x1', function (data) {
-    var settings = data.thrusters2x1;
+
+  //While we work on the best pattern this is a work around to make sure the MCU
+  //gets the motor settings.  Every 30 seconds they get recent, or immediatly after
+  //settings have changed.  This decouples the timing issues around the MCU not coming
+  //up at the same time the Node module.
+  this.settingtimer = setInterval(function(){self.SendMotorSettings()},30000)
+
+  self.cockpit.on('callibrate_escs', function () {
+    self.deps.globalEventLoop.emit('mcu.SendCommand', 'mcal()');
+    self.deps.logger.debug('mcal() sent');
+  });
+  self.cockpit.on('plugin.thrusters2x1.motorTest', function (positions) {
+    self.deps.globalEventLoop.emit('mcu.SendMotorTest', positions.port, positions.starboard, positions.vertical);
+  });
+  self.global.withHistory.on('settings-change.thrusters2x1', function (data) {  
+    self.settings = data.thrusters2x1;
+    self.SendMotorSettings();
+  });
+};
+
+thrusters2x1.prototype.SendMotorSettings = function SendMotorSettings() {
+    if (!this.settings){return;}
+    var settings = this.settings;
     var port = settings.port['forward-modifier'];
     var vertical = settings.vertical['forward-modifier'];
     var starbord = settings.starboard['forward-modifier'];
@@ -30,22 +52,11 @@ thrusters2x1.prototype.start = function start() {
     //todo: Move to motor-diag plugin
     //API to Arduino to pass a percent in 2 decimal accuracy requires multipling by 100 before sending.
     command = 'mtrmod1(' + port * 100 + ',' + vertical * 100 + ',' + starbord * 100 + ')';
-    self.deps.globalEventLoop.emit('mcu.SendCommand', command);
+    this.global.emit('mcu.SendCommand', command);
     command = 'mtrmod2(' + nport * 100 + ',' + nvertical * 100 + ',' + nstarbord * 100 + ')';
-    self.deps.globalEventLoop.emit('mcu.SendCommand', command);
-  });
-  self.deps.globalEventLoop.on('mcu.status', function (status) {
-    if ('mtrmod' in status) {
-    }
-  });
-  self.cockpit.on('callibrate_escs', function () {
-    self.deps.globalEventLoop.emit('mcu.SendCommand', 'mcal()');
-    self.deps.logger.debug('mcal() sent');
-  });
-  self.cockpit.on('plugin.thrusters2x1.motorTest', function (positions) {
-    self.deps.globalEventLoop.emit('mcu.SendMotorTest', positions.port, positions.starboard, positions.vertical);
-  });
-};
+    this.global.emit('mcu.SendCommand', command);
+  }
+
 thrusters2x1.prototype.getSettingSchema = function getSettingSchema() {
   return [{
       'title': 'Thrusters',

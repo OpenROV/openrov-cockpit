@@ -39,9 +39,6 @@
     });
     deps.cockpit.on('plugin.rovpilot.rates.setThrottle', function (value) {
       self.positions.throttle = value;
-      if (value === 0) {
-        self.positions.throttle = self.ttrim;
-      }
     });
     deps.cockpit.on('plugin.rovpilot.rates.setYaw', function (value) {
       self.positions.yaw = value;

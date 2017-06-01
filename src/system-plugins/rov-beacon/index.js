@@ -62,6 +62,9 @@ class RovBeacon{
                 break;
                 case 'vout' :
                   this.state.battery = status['vout'];
+                break;
+                case 'batt_v': //Ma
+                 this.state.battery = status['batt_v'] / 1000.0;
                 break;                
             }
         }

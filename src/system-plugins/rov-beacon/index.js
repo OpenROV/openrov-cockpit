@@ -1,12 +1,14 @@
 'use strict';
 const beaconRate = 5000;
 const ignorePressureChangeThreshold = 100000;
+const RESIN_APP_RELEASE = process.env.RESIN_APP_RELEASE;
 class RovBeacon{
     constructor(name,deps){
      this.state={
          name: require('os').hostname(),
          //model:'trident',  //TODO: Add model detection
-         battery:.7
+         battery:.7,
+         imageVersion:RESIN_APP_RELEASE
      };
      this.beacon = null;
      this.bus = deps.globalEventLoop;

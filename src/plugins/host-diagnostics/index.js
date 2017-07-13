@@ -96,6 +96,11 @@ class HostDiagnostics{
 
       res.json(this.getPressureTestState());
     });    
+
+    express.post('/blink', (req, res)=> {
+      this.bus.emit('mcu.SendCommand', "wake()");
+      res.json("OK");
+    });        
   }
 
   _handleBaro(status){

@@ -2,7 +2,15 @@ Host Diagnostics is a plugin that exposes information about the computer that th
 
 Host Diagnostics provides some REST API end points for quick checks
 
-Details of internal pressure (only works if a barometer is present):
+### Blink the lights on the ROV
+This is useful if you have more than one ROV connected to the same network
+
+>curl -X POST http://localhost:8080/blink
+```
+"OK"
+```
+
+### Details of internal pressure (only works if a barometer is present):
 
 >curl http://localhost:8080/pressure_test
 ```

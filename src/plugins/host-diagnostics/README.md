@@ -10,6 +10,14 @@ This is useful if you have more than one ROV connected to the same network
 "OK"
 ```
 
+### Reset Pressure test data
+The system always tracks this data, but if you want an explicit test, this resets all of the data
+
+>curl -X POST http://localhost:8080/pressure_test/reset
+```
+"OK"
+```
+
 ### Details of internal pressure (only works if a barometer is present):
 
 >curl http://localhost:8080/pressure_test

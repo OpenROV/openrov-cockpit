@@ -98,7 +98,13 @@ class HostDiagnostics{
     });    
 
     express.post('/pressure_test/reset', (req, res)=> {
-      baroReadings = []
+      if (baroReadings.length>0){
+        var lastReading = baroReadings[baroReadings.length-1];
+        baroReadings.length = 0;
+        baroReadings.push(lastReading);
+      } else {
+        baroReadings.length = 0; 
+      }
       res.json("OK");
     });    
 

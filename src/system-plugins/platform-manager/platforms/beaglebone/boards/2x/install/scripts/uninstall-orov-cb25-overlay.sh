@@ -1,1 +1,0 @@
-python /opt/openrov/system/scripts/build_tags/build_tags.py -f /boot/uEnv.txt -t "#OPENROV" remove

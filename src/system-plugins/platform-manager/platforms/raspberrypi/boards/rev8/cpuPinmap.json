@@ -1,3 +1,0 @@
-{
-	"SAMD_RESET": 		{ "gpio": 18, "dir": "out", "initialValue": 1 }
-}
